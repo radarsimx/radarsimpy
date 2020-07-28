@@ -83,6 +83,25 @@ cdef extern from "target.hpp":
                bool is_ground) except +
         Target(T* mesh,
                int mesh_size) except +
+        Target(T* mesh,
+               int mesh_size,
+               Vec3[T] origin,
+               Vec3[T] location,
+               Vec3[T] speed,
+               Vec3[T] rotation,
+               Vec3[T] rotation_rate,
+               bool is_ground) except +
+
+cdef extern from "ray.hpp":
+    cdef cppclass Ray[T, Tg=*]:
+        Ray() except +
+        Vec3[T] dir_
+        Vec3[T] loc_
+
+cdef extern from "raypool.hpp":
+    cdef cppclass RayPool[T, Tg=*]:
+        RayPool() except +
+        vector[Ray[T]] pool_
 
 """
 rcs
@@ -98,6 +117,21 @@ cdef extern from "rcs.hpp":
             const T& density) except +
 
         T CalculateRcs()
+
+"""
+pointcloud
+"""
+cdef extern from "pointcloud.hpp":
+    cdef cppclass PointCloud[T]:
+        PointCloud() except +
+        void AddTarget(const Target[T]& target)
+        void Sbr(const vector[T]& phi,
+                 const vector[T]& theta,
+                 const Vec3[T]& position)
+        
+        RayPool[T] ray_pool_
+        
+
 
 """
 scene interface
