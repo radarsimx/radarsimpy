@@ -129,7 +129,7 @@ cdef extern from "pointcloud.hpp":
                  const vector[T]& theta,
                  const Vec3[T]& position)
         
-        RayPool[T] ray_pool_
+        vector[Ray[T]] cloud_
         
 
 
