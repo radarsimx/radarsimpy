@@ -194,7 +194,7 @@ cdef extern from "receiver.hpp":
             T resistor,
             T baseband_gain,
             int samples) except +
-        void AddChannel(const RxChannel<T>& channel) 
+        void AddChannel(const RxChannel[T]& channel) 
 
 
 """
