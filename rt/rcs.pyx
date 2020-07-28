@@ -71,7 +71,7 @@ cpdef rcs_sbr(model, phi, theta, f, pol=[0, 0, 1], density=10):
     # cdef float_t rcs
 
     cdef Rcs[float_t] rcs
-    rcs = Rcs[float_T](&vectors[0, 0, 0],
+    rcs = Rcs[float_t](&vectors[0, 0, 0],
         <int_t> vectors.shape[0],
         <float_t> phi/180*np.pi,
         <float_t> theta/180*np.pi,
