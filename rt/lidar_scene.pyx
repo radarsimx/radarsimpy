@@ -126,12 +126,12 @@ cpdef lidar_scene(lidar, targets, t=0):
 
     rays = np.zeros(pointcloud.ray_pool_.pool_.size(), dtype=ray_type)
 
-    # for idx in range(0, pointcloud.ray_pool_.pool_.size()):
-    #     rays[idx]['positions'][0] = pointcloud.ray_pool_.pool_[idx].loc_[0]
-    #     rays[idx]['positions'][1] = pointcloud.ray_pool_.pool_[idx].loc_[1]
-    #     rays[idx]['positions'][2] = pointcloud.ray_pool_.pool_[idx].loc_[2]
-    #     rays[idx]['directions'][0] = pointcloud.ray_pool_.pool_[idx].dir_[0]
-    #     rays[idx]['directions'][1] = pointcloud.ray_pool_.pool_[idx].dir_[1]
-    #     rays[idx]['directions'][2] = pointcloud.ray_pool_.pool_[idx].dir_[2]
+    for idx in range(0, pointcloud.ray_pool_.pool_.size()):
+        rays[idx]['positions'][0] = pointcloud.ray_pool_.pool_[idx].loc_[0]
+        rays[idx]['positions'][1] = pointcloud.ray_pool_.pool_[idx].loc_[1]
+        rays[idx]['positions'][2] = pointcloud.ray_pool_.pool_[idx].loc_[2]
+        rays[idx]['directions'][0] = pointcloud.ray_pool_.pool_[idx].dir_[0]
+        rays[idx]['directions'][1] = pointcloud.ray_pool_.pool_[idx].dir_[1]
+        rays[idx]['directions'][2] = pointcloud.ray_pool_.pool_[idx].dir_[2]
     
     return rays
