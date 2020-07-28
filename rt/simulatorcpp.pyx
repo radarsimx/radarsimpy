@@ -49,6 +49,7 @@ from libc.math cimport sin, cos, sqrt, atan, atan2, acos, pow, fmax, M_PI
 from libcpp cimport bool
 
 from radarsimpy.includes.radarsimc cimport Radarsimc, RayPy, Snapshot
+from radarsimpy.includes.radarsimc cimport Point, TxChannel, Transmitter, RxChannel, Receiver, Simulator
 from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t, vector
 from radarsimpy.includes.zpvector cimport Vec3, Vec2
 from libcpp cimport complex
@@ -61,8 +62,13 @@ cimport numpy as np
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cpdef run_simulator(radar, targets, noise=True):
-    cdef Radarsimc[float_t] *rec_ptr
-    rec_ptr = new Radarsimc[float_t]()
+    # cdef Radarsimc[float_t] *rec_ptr
+    # rec_ptr = new Radarsimc[float_t]()
+    cdef Simulator[float_t] sim
+
+    cdef vector[Point[float_t]] points_
+    cdef Transmitter[float_t] tx
+    cdef Receiver[float_t] rx
 
     """
     Targets
@@ -130,16 +136,29 @@ cpdef run_simulator(radar, targets, noise=True):
             c_rcs.push_back(<float_t> rcs)
             c_phs.push_back(<float_t> (phase/180*np.pi))
 
-        rec_ptr[0].AddRadarTarget(
-            c_loc,
-            Vec3[float_t](
-                <float_t> speed[0],
-                <float_t> speed[1],
-                <float_t> speed[2]
-            ),
-            c_rcs,
-            c_phs
+        points_.push_back(
+            Point[float_t](
+                c_loc,
+                Vec3[float_t](
+                    <float_t> speed[0],
+                    <float_t> speed[1],
+                    <float_t> speed[2]
+                ),
+                c_rcs,
+                c_phs
+            )
         )
+
+        # rec_ptr[0].AddRadarTarget(
+        #     c_loc,
+        #     Vec3[float_t](
+        #         <float_t> speed[0],
+        #         <float_t> speed[1],
+        #         <float_t> speed[2]
+        #     ),
+        #     c_rcs,
+        #     c_phs
+        # )
 
     """
     Transmitter
@@ -160,14 +179,24 @@ cpdef run_simulator(radar, targets, noise=True):
     for ct_idx in range(0, len(radar.transmitter.chirp_start_time)):
         chirp_start_time.push_back(<float_t> radar.transmitter.chirp_start_time[ct_idx])
 
-    rec_ptr[0].SetRadarTransmitter(
+    tx = Transmitter[float_t](
         fc_vector,
         <float_t> radar.transmitter.slope,
         <float_t> radar.transmitter.tx_power,
         chirp_start_time,
         frame_time,
         <int> radar.frames,
-        <int> radar.transmitter.pulses)
+        <int> radar.transmitter.pulses,
+        <float_t> 0
+    )
+    # rec_ptr[0].SetRadarTransmitter(
+    #     fc_vector,
+    #     <float_t> radar.transmitter.slope,
+    #     <float_t> radar.transmitter.tx_power,
+    #     chirp_start_time,
+    #     frame_time,
+    #     <int> radar.frames,
+    #     <int> radar.transmitter.pulses)
 
     cdef int ptn_length
     cdef vector[float_t] az_ang
@@ -203,36 +232,68 @@ cpdef run_simulator(radar, targets, noise=True):
             mod_amp.push_back(<float_t> (np.abs(radar.transmitter.phase_code[tx_idx][code_idx])))
             mod_phs.push_back(<float_t> (np.angle(radar.transmitter.phase_code[tx_idx][code_idx])))
         
-        rec_ptr[0].AddRadarTxChannel(
-            Vec3[float_t](
-                <float_t> radar.transmitter.locations[tx_idx, 0],
-                <float_t> radar.transmitter.locations[tx_idx, 1],
-                <float_t> radar.transmitter.locations[tx_idx, 2]
-            ),
-            Vec3[float_t](
-                <float_t> radar.transmitter.polarization[tx_idx, 0],
-                <float_t> radar.transmitter.polarization[tx_idx, 1],
-                <float_t> radar.transmitter.polarization[tx_idx, 2]
-            ),
-            mod_amp,
-            mod_phs,
-            <float_t> radar.transmitter.chip_length[tx_idx],
-            az_ang,
-            az,
-            el_ang,
-            el,
-            <float_t> radar.transmitter.antenna_gains[tx_idx],
-            <float_t> radar.transmitter.delay[tx_idx])
+        tx.AddChannel(
+            TxChannel[float_t](
+                Vec3[float_t](
+                    <float_t> radar.transmitter.locations[tx_idx, 0],
+                    <float_t> radar.transmitter.locations[tx_idx, 1],
+                    <float_t> radar.transmitter.locations[tx_idx, 2]
+                ),
+                Vec3[float_t](
+                    <float_t> radar.transmitter.polarization[tx_idx, 0],
+                    <float_t> radar.transmitter.polarization[tx_idx, 1],
+                    <float_t> radar.transmitter.polarization[tx_idx, 2]
+                ),
+                mod_amp,
+                mod_phs,
+                <float_t> radar.transmitter.chip_length[tx_idx],
+                az_ang,
+                az,
+                el_ang,
+                el,
+                <float_t> radar.transmitter.antenna_gains[tx_idx],
+                <float_t> radar.transmitter.delay[tx_idx],
+                <float_t> 0
+            )
+        )
+        # rec_ptr[0].AddRadarTxChannel(
+        #     Vec3[float_t](
+        #         <float_t> radar.transmitter.locations[tx_idx, 0],
+        #         <float_t> radar.transmitter.locations[tx_idx, 1],
+        #         <float_t> radar.transmitter.locations[tx_idx, 2]
+        #     ),
+        #     Vec3[float_t](
+        #         <float_t> radar.transmitter.polarization[tx_idx, 0],
+        #         <float_t> radar.transmitter.polarization[tx_idx, 1],
+        #         <float_t> radar.transmitter.polarization[tx_idx, 2]
+        #     ),
+        #     mod_amp,
+        #     mod_phs,
+        #     <float_t> radar.transmitter.chip_length[tx_idx],
+        #     az_ang,
+        #     az,
+        #     el_ang,
+        #     el,
+        #     <float_t> radar.transmitter.antenna_gains[tx_idx],
+        #     <float_t> radar.transmitter.delay[tx_idx])
 
     """
     Receiver
-    """ 
-    rec_ptr[0].SetRadarReceiver(
+    """
+    rx = Receiver[float_t](
         <float_t> radar.receiver.fs,
         <float_t> radar.receiver.rf_gain,
         <float_t> radar.receiver.load_resistor,
         <float_t> radar.receiver.baseband_gain,
-        <int> radar.samples_per_pulse)
+        <int> radar.samples_per_pulse
+    )
+    # rec_ptr[0].SetRadarReceiver(
+    #     <float_t> radar.receiver.fs,
+    #     <float_t> radar.receiver.rf_gain,
+    #     <float_t> radar.receiver.load_resistor,
+    #     <float_t> radar.receiver.baseband_gain,
+    #     <int> radar.samples_per_pulse)
+    
 
     for rx_idx in range(0, radar.receiver.channel_size):
         az_ang.clear()
@@ -252,25 +313,40 @@ cpdef run_simulator(radar, targets, noise=True):
             el_ang.push_back(<float_t>el_angles[ang_idx])
             el.push_back(<float_t>el_pattern[ang_idx])
 
-        rec_ptr[0].AddRadarRxChannel(
-            Vec3[float_t](
-                <float_t> radar.receiver.locations[rx_idx, 0],
-                <float_t> radar.receiver.locations[rx_idx, 1],
-                <float_t> radar.receiver.locations[rx_idx, 2]
-            ),
-            Vec3[float_t](0,0,1),
-            az_ang,
-            az,
-            el_ang,
-            el,
-            <float_t> radar.receiver.antenna_gains[rx_idx])
+        rx.AddChannel(
+            RxChannel[float_t](
+                Vec3[float_t](
+                    <float_t> radar.receiver.locations[rx_idx, 0],
+                    <float_t> radar.receiver.locations[rx_idx, 1],
+                    <float_t> radar.receiver.locations[rx_idx, 2]
+                ),
+                Vec3[float_t](0,0,1),
+                az_ang,
+                az,
+                el_ang,
+                el,
+                <float_t> radar.receiver.antenna_gains[rx_idx]
+            )
+        )
+        # rec_ptr[0].AddRadarRxChannel(
+        #     Vec3[float_t](
+        #         <float_t> radar.receiver.locations[rx_idx, 0],
+        #         <float_t> radar.receiver.locations[rx_idx, 1],
+        #         <float_t> radar.receiver.locations[rx_idx, 2]
+        #     ),
+        #     Vec3[float_t](0,0,1),
+        #     az_ang,
+        #     az,
+        #     el_ang,
+        #     el,
+        #     <float_t> radar.receiver.antenna_gains[rx_idx])
 
     cdef float_t[:,:,:] baseband_re = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=np.float32)
     cdef float_t[:,:,:] baseband_im = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=np.float32)
 
-    rec_ptr[0].RadarSimulator(&baseband_re[0,0,0], &baseband_im[0,0,0])
+    # rec_ptr[0].RadarSimulator(&baseband_re[0,0,0], &baseband_im[0,0,0])
 
-    del rec_ptr
+    # del rec_ptr
 
     if noise:
         baseband = np.array(baseband_re)+1j*np.array(baseband_im)+\
