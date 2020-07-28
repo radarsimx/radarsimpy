@@ -203,6 +203,11 @@ simulator
 cdef extern from "simulator.hpp":
     cdef cppclass Simulator[T]:
         Simulator() except +
+        void Run(Transmitter[T] tx,
+             Receiver[T] rx,
+             vector[Point[T]] points,
+             T* baseband_re,
+             T* baseband_im)
         
 
 """

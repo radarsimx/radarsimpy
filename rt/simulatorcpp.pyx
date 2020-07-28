@@ -344,6 +344,8 @@ cpdef run_simulator(radar, targets, noise=True):
     cdef float_t[:,:,:] baseband_re = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=np.float32)
     cdef float_t[:,:,:] baseband_im = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=np.float32)
 
+    sim.Run(tx, rx, points_, &baseband_re[0,0,0], &baseband_im[0,0,0])
+
     # rec_ptr[0].RadarSimulator(&baseband_re[0,0,0], &baseband_im[0,0,0])
 
     # del rec_ptr
