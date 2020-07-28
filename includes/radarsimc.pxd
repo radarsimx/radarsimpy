@@ -68,21 +68,6 @@ cdef extern from "snapshot.hpp":
         vector[RayPy[T]] ray_received
 
 """
-rcs
-"""
-cdef extern from "rcs.hpp":
-    cdef cppclass Rcs[T]:
-        Rcs() except +
-        Rcs(const Target[T]& mesh,
-            const T& phi,
-            const T& theta,
-            const Vec3[T]& polarization,
-            const T& frequency,
-            const T& density) except +
-
-        T CalculateRcs()
-
-"""
 target interface
 """
 cdef extern from "target.hpp":
@@ -96,7 +81,23 @@ cdef extern from "target.hpp":
                vector[Vec3[T]] rotation_array,
                vector[Vec3[T]] rotation_rate_array,
                bool is_ground) except +
+        Target(T* mesh,
+               int mesh_size) except +
 
+"""
+rcs
+"""
+cdef extern from "rcs.hpp":
+    cdef cppclass Rcs[T]:
+        Rcs() except +
+        Rcs(const Target[T]& mesh,
+            const T& phi,
+            const T& theta,
+            const Vec3[T]& polarization,
+            const T& frequency,
+            const T& density) except +
+
+        T CalculateRcs()
 
 """
 scene interface

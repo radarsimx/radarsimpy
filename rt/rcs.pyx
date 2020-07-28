@@ -71,13 +71,13 @@ cpdef rcs_sbr(model, phi, theta, f, pol=[0, 0, 1], density=10):
     # cdef float_t rcs
 
     cdef Rcs[float_t] rcs
-    rcs = Rcs[float_t](&vectors[0, 0, 0],
-        <int_t> vectors.shape[0],
-        <float_t> phi/180*np.pi,
-        <float_t> theta/180*np.pi,
-        Vec3[float_t](<float_t> pol[0], <float_t> pol[1], <float_t> pol[2]),
-        <float_t> f,
-        <float_t> density)
+
+    rcs = Rcs[float_t](Target[float_t](&vectors[0, 0, 0], <int_t> vectors.shape[0]),
+                      <float_t> phi/180*np.pi,
+                      <float_t> theta/180*np.pi,
+                      Vec3[float_t](<float_t> pol[0], <float_t> pol[1], <float_t> pol[2]),
+                      <float_t> f,
+                      <float_t> density)
 
     
     # rcs = rec_ptr[0].TargetRcs(
