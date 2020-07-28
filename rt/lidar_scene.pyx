@@ -48,7 +48,6 @@ cimport cython
 from libc.math cimport sin, cos, sqrt, atan, atan2, acos, pow, fmax, M_PI
 from libcpp cimport bool
 
-from radarsimpy.includes.radarsimc cimport Radarsimc, RayPy
 from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t, vector
 from radarsimpy.includes.zpvector cimport Vec3
 from radarsimpy.includes.radarsimc cimport Target, PointCloud
@@ -108,19 +107,12 @@ cpdef lidar_scene(lidar, targets, t=0):
 
     for idx in range(0, theta.shape[0]):
         theta_vector.push_back(theta[idx])
-
-    # cdef vector[RayPy[float_t]] ray_received
     
     pointcloud.Sbr(
         phi_vector,
         theta_vector,
         Vec3[float_t](<float_t> lidar['position'][0], <float_t> lidar['position'][1], <float_t> lidar['position'][2])
     )
-    # rec_ptr[0].LidarScene(
-    #     Vec3[float_t](<float_t> lidar['position'][0], <float_t> lidar['position'][1], <float_t> lidar['position'][2]),
-    #     phi_vector,
-    #     theta_vector,
-    #     ray_received)
 
     ray_type = np.dtype([('positions', np.float32, (3,)), ('directions', np.float32, (3,))])
 
