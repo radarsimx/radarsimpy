@@ -51,7 +51,7 @@ import numpy as np
 cimport numpy as np
 from stl import mesh
 
-from radarsimpy.includes.radarsimc cimport Rcs
+from radarsimpy.includes.radarsimc cimport Target, Rcs
 from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t
 from radarsimpy.includes.zpvector cimport Vec3
 
