@@ -124,7 +124,7 @@ cpdef lidar_scene(lidar, targets, t=0):
 
     ray_type = np.dtype([('positions', np.float32, (3,)), ('directions', np.float32, (3,))])
 
-    # rays = np.zeros(pointcloud.ray_pool_.pool_.size(), dtype=ray_type)
+    rays = np.zeros(pointcloud.ray_pool_.pool_.size(), dtype=ray_type)
 
     # for idx in range(0, pointcloud.ray_pool_.pool_.size()):
     #     rays[idx]['positions'][0] = pointcloud.ray_pool_.pool_[idx].loc_[0]
