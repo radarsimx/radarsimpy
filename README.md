@@ -6,23 +6,25 @@
 
 A **Radar** **Sim**ulator for **Py**thon
 
+**This module needs to be built/used together with RadarSimC (the C++ engine for radar simulator)**
+
 There are 7 modules in this package:
 
 1. `Radar`: Defines radar parameters
-
-1. `simulator`: Simulates and generates raw time domain baseband data
-
-1. `simulatorcpp`: C++ enginer of radar simulator for simulating and generating raw time domain baseband data
 
 1. `processing`: Basic radar signal processing
 
 1. `tools`: Receiver operating characteristic analysis
 
-1. `lidar_scene`: Simulates LiDAR's point cloud based on a 3D environment model with ray tracing
+1. `simulator`: Simulates and generates raw time domain baseband data (**in RadarSimC**)
 
-1. `rcs`: Simulates target's radar cross section (RCS) based on the 3D model with ray tracing
+1. `simulatorcpp`: C++ enginer of radar simulator for simulating and generating raw time domain baseband data (**in RadarSimC**)
 
-1. `scene`: Simulates radar's response signal in a 3D enviroment model with ray tracing
+1. `lidar_scene`: Simulates LiDAR's point cloud based on a 3D environment model with ray tracing (**in RadarSimC**)
+
+1. `rcs`: Simulates target's radar cross section (RCS) based on the 3D model with ray tracing (**in RadarSimC**)
+
+1. `scene`: Simulates radar's response signal in a 3D enviroment model with ray tracing (**in RadarSimC**)
 
 ## Dependence
 
