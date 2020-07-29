@@ -1,4 +1,4 @@
-[![Build Status](https://dev.azure.com/rookiepeng/radarsimc/_apis/build/status/rookiepeng.radarsimc?branchName=master)](https://dev.azure.com/rookiepeng/radarsimc/_build/latest?definitionId=3&branchName=master)
+![unit test](https://github.com/rookiepeng/radarsimc/workflows/unit%20test/badge.svg)
 
 # RadarSimPy
                                                             
