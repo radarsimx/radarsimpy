@@ -221,10 +221,10 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
         aperture = radar.aperture_mesh.astype(np.float32)
 
         radar_scene.SetAperture(
-                Aperture[float_t](
-                    &aperture[0,0,0],
-                   <int_t> aperture.shape[0]
-                )
+            Aperture[float_t](
+                &aperture[0,0,0],
+                <int_t> aperture.shape[0]
+            )
         )
 
     else:
