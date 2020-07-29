@@ -48,7 +48,6 @@ cimport cython
 from libc.math cimport sin, cos, sqrt, atan, atan2, acos, pow, fmax, M_PI
 from libcpp cimport bool
 
-from radarsimpy.includes.radarsimc cimport Radarsimc, RayPy, Snapshot
 from radarsimpy.includes.radarsimc cimport Point, TxChannel, Transmitter, RxChannel, Receiver, Simulator
 from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t, vector
 from radarsimpy.includes.zpvector cimport Vec3, Vec2
@@ -149,17 +148,6 @@ cpdef run_simulator(radar, targets, noise=True):
             )
         )
 
-        # rec_ptr[0].AddRadarTarget(
-        #     c_loc,
-        #     Vec3[float_t](
-        #         <float_t> speed[0],
-        #         <float_t> speed[1],
-        #         <float_t> speed[2]
-        #     ),
-        #     c_rcs,
-        #     c_phs
-        # )
-
     """
     Transmitter
     """
@@ -189,14 +177,6 @@ cpdef run_simulator(radar, targets, noise=True):
         <int> radar.transmitter.pulses,
         <float_t> 0
     )
-    # rec_ptr[0].SetRadarTransmitter(
-    #     fc_vector,
-    #     <float_t> radar.transmitter.slope,
-    #     <float_t> radar.transmitter.tx_power,
-    #     chirp_start_time,
-    #     frame_time,
-    #     <int> radar.frames,
-    #     <int> radar.transmitter.pulses)
 
     cdef int ptn_length
     cdef vector[float_t] az_ang
@@ -256,26 +236,6 @@ cpdef run_simulator(radar, targets, noise=True):
                 <float_t> 0
             )
         )
-        # rec_ptr[0].AddRadarTxChannel(
-        #     Vec3[float_t](
-        #         <float_t> radar.transmitter.locations[tx_idx, 0],
-        #         <float_t> radar.transmitter.locations[tx_idx, 1],
-        #         <float_t> radar.transmitter.locations[tx_idx, 2]
-        #     ),
-        #     Vec3[float_t](
-        #         <float_t> radar.transmitter.polarization[tx_idx, 0],
-        #         <float_t> radar.transmitter.polarization[tx_idx, 1],
-        #         <float_t> radar.transmitter.polarization[tx_idx, 2]
-        #     ),
-        #     mod_amp,
-        #     mod_phs,
-        #     <float_t> radar.transmitter.chip_length[tx_idx],
-        #     az_ang,
-        #     az,
-        #     el_ang,
-        #     el,
-        #     <float_t> radar.transmitter.antenna_gains[tx_idx],
-        #     <float_t> radar.transmitter.delay[tx_idx])
 
     """
     Receiver
@@ -287,14 +247,7 @@ cpdef run_simulator(radar, targets, noise=True):
         <float_t> radar.receiver.baseband_gain,
         <int> radar.samples_per_pulse
     )
-    # rec_ptr[0].SetRadarReceiver(
-    #     <float_t> radar.receiver.fs,
-    #     <float_t> radar.receiver.rf_gain,
-    #     <float_t> radar.receiver.load_resistor,
-    #     <float_t> radar.receiver.baseband_gain,
-    #     <int> radar.samples_per_pulse)
     
-
     for rx_idx in range(0, radar.receiver.channel_size):
         az_ang.clear()
         az.clear()
@@ -328,27 +281,11 @@ cpdef run_simulator(radar, targets, noise=True):
                 <float_t> radar.receiver.antenna_gains[rx_idx]
             )
         )
-        # rec_ptr[0].AddRadarRxChannel(
-        #     Vec3[float_t](
-        #         <float_t> radar.receiver.locations[rx_idx, 0],
-        #         <float_t> radar.receiver.locations[rx_idx, 1],
-        #         <float_t> radar.receiver.locations[rx_idx, 2]
-        #     ),
-        #     Vec3[float_t](0,0,1),
-        #     az_ang,
-        #     az,
-        #     el_ang,
-        #     el,
-        #     <float_t> radar.receiver.antenna_gains[rx_idx])
 
     cdef float_t[:,:,:] baseband_re = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=np.float32)
     cdef float_t[:,:,:] baseband_im = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=np.float32)
 
     sim.Run(tx, rx, points_, &baseband_re[0,0,0], &baseband_im[0,0,0])
-
-    # rec_ptr[0].RadarSimulator(&baseband_re[0,0,0], &baseband_im[0,0,0])
-
-    # del rec_ptr
 
     if noise:
         baseband = np.array(baseband_re)+1j*np.array(baseband_im)+\

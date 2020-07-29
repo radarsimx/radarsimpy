@@ -35,37 +35,7 @@ from radarsimpy.includes.zpvector cimport Vec3, Vec2
 from libcpp cimport bool
 from libcpp cimport complex
 
-"""
-radarsimc classes
-"""
-cdef extern from "radarsimc_global.hpp":
-    # PathPy
-    #  Ray's path
-    cdef cppclass PathPy[T]:
-        Vec3[T] dir_
-        Vec3[T] loc_
 
-    # RayPy
-    #  Ray's properties
-    cdef cppclass RayPy[T]:
-        Vec3[T] dir_
-        Vec3[T] loc_
-        Vec3[T] pol_
-        T range_
-        T range_rate
-        T area
-        int refCount
-        vector[PathPy[T]] path
-    
-cdef extern from "snapshot.hpp":
-    # Snapshot
-    #  Scene's snapshot
-    cdef cppclass Snapshot[T]:
-        T time_
-        int sample_idx_
-        int pulse_idx_
-        int ch_idx_
-        vector[RayPy[T]] ray_received
 
 """
 target interface
@@ -93,10 +63,20 @@ cdef extern from "target.hpp":
                bool is_ground) except +
 
 cdef extern from "ray.hpp":
+    cdef cppclass PathNode[T]:
+        Vec3[T] dir_
+        Vec3[T] loc_
+
     cdef cppclass Ray[T, Tg=*]:
         Ray() except +
         Vec3[T] dir_
         Vec3[T] loc_
+        Vec3[T] pol_
+        T range_
+        T range_rate_
+        T area_
+        int ref_count_
+        vector[PathNode[T]] path_
 
 cdef extern from "raypool.hpp":
     cdef cppclass RayPool[T, Tg=*]:
@@ -196,6 +176,30 @@ cdef extern from "receiver.hpp":
             int samples) except +
         void AddChannel(const RxChannel[T]& channel) 
 
+"""
+aperture
+"""
+cdef extern from "aperture.hpp":
+    cdef cppclass Aperture[T, Tg=*]:
+        Aperture() except +
+        Aperture(const T& phi,
+             const T& theta,
+             const Vec3[T]& location,
+             T* extension) except +
+        # Aperture(T* aperture, int size) except +
+
+"""
+snapshot
+"""    
+cdef extern from "snapshot.hpp":
+    # Snapshot
+    #  Scene's snapshot
+    cdef cppclass Snapshot[T]:
+        T time_
+        int sample_idx_
+        int pulse_idx_
+        int ch_idx_
+        vector[Ray[T]] ray_received
 
 """
 simulator
@@ -218,6 +222,23 @@ cdef extern from "scene.hpp":
         Scene() except +
 
         void AddTarget(const Target[T]& mesh)
+        void SetAperture(Aperture[T]& aperture)
+        void SetApertureMesh(T* aperture, int size)
+        void SetTransmitter(const Transmitter[T]& tx)
+        void AddTxChannel(const TxChannel[T]& channel)
+        void SetReceiver(const Receiver[T]& rx)
+        void AddRxChannel(const RxChannel[T]& channel)
+        void AddSnapshot(T time,
+               int frame_idx,
+               int ch_idx,
+               int pulse_idx,
+               int sample_idx)
+        void RunSimulator(int,
+                      T correction,
+                      T* baseband_re,
+                      T* baseband_im)
+
+        vector[Snapshot[T]] snapshots_
 
 
 """
