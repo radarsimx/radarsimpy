@@ -215,16 +215,6 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
             c_rotation_array,
             c_rotation_rate_array,
             <bool> targets[idx].get('is_ground', False)))
-
-        # rec_ptr[0].AddSceneTarget(
-        #     &mesh_memview[0,0,0],
-        #     <int_t> mesh_memview.shape[0],
-        #     Vec3[float_t](&origin[0]),
-        #     c_loc_array,
-        #     c_speed_array,
-        #     c_rotation_array,
-        #     c_rotation_rate_array,
-        #     <bool> targets[idx].get('is_ground', False))
     
     """
     Aperture
@@ -236,12 +226,18 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
     if radar.aperture_mesh:
         aperture = radar.aperture_mesh.astype(np.float32)
 
-        radar_scene.SetApertureMesh(
-                &aperture[0,0,0],
-                <int_t> aperture.shape[0]
+        # radar_scene.SetApertureMesh(
+        #         &aperture[0,0,0],
+        #         <int_t> aperture.shape[0]
+        # )
+
+        radar_scene.SetAperture(
+                Aperture[float_t](
+                    &aperture[0,0,0],
+                   <int_t> aperture.shape[0]
+                )
         )
 
-        # rec_ptr[0].SetSceneApertureMesh(&aperture[0,0,0], <int_t> aperture.shape[0])
     else:
         aperture_location = radar.aperture_location.astype(np.float32)
         aperture_extension = radar.aperture_extension.astype(np.float32)
@@ -253,11 +249,6 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
                 &aperture_extension[0]
             )
         )
-        # rec_ptr[0].SetSceneAperture(
-        #     <float_t> (radar.aperture_phi/180*np.pi),
-        #     <float_t> (radar.aperture_theta/180*np.pi),
-        #     Vec3[float_t](&aperture_location[0]),
-        #     &aperture_extension[0])
 
     """
     Transmitter
@@ -289,15 +280,6 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
             <float_t> density
         )
     )
-    # rec_ptr[0].SetSceneTransmitter(
-    #     fc_vector,
-    #     <float_t> radar.transmitter.slope,
-    #     <float_t> radar.transmitter.tx_power,
-    #     chirp_start_time,
-    #     frame_time,
-    #     <int> radar.frames,
-    #     <int> radar.transmitter.pulses,
-    #     <float_t> density)
 
     cdef int ptn_length
     cdef vector[float_t] az_ang
@@ -356,27 +338,6 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
                 <float_t> (radar.transmitter.grid[tx_idx]/180*np.pi)
             )
         )
-        # rec_ptr[0].AddSceneTxChannel(
-        #     Vec3[float_t](
-        #         <float_t> radar.transmitter.locations[tx_idx, 0],
-        #         <float_t> radar.transmitter.locations[tx_idx, 1],
-        #         <float_t> radar.transmitter.locations[tx_idx, 2]
-        #     ),
-        #     Vec3[float_t](
-        #         <float_t> radar.transmitter.polarization[tx_idx, 0],
-        #         <float_t> radar.transmitter.polarization[tx_idx, 1],
-        #         <float_t> radar.transmitter.polarization[tx_idx, 2]
-        #     ),
-        #     mod_amp,
-        #     mod_phs,
-        #     <float_t> radar.transmitter.chip_length[tx_idx],
-        #     az_ang,
-        #     az,
-        #     el_ang,
-        #     el,
-        #     <float_t> radar.transmitter.antenna_gains[tx_idx],
-        #     <float_t> radar.transmitter.delay[tx_idx],
-        #     <float_t> (radar.transmitter.grid[tx_idx]/180*np.pi))
 
     """
     Receiver
@@ -390,12 +351,6 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
             <int> radar.samples_per_pulse
         )
     )
-    # rec_ptr[0].SetSceneReceiver(
-    #     <float_t> radar.receiver.fs,
-    #     <float_t> radar.receiver.rf_gain,
-    #     <float_t> radar.receiver.load_resistor,
-    #     <float_t> radar.receiver.baseband_gain,
-    #     <int> radar.samples_per_pulse)
 
     for rx_idx in range(0, radar.receiver.channel_size):
         az_ang.clear()
@@ -430,22 +385,7 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
                 <float_t> radar.receiver.antenna_gains[rx_idx]
             )
         )
-        # rec_ptr[0].AddSceneRxChannel(
-        #     Vec3[float_t](
-        #         <float_t> radar.receiver.locations[rx_idx, 0],
-        #         <float_t> radar.receiver.locations[rx_idx, 1],
-        #         <float_t> radar.receiver.locations[rx_idx, 2]
-        #     ),
-        #     Vec3[float_t](0,0,1),
-        #     az_ang,
-        #     az,
-        #     el_ang,
-        #     el,
-        #     <float_t> radar.receiver.antenna_gains[rx_idx])
 
-    # cdef vector[Snapshot[float_t]] snapshots
-    # cdef Snapshot[float_t] snap
-    # cdef float_t t_stamp
     cdef int level_id
 
     if level is None:
@@ -455,7 +395,6 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
                 radar_scene.AddSnapshot(
                     <float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, 0, 0], frame_idx, tx_idx, 0, 0
                 )
-                # rec_ptr[0].AddSnapshot(<float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, 0, 0], frame_idx, tx_idx, 0, 0, snapshots)
     elif level == 'pulse':
         level_id = 1
         for frame_idx in range(0, radar.frames):
@@ -515,7 +454,6 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
             count=count+1
         # snp.append(rays)
 
-    # del rec_ptr
 
     if noise:
         baseband = np.array(baseband_re)+1j*np.array(baseband_im)+\

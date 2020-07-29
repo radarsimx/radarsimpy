@@ -36,7 +36,6 @@ from libcpp cimport bool
 from libcpp cimport complex
 
 
-
 """
 target interface
 """
@@ -186,7 +185,7 @@ cdef extern from "aperture.hpp":
              const T& theta,
              const Vec3[T]& location,
              T* extension) except +
-        # Aperture(T* aperture, int size) except +
+        Aperture(T* aperture, int size) except +
 
 """
 snapshot
@@ -223,7 +222,6 @@ cdef extern from "scene.hpp":
 
         void AddTarget(const Target[T]& mesh)
         void SetAperture(Aperture[T]& aperture)
-        void SetApertureMesh(T* aperture, int size)
         void SetTransmitter(const Transmitter[T]& tx)
         void AddTxChannel(const TxChannel[T]& channel)
         void SetReceiver(const Receiver[T]& rx)
@@ -239,79 +237,3 @@ cdef extern from "scene.hpp":
                       T* baseband_im)
 
         vector[Snapshot[T]] snapshots_
-
-
-"""
-radarsimc interface
-"""
-cdef extern from "radarsimc.hpp":
-    cdef cppclass Radarsimc[T]:
-        Radarsimc() except +
-
-        # Radar scene simulation for target's models
-        void AddSnapshot(T time,
-                         int frame_idx,
-                         int tx_idx,
-                         int pulse_idx,
-                         int sample_idx,
-                         vector[Snapshot[T]] &snapshots)
-
-        void AddSceneTarget(T *mesh,
-                            int mesh_size,
-                            Vec3[T] origin,
-                            vector[Vec3[T]] location_array,
-                            vector[Vec3[T]] speed_array,
-                            vector[Vec3[T]] rotation_array,
-                            vector[Vec3[T]] rotation_rate_array,
-                            bool is_ground)
-
-        void SetSceneApertureMesh(T *aperture,
-                                  int size)
-
-        void SetSceneAperture(T phi,
-                              T theta,
-                              Vec3[T] location,
-                              T *extension)
-
-        void SetSceneTransmitter(vector[T] fc,
-                                 T slope,
-                                 T tx_power,
-                                 vector[T] pulse_start_time,
-                                 vector[T] frame_time,
-                                 int frames,
-                                 int pulses,
-                                 T density)
-
-        void AddSceneTxChannel(Vec3[T] location,
-                               Vec3[T] polarization,
-                               vector[T] mod_amp,
-                               vector[T] mod_phs,
-                               T chip_length,
-                               vector[T] phi,
-                               vector[T] phi_ptn,
-                               vector[T] theta,
-                               vector[T] theta_ptn,
-                               T antenna_gain,
-                               T delay,
-                               T grid)
-
-        void SetSceneReceiver(T fs,
-                              T rf_gain,
-                              T resistor,
-                              T baseband_gain,
-                              int samples)
-
-        void AddSceneRxChannel(Vec3[T] location,
-                               Vec3[T] polarization,
-                               vector[T] az_angle,
-                               vector[T] az,
-                               vector[T] el_angle,
-                               vector[T] el,
-                               T antenna_gain)
-
-        void RadarScene(int level,
-                        vector[Snapshot[T]] &snapshots,
-                        T correction,
-                        T *baseband_re,
-                        T *baseband_im)
-
