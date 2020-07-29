@@ -192,6 +192,8 @@ snapshot
 """    
 cdef extern from "snapshot.hpp":
     cdef cppclass Snapshot[T]:
+        Snapshot()
+        Snapshot(T time, int frame_idx, int ch_idx, int pulse_idx, int sample_idx)
         T time_
         int sample_idx_
         int pulse_idx_
@@ -224,11 +226,7 @@ cdef extern from "scene.hpp":
         void AddTxChannel(const TxChannel[T]& channel)
         void SetReceiver(const Receiver[T]& rx)
         void AddRxChannel(const RxChannel[T]& channel)
-        void AddSnapshot(T time,
-               int frame_idx,
-               int ch_idx,
-               int pulse_idx,
-               int sample_idx)
+        void AddSnapshot(const Snapshot[T]& snapshot)
         void RunSimulator(int,
                       T correction,
                       T* baseband_re,

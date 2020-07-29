@@ -382,21 +382,31 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
         for frame_idx in range(0, radar.frames):
             for tx_idx in range(0, radar.transmitter.channel_size):
                 radar_scene.AddSnapshot(
-                    <float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, 0, 0], frame_idx, tx_idx, 0, 0
+                    Snapshot[float_t](
+                        <float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, 0, 0],
+                        frame_idx,
+                        tx_idx,
+                        0,
+                        0
+                    )
                 )
     elif level == 'pulse':
         level_id = 1
         for frame_idx in range(0, radar.frames):
             for tx_idx in range(0, radar.transmitter.channel_size):
                 for pulse_idx in range(0, radar.transmitter.pulses):
-                    radar_scene.AddSnapshot(<float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, pulse_idx, 0], frame_idx, tx_idx, pulse_idx, 0)
+                    radar_scene.AddSnapshot(
+                        Snapshot[float_t](
+                        <float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, pulse_idx, 0], frame_idx, tx_idx, pulse_idx, 0))
     elif level == 'sample':
         level_id = 2
         for frame_idx in range(0, radar.frames):
             for tx_idx in range(0, radar.transmitter.channel_size):
                 for pulse_idx in range(0, radar.transmitter.pulses):
                     for sample_idx in range(0, radar.samples_per_pulse):
-                        radar_scene.AddSnapshot(<float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, pulse_idx, sample_idx], frame_idx, tx_idx, pulse_idx, sample_idx)
+                        radar_scene.AddSnapshot(
+                            Snapshot[float_t](
+                            <float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, pulse_idx, sample_idx], frame_idx, tx_idx, pulse_idx, sample_idx))
 
     cdef float_t[:,:,:] baseband_re = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=np.float32)
     cdef float_t[:,:,:] baseband_im = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=np.float32)
