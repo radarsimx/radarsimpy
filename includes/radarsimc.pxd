@@ -191,8 +191,6 @@ cdef extern from "aperture.hpp":
 snapshot
 """    
 cdef extern from "snapshot.hpp":
-    # Snapshot
-    #  Scene's snapshot
     cdef cppclass Snapshot[T]:
         T time_
         int sample_idx_
@@ -221,7 +219,7 @@ cdef extern from "scene.hpp":
         Scene() except +
 
         void AddTarget(const Target[T]& mesh)
-        void SetAperture(Aperture[T]& aperture)
+        void SetAperture(const Aperture[T]& aperture)
         void SetTransmitter(const Transmitter[T]& tx)
         void AddTxChannel(const TxChannel[T]& channel)
         void SetReceiver(const Receiver[T]& rx)

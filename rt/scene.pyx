@@ -64,12 +64,6 @@ from stl import mesh
 cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
     cdef Scene[float_t] radar_scene
 
-    cdef Transmitter[float_t] tx
-    cdef Receiver[float_t] rx
-    
-    # cdef Radarsimc[float_t] *rec_ptr
-    # rec_ptr = new Radarsimc[float_t]()
-
     """
     Targets
     """
@@ -225,11 +219,6 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
     cdef float_t[:] aperture_extension
     if radar.aperture_mesh:
         aperture = radar.aperture_mesh.astype(np.float32)
-
-        # radar_scene.SetApertureMesh(
-        #         &aperture[0,0,0],
-        #         <int_t> aperture.shape[0]
-        # )
 
         radar_scene.SetAperture(
                 Aperture[float_t](
@@ -452,7 +441,6 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
                 rays[count]['path_pos'][path_idx, 1] = radar_scene.snapshots_[snapshot_idx].ray_received[idx].path_[path_idx].loc_[1]
                 rays[count]['path_pos'][path_idx, 2] = radar_scene.snapshots_[snapshot_idx].ray_received[idx].path_[path_idx].loc_[2]
             count=count+1
-        # snp.append(rays)
 
 
     if noise:
