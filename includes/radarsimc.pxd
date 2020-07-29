@@ -179,7 +179,7 @@ cdef extern from "receiver.hpp":
 aperture
 """
 cdef extern from "aperture.hpp":
-    cdef cppclass Aperture[T, Tg=*]:
+    cdef cppclass Aperture[T]:
         Aperture() except +
         Aperture(const T& phi,
              const T& theta,
@@ -221,7 +221,7 @@ cdef extern from "scene.hpp":
         Scene() except +
 
         void AddTarget(const Target[T]& mesh)
-        void SetAperture(Aperture[T] aperture)
+        void SetAperture(const Aperture[T]& aperture)
         void SetTransmitter(const Transmitter[T]& tx)
         void AddTxChannel(const TxChannel[T]& channel)
         void SetReceiver(const Receiver[T]& rx)
