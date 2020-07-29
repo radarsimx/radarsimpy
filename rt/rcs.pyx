@@ -45,8 +45,6 @@
 
 cimport cython
 
-from radarsimpy.includes.radarsimc cimport Radarsimc
-
 import numpy as np
 cimport numpy as np
 from stl import mesh
