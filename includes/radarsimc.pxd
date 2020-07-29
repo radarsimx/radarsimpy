@@ -33,7 +33,6 @@
 from radarsimpy.includes.type_def cimport vector, uint64_t
 from radarsimpy.includes.zpvector cimport Vec3, Vec2
 from libcpp cimport bool
-from libcpp cimport complex
 
 
 """
