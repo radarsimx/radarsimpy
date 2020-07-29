@@ -117,9 +117,9 @@ cdef extern from "point.hpp":
     cdef cppclass Point[T]:
         Point() except +
         Point(const vector[Vec3[T]]& loc,
-          const Vec3[T]& speed,
-          const vector[T]& rcs,
-          const vector[T]& phs) except +
+              const Vec3[T]& speed,
+              const vector[T]& rcs,
+              const vector[T]& phs) except +
 
 """
 transmitter
@@ -128,28 +128,28 @@ cdef extern from "transmitter.hpp":
     cdef cppclass TxChannel[T]:
         TxChannel() except +
         TxChannel(Vec3[T] loc,
-              Vec3[T] pol,
-              vector[T] mod_amp,
-              vector[T] mod_phs,
-              T chip_length,
-              vector[T] phi,
-              vector[T] phi_ptn,
-              vector[T] theta,
-              vector[T] theta_ptn,
-              T antenna_gain,
-              T delay,
-              T grid) except +
+                  Vec3[T] pol,
+                  vector[T] mod_amp,
+                  vector[T] mod_phs,
+                  T chip_length,
+                  vector[T] phi,
+                  vector[T] phi_ptn,
+                  vector[T] theta,
+                  vector[T] theta_ptn,
+                  T antenna_gain,
+                  T delay,
+                  T grid) except +
 
     cdef cppclass Transmitter[T]:
         Transmitter() except +
         Transmitter(vector[T] fc,
-                T slope,
-                T tx_power,
-                vector[T] pulse_start_time,
-                vector[T] frame_time,
-                int frames,
-                int pulses,
-                T density) except +
+                    T slope,
+                    T tx_power,
+                    vector[T] pulse_start_time,
+                    vector[T] frame_time,
+                    int frames,
+                    int pulses,
+                    T density) except +
         void AddChannel(const TxChannel[T]& channel)
 
 """
@@ -159,20 +159,20 @@ cdef extern from "receiver.hpp":
     cdef cppclass RxChannel[T]:
         RxChannel() except +
         RxChannel(Vec3[T] loc,
-              Vec3[T] pol,
-              vector[T] phi,
-              vector[T] phi_ptn,
-              vector[T] theta,
-              vector[T] theta_ptn,
-              T antenna_gain) except +
+                  Vec3[T] pol,
+                  vector[T] phi,
+                  vector[T] phi_ptn,
+                  vector[T] theta,
+                  vector[T] theta_ptn,
+                  T antenna_gain) except +
 
     cdef cppclass Receiver[T]:
         Receiver() except +
         Receiver(T fs,
-            T rf_gain,
-            T resistor,
-            T baseband_gain,
-            int samples) except +
+                 T rf_gain,
+                 T resistor,
+                 T baseband_gain,
+                 int samples) except +
         void AddChannel(const RxChannel[T]& channel) 
 
 """
@@ -182,9 +182,9 @@ cdef extern from "aperture.hpp":
     cdef cppclass Aperture[T]:
         Aperture() except +
         Aperture(const T& phi,
-             const T& theta,
-             const Vec3[T]& location,
-             T* extension) except +
+                 const T& theta,
+                 const Vec3[T]& location,
+                 T* extension) except +
         Aperture(T* aperture, int size) except +
 
 """
@@ -192,8 +192,12 @@ snapshot
 """    
 cdef extern from "snapshot.hpp":
     cdef cppclass Snapshot[T]:
-        Snapshot()
-        Snapshot(T time, int frame_idx, int ch_idx, int pulse_idx, int sample_idx)
+        Snapshot() except +
+        Snapshot(T time,
+                 int frame_idx,
+                 int ch_idx,
+                 int pulse_idx,
+                 int sample_idx) except +
         T time_
         int sample_idx_
         int pulse_idx_
@@ -207,10 +211,10 @@ cdef extern from "simulator.hpp":
     cdef cppclass Simulator[T]:
         Simulator() except +
         void Run(Transmitter[T] tx,
-             Receiver[T] rx,
-             vector[Point[T]] points,
-             T* baseband_re,
-             T* baseband_im)
+                 Receiver[T] rx,
+                 vector[Point[T]] points,
+                 T* baseband_re,
+                 T* baseband_im)
         
 
 """
@@ -227,9 +231,9 @@ cdef extern from "scene.hpp":
         void SetReceiver(const Receiver[T]& rx)
         void AddRxChannel(const RxChannel[T]& channel)
         void AddSnapshot(const Snapshot[T]& snapshot)
-        void RunSimulator(int,
-                      T correction,
-                      T* baseband_re,
-                      T* baseband_im)
+        void RunSimulator(int level,
+                          T correction,
+                          T* baseband_re,
+                          T* baseband_im)
 
         vector[Snapshot[T]] snapshots_
