@@ -30,8 +30,8 @@
 
 """
 
-from radarsimpy.includes.type_def cimport vector, uint64_t
-from radarsimpy.includes.zpvector cimport Vec3, Vec2
+from radarsimpy.includes.type_def cimport vector
+from radarsimpy.includes.zpvector cimport Vec3
 from libcpp cimport bool
 
 
@@ -229,7 +229,6 @@ cdef extern from "scene.hpp":
         void AddTxChannel(const TxChannel[T]& channel)
         void SetReceiver(const Receiver[T]& rx)
         void AddRxChannel(const RxChannel[T]& channel)
-        # void AddSnapshot(const Snapshot[T]& snapshot)
         void RunSimulator(int level,
                           T correction,
                           vector[Snapshot[T]]& snapshots,

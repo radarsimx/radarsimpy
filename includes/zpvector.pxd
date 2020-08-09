@@ -44,13 +44,4 @@ cdef extern from "zpvector.hpp" namespace "zpv" nogil:
 
         inline Vec3 &operator=(const Vec3 &)
         inline T &operator[](const unsigned int &)
-
-    # 2D vector
-    cdef cppclass Vec2[T]:
-        Vec2()
-        Vec2(const T &...)
-        Vec2(T *)
-
-        inline Vec2 &operator=(const Vec2 &)
-        inline T &operator[](const unsigned int &)
         

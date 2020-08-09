@@ -50,7 +50,7 @@ from libcpp cimport bool
 
 from radarsimpy.includes.radarsimc cimport Point, TxChannel, Transmitter, RxChannel, Receiver, Simulator
 from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t, vector
-from radarsimpy.includes.zpvector cimport Vec3, Vec2
+from radarsimpy.includes.zpvector cimport Vec3
 from libcpp cimport complex
 
 import numpy as np
