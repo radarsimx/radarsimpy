@@ -1,4 +1,5 @@
-![unit test](https://github.com/rookiepeng/radarsimc/workflows/unit%20test/badge.svg)
+![Windows Test](https://github.com/rookiepeng/radarsimc/workflows/Windows%20Test/badge.svg)
+![Linux Test](https://github.com/rookiepeng/radarsimc/workflows/Linux%20Test/badge.svg)
 
 # RadarSimPy
                                                             
