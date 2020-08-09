@@ -375,13 +375,17 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
             )
         )
 
+    """
+    Snapshot
+    """
+    cdef vector[Snapshot[float_t]] snaps
     cdef int level_id
 
     if level is None:
         level_id = 0
         for frame_idx in range(0, radar.frames):
             for tx_idx in range(0, radar.transmitter.channel_size):
-                radar_scene.AddSnapshot(
+                snaps.push_back(
                     Snapshot[float_t](
                         <float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, 0, 0],
                         frame_idx,
@@ -390,66 +394,83 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
                         0
                     )
                 )
+                # radar_scene.AddSnapshot(
+                #     Snapshot[float_t](
+                #         <float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, 0, 0],
+                #         frame_idx,
+                #         tx_idx,
+                #         0,
+                #         0
+                #     )
+                # )
     elif level == 'pulse':
         level_id = 1
         for frame_idx in range(0, radar.frames):
             for tx_idx in range(0, radar.transmitter.channel_size):
                 for pulse_idx in range(0, radar.transmitter.pulses):
-                    radar_scene.AddSnapshot(
+                    snaps.push_back(
                         Snapshot[float_t](
-                        <float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, pulse_idx, 0], frame_idx, tx_idx, pulse_idx, 0))
+                        <float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, pulse_idx, 0], frame_idx, tx_idx, pulse_idx, 0)
+                    )
+                    # radar_scene.AddSnapshot(
+                    #     Snapshot[float_t](
+                    #     <float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, pulse_idx, 0], frame_idx, tx_idx, pulse_idx, 0))
     elif level == 'sample':
         level_id = 2
         for frame_idx in range(0, radar.frames):
             for tx_idx in range(0, radar.transmitter.channel_size):
                 for pulse_idx in range(0, radar.transmitter.pulses):
                     for sample_idx in range(0, radar.samples_per_pulse):
-                        radar_scene.AddSnapshot(
+                        snaps.push_back(
                             Snapshot[float_t](
-                            <float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, pulse_idx, sample_idx], frame_idx, tx_idx, pulse_idx, sample_idx))
+                            <float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, pulse_idx, sample_idx], frame_idx, tx_idx, pulse_idx, sample_idx)
+                        )
+                        # radar_scene.AddSnapshot(
+                        #     Snapshot[float_t](
+                        #     <float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, pulse_idx, sample_idx], frame_idx, tx_idx, pulse_idx, sample_idx))
 
     cdef float_t[:,:,:] baseband_re = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=np.float32)
     cdef float_t[:,:,:] baseband_im = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=np.float32)
 
     # cdef vector[RayPy[float_t]] ray_received
     radar_scene.RunSimulator(
-        level_id, <float_t> correction, &baseband_re[0,0,0], &baseband_im[0,0,0]
+        level_id, <float_t> correction, snaps, &baseband_re[0,0,0], &baseband_im[0,0,0]
     )
 
     ray_type = np.dtype([('area', np.float32, (1,)), ('distance', np.float32, (1,)), ('range_rate', np.float32, (1,)), ('refCount', int, (1,)), ('channel_id', int, (1,)), ('pulse_idx', int, (1,)), ('sample_idx', int, (1,)), ('level', int, (1,)), ('positions', np.float32, (3,)), ('directions', np.float32, (3,)), ('polarization', np.float32, (3,)), ('path_pos', np.float32, (10,3))])
 
 
     cdef int total_size = 0
-    for snapshot_idx in range(0, radar_scene.snapshots_.size()):
-        total_size = total_size+radar_scene.snapshots_[snapshot_idx].ray_received.size()
+    for snapshot_idx in range(0, snaps.size()):
+        total_size = total_size+snaps[snapshot_idx].ray_received.size()
 
     rays = np.zeros(total_size, dtype=ray_type)
 
     cdef int count = 0
-    for snapshot_idx in range(0, radar_scene.snapshots_.size()):
-        for idx in range(0, radar_scene.snapshots_[snapshot_idx].ray_received.size()):
-            rays[count]['area'] = radar_scene.snapshots_[snapshot_idx].ray_received[idx].area_
-            rays[count]['distance'] = radar_scene.snapshots_[snapshot_idx].ray_received[idx].range_
-            rays[count]['range_rate'] = radar_scene.snapshots_[snapshot_idx].ray_received[idx].range_rate_
-            rays[count]['refCount'] = radar_scene.snapshots_[snapshot_idx].ray_received[idx].ref_count_
-            rays[count]['channel_id'] = radar_scene.snapshots_[snapshot_idx].ch_idx_
-            rays[count]['pulse_idx'] = radar_scene.snapshots_[snapshot_idx].pulse_idx_
-            rays[count]['sample_idx'] = radar_scene.snapshots_[snapshot_idx].sample_idx_
+    for snapshot_idx in range(0, snaps.size()):
+        for idx in range(0, snaps[snapshot_idx].ray_received.size()):
+            rays[count]['area'] = snaps[snapshot_idx].ray_received[idx].area_
+            rays[count]['distance'] = snaps[snapshot_idx].ray_received[idx].range_
+            rays[count]['range_rate'] = snaps[snapshot_idx].ray_received[idx].range_rate_
+            rays[count]['refCount'] = snaps[snapshot_idx].ray_received[idx].ref_count_
+            rays[count]['channel_id'] = snaps[snapshot_idx].ch_idx_
+            rays[count]['pulse_idx'] = snaps[snapshot_idx].pulse_idx_
+            rays[count]['sample_idx'] = snaps[snapshot_idx].sample_idx_
             rays[count]['level'] = level_id
-            rays[count]['positions'][0] = radar_scene.snapshots_[snapshot_idx].ray_received[idx].loc_[0]
-            rays[count]['positions'][1] = radar_scene.snapshots_[snapshot_idx].ray_received[idx].loc_[1]
-            rays[count]['positions'][2] = radar_scene.snapshots_[snapshot_idx].ray_received[idx].loc_[2]
-            rays[count]['directions'][0] = radar_scene.snapshots_[snapshot_idx].ray_received[idx].dir_[0]
-            rays[count]['directions'][1] = radar_scene.snapshots_[snapshot_idx].ray_received[idx].dir_[1]
-            rays[count]['directions'][2] = radar_scene.snapshots_[snapshot_idx].ray_received[idx].dir_[2]
-            rays[count]['polarization'][0] = radar_scene.snapshots_[snapshot_idx].ray_received[idx].pol_[0]
-            rays[count]['polarization'][1] = radar_scene.snapshots_[snapshot_idx].ray_received[idx].pol_[1]
-            rays[count]['polarization'][2] = radar_scene.snapshots_[snapshot_idx].ray_received[idx].pol_[2]
+            rays[count]['positions'][0] = snaps[snapshot_idx].ray_received[idx].loc_[0]
+            rays[count]['positions'][1] = snaps[snapshot_idx].ray_received[idx].loc_[1]
+            rays[count]['positions'][2] = snaps[snapshot_idx].ray_received[idx].loc_[2]
+            rays[count]['directions'][0] = snaps[snapshot_idx].ray_received[idx].dir_[0]
+            rays[count]['directions'][1] = snaps[snapshot_idx].ray_received[idx].dir_[1]
+            rays[count]['directions'][2] = snaps[snapshot_idx].ray_received[idx].dir_[2]
+            rays[count]['polarization'][0] = snaps[snapshot_idx].ray_received[idx].pol_[0]
+            rays[count]['polarization'][1] = snaps[snapshot_idx].ray_received[idx].pol_[1]
+            rays[count]['polarization'][2] = snaps[snapshot_idx].ray_received[idx].pol_[2]
             rays[count]['path_pos'] = np.zeros((10,3))
             for path_idx in range(0, int(rays[count]['refCount']+1)):
-                rays[count]['path_pos'][path_idx, 0] = radar_scene.snapshots_[snapshot_idx].ray_received[idx].path_[path_idx].loc_[0]
-                rays[count]['path_pos'][path_idx, 1] = radar_scene.snapshots_[snapshot_idx].ray_received[idx].path_[path_idx].loc_[1]
-                rays[count]['path_pos'][path_idx, 2] = radar_scene.snapshots_[snapshot_idx].ray_received[idx].path_[path_idx].loc_[2]
+                rays[count]['path_pos'][path_idx, 0] = snaps[snapshot_idx].ray_received[idx].path_[path_idx].loc_[0]
+                rays[count]['path_pos'][path_idx, 1] = snaps[snapshot_idx].ray_received[idx].path_[path_idx].loc_[1]
+                rays[count]['path_pos'][path_idx, 2] = snaps[snapshot_idx].ray_received[idx].path_[path_idx].loc_[2]
             count=count+1
 
 

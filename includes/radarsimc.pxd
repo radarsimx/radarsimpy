@@ -229,9 +229,10 @@ cdef extern from "scene.hpp":
         void AddTxChannel(const TxChannel[T]& channel)
         void SetReceiver(const Receiver[T]& rx)
         void AddRxChannel(const RxChannel[T]& channel)
-        void AddSnapshot(const Snapshot[T]& snapshot)
+        # void AddSnapshot(const Snapshot[T]& snapshot)
         void RunSimulator(int level,
                           T correction,
+                          vector[Snapshot[T]]& snapshots,
                           T* baseband_re,
                           T* baseband_im)
 
