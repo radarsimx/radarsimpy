@@ -46,4 +46,4 @@ from .rt.simulatorcpp import run_simulator as simulatorcpp
 # # roc
 # from .tools import roc_pd, roc_snr, threshold
 
-__version__ = '2.5.0'
+__version__ = '2.5.1'
