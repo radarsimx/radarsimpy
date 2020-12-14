@@ -437,7 +437,20 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
         level_id, <float_t> correction, snaps, &baseband_re[0,0,0], &baseband_im[0,0,0]
     )
 
-    ray_type = np.dtype([('area', np.float32, (1,)), ('distance', np.float32, (1,)), ('range_rate', np.float32, (1,)), ('refCount', int, (1,)), ('channel_id', int, (1,)), ('pulse_idx', int, (1,)), ('sample_idx', int, (1,)), ('level', int, (1,)), ('positions', np.float32, (3,)), ('directions', np.float32, (3,)), ('polarization', np.float32, (3,)), ('path_pos', np.float32, (10,3))])
+    ray_type = np.dtype([
+        ('area', np.float32, (1,)),
+        ('distance', np.float32, (1,)),
+        ('range_rate', np.float32, (1,)),
+        ('refCount', int, (1,)),
+        ('channel_id', int, (1,)),
+        ('pulse_idx', int, (1,)),
+        ('sample_idx', int, (1,)),
+        ('level', int, (1,)),
+        ('positions', np.float32, (3,)),
+        ('directions', np.float32, (3,)),
+        ('polarization', np.float32, (3,)),
+        ('path_pos', np.float32, (20,3))
+        ])
 
 
     cdef int total_size = 0
@@ -466,7 +479,7 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
             rays[count]['polarization'][0] = snaps[snapshot_idx].ray_received[idx].pol_[0]
             rays[count]['polarization'][1] = snaps[snapshot_idx].ray_received[idx].pol_[1]
             rays[count]['polarization'][2] = snaps[snapshot_idx].ray_received[idx].pol_[2]
-            rays[count]['path_pos'] = np.zeros((10,3))
+            rays[count]['path_pos'] = np.zeros((20,3))
             for path_idx in range(0, int(rays[count]['refCount']+1)):
                 rays[count]['path_pos'][path_idx, 0] = snaps[snapshot_idx].ray_received[idx].path_[path_idx].loc_[0]
                 rays[count]['path_pos'][path_idx, 1] = snaps[snapshot_idx].ray_received[idx].path_[path_idx].loc_[1]
