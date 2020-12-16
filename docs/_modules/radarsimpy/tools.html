@@ -1,0 +1,475 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>radarsimpy.tools &#8212; RadarSimPy  documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for radarsimpy.tools</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!python</span>
+<span class="c1"># cython: language_level=3</span>
+
+<span class="c1"># Useful tools for radar system analysis</span>
+
+<span class="c1"># This script requires that &#39;numpy&#39; and &#39;scipy&#39; be installed within the</span>
+<span class="c1"># Python environment you are running this script in.</span>
+
+<span class="c1"># This file can be imported as a module and contains the following</span>
+<span class="c1"># functions:</span>
+
+<span class="c1"># * threshold - Threshold ratio</span>
+<span class="c1"># * roc_pd - Calculate probability of detection (Pd) in receiver operating</span>
+<span class="c1">#            characteristic (ROC)</span>
+<span class="c1"># * roc_snr - Calculate the minimal SNR for certain probability of</span>
+<span class="c1">#             detection (Pd) and probability of false alarm (Pfa) in</span>
+<span class="c1">#             receiver operating characteristic (ROC)</span>
+
+<span class="c1"># ----------</span>
+<span class="c1"># RadarSimPy - A Radar Simulator Built with Python</span>
+<span class="c1"># Copyright (C) 2018 - 2020  Zhengyu Peng</span>
+<span class="c1"># E-mail: zpeng.me@gmail.com</span>
+<span class="c1"># Website: https://zpeng.me</span>
+
+<span class="c1"># `                      `</span>
+<span class="c1"># -:.                  -#:</span>
+<span class="c1"># -//:.              -###:</span>
+<span class="c1"># -////:.          -#####:</span>
+<span class="c1"># -/:.://:.      -###++##:</span>
+<span class="c1"># ..   `://:-  -###+. :##:</span>
+<span class="c1">#        `:/+####+.   :##:</span>
+<span class="c1"># .::::::::/+###.     :##:</span>
+<span class="c1"># .////-----+##:    `:###:</span>
+<span class="c1">#  `-//:.   :##:  `:###/.</span>
+<span class="c1">#    `-//:. :##:`:###/.</span>
+<span class="c1">#      `-//:+######/.</span>
+<span class="c1">#        `-/+####/.</span>
+<span class="c1">#          `+##+.</span>
+<span class="c1">#           :##:</span>
+<span class="c1">#           :##:</span>
+<span class="c1">#           :##:</span>
+<span class="c1">#           :##:</span>
+<span class="c1">#           :##:</span>
+<span class="c1">#            .+:</span>
+
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.special</span> <span class="kn">import</span> <span class="n">erfc</span><span class="p">,</span> <span class="n">erfcinv</span><span class="p">,</span> <span class="n">gammainc</span>
+
+
+<span class="k">def</span> <span class="nf">log_factorial</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the factorial of &#39;n&#39; using logarithms to avoid overflow</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n : int</span>
+<span class="sd">        Integer number</span>
+
+<span class="sd">    Return</span>
+<span class="sd">    ------</span>
+<span class="sd">    $\log(n!)$</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="n">n</span><span class="o">+</span><span class="mf">9.0</span>
+    <span class="n">n2</span> <span class="o">=</span> <span class="n">n</span><span class="o">**</span><span class="mi">2</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">-</span><span class="n">n</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">n</span><span class="p">))</span> <span class="o">+</span> \
+        <span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">30</span><span class="o">+</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">105</span><span class="p">)</span><span class="o">/</span><span class="n">n2</span><span class="p">)</span><span class="o">/</span><span class="n">n2</span><span class="p">)</span><span class="o">/</span><span class="mi">12</span><span class="p">)</span><span class="o">/</span><span class="n">n</span> <span class="o">-</span> \
+        <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">((</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">5</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">6</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">7</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">8</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">threshold</span><span class="p">(</span><span class="n">pfa</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Threshold ratio</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    :param pfa : float</span>
+<span class="sd">        Probability of false alarm</span>
+<span class="sd">    :param N : int</span>
+<span class="sd">        Number of pulses for integration</span>
+
+<span class="sd">    Return</span>
+<span class="sd">    ------</span>
+<span class="sd">    threshod ratio : float</span>
+
+<span class="sd">    Reference</span>
+<span class="sd">    ---------</span>
+<span class="sd">    Mahafza, Bassem R. Radar systems analysis and design using MATLAB.</span>
+<span class="sd">        Chapman and Hall/CRC, 2005.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">eps</span> <span class="o">=</span> <span class="mf">0.00000001</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="mf">10000.</span>
+    <span class="n">nfa</span> <span class="o">=</span> <span class="n">N</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="n">pfa</span>
+    <span class="n">sqrtpfa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">pfa</span><span class="p">))</span>
+    <span class="n">sqrtnp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+    <span class="n">thred0</span> <span class="o">=</span> <span class="n">N</span><span class="o">-</span><span class="n">sqrtnp</span><span class="o">+</span><span class="mf">2.3</span><span class="o">*</span><span class="n">sqrtpfa</span><span class="o">*</span><span class="p">(</span><span class="n">sqrtpfa</span><span class="o">+</span><span class="n">sqrtnp</span><span class="o">-</span><span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">thred</span> <span class="o">=</span> <span class="n">thred0</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">delta</span> <span class="o">&gt;=</span> <span class="n">thred0</span><span class="p">):</span>
+        <span class="n">igf</span> <span class="o">=</span> <span class="n">gammainc</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">thred0</span><span class="p">)</span>
+        <span class="n">deno</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">thred0</span><span class="o">+</span><span class="n">eps</span><span class="p">)</span> <span class="o">-</span> <span class="n">thred0</span> <span class="o">-</span> <span class="n">log_factorial</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">thred</span> <span class="o">=</span> <span class="n">thred0</span><span class="o">+</span><span class="p">((</span><span class="mf">0.5</span><span class="o">**</span><span class="p">(</span><span class="n">N</span><span class="o">/</span><span class="n">nfa</span><span class="p">)</span><span class="o">-</span><span class="n">igf</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">deno</span><span class="o">+</span><span class="n">eps</span><span class="p">))</span>
+
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">thred</span><span class="o">-</span><span class="n">thred0</span><span class="p">)</span><span class="o">*</span><span class="mf">10000.0</span>
+        <span class="n">thred0</span> <span class="o">=</span> <span class="n">thred</span>
+
+    <span class="k">return</span> <span class="n">thred</span>
+
+
+<div class="viewcode-block" id="roc_pd"><a class="viewcode-back" href="../../tools.html#radarsimpy.tools.roc_pd">[docs]</a><span class="k">def</span> <span class="nf">roc_pd</span><span class="p">(</span><span class="n">pfa</span><span class="p">,</span> <span class="n">snr</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stype</span><span class="o">=</span><span class="s1">&#39;Coherent&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate probability of detection (Pd) in receiver operating</span>
+<span class="sd">       characteristic (ROC)</span>
+
+<span class="sd">    :param pfa:</span>
+<span class="sd">        Probability of false alarm (Pfa)</span>
+<span class="sd">    :type pfa: float or numpy.1darray</span>
+<span class="sd">    :param snr:</span>
+<span class="sd">        Signal to noise ratio in decibel (dB)</span>
+<span class="sd">    :type snr: float or numpy.1darray</span>
+<span class="sd">    :param int N:</span>
+<span class="sd">        Number of pulses for integration (default is 1)</span>
+<span class="sd">    :param str stype:</span>
+<span class="sd">        Signal type (default is &#39;Coherent&#39;)</span>
+
+<span class="sd">        - &#39;Coherent&#39;: Non-fluctuating coherent</span>
+<span class="sd">        - &#39;Real&#39;: Non-fluctuating real signal</span>
+<span class="sd">        - &#39;Swerling 0&#39;: Non-coherent Swerling 0, Non-fluctuating non-coherent</span>
+<span class="sd">        - &#39;Swerling 1&#39;: Non-coherent Swerling 1</span>
+<span class="sd">        - &#39;Swerling 2&#39;: Non-coherent Swerling 2</span>
+<span class="sd">        - &#39;Swerling 3&#39;: Non-coherent Swerling 3</span>
+<span class="sd">        - &#39;Swerling 4&#39;: Non-coherent Swerling 4</span>
+<span class="sd">        - &#39;Swerling 5&#39;: Non-coherent Swerling 5, Non-fluctuating non-coherent</span>
+<span class="sd">    </span>
+<span class="sd">    :return: probability of detection (Pd)</span>
+<span class="sd">            if both &#39;pfa&#39; and &#39;snr&#39; are floats, &#39;pd&#39; is a float</span>
+<span class="sd">            if &#39;pfa&#39; is a 1-D array or &#39;snr&#39; is a 1-D array, &#39;pd&#39; is a 1-D array</span>
+<span class="sd">            if both &#39;pfa&#39; and &#39;snr&#39; are 1-D arrays, &#39;pd&#39; is a 2-D array</span>
+<span class="sd">    :rtype: float or 1-D array or 2-D array</span>
+
+<span class="sd">    *Reference*</span>
+
+<span class="sd">    Mahafza, Bassem R. Radar systems analysis and design using MATLAB.</span>
+<span class="sd">    Chapman and Hall/CRC, 2005.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">snr_db</span> <span class="o">=</span> <span class="n">snr</span>
+    <span class="n">snr</span> <span class="o">=</span> <span class="mf">10.0</span><span class="o">**</span><span class="p">(</span><span class="n">snr_db</span><span class="o">/</span><span class="mf">10.</span><span class="p">)</span>
+
+    <span class="n">size_pfa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">pfa</span><span class="p">)</span>
+    <span class="n">size_snr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">snr</span><span class="p">)</span>
+
+    <span class="n">pd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">size_pfa</span><span class="p">,</span> <span class="n">size_snr</span><span class="p">))</span>
+
+    <span class="n">it_pfa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nditer</span><span class="p">(</span><span class="n">pfa</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;f_index&#39;</span><span class="p">])</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">it_pfa</span><span class="o">.</span><span class="n">finished</span><span class="p">:</span>
+        <span class="n">thred</span> <span class="o">=</span> <span class="n">threshold</span><span class="p">(</span><span class="n">it_pfa</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">N</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">stype</span> <span class="o">==</span> <span class="s1">&#39;Swerling 1&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">N</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">pd</span><span class="p">[</span><span class="n">it_pfa</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">thred</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">snr</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">temp_sw1</span> <span class="o">=</span> <span class="mi">1</span><span class="o">+</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">N</span><span class="o">*</span><span class="n">snr</span><span class="p">)</span>
+                <span class="n">igf1</span> <span class="o">=</span> <span class="n">gammainc</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">thred</span><span class="p">)</span>
+                <span class="n">igf2</span> <span class="o">=</span> <span class="n">gammainc</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">thred</span><span class="o">/</span><span class="n">temp_sw1</span><span class="p">)</span>
+                <span class="n">pd</span><span class="p">[</span><span class="n">it_pfa</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">1</span><span class="o">-</span><span class="n">igf1</span> <span class="o">+</span> \
+                    <span class="p">(</span><span class="n">temp_sw1</span><span class="o">**</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">*</span><span class="n">igf2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">thred</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">N</span><span class="o">*</span><span class="n">snr</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">stype</span> <span class="o">==</span> <span class="s1">&#39;Swerling 2&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">N</span> <span class="o">&lt;=</span> <span class="mi">50</span><span class="p">):</span>
+                <span class="n">pd</span><span class="p">[</span><span class="n">it_pfa</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">1</span><span class="o">-</span><span class="n">gammainc</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="p">(</span><span class="n">thred</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">snr</span><span class="p">)))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">V</span> <span class="o">=</span> <span class="p">(</span><span class="n">thred</span><span class="o">-</span><span class="n">N</span><span class="o">*</span><span class="p">(</span><span class="n">snr</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">N</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">snr</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+                <span class="n">Vsqr</span> <span class="o">=</span> <span class="n">V</span><span class="o">**</span><span class="mi">2</span>
+                <span class="n">val1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">Vsqr</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+                <span class="n">val2</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">9</span><span class="o">*</span><span class="n">N</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">Vsqr</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="mf">0.25</span><span class="o">*</span><span class="n">V</span> <span class="o">*</span> \
+                    <span class="p">(</span><span class="mi">3</span><span class="o">-</span><span class="n">Vsqr</span><span class="p">)</span><span class="o">/</span><span class="n">N</span><span class="o">-</span><span class="n">V</span><span class="o">*</span><span class="p">(</span><span class="n">V</span><span class="o">**</span><span class="mi">4</span><span class="o">-</span><span class="mi">10</span><span class="o">*</span><span class="n">Vsqr</span><span class="o">+</span><span class="mi">15</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">18</span><span class="o">*</span><span class="n">N</span><span class="p">)</span>
+                <span class="n">pd</span><span class="p">[</span><span class="n">it_pfa</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">erfc</span><span class="p">(</span><span class="n">V</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="o">-</span><span class="n">val1</span><span class="o">*</span><span class="n">val2</span>
+        <span class="k">elif</span> <span class="n">stype</span> <span class="o">==</span> <span class="s1">&#39;Swerling 3&#39;</span><span class="p">:</span>
+            <span class="n">temp_1</span> <span class="o">=</span> <span class="n">thred</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mf">0.5</span><span class="o">*</span><span class="n">N</span><span class="o">*</span><span class="n">snr</span><span class="p">)</span>
+            <span class="n">ko</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">temp_1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="n">N</span><span class="o">*</span><span class="n">snr</span><span class="p">))</span><span class="o">**</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> \
+                <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">temp_1</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">N</span><span class="o">*</span><span class="n">snr</span><span class="p">))</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">N</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">):</span>
+                <span class="n">pd</span><span class="p">[</span><span class="n">it_pfa</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">ko</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">log_factorial</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mf">2.</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">500</span><span class="p">:</span>
+                    <span class="n">temp4</span> <span class="o">=</span> <span class="n">thred</span><span class="o">**</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">thred</span><span class="p">)</span> <span class="o">/</span> \
+                        <span class="p">(</span><span class="n">temp_1</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_factorial</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mf">2.</span><span class="p">)))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">temp4</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">pd</span><span class="p">[</span><span class="n">it_pfa</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">temp4</span><span class="o">+</span><span class="mi">1</span><span class="o">-</span><span class="n">gammainc</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">thred</span><span class="p">)</span> <span class="o">+</span> \
+                    <span class="n">ko</span><span class="o">*</span><span class="n">gammainc</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">thred</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="n">N</span><span class="o">*</span><span class="n">snr</span><span class="p">)))</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">pd</span><span class="p">[</span><span class="n">it_pfa</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="p">:])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">pd</span><span class="p">[</span><span class="n">it_pfa</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="p">:]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">pd</span><span class="p">[</span><span class="n">it_pfa</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">neg_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pd</span><span class="p">[</span><span class="n">it_pfa</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="p">:]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">pd</span><span class="p">[</span><span class="n">it_pfa</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="p">:][</span><span class="n">neg_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">stype</span> <span class="o">==</span> <span class="s1">&#39;Swerling 4&#39;</span><span class="p">:</span>
+            <span class="n">beta</span> <span class="o">=</span> <span class="mi">1</span><span class="o">+</span><span class="n">snr</span><span class="o">/</span><span class="mi">2</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">N</span> <span class="o">&gt;=</span> <span class="mi">50</span><span class="p">):</span>
+                <span class="n">omegabar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">N</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">beta</span><span class="o">**</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+                <span class="n">c3</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">beta</span><span class="o">**</span><span class="mi">3</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">beta</span><span class="o">**</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">omegabar</span><span class="p">)</span>
+                <span class="n">c4</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">beta</span><span class="o">**</span><span class="mi">4</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">N</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">beta</span><span class="o">**</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">c6</span> <span class="o">=</span> <span class="n">c3</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="mi">2</span>
+                <span class="n">V</span> <span class="o">=</span> <span class="p">(</span><span class="n">thred</span><span class="o">-</span><span class="n">N</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">snr</span><span class="p">))</span><span class="o">/</span><span class="n">omegabar</span>
+                <span class="n">Vsqr</span> <span class="o">=</span> <span class="n">V</span><span class="o">**</span><span class="mi">2</span>
+                <span class="n">val1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">Vsqr</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+                <span class="n">val2</span> <span class="o">=</span> <span class="n">c3</span><span class="o">*</span><span class="p">(</span><span class="n">V</span><span class="o">**</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">c4</span><span class="o">*</span><span class="n">V</span><span class="o">*</span><span class="p">(</span><span class="mi">3</span><span class="o">-</span><span class="n">V</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">-</span><span class="n">c6</span><span class="o">*</span><span class="n">V</span><span class="o">*</span><span class="p">(</span><span class="n">V</span><span class="o">**</span><span class="mi">4</span><span class="o">-</span><span class="mi">10</span><span class="o">*</span><span class="n">V</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="mi">15</span><span class="p">)</span>
+                <span class="n">pd</span><span class="p">[</span><span class="n">it_pfa</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">erfc</span><span class="p">(</span><span class="n">V</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="o">-</span><span class="n">val1</span><span class="o">*</span><span class="n">val2</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">gamma0</span> <span class="o">=</span> <span class="n">gammainc</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">thred</span><span class="o">/</span><span class="n">beta</span><span class="p">)</span>
+                <span class="n">a1</span> <span class="o">=</span> <span class="p">(</span><span class="n">thred</span><span class="o">/</span><span class="n">beta</span><span class="p">)</span><span class="o">**</span><span class="n">N</span> <span class="o">/</span> \
+                    <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_factorial</span><span class="p">(</span><span class="n">N</span><span class="p">))</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">thred</span><span class="o">/</span><span class="n">beta</span><span class="p">))</span>
+                <span class="n">sum_var</span> <span class="o">=</span> <span class="n">gamma0</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="n">temp_sw4</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+                        <span class="n">ai</span> <span class="o">=</span> <span class="n">a1</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">ai</span> <span class="o">=</span> <span class="p">(</span><span class="n">thred</span><span class="o">/</span><span class="n">beta</span><span class="p">)</span><span class="o">*</span><span class="n">a1</span><span class="o">/</span><span class="p">(</span><span class="n">N</span><span class="o">+</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="n">a1</span> <span class="o">=</span> <span class="n">ai</span>
+                    <span class="n">gammai</span> <span class="o">=</span> <span class="n">gamma0</span><span class="o">-</span><span class="n">ai</span>
+                    <span class="n">gamma0</span> <span class="o">=</span> <span class="n">gammai</span>
+                    <span class="n">a1</span> <span class="o">=</span> <span class="n">ai</span>
+
+                    <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+                        <span class="n">temp_sw4</span> <span class="o">=</span> <span class="n">temp_sw4</span><span class="o">*</span><span class="p">(</span><span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="o">-</span><span class="n">ii</span><span class="p">)</span>
+
+                    <span class="n">term</span> <span class="o">=</span> <span class="p">(</span><span class="n">snr</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="n">i</span><span class="o">*</span><span class="n">gammai</span><span class="o">*</span><span class="n">temp_sw4</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_factorial</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+                    <span class="n">sum_var</span> <span class="o">=</span> <span class="n">sum_var</span><span class="o">+</span><span class="n">term</span>
+                <span class="n">pd</span><span class="p">[</span><span class="n">it_pfa</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">1</span><span class="o">-</span><span class="n">sum_var</span><span class="o">/</span><span class="n">beta</span><span class="o">**</span><span class="n">N</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">pd</span><span class="p">[</span><span class="n">it_pfa</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="p">:])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">pd</span><span class="p">[</span><span class="n">it_pfa</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="p">:]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">pd</span><span class="p">[</span><span class="n">it_pfa</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">neg_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pd</span><span class="p">[</span><span class="n">it_pfa</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="p">:]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">pd</span><span class="p">[</span><span class="n">it_pfa</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="p">:][</span><span class="n">neg_idx</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">elif</span> <span class="n">stype</span> <span class="o">==</span> <span class="s1">&#39;Swerling 5&#39;</span> <span class="ow">or</span> <span class="n">stype</span> <span class="o">==</span> <span class="s1">&#39;Swerling 0&#39;</span><span class="p">:</span>
+            <span class="n">temp_1</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">snr</span><span class="o">+</span><span class="mi">1</span>
+            <span class="n">omegabar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">N</span><span class="o">*</span><span class="n">temp_1</span><span class="p">)</span>
+            <span class="n">c3</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">snr</span><span class="o">+</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">N</span><span class="p">)</span><span class="o">*</span><span class="n">temp_1</span><span class="o">**</span><span class="mf">1.5</span><span class="p">)</span>
+            <span class="n">c4</span> <span class="o">=</span> <span class="p">(</span><span class="n">snr</span><span class="o">+</span><span class="mf">0.25</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">N</span><span class="o">*</span><span class="n">temp_1</span><span class="o">**</span><span class="mf">2.</span><span class="p">)</span>
+            <span class="n">c6</span> <span class="o">=</span> <span class="n">c3</span><span class="o">*</span><span class="n">c3</span><span class="o">/</span><span class="mi">2</span>
+            <span class="n">V</span> <span class="o">=</span> <span class="p">(</span><span class="n">thred</span><span class="o">-</span><span class="n">N</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">snr</span><span class="p">))</span><span class="o">/</span><span class="n">omegabar</span>
+            <span class="n">Vsqr</span> <span class="o">=</span> <span class="n">V</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">val1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">Vsqr</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+            <span class="n">val2</span> <span class="o">=</span> <span class="n">c3</span><span class="o">*</span><span class="p">(</span><span class="n">V</span><span class="o">**</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">c4</span><span class="o">*</span><span class="n">V</span><span class="o">*</span><span class="p">(</span><span class="mi">3</span><span class="o">-</span><span class="n">V</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> \
+                <span class="n">c6</span><span class="o">*</span><span class="n">V</span><span class="o">*</span><span class="p">(</span><span class="n">V</span><span class="o">**</span><span class="mi">4</span><span class="o">-</span><span class="mi">10</span><span class="o">*</span><span class="n">V</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="mi">15</span><span class="p">)</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">erfc</span><span class="p">(</span><span class="n">V</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+            <span class="n">pd</span><span class="p">[</span><span class="n">it_pfa</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">q</span><span class="o">-</span><span class="n">val1</span><span class="o">*</span><span class="n">val2</span>
+        <span class="k">elif</span> <span class="n">stype</span> <span class="o">==</span> <span class="s1">&#39;Coherent&#39;</span><span class="p">:</span>
+            <span class="n">snr</span> <span class="o">=</span> <span class="n">snr</span><span class="o">*</span><span class="n">N</span>
+            <span class="n">pd</span><span class="p">[</span><span class="n">it_pfa</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">erfc</span><span class="p">(</span><span class="n">erfcinv</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">it_pfa</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">snr</span><span class="p">))</span><span class="o">/</span><span class="mi">2</span>
+        <span class="k">elif</span> <span class="n">stype</span> <span class="o">==</span> <span class="s1">&#39;Real&#39;</span><span class="p">:</span>
+            <span class="n">snr</span> <span class="o">=</span> <span class="n">snr</span><span class="o">*</span><span class="n">N</span><span class="o">/</span><span class="mi">2</span>
+            <span class="n">pd</span><span class="p">[</span><span class="n">it_pfa</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">erfc</span><span class="p">(</span><span class="n">erfcinv</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">it_pfa</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">snr</span><span class="p">))</span><span class="o">/</span><span class="mi">2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">it_pfa</span><span class="o">.</span><span class="n">iternext</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">size_pfa</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">size_snr</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">size_pfa</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">size_snr</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">elif</span> <span class="n">size_pfa</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">size_snr</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pd</span></div>
+
+
+<div class="viewcode-block" id="roc_snr"><a class="viewcode-back" href="../../tools.html#radarsimpy.tools.roc_snr">[docs]</a><span class="k">def</span> <span class="nf">roc_snr</span><span class="p">(</span><span class="n">pfa</span><span class="p">,</span> <span class="n">pd</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stype</span><span class="o">=</span><span class="s1">&#39;Coherent&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculate the minimal SNR for certain probability of</span>
+<span class="sd">       detection (Pd) and probability of false alarm (Pfa) in</span>
+<span class="sd">       receiver operating characteristic (ROC) with Secant method</span>
+
+<span class="sd">    :param pfa:</span>
+<span class="sd">        Probability of false alarm (Pfa)</span>
+<span class="sd">    :type pfa: float or numpy.1darray</span>
+<span class="sd">    :param pd:</span>
+<span class="sd">         Probability of detection (Pd)</span>
+<span class="sd">    :type pd: float or numpy.1darray</span>
+<span class="sd">    :param int N:</span>
+<span class="sd">        Number of pulses for integration (default is 1)</span>
+<span class="sd">    :param str stype:</span>
+<span class="sd">        Signal type (default is &#39;Coherent&#39;)</span>
+
+<span class="sd">        - &#39;Coherent&#39; : Non-fluctuating coherent</span>
+<span class="sd">        - &#39;Real&#39; : Non-fluctuating real signal</span>
+<span class="sd">        - &#39;Swerling 0&#39; : Non-coherent Swerling 0, Non-fluctuating non-coherent</span>
+<span class="sd">        - &#39;Swerling 1&#39; : Non-coherent Swerling 1</span>
+<span class="sd">        - &#39;Swerling 2&#39; : Non-coherent Swerling 2</span>
+<span class="sd">        - &#39;Swerling 3&#39; : Non-coherent Swerling 3</span>
+<span class="sd">        - &#39;Swerling 4&#39; : Non-coherent Swerling 4</span>
+<span class="sd">        - &#39;Swerling 5&#39; : Non-coherent Swerling 5, Non-fluctuating non-coherent</span>
+
+<span class="sd">    :return: Minimal signal to noise ratio in decibel (dB)</span>
+<span class="sd">            if both &#39;pfa&#39; and &#39;pd&#39; are floats, &#39;SNR&#39; is a float</span>
+<span class="sd">            if &#39;pfa&#39; is a 1-D array or &#39;pd&#39; is a 1-D array, &#39;SNR&#39; is a 1-D array</span>
+<span class="sd">            if both &#39;pfa&#39; and &#39;pd&#39; are 1-D arrays, &#39;SNR&#39; is a 2-D array</span>
+<span class="sd">    :rtype: float or 1-D array or 2-D array</span>
+
+<span class="sd">    *Reference*</span>
+
+<span class="sd">    Secant method:</span>
+
+<span class="sd">        The x intercept of the secant line on the the Nth interval</span>
+<span class="sd">        m_n = a_n - f(a_n)*(b_n - a_n)/(f(b_n) - f(a_n))</span>
+<span class="sd">        The initial interval [a_0,b_0] is given by [a,b]. If f(m_n) == 0</span>
+<span class="sd">        for some intercept m_n then the function returns this solution.</span>
+<span class="sd">        If all signs of values f(a_n), f(b_n) and f(m_n) are the same at any</span>
+<span class="sd">        iterations, the secant method fails and return None.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">fun</span><span class="p">(</span><span class="n">pfa</span><span class="p">,</span> <span class="n">pd</span><span class="p">,</span> <span class="n">snr</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">roc_pd</span><span class="p">(</span><span class="n">pfa</span><span class="p">,</span> <span class="n">snr</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">stype</span><span class="p">)</span><span class="o">-</span><span class="n">pd</span>
+
+    <span class="n">max_iter</span> <span class="o">=</span> <span class="mi">1000</span>
+    <span class="n">snra</span> <span class="o">=</span> <span class="mi">40</span>
+    <span class="n">snrb</span> <span class="o">=</span> <span class="o">-</span><span class="mi">30</span>
+
+    <span class="n">size_pd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">pd</span><span class="p">)</span>
+    <span class="n">size_pfa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">pfa</span><span class="p">)</span>
+    <span class="n">snr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">size_pfa</span><span class="p">,</span> <span class="n">size_pd</span><span class="p">))</span>
+
+    <span class="n">it_pfa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nditer</span><span class="p">(</span><span class="n">pfa</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;f_index&#39;</span><span class="p">])</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">it_pfa</span><span class="o">.</span><span class="n">finished</span><span class="p">:</span>
+
+        <span class="n">it_pd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nditer</span><span class="p">(</span><span class="n">pd</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;f_index&#39;</span><span class="p">])</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">it_pd</span><span class="o">.</span><span class="n">finished</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">fun</span><span class="p">(</span><span class="n">it_pfa</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">it_pd</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">snra</span><span class="p">)</span> <span class="o">*</span>\
+                    <span class="n">fun</span><span class="p">(</span><span class="n">it_pfa</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">it_pd</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">snrb</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># print(&quot;Initializing Secant method fails.&quot;)</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="n">a_n</span> <span class="o">=</span> <span class="n">snra</span>
+            <span class="n">b_n</span> <span class="o">=</span> <span class="n">snrb</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">m_n</span> <span class="o">=</span> <span class="n">a_n</span><span class="o">-</span><span class="n">fun</span><span class="p">(</span><span class="n">it_pfa</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">it_pd</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">a_n</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">b_n</span><span class="o">-</span><span class="n">a_n</span><span class="p">)</span> <span class="o">/</span> \
+                    <span class="p">(</span><span class="n">fun</span><span class="p">(</span><span class="n">it_pfa</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">it_pd</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">b_n</span><span class="p">)</span> <span class="o">-</span>
+                     <span class="n">fun</span><span class="p">(</span><span class="n">it_pfa</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">it_pd</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">a_n</span><span class="p">))</span>
+                <span class="n">f_m_n</span> <span class="o">=</span> <span class="n">fun</span><span class="p">(</span><span class="n">it_pfa</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">it_pd</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">m_n</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">f_m_n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># print(&quot;Found exact solution.&quot;)</span>
+                    <span class="n">snr</span><span class="p">[</span><span class="n">it_pfa</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">it_pd</span><span class="o">.</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">m_n</span>
+                    <span class="k">break</span>
+                <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">f_m_n</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.00001</span><span class="p">:</span>
+                    <span class="c1"># print(&quot;Reach threshold.&quot;)</span>
+                    <span class="n">snr</span><span class="p">[</span><span class="n">it_pfa</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">it_pd</span><span class="o">.</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">m_n</span>
+                    <span class="k">break</span>
+                <span class="k">elif</span> <span class="n">fun</span><span class="p">(</span><span class="n">it_pfa</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">it_pd</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">a_n</span><span class="p">)</span><span class="o">*</span><span class="n">f_m_n</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">a_n</span> <span class="o">=</span> <span class="n">a_n</span>
+                    <span class="n">b_n</span> <span class="o">=</span> <span class="n">m_n</span>
+                <span class="k">elif</span> <span class="n">fun</span><span class="p">(</span><span class="n">it_pfa</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">it_pd</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">b_n</span><span class="p">)</span><span class="o">*</span><span class="n">f_m_n</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">a_n</span> <span class="o">=</span> <span class="n">m_n</span>
+                    <span class="n">b_n</span> <span class="o">=</span> <span class="n">b_n</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># print(&quot;Secant method fails.&quot;)</span>
+                    <span class="c1"># return None</span>
+                    <span class="n">snr</span><span class="p">[</span><span class="n">it_pfa</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">it_pd</span><span class="o">.</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;nan&#39;</span><span class="p">)</span>
+                    <span class="k">break</span>
+            <span class="c1"># return a_n-fun(a_n)*(b_n-a_n)/(fun(b_n)-fun(a_n))</span>
+            <span class="n">snr</span><span class="p">[</span><span class="n">it_pfa</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">it_pd</span><span class="o">.</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">a_n</span> <span class="o">-</span> \
+                <span class="n">fun</span><span class="p">(</span><span class="n">it_pfa</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">it_pd</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">a_n</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">b_n</span><span class="o">-</span><span class="n">a_n</span><span class="p">)</span> <span class="o">/</span> \
+                <span class="p">(</span><span class="n">fun</span><span class="p">(</span><span class="n">it_pfa</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">it_pd</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">b_n</span><span class="p">)</span><span class="o">-</span><span class="n">fun</span><span class="p">(</span><span class="n">it_pfa</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">it_pd</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">a_n</span><span class="p">))</span>
+            <span class="n">it_pd</span><span class="o">.</span><span class="n">iternext</span><span class="p">()</span>
+        <span class="n">it_pfa</span><span class="o">.</span><span class="n">iternext</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">size_pfa</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">size_pd</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">snr</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">size_pfa</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">size_pd</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">snr</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">elif</span> <span class="n">size_pfa</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">size_pd</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">snr</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">snr</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">RadarSimPy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../radar.html">radarsimpy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tools.html">radarsimpy.tools</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Zhengyu Peng.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

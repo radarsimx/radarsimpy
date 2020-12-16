@@ -1,47 +1,46 @@
 #!python
 # cython: language_level=3
-"""
-    This script contains classes that define all the parameters for
-    a radar system
 
-    This script requires that `numpy` be installed within the Python
-    environment you are running this script in.
+# This script contains classes that define all the parameters for
+# a radar system
 
-    This file can be imported as a module and contains the following
-    class:
+# This script requires that 'numpy' be installed within the Python
+# environment you are running this script in.
 
-    * Transmitter - A class defines parameters of a radar transmitter
-    * Receiver - A class defines parameters of a radar receiver
-    * Radar - A class defines basic parameters of a radar system
+# This file can be imported as a module and contains the following
+# class:
 
-    ----------
-    RadarSimPy - A Radar Simulator Built with Python
-    Copyright (C) 2018 - 2020  Zhengyu Peng
-    E-mail: zpeng.me@gmail.com
-    Website: https://zpeng.me
+# * Transmitter - A class defines parameters of a radar transmitter
+# * Receiver - A class defines parameters of a radar receiver
+# * Radar - A class defines basic parameters of a radar system
 
-    `                      `
-    -:.                  -#:
-    -//:.              -###:
-    -////:.          -#####:
-    -/:.://:.      -###++##:
-    ..   `://:-  -###+. :##:
-           `:/+####+.   :##:
-    .::::::::/+###.     :##:
-    .////-----+##:    `:###:
-     `-//:.   :##:  `:###/.
-       `-//:. :##:`:###/.
-         `-//:+######/.
-           `-/+####/.
-             `+##+.
-              :##:
-              :##:
-              :##:
-              :##:
-              :##:
-               .+:
+# ----------
+# RadarSimPy - A Radar Simulator Built with Python
+# Copyright (C) 2018 - 2020  Zhengyu Peng
+# E-mail: zpeng.me@gmail.com
+# Website: https://zpeng.me
 
-"""
+# `                      `
+# -:.                  -#:
+# -//:.              -###:
+# -////:.          -#####:
+# -/:.://:.      -###++##:
+# ..   `://:-  -###+. :##:
+#        `:/+####+.   :##:
+# .::::::::/+###.     :##:
+# .////-----+##:    `:###:
+#  `-//:.   :##:  `:###/.
+#    `-//:. :##:`:###/.
+#      `-//:+######/.
+#        `-/+####/.
+#          `+##+.
+#           :##:
+#           :##:
+#           :##:
+#           :##:
+#           :##:
+#            .+:
+
 
 import numpy as np
 import scipy.constants as const
@@ -51,82 +50,90 @@ from scipy.interpolate import interp1d
 class Transmitter:
     """A class defines basic parameters of a radar transmitter
 
-    ...
-
-    Attributes
-    ----------
-    fc : float or 1-D array
-        Center frequency (Hz). If fc is a 1-D array, length
-        should be equal to `pulses`
-    pulse_length : float
+    :param fc:
+        Center frequency (Hz). If fc is a 1-D array, 
+        length should be equal to 'pulses'
+    :type fc: float or numpy.1darray
+    :param float pulse_length:
         Length of each pulse (s)
-    bandwidth : float
+    :param float bandwidth:
         Bandwith of each pulse (Hz)
-    tx_power : float
+    :param float tx_power:
         Transmitter power (dBm)
-    repetition_period : float
-        Pulse repetition period (s). `repetition_period` >=
-        `pulse_length`
-    pulses : int
+    :param float repetition_period:
+        Pulse repetition period (s). 'repetition_period' >=
+        'pulse_length'
+    :param int pulses:
         Total number of pulses
-    slop_type : str
+    :param str slop_type:
         'rising' or 'falling' slop for FMCW waveform
-    channels : list of dict
+    :param channels:
         Properties of transmitter channels
+
         [
             {
-            location : 1D array
+
+            - **location** (*numpy.1darray*) -
                 3D location of the channel <x. y. z> (m)
-            delay : float
+            - **delay** (*float*) -
                 Transmit delay (s)
-            azimuth_angle : 1D array
+            - **azimuth_angle** (*numpy.1darray*) -
                 Angles for azimuth pattern (deg)
-            azimuth_pattern : 1D array
+            - **azimuth_pattern** (*numpy.1darray*) -
                 Azimuth pattern (dB)
-            elevation_angle : 1D array
+            - **elevation_angle** (*numpy.1darray*) -
                 Angles for elevation pattern (deg)
-            elevation_pattern : 1D array
+            - **elevation_pattern** (*numpy.1darray*) -
                 Elevation pattern (dB)
-            phase_code : 1D array
+            - **phase_code** (*numpy.1darray*) -
                 Phase code sequence for phase modulation (deg).
-                If `chip_length` == 0, or `chip_length` is not
-                defined, length of `phase_code` should be equal
-                to `pulses'
-            chip_length : float
-                Length for each phase code (s). If `chip_length` ==
-                0, one pulse will have one `phase_code`. If
-                `chip_length` != 0, all `phase_code` will be
+                If 'chip_length' == 0, or 'chip_length' is not defined,
+                length of 'phase_code' should be equal to 'pulses'
+            - **chip_length** (*float*) -
+                Length for each phase code (s). If 'chip_length' ==
+                0, one pulse will have one 'phase_code'. If
+                'chip_length' != 0, all 'phase_code' will be
                 applied to each pulse
+
             }
+
         ]
-    channel_size : int
+    :type channels: list[dict]
+        Properties of transmitter channels
+
+    :ivar int channel_size:
         Total number of transmitter channels
-    locations : 2D arrays
+    :ivar numpy.2darray locations:
         3D location of the channel <x. y. z> (m)
-    az_angles : list of 1D arrays
+    :ivar numpy.1darray az_angles:
         Angles for azimuth patterns (deg)
-    az_patterns : list of 1D arrays
+    :type az_angles: list[numpy.1darray]
+    :ivar numpy.1darray az_patterns:
         Azimuth pattern (dB)
-    el_angles : list of 1D arrays
+    :type az_patterns: list[numpy.1darray]
+    :ivar numpy.1darray el_angles:
         Angles for elevation pattern (deg)
-    el_patterns : list of 1D arrays
+    :type el_angles: list[numpy.1darray]
+    :ivar el_patterns:
         Elevation pattern (dB)
-    phase_code : list of 1D arrays
+    :type el_patterns: list[numpy.1darray]
+    :ivar phase_code:
         Phase code sequence for phase modulation (deg).
-        If `chip_length` == 0, or `chip_length` is not
-        defined, length of `phase_code` should be equal
-        to `pulses'
-    chip_length : 1D array
-        Length for each phase code (s). If `chip_length` ==
-        0, one pulse will have one `phase_code`. If
-        `chip_length` != 0, all `phase_code` will be
+        If 'chip_length' == 0, or 'chip_length' is not
+        defined, length of 'phase_code' should be equal
+        to 'pulses'
+    :type phase_code: list[numpy.1darray]
+    :ivar numpy.1darray chip_length:
+        Length for each phase code (s). If 'chip_length' ==
+        0, one pulse will have one 'phase_code'. If
+        'chip_length' != 0, all 'phase_code' will be
         applied to each pulse
-    delay : 1D array
+    :ivar numpy.1darray delay:
         Transmit delay (s)
-    wavelength : float
+    :ivar float wavelength:
         Wavelength (m)
-    slope : float
-        Waveform slope, `bandwidth` / `pulse_length`
+    :ivar float slope:
+        Waveform slope, 'bandwidth' / 'pulse_length'
     """
 
     def __init__(self, fc,
@@ -137,64 +144,6 @@ class Transmitter:
                  pulses=1,
                  slop_type='rising',
                  channels=[dict(location=(0, 0, 0))]):
-        """
-        Parameters
-        ----------
-        fc : float or 1-D array
-            Center frequency (Hz). If fc is a 1-D array, length
-            should be equal to `pulses`
-        pulse_length : float
-            Length of each pulse (s)
-        bandwidth : float, optional
-            Bandwith of each pulse (Hz). (default is 0)
-        tx_power : float, optional
-            Transmitter power (dBm). (default is 0)
-        repetition_period : float, optional
-            Pulse repetition period (s). `repetition_period` >=
-            `pulse_length`. (default is `pulse_length`)
-        pulses : int, optional
-            Total number of pulses. (default is 1)
-        slop_type : str. optional
-            'rising' or 'falling' slop for FMCW waveform. (default
-            is 'rising')
-        channels : list of dict, optional
-            Properties of transmitter channels. (default channel
-            locates at (0, 0, 0) m with omni-spherical pattern and
-            0 dB gain)
-            [
-                {
-                location : 1D array
-                    3D location of the channel <x. y. z> (m)
-                delay : float, optional
-                    Transmit delay (s). (default is 0)
-                azimuth_angle : 1D array, optional
-                    Angles for azimuth pattern (deg). (default is an
-                    array from -90 deg to 90 deg)
-                azimuth_pattern : 1D array, optional
-                    Azimuth pattern (dB). (default is an omni-spherical
-                    pattern with 0 dB gain)
-                elevation_angle : 1D array, optional
-                    Angles for elevation pattern (deg). (default is an
-                    array from -90 deg to 90 deg)
-                elevation_pattern : 1D array, optional
-                    Elevation pattern (dB). (default is an omni-
-                    spherical pattern with 0 dB gain)
-                phase_code : 1D array, optional
-                    Phase code sequence for phase modulation (deg).
-                    If `chip_length` == 0, or `chip_length` is not
-                    defined, length of `phase_code` should be equal
-                    to `pulses'. (default is 0)
-                chip_length : float, optional
-                    Length for each phase code (s). If `chip_length` ==
-                    0, one pulse will have one `phase_code`. If
-                    `chip_length` != 0, all `phase_code` will be
-                    applied to each pulse. (default is 0)
-                azimuth_fov
-                elevation_fov
-                grid
-                }
-            ]
-        """
         # self.fc = np.array(fc)
         if isinstance(fc, (list, tuple, np.ndarray)):
             if len(fc) != pulses:
@@ -306,49 +255,50 @@ class Transmitter:
 class Receiver:
     """A class defines basic parameters of a radar receiver
 
-    ...
-
-    Attributes
-    ----------
-    fs : float
+    :param float fs:
         Sampling rate (sps)
-    noise_figure : float
+    :param float noise_figure:
         Noise figure (dB)
-    rf_gain : float
+    :param float rf_gain:
         RF gain (dB)
-    load_resistor : float
+    :param float load_resistor:
         Load resistor to convert power to voltage (Ohm)
-    baseband_gain : float
+    :param float baseband_gain:
         Baseband gain (dB)
-    noise_bandwidth : int
-        Noise bandwith in calculating thermal noise, `fs` / 2
-    channels : list of dict
+    :param int noise_bandwidth:
+        Noise bandwith in calculating thermal noise, 'fs' / 2
+    :param list[dict] channels:
         Properties of transmitter channels
+
         [
             {
-            location : 1D array
+
+            - **location** (*numpy.1darray*) -
                 3D location of the channel <x. y. z> (m)
-            azimuth_angle : 1D array
+            - **azimuth_angle** (*numpy.1darray*) -
                 Angles for azimuth pattern (deg)
-            azimuth_pattern : 1D array
+            - **azimuth_pattern** (*numpy.1darray*) -
                 Azimuth pattern (dB)
-            elevation_angle : 1D array
+            - **elevation_angle** (*numpy.1darray*) -
                 Angles for elevation pattern (deg)
-            elevation_pattern : 1D array
+            - **elevation_pattern** (*numpy.1darray*) -
                 Elevation pattern (dB)
+
             }
+
         ]
-    channel_size : int
+
+    :ivar int channel_size:
         Total number of transmitter channels
-    locations : 2D arrays
+    :ivar numpy.2darray locations:
         3D location of the channel <x. y. z> (m)
-    az_angles : list of 1D arrays
+    :ivar list[numpy.1darray] az_angles:
         Angles for azimuth patterns (deg)
-    az_patterns : list of 1D arrays
+    :ivar list[numpy.1darray] az_patterns:
         Azimuth pattern (dB)
-    el_angles : list of 1D arrays
+    :ivar list[numpy.1darray] el_angles:
         Angles for elevation pattern (deg)
-    el_patterns : list of 1D arrays
+    :ivar list[numpy.1darray] el_patterns:
         Elevation pattern (dB)
     """
 
@@ -358,43 +308,6 @@ class Receiver:
                  load_resistor=500,
                  baseband_gain=0,
                  channels=[dict(location=(0, 0, 0))]):
-        """
-        Parameters
-        ----------
-        fs : float
-            Sampling rate (sps)
-        noise_figure : float, optional
-            Noise figure (dB), (default is 10)
-        rf_gain : float, optional
-            RF gain (dB). (default is 0)
-        load_resistor : float, optional
-            Load resistor to convert power to voltage (Ohm).
-            (default is 500)
-        baseband_gain : float, optional
-            Baseband gain (dB). (default is 0)
-        channels : list of dict, optional
-            Properties of receiver channels. (default channel
-            locates at (0, 0, 0) m with omni-spherical pattern and
-            0 dB gain)
-            [
-                {
-                location : 1D array
-                    3D location of the channel <x. y. z> (m)
-                azimuth_angle : 1D array, optional
-                    Angles for azimuth pattern (deg). (default is an
-                    array from -90 deg to 90 deg)
-                azimuth_pattern : 1D array, optional
-                    Azimuth pattern (dB). (default is an omni-spherical
-                    pattern with 0 dB gain)
-                elevation_angle : 1D array, optional
-                    Angles for elevation pattern (deg). (default is an
-                    array from -90 deg to 90 deg)
-                elevation_pattern : 1D array, optional
-                    Elevation pattern (dB). (default is an omni-
-                    spherical pattern with 0 dB gain)
-                }
-            ]
-        """
         self.fs = fs
         self.noise_figure = noise_figure
         self.rf_gain = rf_gain
@@ -452,19 +365,15 @@ class Receiver:
 class Radar:
     """A class defines basic parameters of a radar system
 
-    ...
-
-    Attributes
-    ----------
-    transmitter : Transmitter
+    :param Transmitter transmitter:
         Radar transmiter
-    receiver : class
+    :param Receiver receiver:
         Radar Receiver
-    samples_per_pulse : int
+    :ivar int samples_per_pulse:
         Number of samples in one pulse
-    channel_size : int
+    :ivar int channel_size:
         Total number of channels
-    virtual_array : numpy 2D array
+    :ivar numpy.2darray virtual_array:
         Locations of virtual array elements. [channel_size, 3 <x, y, z>]
     """
 
@@ -474,18 +383,6 @@ class Radar:
                  time=0,
                  type=None,
                  aperture=None):
-        """
-        Parameters
-        ----------
-        transmitter : Transmitter
-            Radar transmitter
-        receiver : Receiver
-            Radar receiver
-        type : str, optional
-            Type of the waveform (default is None)
-        aperture
-            top, right, bottom, left
-        """
 
         self.transmitter = transmitter
         self.receiver = receiver
@@ -577,12 +474,12 @@ class Radar:
         Parameters
         ----------
         radar : Radar (radarsimpy.Radar)
-            Refer to `radar` parameter in `run_simulator`
+            Refer to 'radar' parameter in 'run_simulator'
 
         Returns
         -------
         3D array
-            A 3D array of timestamp, `[channels, pulses, adc_samples]`
+            A 3D array of timestamp, '[channels, pulses, adc_samples]'
         """
 
         channel_size = self.channel_size
@@ -631,9 +528,9 @@ class Radar:
         Parameters
         ----------
         radar : Radar (radarsimpy.Radar)
-            Refer to `radar` parameter in `run_simulator`
+            Refer to 'radar' parameter in 'run_simulator'
         targets : list of dict
-            Refer to `targets` parameter in `run_simulator`
+            Refer to 'targets' parameter in 'run_simulator'
 
         Returns
         -------
@@ -652,9 +549,9 @@ class Radar:
         Parameters
         ----------
         radar : Radar (radarsimpy.Radar)
-            Refer to `radar` parameter in `run_simulator`
+            Refer to 'radar' parameter in 'run_simulator'
         targets : list of dict
-            Refer to `targets` parameter in `run_simulator`
+            Refer to 'targets' parameter in 'run_simulator'
 
         Returns
         -------
@@ -696,14 +593,14 @@ class Radar:
         Parameters
         ----------
         radar : Radar (radarsimpy.Radar)
-            Refer to `radar` parameter in `run_simulator`
+            Refer to 'radar' parameter in 'run_simulator'
         targets : list of dict
-            Refer to `targets` parameter in `run_simulator`
+            Refer to 'targets' parameter in 'run_simulator'
 
         Returns
         -------
         3D array
-            Noise amplitudes, `[channels, pulses, adc_samples]`
+            Noise amplitudes, '[channels, pulses, adc_samples]'
         """
 
         noise_amp = np.zeros([

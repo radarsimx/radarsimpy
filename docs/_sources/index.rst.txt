@@ -10,7 +10,8 @@ Welcome to RadarSimPy's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   radarsimpy
+   radar
+   tools
 
 
 Indices and tables

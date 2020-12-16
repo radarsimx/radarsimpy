@@ -1,56 +1,55 @@
 #!python
 # cython: language_level=3
-"""
-    Useful tools for radar system analysis
 
-    This script requires that `numpy` and `scipy` be installed within the
-    Python environment you are running this script in.
+# Useful tools for radar system analysis
 
-    This file can be imported as a module and contains the following
-    functions:
+# This script requires that 'numpy' and 'scipy' be installed within the
+# Python environment you are running this script in.
 
-    * threshold - Threshold ratio
-    * roc_pd - Calculate probability of detection (Pd) in receiver operating
-               characteristic (ROC)
-    * roc_snr - Calculate the minimal SNR for certain probability of
-                detection (Pd) and probability of false alarm (Pfa) in
-                receiver operating characteristic (ROC)
+# This file can be imported as a module and contains the following
+# functions:
 
-    ----------
-    RadarSimPy - A Radar Simulator Built with Python
-    Copyright (C) 2018 - 2020  Zhengyu Peng
-    E-mail: zpeng.me@gmail.com
-    Website: https://zpeng.me
+# * threshold - Threshold ratio
+# * roc_pd - Calculate probability of detection (Pd) in receiver operating
+#            characteristic (ROC)
+# * roc_snr - Calculate the minimal SNR for certain probability of
+#             detection (Pd) and probability of false alarm (Pfa) in
+#             receiver operating characteristic (ROC)
 
-    `                      `
-    -:.                  -#:
-    -//:.              -###:
-    -////:.          -#####:
-    -/:.://:.      -###++##:
-    ..   `://:-  -###+. :##:
-           `:/+####+.   :##:
-    .::::::::/+###.     :##:
-    .////-----+##:    `:###:
-     `-//:.   :##:  `:###/.
-       `-//:. :##:`:###/.
-         `-//:+######/.
-           `-/+####/.
-             `+##+.
-              :##:
-              :##:
-              :##:
-              :##:
-              :##:
-               .+:
+# ----------
+# RadarSimPy - A Radar Simulator Built with Python
+# Copyright (C) 2018 - 2020  Zhengyu Peng
+# E-mail: zpeng.me@gmail.com
+# Website: https://zpeng.me
 
-"""
+# `                      `
+# -:.                  -#:
+# -//:.              -###:
+# -////:.          -#####:
+# -/:.://:.      -###++##:
+# ..   `://:-  -###+. :##:
+#        `:/+####+.   :##:
+# .::::::::/+###.     :##:
+# .////-----+##:    `:###:
+#  `-//:.   :##:  `:###/.
+#    `-//:. :##:`:###/.
+#      `-//:+######/.
+#        `-/+####/.
+#          `+##+.
+#           :##:
+#           :##:
+#           :##:
+#           :##:
+#           :##:
+#            .+:
+
 
 import numpy as np
 from scipy.special import erfc, erfcinv, gammainc
 
 
 def log_factorial(n):
-    r"""Compute the factorial of `n` using logarithms to avoid overflow
+    r"""Compute the factorial of 'n' using logarithms to avoid overflow
 
     Parameters
     ----------
@@ -74,9 +73,9 @@ def threshold(pfa, N):
 
     Parameters
     ----------
-    pfa : float
+    :param pfa : float
         Probability of false alarm
-    N : int
+    :param N : int
         Number of pulses for integration
 
     Return
@@ -111,38 +110,36 @@ def roc_pd(pfa, snr, N=1, stype='Coherent'):
     """Calculate probability of detection (Pd) in receiver operating
        characteristic (ROC)
 
-    Parameters
-    ----------
-    pfa : float or 1-D array
+    :param pfa:
         Probability of false alarm (Pfa)
-    snr : float or 1-D array
+    :type pfa: float or numpy.1darray
+    :param snr:
         Signal to noise ratio in decibel (dB)
-    N : int (optional)
+    :type snr: float or numpy.1darray
+    :param int N:
         Number of pulses for integration (default is 1)
-    stype : str (optional)
-        Signal type (default is `Coherent`)
-        - `Coherent` : Non-fluctuating coherent
-        - `Real` : Non-fluctuating real signal
-        - `Swerling 0` : Non-coherent Swerling 0, Non-fluctuating non-coherent
-        - `Swerling 1` : Non-coherent Swerling 1
-        - `Swerling 2` : Non-coherent Swerling 2
-        - `Swerling 3` : Non-coherent Swerling 3
-        - `Swerling 4` : Non-coherent Swerling 4
-        - `Swerling 5` : Non-coherent Swerling 5, Non-fluctuating non-coherent
+    :param str stype:
+        Signal type (default is 'Coherent')
 
-    Returns
-    -------
-    pd : float or 1-D array or 2-D array
-        probability of detection (Pd)
-        ---
-        if both `pfa` and `snr` are floats, `pd` is a float
-        if `pfa` is a 1-D array or `snr` is a 1-D array, `pd` is a 1-D array
-        if both `pfa` and `snr` are 1-D arrays, `pd` is a 2-D array
+        - 'Coherent': Non-fluctuating coherent
+        - 'Real': Non-fluctuating real signal
+        - 'Swerling 0': Non-coherent Swerling 0, Non-fluctuating non-coherent
+        - 'Swerling 1': Non-coherent Swerling 1
+        - 'Swerling 2': Non-coherent Swerling 2
+        - 'Swerling 3': Non-coherent Swerling 3
+        - 'Swerling 4': Non-coherent Swerling 4
+        - 'Swerling 5': Non-coherent Swerling 5, Non-fluctuating non-coherent
+    
+    :return: probability of detection (Pd)
+            if both 'pfa' and 'snr' are floats, 'pd' is a float
+            if 'pfa' is a 1-D array or 'snr' is a 1-D array, 'pd' is a 1-D array
+            if both 'pfa' and 'snr' are 1-D arrays, 'pd' is a 2-D array
+    :rtype: float or 1-D array or 2-D array
 
-    Reference
-    ---------
+    *Reference*
+
     Mahafza, Bassem R. Radar systems analysis and design using MATLAB.
-        Chapman and Hall/CRC, 2005.
+    Chapman and Hall/CRC, 2005.
     """
     snr_db = snr
     snr = 10.0**(snr_db/10.)
@@ -274,39 +271,38 @@ def roc_snr(pfa, pd, N=1, stype='Coherent'):
        detection (Pd) and probability of false alarm (Pfa) in
        receiver operating characteristic (ROC) with Secant method
 
-    Parameters
-    ----------
-    pfa : float or 1-D array
+    :param pfa:
         Probability of false alarm (Pfa)
-    pd : float or 1-D array
+    :type pfa: float or numpy.1darray
+    :param pd:
          Probability of detection (Pd)
-    N : int (optional)
+    :type pd: float or numpy.1darray
+    :param int N:
         Number of pulses for integration (default is 1)
-    stype : str (optional)
-        Signal type (default is `Coherent`)
-        - `Coherent` : Non-fluctuating coherent
-        - `Real` : Non-fluctuating real signal
-        - `Swerling 0` : Non-coherent Swerling 0, Non-fluctuating non-coherent
-        - `Swerling 1` : Non-coherent Swerling 1
-        - `Swerling 2` : Non-coherent Swerling 2
-        - `Swerling 3` : Non-coherent Swerling 3
-        - `Swerling 4` : Non-coherent Swerling 4
-        - `Swerling 5` : Non-coherent Swerling 5, Non-fluctuating non-coherent
+    :param str stype:
+        Signal type (default is 'Coherent')
 
-    Returns
-    -------
-    SNR :  float or 1-D array or 2-D array
-        Minimal signal to noise ratio in decibel (dB)
-        ---
-        if both `pfa` and `pd` are floats, `SNR` is a float
-        if `pfa` is a 1-D array or `pd` is a 1-D array, `SNR` is a 1-D array
-        if both `pfa` and `pd` are 1-D arrays, `SNR` is a 2-D array
+        - 'Coherent' : Non-fluctuating coherent
+        - 'Real' : Non-fluctuating real signal
+        - 'Swerling 0' : Non-coherent Swerling 0, Non-fluctuating non-coherent
+        - 'Swerling 1' : Non-coherent Swerling 1
+        - 'Swerling 2' : Non-coherent Swerling 2
+        - 'Swerling 3' : Non-coherent Swerling 3
+        - 'Swerling 4' : Non-coherent Swerling 4
+        - 'Swerling 5' : Non-coherent Swerling 5, Non-fluctuating non-coherent
 
-    Reference
-    ---------
+    :return: Minimal signal to noise ratio in decibel (dB)
+            if both 'pfa' and 'pd' are floats, 'SNR' is a float
+            if 'pfa' is a 1-D array or 'pd' is a 1-D array, 'SNR' is a 1-D array
+            if both 'pfa' and 'pd' are 1-D arrays, 'SNR' is a 2-D array
+    :rtype: float or 1-D array or 2-D array
+
+    *Reference*
+
     Secant method:
+
         The x intercept of the secant line on the the Nth interval
-            m_n = a_n - f(a_n)*(b_n - a_n)/(f(b_n) - f(a_n))
+        m_n = a_n - f(a_n)*(b_n - a_n)/(f(b_n) - f(a_n))
         The initial interval [a_0,b_0] is given by [a,b]. If f(m_n) == 0
         for some intercept m_n then the function returns this solution.
         If all signs of values f(a_n), f(b_n) and f(m_n) are the same at any

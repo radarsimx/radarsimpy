@@ -37,13 +37,8 @@ from .radar import Radar
 from .radar import Transmitter
 from .radar import Receiver
 
-from .simulator import run_simulator as simulator
-from .rt.simulatorcpp import run_simulator as simulatorcpp
-# from .processing import cal_range_profile
-# from .processing import cal_range_doppler
-# from .processing import get_polar_image
+# from .simulator import run_simulator as simulator
+# from .rt.simulatorcpp import run_simulator as simulatorcpp
 
-# # roc
-# from .tools import roc_pd, roc_snr, threshold
 
 __version__ = '2.5.1'

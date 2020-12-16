@@ -1,0 +1,200 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>radarsimpy.tools &#8212; RadarSimPy  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="radarsimpy" href="radar.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-radarsimpy.tools">
+<span id="radarsimpy-tools"></span><h1>radarsimpy.tools<a class="headerlink" href="#module-radarsimpy.tools" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="radarsimpy.tools.roc_pd">
+<code class="sig-prename descclassname">radarsimpy.tools.</code><code class="sig-name descname">roc_pd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pfa</span></em>, <em class="sig-param"><span class="n">snr</span></em>, <em class="sig-param"><span class="n">N</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">stype</span><span class="o">=</span><span class="default_value">'Coherent'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/radarsimpy/tools.html#roc_pd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#radarsimpy.tools.roc_pd" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Calculate probability of detection (Pd) in receiver operating</dt><dd><p>characteristic (ROC)</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pfa</strong> (<em>float</em><em> or </em><em>numpy.1darray</em>) – Probability of false alarm (Pfa)</p></li>
+<li><p><strong>snr</strong> (<em>float</em><em> or </em><em>numpy.1darray</em>) – Signal to noise ratio in decibel (dB)</p></li>
+<li><p><strong>N</strong> (<em>int</em>) – Number of pulses for integration (default is 1)</p></li>
+<li><p><strong>stype</strong> (<em>str</em>) – <p>Signal type (default is ‘Coherent’)</p>
+<ul>
+<li><p>’Coherent’: Non-fluctuating coherent</p></li>
+<li><p>’Real’: Non-fluctuating real signal</p></li>
+<li><p>’Swerling 0’: Non-coherent Swerling 0, Non-fluctuating non-coherent</p></li>
+<li><p>’Swerling 1’: Non-coherent Swerling 1</p></li>
+<li><p>’Swerling 2’: Non-coherent Swerling 2</p></li>
+<li><p>’Swerling 3’: Non-coherent Swerling 3</p></li>
+<li><p>’Swerling 4’: Non-coherent Swerling 4</p></li>
+<li><p>’Swerling 5’: Non-coherent Swerling 5, Non-fluctuating non-coherent</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>probability of detection (Pd)
+if both ‘pfa’ and ‘snr’ are floats, ‘pd’ is a float
+if ‘pfa’ is a 1-D array or ‘snr’ is a 1-D array, ‘pd’ is a 1-D array
+if both ‘pfa’ and ‘snr’ are 1-D arrays, ‘pd’ is a 2-D array</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float or 1-D array or 2-D array</p>
+</dd>
+</dl>
+<p><em>Reference</em></p>
+<p>Mahafza, Bassem R. Radar systems analysis and design using MATLAB.
+Chapman and Hall/CRC, 2005.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="radarsimpy.tools.roc_snr">
+<code class="sig-prename descclassname">radarsimpy.tools.</code><code class="sig-name descname">roc_snr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pfa</span></em>, <em class="sig-param"><span class="n">pd</span></em>, <em class="sig-param"><span class="n">N</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">stype</span><span class="o">=</span><span class="default_value">'Coherent'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/radarsimpy/tools.html#roc_snr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#radarsimpy.tools.roc_snr" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Calculate the minimal SNR for certain probability of</dt><dd><p>detection (Pd) and probability of false alarm (Pfa) in
+receiver operating characteristic (ROC) with Secant method</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pfa</strong> (<em>float</em><em> or </em><em>numpy.1darray</em>) – Probability of false alarm (Pfa)</p></li>
+<li><p><strong>pd</strong> (<em>float</em><em> or </em><em>numpy.1darray</em>) – Probability of detection (Pd)</p></li>
+<li><p><strong>N</strong> (<em>int</em>) – Number of pulses for integration (default is 1)</p></li>
+<li><p><strong>stype</strong> (<em>str</em>) – <p>Signal type (default is ‘Coherent’)</p>
+<ul>
+<li><p>’Coherent’ : Non-fluctuating coherent</p></li>
+<li><p>’Real’ : Non-fluctuating real signal</p></li>
+<li><p>’Swerling 0’ : Non-coherent Swerling 0, Non-fluctuating non-coherent</p></li>
+<li><p>’Swerling 1’ : Non-coherent Swerling 1</p></li>
+<li><p>’Swerling 2’ : Non-coherent Swerling 2</p></li>
+<li><p>’Swerling 3’ : Non-coherent Swerling 3</p></li>
+<li><p>’Swerling 4’ : Non-coherent Swerling 4</p></li>
+<li><p>’Swerling 5’ : Non-coherent Swerling 5, Non-fluctuating non-coherent</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Minimal signal to noise ratio in decibel (dB)
+if both ‘pfa’ and ‘pd’ are floats, ‘SNR’ is a float
+if ‘pfa’ is a 1-D array or ‘pd’ is a 1-D array, ‘SNR’ is a 1-D array
+if both ‘pfa’ and ‘pd’ are 1-D arrays, ‘SNR’ is a 2-D array</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float or 1-D array or 2-D array</p>
+</dd>
+</dl>
+<p><em>Reference</em></p>
+<p>Secant method:</p>
+<blockquote>
+<div><p>The x intercept of the secant line on the the Nth interval
+m_n = a_n - f(a_n)*(b_n - a_n)/(f(b_n) - f(a_n))
+The initial interval [a_0,b_0] is given by [a,b]. If f(m_n) == 0
+for some intercept m_n then the function returns this solution.
+If all signs of values f(a_n), f(b_n) and f(m_n) are the same at any
+iterations, the secant method fails and return None.</p>
+</div></blockquote>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">RadarSimPy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="radar.html">radarsimpy</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">radarsimpy.tools</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="radar.html" title="previous chapter">radarsimpy</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Zhengyu Peng.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/tools.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

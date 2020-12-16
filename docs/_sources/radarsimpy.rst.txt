@@ -1,10 +1,22 @@
 radarsimpy package
 ===========
 
-radar
+radar module
 --------
 
-.. autoclass:: radarsimpy.radar
+.. autoclass:: radarsimpy.Transmitter
+    :members:
+    :undoc-members:
+    :inherited-members:
+    :show-inheritance:
+
+.. autoclass:: radarsimpy.Receiver
+    :members:
+    :undoc-members:
+    :inherited-members:
+    :show-inheritance:
+
+.. autoclass:: radarsimpy.Radar
     :members:
     :undoc-members:
     :inherited-members:
