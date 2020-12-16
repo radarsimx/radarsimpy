@@ -1,0 +1,30 @@
+radarsimpy package
+===========
+
+radar
+--------
+
+.. autoclass:: radarsimpy.radar
+    :members:
+    :undoc-members:
+    :inherited-members:
+    :show-inheritance:
+
+tools module
+---------------
+
+.. automodule:: radarsimpy.tools
+    :members:
+    :undoc-members:
+    :inherited-members:
+    :show-inheritance:
+
+processing module
+---------------
+
+.. automodule:: radarsimpy.processing
+    :members:
+    :undoc-members:
+    :inherited-members:
+    :show-inheritance:
+

@@ -1,0 +1,419 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>radarsimpy package &#8212; RadarSimPy  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome to RadarSimPy’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="radarsimpy-package">
+<h1>radarsimpy package<a class="headerlink" href="#radarsimpy-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="radar">
+<h2>radar<a class="headerlink" href="#radar" title="Permalink to this headline">¶</a></h2>
+<dl class="py attribute">
+<dt id="radarsimpy.radar">
+<code class="sig-prename descclassname">radarsimpy.</code><code class="sig-name descname">radar</code><a class="headerlink" href="#radarsimpy.radar" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#radarsimpy.radar" title="radarsimpy.radar"><code class="xref py py-class docutils literal notranslate"><span class="pre">radarsimpy.radar</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-radarsimpy.tools">
+<span id="tools-module"></span><h2>tools module<a class="headerlink" href="#module-radarsimpy.tools" title="Permalink to this headline">¶</a></h2>
+<p>Useful tools for radar system analysis</p>
+<p>This script requires that <cite>numpy</cite> and <cite>scipy</cite> be installed within the
+Python environment you are running this script in.</p>
+<p>This file can be imported as a module and contains the following
+functions:</p>
+<ul class="simple">
+<li><p>threshold - Threshold ratio</p></li>
+<li><dl class="simple">
+<dt>roc_pd - Calculate probability of detection (Pd) in receiver operating</dt><dd><p>characteristic (ROC)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>roc_snr - Calculate the minimal SNR for certain probability of</dt><dd><p>detection (Pd) and probability of false alarm (Pfa) in
+receiver operating characteristic (ROC)</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>E-mail: <a class="reference external" href="mailto:zpeng&#46;me&#37;&#52;&#48;gmail&#46;com">zpeng<span>&#46;</span>me<span>&#64;</span>gmail<span>&#46;</span>com</a>
+Website: <a class="reference external" href="https://zpeng.me">https://zpeng.me</a></p>
+<p>`                      `
+-:.                  -#:
+-//:.              -###:
+-////:.          -#####:
+-/:.://:.      -###++##:
+..   <a href="#id1"><span class="problematic" id="id2">`</span></a>://:-  -###+. :##:</p>
+<blockquote>
+<div><p><a href="#id3"><span class="problematic" id="id4">`</span></a>:/+####+.   :##:</p>
+</div></blockquote>
+<p>.::::::::/+###.     :##:
+.////—–+##:    <a href="#id5"><span class="problematic" id="id6">`</span></a>:###:</p>
+<blockquote>
+<div><dl class="simple">
+<dt><a href="#id7"><span class="problematic" id="id8">`</span></a>-//:.   :##:  <a href="#id9"><span class="problematic" id="id10">`</span></a>:###/.</dt><dd><dl class="simple">
+<dt><cite>-//:. :##:</cite>:###/.</dt><dd><dl class="simple">
+<dt><a href="#id11"><span class="problematic" id="id12">`</span></a>-//:+######/.</dt><dd><dl class="simple">
+<dt><a href="#id13"><span class="problematic" id="id14">`</span></a>-/+####/.</dt><dd><dl class="simple">
+<dt><a href="#id15"><span class="problematic" id="id16">`</span></a>+##+.</dt><dd><dl class="field-list simple">
+<dt class="field-odd">##</dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">##</dt>
+<dd class="field-even"><p></p></dd>
+<dt class="field-odd">##</dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">##</dt>
+<dd class="field-even"><p></p></dd>
+<dt class="field-odd">##</dt>
+<dd class="field-odd"><p>.+:</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="py function">
+<dt id="radarsimpy.tools.log_factorial">
+<code class="sig-prename descclassname">radarsimpy.tools.</code><code class="sig-name descname">log_factorial</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.tools.log_factorial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the factorial of <cite>n</cite> using logarithms to avoid overflow</p>
+<dl class="simple">
+<dt>n<span class="classifier">int</span></dt><dd><p>Integer number</p>
+</dd>
+</dl>
+<p>$log(n!)$</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="radarsimpy.tools.roc_pd">
+<code class="sig-prename descclassname">radarsimpy.tools.</code><code class="sig-name descname">roc_pd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pfa</span></em>, <em class="sig-param"><span class="n">snr</span></em>, <em class="sig-param"><span class="n">N</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">stype</span><span class="o">=</span><span class="default_value">'Coherent'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.tools.roc_pd" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Calculate probability of detection (Pd) in receiver operating</dt><dd><p>characteristic (ROC)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>pfa<span class="classifier">float or 1-D array</span></dt><dd><p>Probability of false alarm (Pfa)</p>
+</dd>
+<dt>snr<span class="classifier">float or 1-D array</span></dt><dd><p>Signal to noise ratio in decibel (dB)</p>
+</dd>
+<dt>N<span class="classifier">int (optional)</span></dt><dd><p>Number of pulses for integration (default is 1)</p>
+</dd>
+<dt>stype<span class="classifier">str (optional)</span></dt><dd><p>Signal type (default is <cite>Coherent</cite>)
+- <cite>Coherent</cite> : Non-fluctuating coherent
+- <cite>Real</cite> : Non-fluctuating real signal
+- <cite>Swerling 0</cite> : Non-coherent Swerling 0, Non-fluctuating non-coherent
+- <cite>Swerling 1</cite> : Non-coherent Swerling 1
+- <cite>Swerling 2</cite> : Non-coherent Swerling 2
+- <cite>Swerling 3</cite> : Non-coherent Swerling 3
+- <cite>Swerling 4</cite> : Non-coherent Swerling 4
+- <cite>Swerling 5</cite> : Non-coherent Swerling 5, Non-fluctuating non-coherent</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>pd<span class="classifier">float or 1-D array or 2-D array</span></dt><dd><p>probability of detection (Pd)
+—
+if both <cite>pfa</cite> and <cite>snr</cite> are floats, <cite>pd</cite> is a float
+if <cite>pfa</cite> is a 1-D array or <cite>snr</cite> is a 1-D array, <cite>pd</cite> is a 1-D array
+if both <cite>pfa</cite> and <cite>snr</cite> are 1-D arrays, <cite>pd</cite> is a 2-D array</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Mahafza, Bassem R. Radar systems analysis and design using MATLAB.</dt><dd><p>Chapman and Hall/CRC, 2005.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="radarsimpy.tools.roc_snr">
+<code class="sig-prename descclassname">radarsimpy.tools.</code><code class="sig-name descname">roc_snr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pfa</span></em>, <em class="sig-param"><span class="n">pd</span></em>, <em class="sig-param"><span class="n">N</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">stype</span><span class="o">=</span><span class="default_value">'Coherent'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.tools.roc_snr" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Calculate the minimal SNR for certain probability of</dt><dd><p>detection (Pd) and probability of false alarm (Pfa) in
+receiver operating characteristic (ROC) with Secant method</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>pfa<span class="classifier">float or 1-D array</span></dt><dd><p>Probability of false alarm (Pfa)</p>
+</dd>
+<dt>pd<span class="classifier">float or 1-D array</span></dt><dd><p>Probability of detection (Pd)</p>
+</dd>
+<dt>N<span class="classifier">int (optional)</span></dt><dd><p>Number of pulses for integration (default is 1)</p>
+</dd>
+<dt>stype<span class="classifier">str (optional)</span></dt><dd><p>Signal type (default is <cite>Coherent</cite>)
+- <cite>Coherent</cite> : Non-fluctuating coherent
+- <cite>Real</cite> : Non-fluctuating real signal
+- <cite>Swerling 0</cite> : Non-coherent Swerling 0, Non-fluctuating non-coherent
+- <cite>Swerling 1</cite> : Non-coherent Swerling 1
+- <cite>Swerling 2</cite> : Non-coherent Swerling 2
+- <cite>Swerling 3</cite> : Non-coherent Swerling 3
+- <cite>Swerling 4</cite> : Non-coherent Swerling 4
+- <cite>Swerling 5</cite> : Non-coherent Swerling 5, Non-fluctuating non-coherent</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>SNR<span class="classifier">float or 1-D array or 2-D array</span></dt><dd><p>Minimal signal to noise ratio in decibel (dB)
+—
+if both <cite>pfa</cite> and <cite>pd</cite> are floats, <cite>SNR</cite> is a float
+if <cite>pfa</cite> is a 1-D array or <cite>pd</cite> is a 1-D array, <cite>SNR</cite> is a 1-D array
+if both <cite>pfa</cite> and <cite>pd</cite> are 1-D arrays, <cite>SNR</cite> is a 2-D array</p>
+</dd>
+</dl>
+<dl>
+<dt>Secant method:</dt><dd><dl class="simple">
+<dt>The x intercept of the secant line on the the Nth interval</dt><dd><p>m_n = a_n - f(a_n)*(b_n - a_n)/(f(b_n) - f(a_n))</p>
+</dd>
+</dl>
+<p>The initial interval [a_0,b_0] is given by [a,b]. If f(m_n) == 0
+for some intercept m_n then the function returns this solution.
+If all signs of values f(a_n), f(b_n) and f(m_n) are the same at any
+iterations, the secant method fails and return None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="radarsimpy.tools.threshold">
+<code class="sig-prename descclassname">radarsimpy.tools.</code><code class="sig-name descname">threshold</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pfa</span></em>, <em class="sig-param"><span class="n">N</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.tools.threshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>Threshold ratio</p>
+<dl class="simple">
+<dt>pfa<span class="classifier">float</span></dt><dd><p>Probability of false alarm</p>
+</dd>
+<dt>N<span class="classifier">int</span></dt><dd><p>Number of pulses for integration</p>
+</dd>
+</dl>
+<p>threshod ratio : float</p>
+<dl class="simple">
+<dt>Mahafza, Bassem R. Radar systems analysis and design using MATLAB.</dt><dd><p>Chapman and Hall/CRC, 2005.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="processing-module">
+<h2>processing module<a class="headerlink" href="#processing-module" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-radarsimpy.processing"></span><p>Script for radar signal processing</p>
+<p>This script requires that <cite>numpy</cite> and be installed within the Python
+environment you are running this script in.</p>
+<p>This file can be imported as a module and contains the following
+functions:</p>
+<ul class="simple">
+<li><p>cal_range_profile - calculate range profile matrix</p></li>
+<li><p>cal_range_doppler - range-Doppler processing</p></li>
+<li><p>get_polar_image - convert cartesian coordinate to polar</p></li>
+</ul>
+<p>E-mail: <a class="reference external" href="mailto:zpeng&#46;me&#37;&#52;&#48;gmail&#46;com">zpeng<span>&#46;</span>me<span>&#64;</span>gmail<span>&#46;</span>com</a>
+Website: <a class="reference external" href="https://zpeng.me">https://zpeng.me</a></p>
+<p>`                      `
+-:.                  -#:
+-//:.              -###:
+-////:.          -#####:
+-/:.://:.      -###++##:
+..   <a href="#id17"><span class="problematic" id="id18">`</span></a>://:-  -###+. :##:</p>
+<blockquote>
+<div><p><a href="#id19"><span class="problematic" id="id20">`</span></a>:/+####+.   :##:</p>
+</div></blockquote>
+<p>.::::::::/+###.     :##:
+.////—–+##:    <a href="#id21"><span class="problematic" id="id22">`</span></a>:###:</p>
+<blockquote>
+<div><dl class="simple">
+<dt><a href="#id23"><span class="problematic" id="id24">`</span></a>-//:.   :##:  <a href="#id25"><span class="problematic" id="id26">`</span></a>:###/.</dt><dd><dl class="simple">
+<dt><cite>-//:. :##:</cite>:###/.</dt><dd><dl class="simple">
+<dt><a href="#id27"><span class="problematic" id="id28">`</span></a>-//:+######/.</dt><dd><dl class="simple">
+<dt><a href="#id29"><span class="problematic" id="id30">`</span></a>-/+####/.</dt><dd><dl class="simple">
+<dt><a href="#id31"><span class="problematic" id="id32">`</span></a>+##+.</dt><dd><dl class="field-list simple">
+<dt class="field-odd">##</dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">##</dt>
+<dd class="field-even"><p></p></dd>
+<dt class="field-odd">##</dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">##</dt>
+<dd class="field-even"><p></p></dd>
+<dt class="field-odd">##</dt>
+<dd class="field-odd"><p>.+:</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="py function">
+<dt id="radarsimpy.processing.cal_range_doppler">
+<code class="sig-prename descclassname">radarsimpy.processing.</code><code class="sig-name descname">cal_range_doppler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">radar</span></em>, <em class="sig-param"><span class="n">range_profile</span></em>, <em class="sig-param"><span class="n">doppler_window</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">fft_shift</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.processing.cal_range_doppler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate range-Doppler matrix</p>
+<dl class="simple">
+<dt>radar<span class="classifier">Radar (radarsimpy.Radar)</span></dt><dd><p>A well defined radar system</p>
+</dd>
+<dt>range_profile<span class="classifier">3D array</span></dt><dd><p>Range profile matrix, <cite>[channels, pulses, adc_samples]</cite></p>
+</dd>
+<dt>doppler_window<span class="classifier">1D array, optional</span></dt><dd><p>Window for FFT, length should be equal to adc_samples. (default is
+a square window)</p>
+</dd>
+<dt>fft_shift<span class="classifier">boolean, optional</span></dt><dd><p>Perform FFT shift.  (default is False)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>3D array</dt><dd><p>A 3D array of range-Doppler, <cite>[channels, Doppler, range]</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="radarsimpy.processing.cal_range_profile">
+<code class="sig-prename descclassname">radarsimpy.processing.</code><code class="sig-name descname">cal_range_profile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">radar</span></em>, <em class="sig-param"><span class="n">baseband</span></em>, <em class="sig-param"><span class="n">range_window</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.processing.cal_range_profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate range profile matrix</p>
+<dl class="simple">
+<dt>radar<span class="classifier">Radar (radarsimpy.Radar)</span></dt><dd><p>A well defined radar system</p>
+</dd>
+<dt>baseband<span class="classifier">3D array</span></dt><dd><p>Baseband data, <cite>[channels, pulses, adc_samples]</cite></p>
+</dd>
+<dt>range_window<span class="classifier">1D array, optional</span></dt><dd><p>Window for FFT, length should be equal to adc_samples. (default is
+a square window)</p>
+</dd>
+<dt>n<span class="classifier">int, optional</span></dt><dd><p>FFT size, if n &gt; adc_samples, zero-padding will be applied.
+(default is None)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>3D array</dt><dd><p>A 3D array of range profile, <cite>[channels, pulses, range]</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="radarsimpy.processing.get_polar_image">
+<code class="sig-prename descclassname">radarsimpy.processing.</code><code class="sig-name descname">get_polar_image</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">image</span></em>, <em class="sig-param"><span class="n">range_bins</span></em>, <em class="sig-param"><span class="n">angle_bins</span></em>, <em class="sig-param"><span class="n">fov_deg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.processing.get_polar_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert cartesian coordinate to polar</p>
+<dl class="simple">
+<dt>image<span class="classifier">2D array</span></dt><dd><p>Data with cartesian coordinate, [range, angle]</p>
+</dd>
+<dt>range_bins<span class="classifier">int</span></dt><dd><p>Number of range bins</p>
+</dd>
+<dt>angle_bins<span class="classifier">int</span></dt><dd><p>Number of angle bins</p>
+</dd>
+<dt>fov_deg<span class="classifier">float</span></dt><dd><p>Field of view (deg)</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>2D array</dt><dd><p>A 2D image with polar coordinate</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">RadarSimPy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">radarsimpy package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#radar">radar</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-radarsimpy.tools">tools module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#processing-module">processing module</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to RadarSimPy’s documentation!</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Zhengyu Peng.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/radarsimpy.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
