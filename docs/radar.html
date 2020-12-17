@@ -56,15 +56,21 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>fc</strong> (<em>float</em><em> or </em><em>numpy.1darray</em>) – Center frequency (Hz). If fc is a 1-D array, 
-length should be equal to <code class="docutils literal notranslate"><span class="pre">pulses</span></code></p></li>
-<li><p><strong>pulse_length</strong> (<em>float</em>) – Length of each pulse (s)</p></li>
+<li><p><strong>fc</strong> (<em>float</em><em> or </em><em>numpy.1darray</em>) – Center frequency for each pulse (Hz).
+If <code class="docutils literal notranslate"><span class="pre">fc</span></code> is a single number, all the pulses have
+the same center frequency.
+<code class="docutils literal notranslate"><span class="pre">fc</span></code> can alse be a 1-D array to specify different
+center frequency for each pulse. In this case, the
+length of the 1-D array should equals to the length
+of <code class="docutils literal notranslate"><span class="pre">pulses</span></code></p></li>
+<li><p><strong>pulse_length</strong> (<em>float</em>) – Dwell time of each pulse (seconds)</p></li>
 <li><p><strong>bandwidth</strong> (<em>float</em>) – Bandwith of each pulse (Hz)</p></li>
 <li><p><strong>tx_power</strong> (<em>float</em>) – Transmitter power (dBm)</p></li>
 <li><p><strong>repetition_period</strong> (<em>float</em>) – Pulse repetition period (s). <code class="docutils literal notranslate"><span class="pre">repetition_period</span> <span class="pre">&gt;=</span>
+<span class="pre">pulse_length</span></code>. If it is <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">repetition_period</span> <span class="pre">=</span>
 <span class="pre">pulse_length</span></code></p></li>
 <li><p><strong>pulses</strong> (<em>int</em>) – Total number of pulses</p></li>
-<li><p><strong>slop_type</strong> (<em>str</em>) – <code class="docutils literal notranslate"><span class="pre">rising</span></code> or <code class="docutils literal notranslate"><span class="pre">falling</span></code> slop for FMCW waveform</p></li>
+<li><p><strong>slop_type</strong> (<em>str</em>) – <code class="docutils literal notranslate"><span class="pre">rising</span></code> or <code class="docutils literal notranslate"><span class="pre">falling</span></code> slop for the frequency modulation</p></li>
 <li><p><strong>channels</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – <p>Properties of transmitter channels</p>
 <dl>
 <dt>[</dt><dd><p>{</p>
@@ -144,6 +150,36 @@ applied to each pulse</p></li>
 </ul>
 </dd>
 </dl>
+<p><strong>Waveform</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#                repetition_period</span>
+<span class="c1">#                  +-----------+</span>
+<span class="c1">#</span>
+<span class="c1">#                          X            X            X          +</span>
+<span class="c1">#                         X            X            X           |</span>
+<span class="c1">#                        X            X            X            |</span>
+<span class="c1">#                       X            X            X             |</span>
+<span class="c1">#          +---fc---&gt;  X            X            X     ...   bandwidth</span>
+<span class="c1">#                     X            X            X               |</span>
+<span class="c1">#                    X            X            X                |</span>
+<span class="c1">#                   X            X            X                 |</span>
+<span class="c1">#                  X            X            X                  +</span>
+<span class="c1">#</span>
+<span class="c1">#                  +-------+</span>
+<span class="c1">#                 pulse_length</span>
+<span class="c1">#</span>
+<span class="c1">#                  +-------------------------------------+</span>
+<span class="c1"># chip_length == 0 |  phase 0  ||  phase 1  ||  phase 2  |  ...</span>
+<span class="c1">#                  +-------------------------------------+</span>
+<span class="c1">#</span>
+<span class="c1">#                  +-------------------------------------+</span>
+<span class="c1"># chip_length != 0 | phase 0:N || phase 0:N || phase 0:N |  ...</span>
+<span class="c1">#                  +-------------------------------------+</span>
+</pre></div>
+</div>
+<p>Tips:</p>
+<ul class="simple">
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">bandwidth</span></code> to 0 get a tone waveform for a Doppler radar</p></li>
+</ul>
 </dd></dl>
 
 </div>

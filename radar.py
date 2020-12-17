@@ -52,22 +52,28 @@ class Transmitter:
     A class defines basic parameters of a radar transmitter
 
     :param fc:
-        Center frequency (Hz). If ``fc`` is a 1-D array,
-        length should be equal to ``pulses``
+        Center frequency for each pulse (Hz).
+        If ``fc`` is a single number, all the pulses have
+        the same center frequency.
+        ``fc`` can alse be a 1-D array to specify different
+        center frequency for each pulse. In this case, the
+        length of the 1-D array should equals to the length
+        of ``pulses``
     :type fc: float or numpy.1darray
     :param float pulse_length:
-        Length of each pulse (s)
+        Dwell time of each pulse (seconds)
     :param float bandwidth:
         Bandwith of each pulse (Hz)
     :param float tx_power:
         Transmitter power (dBm)
     :param float repetition_period:
         Pulse repetition period (s). ``repetition_period >=
+        pulse_length``. If it is ``None``, ``repetition_period =
         pulse_length``
     :param int pulses:
         Total number of pulses
     :param str slop_type:
-        ``rising`` or ``falling`` slop for FMCW waveform
+        ``rising`` or ``falling`` slop for the frequency modulation
     :param list[dict] channels:
         Properties of transmitter channels
 
@@ -133,6 +139,39 @@ class Transmitter:
         Wavelength (m)
     :ivar float slope:
         Waveform slope, ``bandwidth / pulse_length``
+
+    **Waveform**
+
+    .. code-block:: python
+
+        #                repetition_period
+        #                  +-----------+
+        #
+        #                          X            X            X          +
+        #                         X            X            X           |
+        #                        X            X            X            |
+        #                       X            X            X             |
+        #          +---fc--->  X            X            X     ...   bandwidth
+        #                     X            X            X               |
+        #                    X            X            X                |
+        #                   X            X            X                 |
+        #                  X            X            X                  +
+        #
+        #                  +-------+
+        #                 pulse_length
+        #
+        #                  +-------------------------------------+
+        # chip_length == 0 |  phase 0  ||  phase 1  ||  phase 2  |  ...
+        #                  +-------------------------------------+
+        #
+        #                  +-------------------------------------+
+        # chip_length != 0 | phase 0:N || phase 0:N || phase 0:N |  ...
+        #                  +-------------------------------------+
+
+    Tips:
+
+    - Set ``bandwidth`` to 0 get a tone waveform for a Doppler radar
+
     """
 
     def __init__(self, fc,
