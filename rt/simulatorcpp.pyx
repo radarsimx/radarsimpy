@@ -1,47 +1,46 @@
 # distutils: language = c++
 # cython: language_level=3
-"""
-    This script contains classes that define all the parameters for
-    a radar system
 
-    This script requires that `numpy` be installed within the Python
-    environment you are running this script in.
+# This script contains classes that define all the parameters for
+# a radar system
 
-    This file can be imported as a module and contains the following
-    class:
+# This script requires that `numpy` be installed within the Python
+# environment you are running this script in.
 
-    * Transmitter - A class defines parameters of a radar transmitter
-    * Receiver - A class defines parameters of a radar receiver
-    * Radar - A class defines basic parameters of a radar system
+# This file can be imported as a module and contains the following
+# class:
 
-    ----------
-    RadarSimPy - A Radar Simulator Built with Python
-    Copyright (C) 2018 - 2020  Zhengyu Peng
-    E-mail: zpeng.me@gmail.com
-    Website: https://zpeng.me
+# * Transmitter - A class defines parameters of a radar transmitter
+# * Receiver - A class defines parameters of a radar receiver
+# * Radar - A class defines basic parameters of a radar system
 
-    `                      `
-    -:.                  -#:
-    -//:.              -###:
-    -////:.          -#####:
-    -/:.://:.      -###++##:
-    ..   `://:-  -###+. :##:
-           `:/+####+.   :##:
-    .::::::::/+###.     :##:
-    .////-----+##:    `:###:
-     `-//:.   :##:  `:###/.
-       `-//:. :##:`:###/.
-         `-//:+######/.
-           `-/+####/.
-             `+##+.
-              :##:
-              :##:
-              :##:
-              :##:
-              :##:
-               .+:
+# ----------
+# RadarSimPy - A Radar Simulator Built with Python
+# Copyright (C) 2018 - 2020  Zhengyu Peng
+# E-mail: zpeng.me@gmail.com
+# Website: https://zpeng.me
 
-"""
+# `                      `
+# -:.                  -#:
+# -//:.              -###:
+# -////:.          -#####:
+# -/:.://:.      -###++##:
+# ..   `://:-  -###+. :##:
+#        `:/+####+.   :##:
+# .::::::::/+###.     :##:
+# .////-----+##:    `:###:
+#  `-//:.   :##:  `:###/.
+#    `-//:. :##:`:###/.
+#      `-//:+######/.
+#        `-/+####/.
+#          `+##+.
+#           :##:
+#           :##:
+#           :##:
+#           :##:
+#           :##:
+#            .+:
+
 
 cimport cython
 
@@ -61,6 +60,12 @@ cimport numpy as np
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cpdef run_simulator(radar, targets, noise=True):
+    """
+    Alias: **radarsimpy.simulatorcpp()**
+    
+    Radar simulator with C++ engine
+
+    """
     # cdef Radarsimc[float_t] *rec_ptr
     # rec_ptr = new Radarsimc[float_t]()
     cdef Simulator[float_t] sim

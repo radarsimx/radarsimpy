@@ -119,21 +119,21 @@ def roc_pd(pfa, snr, N=1, stype='Coherent'):
     :param int N:
         Number of pulses for integration (default is 1)
     :param str stype:
-        Signal type (default is 'Coherent')
+        Signal type (default is ``Coherent``)
 
-        - 'Coherent': Non-fluctuating coherent
-        - 'Real': Non-fluctuating real signal
-        - 'Swerling 0': Non-coherent Swerling 0, Non-fluctuating non-coherent
-        - 'Swerling 1': Non-coherent Swerling 1
-        - 'Swerling 2': Non-coherent Swerling 2
-        - 'Swerling 3': Non-coherent Swerling 3
-        - 'Swerling 4': Non-coherent Swerling 4
-        - 'Swerling 5': Non-coherent Swerling 5, Non-fluctuating non-coherent
-    
+        - ``Coherent``: Non-fluctuating coherent
+        - ``Real``: Non-fluctuating real signal
+        - ``Swerling 0``: Non-coherent Swerling 0, Non-fluctuating non-coherent
+        - ``Swerling 1``: Non-coherent Swerling 1
+        - ``Swerling 2``: Non-coherent Swerling 2
+        - ``Swerling 3``: Non-coherent Swerling 3
+        - ``Swerling 4``: Non-coherent Swerling 4
+        - ``Swerling 5``: Non-coherent Swerling 5, Non-fluctuating non-coherent
+
     :return: probability of detection (Pd)
-            if both 'pfa' and 'snr' are floats, 'pd' is a float
-            if 'pfa' is a 1-D array or 'snr' is a 1-D array, 'pd' is a 1-D array
-            if both 'pfa' and 'snr' are 1-D arrays, 'pd' is a 2-D array
+            if both ``pfa`` and ``snr`` are floats, ``pd`` is a float
+            if ``pfa`` is a 1-D array or ``snr`` is a 1-D array, ``pd`` is a 1-D array
+            if both ``pfa`` and ``snr`` are 1-D arrays, ``pd`` is a 2-D array
     :rtype: float or 1-D array or 2-D array
 
     *Reference*
@@ -280,21 +280,21 @@ def roc_snr(pfa, pd, N=1, stype='Coherent'):
     :param int N:
         Number of pulses for integration (default is 1)
     :param str stype:
-        Signal type (default is 'Coherent')
+        Signal type (default is ``Coherent``)
 
-        - 'Coherent' : Non-fluctuating coherent
-        - 'Real' : Non-fluctuating real signal
-        - 'Swerling 0' : Non-coherent Swerling 0, Non-fluctuating non-coherent
-        - 'Swerling 1' : Non-coherent Swerling 1
-        - 'Swerling 2' : Non-coherent Swerling 2
-        - 'Swerling 3' : Non-coherent Swerling 3
-        - 'Swerling 4' : Non-coherent Swerling 4
-        - 'Swerling 5' : Non-coherent Swerling 5, Non-fluctuating non-coherent
+        - ``Coherent`` : Non-fluctuating coherent
+        - ``Real`` : Non-fluctuating real signal
+        - ``Swerling 0`` : Non-coherent Swerling 0, Non-fluctuating non-coherent
+        - ``Swerling 1`` : Non-coherent Swerling 1
+        - ``Swerling 2`` : Non-coherent Swerling 2
+        - ``Swerling 3`` : Non-coherent Swerling 3
+        - ``Swerling 4`` : Non-coherent Swerling 4
+        - ``Swerling 5`` : Non-coherent Swerling 5, Non-fluctuating non-coherent
 
     :return: Minimal signal to noise ratio in decibel (dB)
-            if both 'pfa' and 'pd' are floats, 'SNR' is a float
-            if 'pfa' is a 1-D array or 'pd' is a 1-D array, 'SNR' is a 1-D array
-            if both 'pfa' and 'pd' are 1-D arrays, 'SNR' is a 2-D array
+            if both ``pfa`` and ``pd`` are floats, ``SNR`` is a float
+            if ``pfa`` is a 1-D array or ``pd`` is a 1-D array, ``SNR`` is a 1-D array
+            if both ``pfa`` and ``pd`` are 1-D arrays, ``SNR`` is a 2-D array
     :rtype: float or 1-D array or 2-D array
 
     *Reference*
@@ -302,7 +302,9 @@ def roc_snr(pfa, pd, N=1, stype='Coherent'):
     Secant method:
 
         The x intercept of the secant line on the the Nth interval
-        m_n = a_n - f(a_n)*(b_n - a_n)/(f(b_n) - f(a_n))
+
+        .. math:: m_n = a_n - f(a_n)*(b_n - a_n)/(f(b_n) - f(a_n))
+
         The initial interval [a_0,b_0] is given by [a,b]. If f(m_n) == 0
         for some intercept m_n then the function returns this solution.
         If all signs of values f(a_n), f(b_n) and f(m_n) are the same at any

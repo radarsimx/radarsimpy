@@ -52,7 +52,7 @@ class Transmitter:
 
     :param fc:
         Center frequency (Hz). If fc is a 1-D array, 
-        length should be equal to 'pulses'
+        length should be equal to ``pulses``
     :type fc: float or numpy.1darray
     :param float pulse_length:
         Length of each pulse (s)
@@ -61,13 +61,13 @@ class Transmitter:
     :param float tx_power:
         Transmitter power (dBm)
     :param float repetition_period:
-        Pulse repetition period (s). 'repetition_period' >=
-        'pulse_length'
+        Pulse repetition period (s). ``repetition_period >=
+        pulse_length``
     :param int pulses:
         Total number of pulses
     :param str slop_type:
-        'rising' or 'falling' slop for FMCW waveform
-    :param channels:
+        ``rising`` or ``falling`` slop for FMCW waveform
+    :param list[dict] channels:
         Properties of transmitter channels
 
         [
@@ -87,19 +87,17 @@ class Transmitter:
                 Elevation pattern (dB)
             - **phase_code** (*numpy.1darray*) -
                 Phase code sequence for phase modulation (deg).
-                If 'chip_length' == 0, or 'chip_length' is not defined,
-                length of 'phase_code' should be equal to 'pulses'
+                If ``chip_length == 0``, or ``chip_length`` is not defined,
+                length of ``phase_code`` should be equal to ``pulses``
             - **chip_length** (*float*) -
-                Length for each phase code (s). If 'chip_length' ==
-                0, one pulse will have one 'phase_code'. If
-                'chip_length' != 0, all 'phase_code' will be
+                Length for each phase code (s). If ``chip_length ==
+                0``, one pulse will have one ``phase_code``. If
+                ``chip_length != 0``, all ``phase_code`` will be
                 applied to each pulse
 
             }
 
         ]
-    :type channels: list[dict]
-        Properties of transmitter channels
 
     :ivar int channel_size:
         Total number of transmitter channels
@@ -119,21 +117,21 @@ class Transmitter:
     :type el_patterns: list[numpy.1darray]
     :ivar phase_code:
         Phase code sequence for phase modulation (deg).
-        If 'chip_length' == 0, or 'chip_length' is not
-        defined, length of 'phase_code' should be equal
-        to 'pulses'
+        If ``chip_length == 0``, or ``chip_length`` is not
+        defined, length of ``phase_code`` should be equal
+        to ``pulses``
     :type phase_code: list[numpy.1darray]
     :ivar numpy.1darray chip_length:
-        Length for each phase code (s). If 'chip_length' ==
-        0, one pulse will have one 'phase_code'. If
-        'chip_length' != 0, all 'phase_code' will be
+        Length for each phase code (s). If ``chip_length ==
+        0``, one pulse will have one ``phase_code``. If
+        ``chip_length != 0``, all ``phase_code`` will be
         applied to each pulse
     :ivar numpy.1darray delay:
         Transmit delay (s)
     :ivar float wavelength:
         Wavelength (m)
     :ivar float slope:
-        Waveform slope, 'bandwidth' / 'pulse_length'
+        Waveform slope, ``bandwidth / pulse_length``
     """
 
     def __init__(self, fc,
@@ -266,7 +264,7 @@ class Receiver:
     :param float baseband_gain:
         Baseband gain (dB)
     :param int noise_bandwidth:
-        Noise bandwith in calculating thermal noise, 'fs' / 2
+        Noise bandwith in calculating thermal noise, ``fs / 2``
     :param list[dict] channels:
         Properties of transmitter channels
 
