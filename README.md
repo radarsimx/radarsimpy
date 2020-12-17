@@ -1,6 +1,6 @@
 
-![py_version](https://img.shields.io/badge/py-3.7%2F3.8%2F3.9-brightgreen)
-<a href="https://rookiepeng.github.io/radarsimpy/" target="_blank" rel="nofollow"><img src="https://img.shields.io/badge/docs-Documentation-brightgree" height="20" ></a>
+![py_version](https://img.shields.io/badge/Python-3.7%2F3.8%2F3.9-blue?style=flat&logo=python)
+<a href="https://rookiepeng.github.io/radarsimpy/" target="_blank" rel="nofollow"><img src="https://img.shields.io/badge/Documentation-v2.5.1-brightgree?style=flat&logo=read-the-docs" height="20" ></a>
 
 # RadarSimPy
                                                             
