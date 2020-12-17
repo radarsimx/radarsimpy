@@ -52,7 +52,7 @@ class Transmitter:
     A class defines basic parameters of a radar transmitter
 
     :param fc:
-        Center frequency (Hz). If fc is a 1-D array, 
+        Center frequency (Hz). If ``fc`` is a 1-D array,
         length should be equal to ``pulses``
     :type fc: float or numpy.1darray
     :param float pulse_length:
