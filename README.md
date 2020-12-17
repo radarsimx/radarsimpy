@@ -1,6 +1,5 @@
-![Windows Test](https://github.com/rookiepeng/radarsimc/workflows/Windows%20Test/badge.svg)
-![Linux Test](https://github.com/rookiepeng/radarsimc/workflows/Linux%20Test/badge.svg)
 
+![py_version](https://img.shields.io/badge/py-3.7%2F3.8%2F3.9-brightgreen)
 <a href="https://rookiepeng.github.io/radarsimpy/" target="_blank" rel="nofollow"><img src="https://img.shields.io/badge/docs-Documentation-brightgree" height="20" ></a>
 
 # RadarSimPy
