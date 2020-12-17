@@ -5,57 +5,67 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>radarsimpy &#8212; RadarSimPy  documentation</title>
+    <title>Radar Model &#8212; RadarSimPy  documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="radarsimpy.tools" href="tools.html" />
-    <link rel="prev" title="Welcome to RadarSimPy’s documentation!" href="index.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
+    <link rel="next" title="Simulator" href="sim.html" />
+    <link rel="prev" title="Welcome to RadarSimPy’s documentation!" href="index.html" /> 
   </head><body>
-  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="sim.html" title="Simulator"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to RadarSimPy’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">RadarSimPy  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Radar Model</a></li> 
+      </ul>
+    </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          
-
           <div class="body" role="main">
             
-  <div class="section" id="radarsimpy">
-<h1>radarsimpy<a class="headerlink" href="#radarsimpy" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="radar-model">
+<h1>Radar Model<a class="headerlink" href="#radar-model" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="radarsimpy-transmitter">
 <h2>radarsimpy.Transmitter<a class="headerlink" href="#radarsimpy-transmitter" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="radarsimpy.Transmitter">
-<em class="property">class </em><code class="sig-prename descclassname">radarsimpy.</code><code class="sig-name descname">Transmitter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fc</span></em>, <em class="sig-param"><span class="n">pulse_length</span></em>, <em class="sig-param"><span class="n">bandwidth</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">tx_power</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">repetition_period</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">pulses</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">slop_type</span><span class="o">=</span><span class="default_value">'rising'</span></em>, <em class="sig-param"><span class="n">channels</span><span class="o">=</span><span class="default_value">[{'location': (0, 0, 0)}]</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/radarsimpy/radar.html#Transmitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#radarsimpy.Transmitter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">radarsimpy.</code><code class="sig-name descname">Transmitter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fc</span></em>, <em class="sig-param"><span class="n">pulse_length</span></em>, <em class="sig-param"><span class="n">bandwidth</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">tx_power</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">repetition_period</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">pulses</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">slop_type</span><span class="o">=</span><span class="default_value">'rising'</span></em>, <em class="sig-param"><span class="n">channels</span><span class="o">=</span><span class="default_value">[{'location': (0, 0, 0)}]</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.Transmitter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class defines basic parameters of a radar transmitter</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fc</strong> (<em>float</em><em> or </em><em>numpy.1darray</em>) – Center frequency (Hz). If fc is a 1-D array, 
-length should be equal to ‘pulses’</p></li>
+length should be equal to <code class="docutils literal notranslate"><span class="pre">pulses</span></code></p></li>
 <li><p><strong>pulse_length</strong> (<em>float</em>) – Length of each pulse (s)</p></li>
 <li><p><strong>bandwidth</strong> (<em>float</em>) – Bandwith of each pulse (Hz)</p></li>
 <li><p><strong>tx_power</strong> (<em>float</em>) – Transmitter power (dBm)</p></li>
-<li><p><strong>repetition_period</strong> (<em>float</em>) – Pulse repetition period (s). ‘repetition_period’ &gt;=
-‘pulse_length’</p></li>
+<li><p><strong>repetition_period</strong> (<em>float</em>) – Pulse repetition period (s). <code class="docutils literal notranslate"><span class="pre">repetition_period</span> <span class="pre">&gt;=</span>
+<span class="pre">pulse_length</span></code></p></li>
 <li><p><strong>pulses</strong> (<em>int</em>) – Total number of pulses</p></li>
-<li><p><strong>slop_type</strong> (<em>str</em>) – ‘rising’ or ‘falling’ slop for FMCW waveform</p></li>
-<li><p><strong>channels</strong> (<em>list</em><em>[</em><em>dict</em><em>]
-</em><em>Properties of transmitter channels</em>) – <p>Properties of transmitter channels</p>
+<li><p><strong>slop_type</strong> (<em>str</em>) – <code class="docutils literal notranslate"><span class="pre">rising</span></code> or <code class="docutils literal notranslate"><span class="pre">falling</span></code> slop for FMCW waveform</p></li>
+<li><p><strong>channels</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – <p>Properties of transmitter channels</p>
 <dl>
 <dt>[</dt><dd><p>{</p>
 <ul>
@@ -91,15 +101,15 @@ length should be equal to ‘pulses’</p></li>
 </li>
 <li><dl class="simple">
 <dt><strong>phase_code</strong> (<em>numpy.1darray</em>) -</dt><dd><p>Phase code sequence for phase modulation (deg).
-If ‘chip_length’ == 0, or ‘chip_length’ is not defined,
-length of ‘phase_code’ should be equal to ‘pulses’</p>
+If <code class="docutils literal notranslate"><span class="pre">chip_length</span> <span class="pre">==</span> <span class="pre">0</span></code>, or <code class="docutils literal notranslate"><span class="pre">chip_length</span></code> is not defined,
+length of <code class="docutils literal notranslate"><span class="pre">phase_code</span></code> should be equal to <code class="docutils literal notranslate"><span class="pre">pulses</span></code></p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>chip_length</strong> (<em>float</em>) -</dt><dd><p>Length for each phase code (s). If ‘chip_length’ ==
-0, one pulse will have one ‘phase_code’. If
-‘chip_length’ != 0, all ‘phase_code’ will be
+<dt><strong>chip_length</strong> (<em>float</em>) -</dt><dd><p>Length for each phase code (s). If <code class="docutils literal notranslate"><span class="pre">chip_length</span> <span class="pre">==</span>
+<span class="pre">0</span></code>, one pulse will have one <code class="docutils literal notranslate"><span class="pre">phase_code</span></code>. If
+<code class="docutils literal notranslate"><span class="pre">chip_length</span> <span class="pre">!=</span> <span class="pre">0</span></code>, all <code class="docutils literal notranslate"><span class="pre">phase_code</span></code> will be
 applied to each pulse</p>
 </dd>
 </dl>
@@ -121,16 +131,16 @@ applied to each pulse</p>
 <li><p><strong>el_angles</strong> (<em>numpy.1darray</em>) – Angles for elevation pattern (deg)</p></li>
 <li><p><strong>el_patterns</strong> – Elevation pattern (dB)</p></li>
 <li><p><strong>phase_code</strong> – Phase code sequence for phase modulation (deg).
-If ‘chip_length’ == 0, or ‘chip_length’ is not
-defined, length of ‘phase_code’ should be equal
-to ‘pulses’</p></li>
-<li><p><strong>chip_length</strong> (<em>numpy.1darray</em>) – Length for each phase code (s). If ‘chip_length’ ==
-0, one pulse will have one ‘phase_code’. If
-‘chip_length’ != 0, all ‘phase_code’ will be
+If <code class="docutils literal notranslate"><span class="pre">chip_length</span> <span class="pre">==</span> <span class="pre">0</span></code>, or <code class="docutils literal notranslate"><span class="pre">chip_length</span></code> is not
+defined, length of <code class="docutils literal notranslate"><span class="pre">phase_code</span></code> should be equal
+to <code class="docutils literal notranslate"><span class="pre">pulses</span></code></p></li>
+<li><p><strong>chip_length</strong> (<em>numpy.1darray</em>) – Length for each phase code (s). If <code class="docutils literal notranslate"><span class="pre">chip_length</span> <span class="pre">==</span>
+<span class="pre">0</span></code>, one pulse will have one <code class="docutils literal notranslate"><span class="pre">phase_code</span></code>. If
+<code class="docutils literal notranslate"><span class="pre">chip_length</span> <span class="pre">!=</span> <span class="pre">0</span></code>, all <code class="docutils literal notranslate"><span class="pre">phase_code</span></code> will be
 applied to each pulse</p></li>
 <li><p><strong>delay</strong> (<em>numpy.1darray</em>) – Transmit delay (s)</p></li>
 <li><p><strong>wavelength</strong> (<em>float</em>) – Wavelength (m)</p></li>
-<li><p><strong>slope</strong> (<em>float</em>) – Waveform slope, ‘bandwidth’ / ‘pulse_length’</p></li>
+<li><p><strong>slope</strong> (<em>float</em>) – Waveform slope, <code class="docutils literal notranslate"><span class="pre">bandwidth</span> <span class="pre">/</span> <span class="pre">pulse_length</span></code></p></li>
 </ul>
 </dd>
 </dl>
@@ -141,7 +151,7 @@ applied to each pulse</p></li>
 <h2>radarsimpy.Receiver<a class="headerlink" href="#radarsimpy-receiver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="radarsimpy.Receiver">
-<em class="property">class </em><code class="sig-prename descclassname">radarsimpy.</code><code class="sig-name descname">Receiver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fs</span></em>, <em class="sig-param"><span class="n">noise_figure</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">rf_gain</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">load_resistor</span><span class="o">=</span><span class="default_value">500</span></em>, <em class="sig-param"><span class="n">baseband_gain</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">channels</span><span class="o">=</span><span class="default_value">[{'location': (0, 0, 0)}]</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/radarsimpy/radar.html#Receiver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#radarsimpy.Receiver" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">radarsimpy.</code><code class="sig-name descname">Receiver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fs</span></em>, <em class="sig-param"><span class="n">noise_figure</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">rf_gain</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">load_resistor</span><span class="o">=</span><span class="default_value">500</span></em>, <em class="sig-param"><span class="n">baseband_gain</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">channels</span><span class="o">=</span><span class="default_value">[{'location': (0, 0, 0)}]</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.Receiver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class defines basic parameters of a radar receiver</p>
 <dl class="field-list simple">
@@ -152,7 +162,7 @@ applied to each pulse</p></li>
 <li><p><strong>rf_gain</strong> (<em>float</em>) – RF gain (dB)</p></li>
 <li><p><strong>load_resistor</strong> (<em>float</em>) – Load resistor to convert power to voltage (Ohm)</p></li>
 <li><p><strong>baseband_gain</strong> (<em>float</em>) – Baseband gain (dB)</p></li>
-<li><p><strong>noise_bandwidth</strong> (<em>int</em>) – Noise bandwith in calculating thermal noise, ‘fs’ / 2</p></li>
+<li><p><strong>noise_bandwidth</strong> (<em>int</em>) – Noise bandwith in calculating thermal noise, <code class="docutils literal notranslate"><span class="pre">fs</span> <span class="pre">/</span> <span class="pre">2</span></code></p></li>
 <li><p><strong>channels</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – <p>Properties of transmitter channels</p>
 <dl>
 <dt>[</dt><dd><p>{</p>
@@ -208,7 +218,7 @@ applied to each pulse</p></li>
 <h2>radarsimpy.Radar<a class="headerlink" href="#radarsimpy-radar" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="radarsimpy.Radar">
-<em class="property">class </em><code class="sig-prename descclassname">radarsimpy.</code><code class="sig-name descname">Radar</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transmitter</span></em>, <em class="sig-param"><span class="n">receiver</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">aperture</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/radarsimpy/radar.html#Radar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#radarsimpy.Radar" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">radarsimpy.</code><code class="sig-name descname">Radar</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transmitter</span></em>, <em class="sig-param"><span class="n">receiver</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">aperture</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.Radar" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class defines basic parameters of a radar system</p>
 <dl class="field-list simple">
@@ -232,42 +242,35 @@ applied to each pulse</p></li>
 </div>
 
 
+            <div class="clearer"></div>
           </div>
-          
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">RadarSimPy</a></h1>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">radarsimpy</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#radarsimpy-transmitter">radarsimpy.Transmitter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#radarsimpy-receiver">radarsimpy.Receiver</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#radarsimpy-radar">radarsimpy.Radar</a></li>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Radar Model</a><ul>
+<li><a class="reference internal" href="#radarsimpy-transmitter">radarsimpy.Transmitter</a></li>
+<li><a class="reference internal" href="#radarsimpy-receiver">radarsimpy.Receiver</a></li>
+<li><a class="reference internal" href="#radarsimpy-radar">radarsimpy.Radar</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="tools.html">radarsimpy.tools</a></li>
 </ul>
 
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="index.html" title="previous chapter">Welcome to RadarSimPy’s documentation!</a></li>
-      <li>Next: <a href="tools.html" title="next chapter">radarsimpy.tools</a></li>
-  </ul></li>
-</ul>
-</div>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to RadarSimPy’s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="sim.html"
+                        title="next chapter">Simulator</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/radar.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
 <div id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
@@ -278,32 +281,32 @@ applied to each pulse</p></li>
     </div>
 </div>
 <script>$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2020, Zhengyu Peng.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.3.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
-      
-      |
-      <a href="_sources/radar.rst.txt"
-          rel="nofollow">Page source</a>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="sim.html" title="Simulator"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to RadarSimPy’s documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">RadarSimPy  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Radar Model</a></li> 
+      </ul>
     </div>
-
-    
-
-    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Zhengyu Peng.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
   </body>
 </html>

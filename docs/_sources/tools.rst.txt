@@ -1,4 +1,4 @@
-radarsimpy.tools
+Tools
 =================
 
 .. automodule:: radarsimpy.tools

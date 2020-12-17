@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Welcome to RadarSimPy’s documentation! &#8212; RadarSimPy  documentation</title>
+    <title>Simulator &#8212; RadarSimPy  documentation</title>
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -16,7 +16,8 @@
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Radar Model" href="radar.html" /> 
+    <link rel="next" title="Raytracing" href="rt.html" />
+    <link rel="prev" title="Radar Model" href="radar.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -28,10 +29,13 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="radar.html" title="Radar Model"
+          <a href="rt.html" title="Raytracing"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">RadarSimPy  documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Welcome to RadarSimPy’s documentation!</a></li> 
+        <li class="right" >
+          <a href="radar.html" title="Radar Model"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">RadarSimPy  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Simulator</a></li> 
       </ul>
     </div>  
 
@@ -40,33 +44,37 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="welcome-to-radarsimpy-s-documentation">
-<h1>Welcome to RadarSimPy’s documentation!<a class="headerlink" href="#welcome-to-radarsimpy-s-documentation" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="radar.html">Radar Model</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="radar.html#radarsimpy-transmitter">radarsimpy.Transmitter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="radar.html#radarsimpy-receiver">radarsimpy.Receiver</a></li>
-<li class="toctree-l2"><a class="reference internal" href="radar.html#radarsimpy-radar">radarsimpy.Radar</a></li>
+  <div class="section" id="simulator">
+<h1>Simulator<a class="headerlink" href="#simulator" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-radarsimpy.rt.simulatorcpp">
+<span id="radarsimpy-simulatorcpp"></span><h2>radarsimpy.simulatorcpp<a class="headerlink" href="#module-radarsimpy.rt.simulatorcpp" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="radarsimpy.rt.simulatorcpp.run_simulator">
+<code class="sig-prename descclassname">radarsimpy.rt.simulatorcpp.</code><code class="sig-name descname">run_simulator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.rt.simulatorcpp.run_simulator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias: <code class="docutils literal notranslate"><span class="pre">radarsimpy.simulatorcpp()</span></code>
+Radar simulator with C++ engine</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>radar</strong> (<a class="reference internal" href="radar.html#radarsimpy.Radar" title="radarsimpy.Radar"><em>Radar</em></a>) – Radar model</p></li>
+<li><p><strong>targets</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – Target list</p></li>
+<li><p><strong>noise</strong> (<em>bool</em>) – Flag to enable noise calculation</p></li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="sim.html">Simulator</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="sim.html#module-radarsimpy.rt.simulatorcpp">radarsimpy.simulatorcpp</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="rt.html">Raytracing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools</a></li>
-</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>{
+‘baseband’:baseband,
+‘timestamp’:radar.timestamp
+}</p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
-</div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
-</ul>
 </div>
 
 
@@ -76,19 +84,24 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="#">Table of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Welcome to RadarSimPy’s documentation!</a></li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+<li><a class="reference internal" href="#">Simulator</a><ul>
+<li><a class="reference internal" href="#module-radarsimpy.rt.simulatorcpp">radarsimpy.simulatorcpp</a></li>
+</ul>
+</li>
 </ul>
 
-  <h4>Next topic</h4>
+  <h4>Previous topic</h4>
   <p class="topless"><a href="radar.html"
-                        title="next chapter">Radar Model</a></p>
+                        title="previous chapter">Radar Model</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="rt.html"
+                        title="next chapter">Raytracing</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/index.rst.txt"
+      <li><a href="_sources/sim.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -116,10 +129,13 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="radar.html" title="Radar Model"
+          <a href="rt.html" title="Raytracing"
              >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">RadarSimPy  documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Welcome to RadarSimPy’s documentation!</a></li> 
+        <li class="right" >
+          <a href="radar.html" title="Radar Model"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">RadarSimPy  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Simulator</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

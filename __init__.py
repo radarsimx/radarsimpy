@@ -37,8 +37,8 @@ from .radar import Radar
 from .radar import Transmitter
 from .radar import Receiver
 
-# from .simulator import run_simulator as simulator
-# from .rt.simulatorcpp import run_simulator as simulatorcpp
+from .simulator import run_simulator as simulator
+from .rt.simulatorcpp import run_simulator as simulatorcpp
 
 
 __version__ = '2.5.1'

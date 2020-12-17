@@ -11,6 +11,8 @@ Welcome to RadarSimPy's documentation!
    :caption: Contents:
 
    radar
+   sim
+   rt
    tools
 
 

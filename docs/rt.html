@@ -1,0 +1,143 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Raytracing &#8212; RadarSimPy  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tools" href="tools.html" />
+    <link rel="prev" title="Simulator" href="sim.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tools.html" title="Tools"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="sim.html" title="Simulator"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">RadarSimPy  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Raytracing</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-radarsimpy.rt.scene">
+<span id="raytracing"></span><h1>Raytracing<a class="headerlink" href="#module-radarsimpy.rt.scene" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="radarsimpy.rt.scene.scene">
+<code class="sig-prename descclassname">radarsimpy.rt.scene.</code><code class="sig-name descname">scene</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.rt.scene.scene" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="module-radarsimpy.rt.lidar_scene"></span><dl class="py function">
+<dt id="radarsimpy.rt.lidar_scene.lidar_scene">
+<code class="sig-prename descclassname">radarsimpy.rt.lidar_scene.</code><code class="sig-name descname">lidar_scene</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.rt.lidar_scene.lidar_scene" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<span class="target" id="module-radarsimpy.rt.rcs"></span><dl class="py function">
+<dt id="radarsimpy.rt.rcs.rcs_sbr">
+<code class="sig-prename descclassname">radarsimpy.rt.rcs.</code><code class="sig-name descname">rcs_sbr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.rt.rcs.rcs_sbr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate target’s RCS by using raytracing</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>str</em>) – Path of the model</p></li>
+<li><p><strong>phi</strong> (<em>float</em>) – Observation angle phi (deg)</p></li>
+<li><p><strong>theta</strong> (<em>float</em>) – Observation angle theta (deg)</p></li>
+<li><p><strong>f</strong> (<em>float</em>) – Center frequency (Hz)</p></li>
+<li><p><strong>pol</strong> (<em>list</em>) – Polarization &lt;x, y, z&gt;</p></li>
+<li><p><strong>density</strong> (<em>float</em>) – Ray density (number of rays per wavelength)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Target’s RCS (m^2), use 10*log10(RCS) to convert to dBsm</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="sim.html"
+                        title="previous chapter">Simulator</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tools.html"
+                        title="next chapter">Tools</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/rt.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tools.html" title="Tools"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="sim.html" title="Simulator"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">RadarSimPy  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Raytracing</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Zhengyu Peng.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

@@ -61,9 +61,21 @@ cimport numpy as np
 @cython.wraparound(False)
 cpdef run_simulator(radar, targets, noise=True):
     """
-    Alias: **radarsimpy.simulatorcpp()**
-    
+    Alias: ``radarsimpy.simulatorcpp()``
     Radar simulator with C++ engine
+
+    :param Radar radar:
+        Radar model
+    :param list[dict] targets:
+        Target list
+    :param bool noise:
+        Flag to enable noise calculation
+
+    :return: {
+        'baseband':baseband,
+        'timestamp':radar.timestamp
+        }
+    :rtype: dict
 
     """
     # cdef Radarsimc[float_t] *rec_ptr

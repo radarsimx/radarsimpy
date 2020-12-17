@@ -1,46 +1,45 @@
 #!python
 # cython: language_level=3
-"""
-    Script for radar signal processing
 
-    This script requires that `numpy` and be installed within the Python
-    environment you are running this script in.
+# Script for radar signal processing
 
-    This file can be imported as a module and contains the following
-    functions:
+# This script requires that `numpy` and be installed within the Python
+# environment you are running this script in.
 
-    * cal_range_profile - calculate range profile matrix
-    * cal_range_doppler - range-Doppler processing
-    * get_polar_image - convert cartesian coordinate to polar
+# This file can be imported as a module and contains the following
+# functions:
 
-    ----------
-    RadarSimPy - A Radar Simulator Built with Python
-    Copyright (C) 2018 - 2020  Zhengyu Peng
-    E-mail: zpeng.me@gmail.com
-    Website: https://zpeng.me
+# * cal_range_profile - calculate range profile matrix
+# * cal_range_doppler - range-Doppler processing
+# * get_polar_image - convert cartesian coordinate to polar
 
-    `                      `
-    -:.                  -#:
-    -//:.              -###:
-    -////:.          -#####:
-    -/:.://:.      -###++##:
-    ..   `://:-  -###+. :##:
-           `:/+####+.   :##:
-    .::::::::/+###.     :##:
-    .////-----+##:    `:###:
-     `-//:.   :##:  `:###/.
-       `-//:. :##:`:###/.
-         `-//:+######/.
-           `-/+####/.
-             `+##+.
-              :##:
-              :##:
-              :##:
-              :##:
-              :##:
-               .+:
+# ----------
+# RadarSimPy - A Radar Simulator Built with Python
+# Copyright (C) 2018 - 2020  Zhengyu Peng
+# E-mail: zpeng.me@gmail.com
+# Website: https://zpeng.me
 
-"""
+# `                      `
+# -:.                  -#:
+# -//:.              -###:
+# -////:.          -#####:
+# -/:.://:.      -###++##:
+# ..   `://:-  -###+. :##:
+#        `:/+####+.   :##:
+# .::::::::/+###.     :##:
+# .////-----+##:    `:###:
+#  `-//:.   :##:  `:###/.
+#    `-//:. :##:`:###/.
+#      `-//:+######/.
+#        `-/+####/.
+#          `+##+.
+#           :##:
+#           :##:
+#           :##:
+#           :##:
+#           :##:
+#            .+:
+
 
 import numpy as np
 

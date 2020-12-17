@@ -59,31 +59,21 @@ from radarsimpy.includes.zpvector cimport Vec3
 cpdef rcs_sbr(model, phi, theta, f, pol=[0, 0, 1], density=10):
     """Calculate target's RCS by using raytracing
 
-    :param pfa:
-        Probability of false alarm (Pfa)
-    :type pfa: float or numpy.1darray
-    :param snr:
-        Signal to noise ratio in decibel (dB)
-    :type snr: float or numpy.1darray
-    :param int N:
-        Number of pulses for integration (default is 1)
-    :param str stype:
-        Signal type (default is 'Coherent')
-
-        - 'Coherent': Non-fluctuating coherent
-        - 'Real': Non-fluctuating real signal
-        - 'Swerling 0': Non-coherent Swerling 0, Non-fluctuating non-coherent
-        - 'Swerling 1': Non-coherent Swerling 1
-        - 'Swerling 2': Non-coherent Swerling 2
-        - 'Swerling 3': Non-coherent Swerling 3
-        - 'Swerling 4': Non-coherent Swerling 4
-        - 'Swerling 5': Non-coherent Swerling 5, Non-fluctuating non-coherent
+    :param str model:
+        Path of the model
+    :param float phi:
+        Observation angle phi (deg)
+    :param float theta:
+        Observation angle theta (deg)
+    :param float f:
+        Center frequency (Hz)
+    :param list pol:
+        Polarization <x, y, z>
+    :param float density:
+        Ray density (number of rays per wavelength)
     
-    :return: probability of detection (Pd)
-            if both 'pfa' and 'snr' are floats, 'pd' is a float
-            if 'pfa' is a 1-D array or 'snr' is a 1-D array, 'pd' is a 1-D array
-            if both 'pfa' and 'snr' are 1-D arrays, 'pd' is a 2-D array
-    :rtype: float or 1-D array or 2-D array
+    :return: Target's RCS (m^2), use 10*log10(RCS) to convert to dBsm
+    :rtype: float
     """
     trig_mesh = mesh.Mesh.from_file(model)
     cdef float_t[:, :, :] vectors = trig_mesh.vectors.astype(np.float32)
