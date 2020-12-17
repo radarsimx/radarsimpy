@@ -1,9 +1,11 @@
 ![Windows Test](https://github.com/rookiepeng/radarsimc/workflows/Windows%20Test/badge.svg)
 ![Linux Test](https://github.com/rookiepeng/radarsimc/workflows/Linux%20Test/badge.svg)
 
+![docs](https://img.shields.io/badge/docs-Documentation-brightgreen)
+
 # RadarSimPy
                                                             
-<img src="./docs/radarsimpy.svg" alt="logo" width="200"/>
+<img src="./assets/radarsimpy.svg" alt="logo" width="200"/>
 
 A **Radar** **Sim**ulator for **Py**thon
 
