@@ -45,25 +45,22 @@ import numpy as np
 
 
 def cal_range_profile(radar, baseband, range_window=1, n=None):
-    """Calculate range profile matrix
+    """
+    Calculate range profile matrix
 
-    Parameters
-    ----------
-    radar : Radar (radarsimpy.Radar)
+    :param Radar radar:
         A well defined radar system
-    baseband : 3D array
-        Baseband data, `[channels, pulses, adc_samples]`
-    range_window : 1D array, optional
+    :param numpy.3darray baseband:
+        Baseband data, ``[channels, pulses, adc_samples]``
+    :param numpy.1darray range_window:
         Window for FFT, length should be equal to adc_samples. (default is
         a square window)
-    n : int, optional
+    :param int n:
         FFT size, if n > adc_samples, zero-padding will be applied.
         (default is None)
 
-    Returns
-    -------
-    3D array
-        A 3D array of range profile, `[channels, pulses, range]`
+    :return: A 3D array of range profile, ``[channels, pulses, range]``
+    :rtype: numpy.3darray
     """
 
     if n is None:
@@ -86,24 +83,21 @@ def cal_range_profile(radar, baseband, range_window=1, n=None):
 
 
 def cal_range_doppler(radar, range_profile, doppler_window=1, fft_shift=False, n=None):
-    """Calculate range-Doppler matrix
+    """
+    Calculate range-Doppler matrix
 
-    Parameters
-    ----------
-    radar : Radar (radarsimpy.Radar)
+    :param Radar radar:
         A well defined radar system
-    range_profile : 3D array
-        Range profile matrix, `[channels, pulses, adc_samples]`
-    doppler_window : 1D array, optional
+    :param numpy.3darray range_profile: 
+        Range profile matrix, ``[channels, pulses, adc_samples]``
+    :param numpy.1darray doppler_window:
         Window for FFT, length should be equal to adc_samples. (default is
         a square window)
-    fft_shift : boolean, optional
+    :param bool fft_shift:
         Perform FFT shift.  (default is False)
 
-    Returns
-    -------
-    3D array
-        A 3D array of range-Doppler, `[channels, Doppler, range]`
+    :return: A 3D array of range profile, ``[channels, Doppler, range]``
+    :rtype: numpy.3darray
     """
 
     if n is None:
@@ -130,23 +124,20 @@ def cal_range_doppler(radar, range_profile, doppler_window=1, fft_shift=False, n
 
 
 def get_polar_image(image, range_bins, angle_bins, fov_deg):
-    """Convert cartesian coordinate to polar
+    """
+    Convert cartesian coordinate to polar
 
-    Parameters
-    ----------
-    image : 2D array
+    :param numpy.2darray image:
         Data with cartesian coordinate, [range, angle]
-    range_bins : int
+    :param int range_bins:
         Number of range bins
-    angle_bins : int
+    :param int angle_bins:
         Number of angle bins
-    fov_deg : float
+    :param float fov_deg:
         Field of view (deg)
 
-    Returns
-    -------
-    2D array
-        A 2D image with polar coordinate
+    :return: A 2D image with polar coordinate
+    :rtype: numpy.2darray
     """
 
     angle_bin_res = fov_deg / angle_bins

@@ -1,0 +1,178 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Processing &#8212; RadarSimPy  documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tools" href="tools.html" />
+    <link rel="prev" title="Raytracing" href="rt.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tools.html" title="Tools"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="rt.html" title="Raytracing"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">RadarSimPy  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Processing</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-radarsimpy.processing">
+<span id="processing"></span><h1>Processing<a class="headerlink" href="#module-radarsimpy.processing" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="radarsimpy.processing.cal_range_doppler">
+<code class="sig-prename descclassname">radarsimpy.processing.</code><code class="sig-name descname">cal_range_doppler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">radar</span></em>, <em class="sig-param"><span class="n">range_profile</span></em>, <em class="sig-param"><span class="n">doppler_window</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">fft_shift</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.processing.cal_range_doppler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate range-Doppler matrix</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>radar</strong> (<a class="reference internal" href="radar.html#radarsimpy.Radar" title="radarsimpy.Radar"><em>Radar</em></a>) – A well defined radar system</p></li>
+<li><p><strong>range_profile</strong> (<em>numpy.3darray</em>) – Range profile matrix, <code class="docutils literal notranslate"><span class="pre">[channels,</span> <span class="pre">pulses,</span> <span class="pre">adc_samples]</span></code></p></li>
+<li><p><strong>doppler_window</strong> (<em>numpy.1darray</em>) – Window for FFT, length should be equal to adc_samples. (default is
+a square window)</p></li>
+<li><p><strong>fft_shift</strong> (<em>bool</em>) – Perform FFT shift.  (default is False)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A 3D array of range profile, <code class="docutils literal notranslate"><span class="pre">[channels,</span> <span class="pre">Doppler,</span> <span class="pre">range]</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.3darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="radarsimpy.processing.cal_range_profile">
+<code class="sig-prename descclassname">radarsimpy.processing.</code><code class="sig-name descname">cal_range_profile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">radar</span></em>, <em class="sig-param"><span class="n">baseband</span></em>, <em class="sig-param"><span class="n">range_window</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.processing.cal_range_profile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate range profile matrix</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>radar</strong> (<a class="reference internal" href="radar.html#radarsimpy.Radar" title="radarsimpy.Radar"><em>Radar</em></a>) – A well defined radar system</p></li>
+<li><p><strong>baseband</strong> (<em>numpy.3darray</em>) – Baseband data, <code class="docutils literal notranslate"><span class="pre">[channels,</span> <span class="pre">pulses,</span> <span class="pre">adc_samples]</span></code></p></li>
+<li><p><strong>range_window</strong> (<em>numpy.1darray</em>) – Window for FFT, length should be equal to adc_samples. (default is
+a square window)</p></li>
+<li><p><strong>n</strong> (<em>int</em>) – FFT size, if n &gt; adc_samples, zero-padding will be applied.
+(default is None)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A 3D array of range profile, <code class="docutils literal notranslate"><span class="pre">[channels,</span> <span class="pre">pulses,</span> <span class="pre">range]</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.3darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="radarsimpy.processing.get_polar_image">
+<code class="sig-prename descclassname">radarsimpy.processing.</code><code class="sig-name descname">get_polar_image</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">image</span></em>, <em class="sig-param"><span class="n">range_bins</span></em>, <em class="sig-param"><span class="n">angle_bins</span></em>, <em class="sig-param"><span class="n">fov_deg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.processing.get_polar_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert cartesian coordinate to polar</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> (<em>numpy.2darray</em>) – Data with cartesian coordinate, [range, angle]</p></li>
+<li><p><strong>range_bins</strong> (<em>int</em>) – Number of range bins</p></li>
+<li><p><strong>angle_bins</strong> (<em>int</em>) – Number of angle bins</p></li>
+<li><p><strong>fov_deg</strong> (<em>float</em>) – Field of view (deg)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A 2D image with polar coordinate</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.2darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="rt.html"
+                        title="previous chapter">Raytracing</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tools.html"
+                        title="next chapter">Tools</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/process.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tools.html" title="Tools"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="rt.html" title="Raytracing"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">RadarSimPy  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Processing</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Zhengyu Peng.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.3.1.
+    </div>
+  </body>
+</html>

@@ -49,7 +49,8 @@ from scipy.special import erfc, erfcinv, gammainc
 
 
 def log_factorial(n):
-    r"""Compute the factorial of 'n' using logarithms to avoid overflow
+    r"""
+    Compute the factorial of 'n' using logarithms to avoid overflow
 
     Parameters
     ----------
@@ -69,7 +70,8 @@ def log_factorial(n):
 
 
 def threshold(pfa, N):
-    """Threshold ratio
+    """
+    Threshold ratio
 
     Parameters
     ----------
@@ -107,8 +109,9 @@ def threshold(pfa, N):
 
 
 def roc_pd(pfa, snr, N=1, stype='Coherent'):
-    """Calculate probability of detection (Pd) in receiver operating
-       characteristic (ROC)
+    """
+    Calculate probability of detection (Pd) in receiver operating
+    characteristic (ROC)
 
     :param pfa:
         Probability of false alarm (Pfa)
@@ -267,7 +270,8 @@ def roc_pd(pfa, snr, N=1, stype='Coherent'):
 
 
 def roc_snr(pfa, pd, N=1, stype='Coherent'):
-    """Calculate the minimal SNR for certain probability of
+    """
+    Calculate the minimal SNR for certain probability of
        detection (Pd) and probability of false alarm (Pfa) in
        receiver operating characteristic (ROC) with Secant method
 

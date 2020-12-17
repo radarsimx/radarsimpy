@@ -16,7 +16,7 @@
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Tools" href="tools.html" />
+    <link rel="next" title="Processing" href="process.html" />
     <link rel="prev" title="Simulator" href="sim.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -29,7 +29,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="tools.html" title="Tools"
+          <a href="process.html" title="Processing"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="sim.html" title="Simulator"
@@ -44,22 +44,73 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-radarsimpy.rt.scene">
-<span id="raytracing"></span><h1>Raytracing<a class="headerlink" href="#module-radarsimpy.rt.scene" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="raytracing">
+<h1>Raytracing<a class="headerlink" href="#raytracing" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-radarsimpy.rt.scene">
+<span id="radarsimpy-rt-scene"></span><h2>radarsimpy.rt.scene<a class="headerlink" href="#module-radarsimpy.rt.scene" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="radarsimpy.rt.scene.scene">
 <code class="sig-prename descclassname">radarsimpy.rt.scene.</code><code class="sig-name descname">scene</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.rt.scene.scene" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Alias: <code class="docutils literal notranslate"><span class="pre">radarsimpy.rt.scene()</span></code></p>
+<p>Radar scene simulator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>radar</strong> (<a class="reference internal" href="radar.html#radarsimpy.Radar" title="radarsimpy.Radar"><em>Radar</em></a>) – Radar model</p></li>
+<li><p><strong>targets</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – Target list</p></li>
+<li><p><strong>correction</strong> (<em>float</em>) – Amplitude correction</p></li>
+<li><p><strong>density</strong> (<em>float</em>) – Ray density (number of rays per wavelength)</p></li>
+<li><p><strong>level</strong> (<em>int</em>) – Fidelity level of the simulation</p></li>
+<li><p><strong>noise</strong> (<em>bool</em>) – Flag to enable noise calculation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>{
+‘baseband’:baseband,
+‘timestamp’:timestamp
+‘rays’:rays
+}</p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
 
-<span class="target" id="module-radarsimpy.rt.lidar_scene"></span><dl class="py function">
+</div>
+<div class="section" id="module-radarsimpy.rt.lidar_scene">
+<span id="radarsimpy-rt-lidar-scene"></span><h2>radarsimpy.rt.lidar_scene<a class="headerlink" href="#module-radarsimpy.rt.lidar_scene" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
 <dt id="radarsimpy.rt.lidar_scene.lidar_scene">
 <code class="sig-prename descclassname">radarsimpy.rt.lidar_scene.</code><code class="sig-name descname">lidar_scene</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.rt.lidar_scene.lidar_scene" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Alias: <code class="docutils literal notranslate"><span class="pre">radarsimpy.rt.lidar_scene()</span></code></p>
+<p>Lidar scene simulator</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lidar</strong> (<em>dict</em>) – Lidar configuration</p></li>
+<li><p><strong>targets</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – Target list</p></li>
+<li><p><strong>t</strong> (<em>time</em>) – Amplitude correction</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>rays</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.array</p>
+</dd>
+</dl>
+</dd></dl>
 
-<span class="target" id="module-radarsimpy.rt.rcs"></span><dl class="py function">
+</div>
+<div class="section" id="module-radarsimpy.rt.rcs">
+<span id="radarsimpy-rt-rcs"></span><h2>radarsimpy.rt.rcs<a class="headerlink" href="#module-radarsimpy.rt.rcs" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
 <dt id="radarsimpy.rt.rcs.rcs_sbr">
 <code class="sig-prename descclassname">radarsimpy.rt.rcs.</code><code class="sig-name descname">rcs_sbr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.rt.rcs.rcs_sbr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculate target’s RCS by using raytracing</p>
+<dd><p>Alias: <code class="docutils literal notranslate"><span class="pre">radarsimpy.rt.rcs()</span></code></p>
+<p>Calculate target’s RCS by using raytracing</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -81,6 +132,7 @@
 </dd></dl>
 
 </div>
+</div>
 
 
             <div class="clearer"></div>
@@ -89,12 +141,22 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Raytracing</a><ul>
+<li><a class="reference internal" href="#module-radarsimpy.rt.scene">radarsimpy.rt.scene</a></li>
+<li><a class="reference internal" href="#module-radarsimpy.rt.lidar_scene">radarsimpy.rt.lidar_scene</a></li>
+<li><a class="reference internal" href="#module-radarsimpy.rt.rcs">radarsimpy.rt.rcs</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
   <p class="topless"><a href="sim.html"
                         title="previous chapter">Simulator</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="tools.html"
-                        title="next chapter">Tools</a></p>
+  <p class="topless"><a href="process.html"
+                        title="next chapter">Processing</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -126,7 +188,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="tools.html" title="Tools"
+          <a href="process.html" title="Processing"
              >next</a> |</li>
         <li class="right" >
           <a href="sim.html" title="Simulator"

@@ -59,6 +59,21 @@ from stl import mesh
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cpdef lidar_scene(lidar, targets, t=0):
+    """
+    Alias: ``radarsimpy.rt.lidar_scene()``
+    
+    Lidar scene simulator
+
+    :param dict lidar:
+        Lidar configuration
+    :param list[dict] targets:
+        Target list
+    :param time t:
+        Amplitude correction
+
+    :return: rays
+    :rtype: numpy.array
+    """
     cdef PointCloud[float_t] pointcloud
     
     cdef float_t[:,:,:] mesh_memview

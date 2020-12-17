@@ -51,8 +51,8 @@
 <dl class="py function">
 <dt id="radarsimpy.rt.simulatorcpp.run_simulator">
 <code class="sig-prename descclassname">radarsimpy.rt.simulatorcpp.</code><code class="sig-name descname">run_simulator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.rt.simulatorcpp.run_simulator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias: <code class="docutils literal notranslate"><span class="pre">radarsimpy.simulatorcpp()</span></code>
-Radar simulator with C++ engine</p>
+<dd><p>Alias: <code class="docutils literal notranslate"><span class="pre">radarsimpy.simulatorcpp()</span></code></p>
+<p>Radar simulator with C++ engine</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -75,6 +75,75 @@ Radar simulator with C++ engine</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-radarsimpy.simulator">
+<span id="radarsimpy-simulator"></span><h2>radarsimpy.simulator<a class="headerlink" href="#module-radarsimpy.simulator" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="radarsimpy.simulator.run_simulator">
+<code class="sig-prename descclassname">radarsimpy.simulator.</code><code class="sig-name descname">run_simulator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">radar</span></em>, <em class="sig-param"><span class="n">targets</span></em>, <em class="sig-param"><span class="n">noise</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.simulator.run_simulator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias: <code class="docutils literal notranslate"><span class="pre">radarsimpy.simulator()</span></code></p>
+<p>Simulate baseband response of a radar with defined targets. Python engine.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>radar</strong> (<a class="reference internal" href="radar.html#radarsimpy.Radar" title="radarsimpy.Radar"><em>Radar</em></a>) – Radar model</p></li>
+<li><p><strong>targets</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – <p>Targets’ properties</p>
+<dl>
+<dt>[</dt><dd><p>{</p>
+<ul>
+<li><dl class="simple">
+<dt><strong>location</strong> (<em>1D array</em>) -</dt><dd><p>Location of the target (m), (x, y, z)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>rcs</strong> (<em>float</em>) -</dt><dd><p>Target RCS (dBsm)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>speed</strong> (<em>1D array</em>) -</dt><dd><p>Speed of the target (m/s), (vx, vy, vz). (default is
+(0, 0, 0))</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>phase</strong> (<em>float</em>) -</dt><dd><p>Target phase (deg). (default is 0)</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>}</p>
+</dd>
+</dl>
+<p>]</p>
+</p></li>
+<li><p><strong>noise</strong> (<em>bool</em>) – Flag to enable noise calculation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>{</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><strong>timestamp</strong> (<em>3D array</em>) -</dt><dd><p>Timestamp for baseband data, <code class="docutils literal notranslate"><span class="pre">[channels,</span> <span class="pre">pulses,</span> <span class="pre">adc_samples]</span></code></p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>baseband</strong> (<em>3D array</em>) -</dt><dd><p>Radar’s baseband output, <code class="docutils literal notranslate"><span class="pre">[channels,</span> <span class="pre">pulses,</span> <span class="pre">adc_samples]</span></code></p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>}</p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 </div>
 
 
@@ -88,6 +157,7 @@ Radar simulator with C++ engine</p>
   <ul>
 <li><a class="reference internal" href="#">Simulator</a><ul>
 <li><a class="reference internal" href="#module-radarsimpy.rt.simulatorcpp">radarsimpy.simulatorcpp</a></li>
+<li><a class="reference internal" href="#module-radarsimpy.simulator">radarsimpy.simulator</a></li>
 </ul>
 </li>
 </ul>

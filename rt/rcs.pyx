@@ -57,7 +57,10 @@ from radarsimpy.includes.zpvector cimport Vec3
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cpdef rcs_sbr(model, phi, theta, f, pol=[0, 0, 1], density=10):
-    """Calculate target's RCS by using raytracing
+    """
+    Alias: ``radarsimpy.rt.rcs()``
+
+    Calculate target's RCS by using raytracing
 
     :param str model:
         Path of the model

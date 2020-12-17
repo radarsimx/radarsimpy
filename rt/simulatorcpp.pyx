@@ -62,6 +62,7 @@ cimport numpy as np
 cpdef run_simulator(radar, targets, noise=True):
     """
     Alias: ``radarsimpy.simulatorcpp()``
+    
     Radar simulator with C++ engine
 
     :param Radar radar:
@@ -76,7 +77,6 @@ cpdef run_simulator(radar, targets, noise=True):
         'timestamp':radar.timestamp
         }
     :rtype: dict
-
     """
     # cdef Radarsimc[float_t] *rec_ptr
     # rec_ptr = new Radarsimc[float_t]()

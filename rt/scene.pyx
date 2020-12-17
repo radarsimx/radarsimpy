@@ -61,6 +61,31 @@ from stl import mesh
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
+    """
+    Alias: ``radarsimpy.rt.scene()``
+    
+    Radar scene simulator
+
+    :param Radar radar:
+        Radar model
+    :param list[dict] targets:
+        Target list
+    :param float correction:
+        Amplitude correction
+    :param float density:
+        Ray density (number of rays per wavelength)
+    :param int level:
+        Fidelity level of the simulation
+    :param bool noise:
+        Flag to enable noise calculation
+
+    :return: {
+        'baseband':baseband,
+        'timestamp':timestamp
+        'rays':rays
+        }
+    :rtype: dict
+    """
     cdef Scene[float_t] radar_scene
 
     """

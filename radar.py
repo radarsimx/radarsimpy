@@ -48,7 +48,8 @@ from scipy.interpolate import interp1d
 
 
 class Transmitter:
-    """A class defines basic parameters of a radar transmitter
+    """
+    A class defines basic parameters of a radar transmitter
 
     :param fc:
         Center frequency (Hz). If fc is a 1-D array, 
@@ -251,7 +252,8 @@ class Transmitter:
 
 
 class Receiver:
-    """A class defines basic parameters of a radar receiver
+    """
+    A class defines basic parameters of a radar receiver
 
     :param float fs:
         Sampling rate (sps)
@@ -361,7 +363,8 @@ class Receiver:
 
 
 class Radar:
-    """A class defines basic parameters of a radar system
+    """
+    A class defines basic parameters of a radar system
 
     :param Transmitter transmitter:
         Radar transmiter
@@ -467,7 +470,8 @@ class Radar:
         )
 
     def gen_timestamp(self):
-        """Generate timestamp
+        """
+        Generate timestamp
 
         Parameters
         ----------
@@ -512,7 +516,8 @@ class Radar:
                 np.tile(
                     np.expand_dims(
                         np.expand_dims(self.t_offset, axis=1), axis=2), (
-                        1, self.transmitter.pulses, self.samples_per_pulse)), self.channel_size, axis=0)
+                        1, self.transmitter.pulses, self.samples_per_pulse
+                    )), self.channel_size, axis=0)
 
             timestamp = np.tile(timestamp, (self.frames, 1, 1)) + toffset
         elif self.frames == 1:
@@ -521,7 +526,8 @@ class Radar:
         return timestamp
 
     def cal_frame_phases(self):
-        """Calculate phase sequence for frame level modulation
+        """
+        Calculate phase sequence for frame level modulation
 
         Parameters
         ----------
@@ -542,7 +548,8 @@ class Radar:
         return phase_code
 
     def cal_code_timestamp(self):
-        """Calculate phase sequence for pulse level modulation
+        """
+        Calculate phase sequence for pulse level modulation
 
         Parameters
         ----------
@@ -586,7 +593,8 @@ class Radar:
         return code_timestamp
 
     def cal_noise(self):
-        """Calculate noise amplitudes
+        """
+        Calculate noise amplitudes
 
         Parameters
         ----------
