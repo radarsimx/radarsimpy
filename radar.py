@@ -537,21 +537,21 @@ class Radar:
 
     **Channel/frame order in timestamp**
 
-    ***0*** Frame 0 - Tx 0 - Rx 0
+    **0** Frame 0 - Tx 0 - Rx 0
 
-    ***1*** Frame 0 - Tx 0 - Rx 1
-
-    ...
-
-    ***N*** Frame 0 - Tx 1 - Rx 0
-
-    ***N+1*** Frame 0 - Tx 1 - Rx 1
+    **1** Frame 0 - Tx 0 - Rx 1
 
     ...
 
-    ***M*** Frame 1 - Tx 0 - Rx 0
+    **N** Frame 0 - Tx 1 - Rx 0
 
-    ***M+1*** Frame 1 - Tx 0 - Rx 1
+    **N+1** Frame 0 - Tx 1 - Rx 1
+
+    ...
+
+    **M** Frame 1 - Tx 0 - Rx 0
+
+    **M+1** Frame 1 - Tx 0 - Rx 1
 
     """
 
@@ -653,30 +653,10 @@ class Radar:
         """
         Generate timestamp
 
-        :return:
+        :return numpy.3darray:
             Timestamp for each samples. Frame start time is
             defined in ``time``.
             ``[channes/frames, pulses, samples]``
-
-        **Channel/frame order in timestamp**
-
-        ***0*** Frame 0 - Tx 0 - Rx 0
-
-        ***1*** Frame 0 - Tx 0 - Rx 1
-
-        ...
-
-        ***N*** Frame 0 - Tx 1 - Rx 0
-
-        ***N+1*** Frame 0 - Tx 1 - Rx 1
-
-        ...
-
-        ***M*** Frame 1 - Tx 0 - Rx 0
-
-        ***M+1*** Frame 1 - Tx 0 - Rx 1
-
-        :rtype: numpy.3darray
         """
 
         channel_size = self.channel_size
@@ -724,13 +704,8 @@ class Radar:
         """
         Calculate phase sequence for frame level modulation
 
-        radar : Radar (radarsimpy.Radar)
-            Refer to 'radar' parameter in 'run_simulator'
-        targets : list of dict
-            Refer to 'targets' parameter in 'run_simulator'
-
-        3D array
-            Phase sequence
+        :return numpy.2darray:
+            Phase sequence. ``[channes/frames, pulses, samples]``
         """
 
         phase_code = np.array(self.transmitter.phase_code, dtype=complex)
@@ -740,26 +715,11 @@ class Radar:
 
     def cal_code_timestamp(self):
         """
-        Calculate phase sequence for pulse level modulation
+        Calculate phase code timing for pulse level modulation
 
-        radar : Radar (radarsimpy.Radar)
-            Refer to 'radar' parameter in 'run_simulator'
-        targets : list of dict
-            Refer to 'targets' parameter in 'run_simulator'
-
-        dict
-            {
-                code_timestamp : list of 1D array
-                    [
-                        1D array
-                            Timestamp for the edge of each code
-                    ]
-                phase_code : list of 1D array
-                    [
-                        1D array
-                            Phase sequence
-                    ]
-            }
+        :return numpy.2darray:
+            Timing at the start position of each phase code.
+            ``[channes/frames, max_code_length]``
         """
 
         chip_length = np.expand_dims(
@@ -783,13 +743,9 @@ class Radar:
         """
         Calculate noise amplitudes
 
-        radar : Radar (radarsimpy.Radar)
-            Refer to 'radar' parameter in 'run_simulator'
-        targets : list of dict
-            Refer to 'targets' parameter in 'run_simulator'
-
-        3D array
-            Noise amplitudes, '[channels, pulses, adc_samples]'
+        :return numpy.3darray:
+            Peak to peak amplitude of noise.
+            ``[channes/frames, pulses, samples]``
         """
 
         noise_amp = np.zeros([
