@@ -479,7 +479,6 @@ class Radar:
                  transmitter,
                  receiver,
                  time=0,
-                 type=None,
                  aperture=None):
 
         self.transmitter = transmitter
@@ -490,15 +489,19 @@ class Radar:
 
         self.t_offset = np.array(time)
         self.frames = np.size(time)
-        # system parameters for FMCW radar
-        if type == 'FMCW':
+
+        if self.transmitter.bandwidth > 0:
             self.max_range = (const.c * self.receiver.fs *
                               self.transmitter.pulse_length /
-                              self.transmitter.bandwidth / 2)
+                              self.transmitter.bandwidth)
             self.unambiguous_speed = const.c / \
                 self.transmitter.repetition_period[0] / \
                 self.transmitter.fc[0] / 2
             self.range_resolution = const.c / 2 / self.transmitter.bandwidth
+        else:
+            self.max_range = 0
+            self.unambiguous_speed = 0
+            self.range_resolution = 0
 
         # virtual array
         self.channel_size = self.transmitter.channel_size * \
@@ -570,11 +573,9 @@ class Radar:
         """
         Generate timestamp
 
-        radar : Radar (radarsimpy.Radar)
-            Refer to 'radar' parameter in 'run_simulator'
-
-        3D array
-            A 3D array of timestamp, '[channels, pulses, adc_samples]'
+        :return:
+            Timestamp for each sample. ``[channels, pulses, adc_samples]``
+        :rtype: numpy.3darray
         """
 
         channel_size = self.channel_size
