@@ -208,6 +208,12 @@ class Transmitter:
                  slop_type='rising',
                  channels=[dict(location=(0, 0, 0))]):
 
+        self.pulse_length = pulse_length
+        self.bandwidth = bandwidth
+        self.tx_power = tx_power
+        self.pulses = pulses
+        self.channels = channels
+
         # Extend `fc` to a numpy.1darray. Length equels to `pulses`
         if isinstance(fc, (list, tuple, np.ndarray)):
             if len(fc) != pulses:
@@ -218,10 +224,8 @@ class Transmitter:
         else:
             self.fc = fc+np.zeros(pulses)
 
-        self.pulse_length = pulse_length
-        self.bandwidth = bandwidth
-        self.tx_power = tx_power
-
+        # Extend `repetition_period` to a numpy.1darray.
+        # Length equels to `pulses`
         if repetition_period is None:
             self.repetition_period = self.pulse_length + np.zeros(pulses)
         else:
@@ -239,13 +243,11 @@ class Transmitter:
             raise ValueError(
                 '`repetition_period` should be larger than `pulse_length`.')
 
-        self.chirp_start_time = np.cumsum(
-            self.repetition_period)-self.repetition_period[0]
-        self.pulses = pulses
+        # self.chirp_start_time = np.cumsum(
+        #     self.repetition_period)-self.repetition_period[0]
 
         self.max_code_length = 0
 
-        self.channels = channels
         self.channel_size = len(self.channels)
         self.locations = np.zeros((self.channel_size, 3))
         self.az_patterns = []
@@ -508,12 +510,47 @@ class Radar:
 
         }
 
+    :ivar Transmitter transmitter:
+        Radar transmiter
+    :ivar Receiver receiver:
+        Radar Receiver
     :ivar int samples_per_pulse:
         Number of samples in one pulse
     :ivar int channel_size:
-        Total number of channels
+        Total number of channels.
+        ``channel_size = transmitter.channel_size * receiver.channel_size``
     :ivar numpy.2darray virtual_array:
         Locations of virtual array elements. [channel_size, 3 <x, y, z>]
+    :ivar float aperture_phi:
+        phi angle of the aperture's normal (deg)
+    :ivar float aperture_theta:
+        theta angle of the aperture's normal (deg)
+    :ivar numpy.1darray aperture_location:
+        Aperture's center location ``[x, y, z]`` (m)
+    :ivar numpy.1darray aperture_extension:
+        Aperture's extension of ``[left, right, top, bottom]``
+        when facing towards its normal (m)
+    :ivar numpy.3darray timestamp:
+        Timestamp for each samples. Frame start time is
+        defined in ``time``.
+        ``[channes/frames, pulses, samples]``
+
+        **Channel/frame order in ``timestamp``**
+
+        0. Frame 0 - Tx 0 - Rx 0
+        1. Frame 0 - Tx 0 - Rx 1
+
+        ...
+
+        N. Frame 0 - Tx 1 - Rx 0
+        N+1. Frame 0 - Tx 1 - Rx 1
+
+        ...
+
+        M. Frame 1 - Tx 0 - Rx 0
+        M+1. Frame 1 - Tx 0 - Rx 1
+
+
     """
 
     def __init__(self,
