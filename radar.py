@@ -493,7 +493,7 @@ class Radar:
         if self.transmitter.bandwidth > 0:
             self.max_range = (const.c * self.receiver.fs *
                               self.transmitter.pulse_length /
-                              self.transmitter.bandwidth)
+                              self.transmitter.bandwidth / 2)
             self.unambiguous_speed = const.c / \
                 self.transmitter.repetition_period[0] / \
                 self.transmitter.fc[0] / 2
