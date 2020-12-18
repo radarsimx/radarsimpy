@@ -55,13 +55,14 @@ class Transmitter:
         Center frequency for each pulse (Hz).
         If ``fc`` is a single number, all the pulses have
         the same center frequency.
+
         ``fc`` can alse be a 1-D array to specify different
         center frequency for each pulse. In this case, the
         length of the 1-D array should equals to the length
         of ``pulses``
     :type fc: float or numpy.1darray
     :param float pulse_length:
-        Dwell time of each pulse (seconds)
+        Dwell time of each pulse (s)
     :param float bandwidth:
         Bandwith of each pulse (Hz)
     :param float tx_power:
@@ -69,11 +70,17 @@ class Transmitter:
     :param float repetition_period:
         Pulse repetition period (s). ``repetition_period >=
         pulse_length``. If it is ``None``, ``repetition_period =
-        pulse_length``
+        pulse_length``.
+
+        ``repetition_period`` can alse be a 1-D array to specify
+        different repetition period for each pulse. In this case, the
+        length of the 1-D array should equals to the length
+        of ``pulses``
+    :type repetitions_period: float or numpy.1darray
     :param int pulses:
         Total number of pulses
     :param str slop_type:
-        ``rising`` or ``falling`` slop for the frequency modulation
+        ``rising`` or ``falling`` slope for the frequency modulation
     :param list[dict] channels:
         Properties of transmitter channels
 
@@ -81,26 +88,27 @@ class Transmitter:
             {
 
             - **location** (*numpy.1darray*) -
-                3D location of the channel <x. y. z> (m)
+                3D location of the channel [x. y. z] (m)
             - **delay** (*float*) -
-                Transmit delay (s)
+                Transmit delay (s). ``default 0``
             - **azimuth_angle** (*numpy.1darray*) -
-                Angles for azimuth pattern (deg)
+                Angles for azimuth pattern (deg). ``default [-90, 90]``
             - **azimuth_pattern** (*numpy.1darray*) -
-                Azimuth pattern (dB)
+                Azimuth pattern (dB). ``default [0, 0]``
             - **elevation_angle** (*numpy.1darray*) -
-                Angles for elevation pattern (deg)
+                Angles for elevation pattern (deg). ``default [-90, 90]``
             - **elevation_pattern** (*numpy.1darray*) -
-                Elevation pattern (dB)
+                Elevation pattern (dB). ``default [0, 0]``
             - **phase_code** (*numpy.1darray*) -
                 Phase code sequence for phase modulation (deg).
                 If ``chip_length == 0``, or ``chip_length`` is not defined,
-                length of ``phase_code`` should be equal to ``pulses``
+                length of ``phase_code`` should be equal to ``pulses``.
+                ``default 0``
             - **chip_length** (*float*) -
                 Length for each phase code (s). If ``chip_length ==
                 0``, one pulse will have one ``phase_code``. If
                 ``chip_length != 0``, all ``phase_code`` will be
-                applied to each pulse
+                applied to each pulse. ``default 0``
 
             }
 
@@ -147,15 +155,15 @@ class Transmitter:
         #                repetition_period
         #                  +-----------+
         #
-        #                          X            X            X          +
-        #                         X            X            X           |
-        #                        X            X            X            |
-        #                       X            X            X             |
-        #          +---fc--->  X            X            X     ...   bandwidth
-        #                     X            X            X               |
-        #                    X            X            X                |
-        #                   X            X            X                 |
-        #                  X            X            X                  +
+        #                          /            /            /          +
+        #                         /            /            /           |
+        #                        /            /            /            |
+        #                       /            /            /             |
+        #          +---fc--->  /            /            /     ...   bandwidth
+        #                     /            /            /               |
+        #                    /            /            /                |
+        #                   /            /            /                 |
+        #                  /            /            /                  +
         #
         #                  +-------+
         #                 pulse_length
@@ -182,10 +190,11 @@ class Transmitter:
                  pulses=1,
                  slop_type='rising',
                  channels=[dict(location=(0, 0, 0))]):
-        # self.fc = np.array(fc)
+
         if isinstance(fc, (list, tuple, np.ndarray)):
             if len(fc) != pulses:
-                raise ValueError('Length of `fc` should be equal to `pulses`.')
+                raise ValueError(
+                    'Length of `fc` should equal to the length of `pulses`.')
             else:
                 self.fc = np.array(fc)
         else:
@@ -194,21 +203,28 @@ class Transmitter:
         self.pulse_length = pulse_length
         self.bandwidth = bandwidth
         self.tx_power = tx_power
+
         if repetition_period is None:
             self.repetition_period = self.pulse_length + np.zeros(pulses)
         else:
             if isinstance(repetition_period, (list, tuple, np.ndarray)):
-                self.repetition_period = repetition_period
+                if len(repetition_period) != pulses:
+                    raise ValueError(
+                        'Length of `repetition_period` should equal to the \
+                            length of `pulses`.')
+                else:
+                    self.repetition_period = repetition_period
             else:
                 self.repetition_period = repetition_period + np.zeros(pulses)
+
+        if np.min(self.repetition_period < self.pulse_length):
+            raise ValueError(
+                '`repetition_period` should be larger than `pulse_length`.')
 
         self.chirp_start_time = np.cumsum(
             self.repetition_period)-self.repetition_period[0]
         self.pulses = pulses
 
-        # self.az_fov = np.array(az_fov)
-        # self.el_fov = np.array(el_fov)
-        # self.grid = grid
         self.max_code_length = 0
 
         self.channels = channels
@@ -635,15 +651,11 @@ class Radar:
         """
         Calculate noise amplitudes
 
-        Parameters
-        ----------
         radar : Radar (radarsimpy.Radar)
             Refer to 'radar' parameter in 'run_simulator'
         targets : list of dict
             Refer to 'targets' parameter in 'run_simulator'
 
-        Returns
-        -------
         3D array
             Noise amplitudes, '[channels, pulses, adc_samples]'
         """
