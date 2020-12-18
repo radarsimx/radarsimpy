@@ -353,6 +353,29 @@ class Receiver:
         Angles for elevation pattern (deg)
     :ivar list[numpy.1darray] el_patterns:
         Elevation pattern (dB)
+
+    **Receiver noise**
+
+    .. code-block:: python
+        #           + n1 = 10*log10(Boltzmann_constant * Ts * 1000)
+        #           |      + 10*log10(noise_bandwidth)  (dBm)
+        #           v
+        #    +------+------+
+        #    |rf_gain      |
+        #    +------+------+
+        #           | n2 = n1 + noise_figure + rf_gain (dBm)
+        #           v n3 = 1e-3 * 10^(n2/10) (Watts)
+        #    +------+------+
+        #    |mixer        |
+        #    +------+------+
+        #           | n4 = sqrt(n3 * load_resistor) (V)
+        #           v
+        #    +------+------+
+        #    |baseband_gain|
+        #    +------+------+
+        #           | noise amplitude (peak to peak)
+        #           v n5 = n4 * 10^(baseband_gain / 20) * sqrt(2) (V)
+
     """
 
     def __init__(self, fs,
@@ -424,19 +447,22 @@ class Radar:
     :param Receiver receiver:
         Radar Receiver
     :param time:
-        Radar firing time instances
+        Radar firing time instances / frames
     :type time: float or numpy.1darray
     :param dict aperture:
         Radar receiver aperture for ray tracing simulation
 
         {
 
-        - **phi** (*float*) - phi angle of the aperture's normal (deg)
-        - **theta** (*float*) - theta angle of the aperture's normal (deg)
-        - **location** (*numpy.1darray*) - aperture's center location
-            ``[x, y, x]`` (m)
-        - **extension** (*numpy.1darray*) - aperture's extension of
-            ``[left, right, top, bottom]`` when facing towards its normal (m)
+        - **phi** (*float*) -
+            phi angle of the aperture's normal (deg)
+        - **theta** (*float*) -
+            theta angle of the aperture's normal (deg)
+        - **location** (*numpy.1darray*) -
+            aperture's center location ``[x, y, z]`` (m)
+        - **extension** (*numpy.1darray*) -
+            aperture's extension of ``[left, right, top, bottom]``
+            when facing towards its normal (m)
 
         }
 
@@ -543,13 +569,9 @@ class Radar:
         """
         Generate timestamp
 
-        Parameters
-        ----------
         radar : Radar (radarsimpy.Radar)
             Refer to 'radar' parameter in 'run_simulator'
 
-        Returns
-        -------
         3D array
             A 3D array of timestamp, '[channels, pulses, adc_samples]'
         """
@@ -599,15 +621,11 @@ class Radar:
         """
         Calculate phase sequence for frame level modulation
 
-        Parameters
-        ----------
         radar : Radar (radarsimpy.Radar)
             Refer to 'radar' parameter in 'run_simulator'
         targets : list of dict
             Refer to 'targets' parameter in 'run_simulator'
 
-        Returns
-        -------
         3D array
             Phase sequence
         """
@@ -621,15 +639,11 @@ class Radar:
         """
         Calculate phase sequence for pulse level modulation
 
-        Parameters
-        ----------
         radar : Radar (radarsimpy.Radar)
             Refer to 'radar' parameter in 'run_simulator'
         targets : list of dict
             Refer to 'targets' parameter in 'run_simulator'
 
-        Returns
-        -------
         dict
             {
                 code_timestamp : list of 1D array
