@@ -243,8 +243,8 @@ class Transmitter:
             raise ValueError(
                 '`repetition_period` should be larger than `pulse_length`.')
 
-        # self.chirp_start_time = np.cumsum(
-        #     self.repetition_period)-self.repetition_period[0]
+        self.chirp_start_time = np.cumsum(
+            self.repetition_period)-self.repetition_period[0]
 
         self.max_code_length = 0
 
