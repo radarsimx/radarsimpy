@@ -114,35 +114,52 @@ class Transmitter:
 
         ]
 
+    :ivar numpy.1darray fc:
+        Center frequency array for the pulses
+    :ivar float pulse_length:
+        Dwell time of each pulse (s)
+    :ivar float bandwidth:
+        Bandwith of each pulse (Hz)
+    :ivar float tx_power:
+        Transmitter power (dBm)
+    :ivar numpy.1darray repetition_period:
+        Pulse repetition period (s)
+    :ivar int pulses:
+        Total number of pulses
+    :ivar list[dict] channels:
+        Properties of transmitter channels
     :ivar int channel_size:
-        Total number of transmitter channels
+        Number of transmitter channels
     :ivar numpy.2darray locations:
-        3D location of the channel <x. y. z> (m)
-    :ivar numpy.1darray az_angles:
-        Angles for azimuth patterns (deg)
-    :type az_angles: list[numpy.1darray]
-    :ivar numpy.1darray az_patterns:
-        Azimuth pattern (dB)
-    :type az_patterns: list[numpy.1darray]
-    :ivar numpy.1darray el_angles:
-        Angles for elevation pattern (deg)
-    :type el_angles: list[numpy.1darray]
-    :ivar el_patterns:
-        Elevation pattern (dB)
-    :type el_patterns: list[numpy.1darray]
-    :ivar phase_code:
-        Phase code sequence for phase modulation (deg).
-        If ``chip_length == 0``, or ``chip_length`` is not
-        defined, length of ``phase_code`` should be equal
-        to ``pulses``
-    :type phase_code: list[numpy.1darray]
+        3D location of the channels. Size of the aray is
+        ``[channel_size, 3 <x, y, z>]`` (m)
+    :ivar list[numpy.1darray] az_angles:
+        Angles for each channel's azimuth pattern (deg)
+    :ivar list[numpy.1darray] az_patterns:
+        Azimuth pattern for each channel (dB)
+    :ivar list[numpy.1darray] el_angles:
+        Angles for each channel's elevation pattern (deg)
+    :ivar list[numpy.1darray] el_patterns:
+        Elevation pattern for each channel (dB)
+    :ivar list az_func:
+        Azimuth patterns' interpolation functions
+    :ivar list el_func:
+        Elevation patterns' interpolation functions
+    :ivar numpy.1darray antenna_gains:
+        Antenna gain for each channel (dB).
+        Antenna gain is ``max(az_pattern)``
+    :ivar list[numpy.1darray] phase_code:
+        Phase code sequence for phase modulation (deg)
     :ivar numpy.1darray chip_length:
-        Length for each phase code (s). If ``chip_length ==
-        0``, one pulse will have one ``phase_code``. If
-        ``chip_length != 0``, all ``phase_code`` will be
-        applied to each pulse
+        Length for each phase code (s)
     :ivar numpy.1darray delay:
-        Transmit delay (s)
+        Delay for each channel (s)
+    :ivar numpy.1darray polarization:
+        Antenna polarization ``[x, y, z]``.
+
+        - Horizontal polarization: ``[1, 0, 0]``
+        - Vertical polarization: ``[0, 0, 1]``
+
     :ivar float wavelength:
         Wavelength (m)
     :ivar float slope:
@@ -191,6 +208,7 @@ class Transmitter:
                  slop_type='rising',
                  channels=[dict(location=(0, 0, 0))]):
 
+        # Extend `fc` to a numpy.1darray. Length equels to `pulses`
         if isinstance(fc, (list, tuple, np.ndarray)):
             if len(fc) != pulses:
                 raise ValueError(
@@ -341,18 +359,41 @@ class Receiver:
 
         ]
 
+    :ivar float fs:
+        Sampling rate (sps)
+    :ivar float noise_figure:
+        Noise figure (dB)
+    :ivar float rf_gain:
+        Total RF gain (dB)
+    :ivar float load_resistor:
+        Load resistor to convert power to voltage (Ohm)
+    :ivar float baseband_gain:
+        Total baseband gain (dB)
+    :ivar float noise_bandwidth:
+        Bandwidth in calculating the noise (Hz).
+        ``noise_bandwidth = fs / 2``
+    :ivar list[dict] channels:
+        Properties of receiver channels
     :ivar int channel_size:
-        Total number of transmitter channels
+        Total number of receiver channels
     :ivar numpy.2darray locations:
-        3D location of the channel <x. y. z> (m)
+        3D location of the channels. Size of the aray is
+        ``[channel_size, 3 <x, y, z>]`` (m)
     :ivar list[numpy.1darray] az_angles:
-        Angles for azimuth patterns (deg)
+        Angles for each channel's azimuth pattern (deg)
     :ivar list[numpy.1darray] az_patterns:
-        Azimuth pattern (dB)
+        Azimuth pattern for each channel (dB)
     :ivar list[numpy.1darray] el_angles:
-        Angles for elevation pattern (deg)
+        Angles for each channel's elevation pattern (deg)
     :ivar list[numpy.1darray] el_patterns:
-        Elevation pattern (dB)
+        Elevation pattern for each channel (dB)
+    :ivar list az_func:
+        Azimuth patterns' interpolation functions
+    :ivar list el_func:
+        Elevation patterns' interpolation functions
+    :ivar numpy.1darray antenna_gains:
+        Antenna gain for each channel (dB).
+        Antenna gain is ``max(az_pattern)``
 
     **Receiver noise**
 
