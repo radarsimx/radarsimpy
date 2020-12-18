@@ -315,13 +315,11 @@ class Receiver:
     :param float noise_figure:
         Noise figure (dB)
     :param float rf_gain:
-        RF gain (dB)
+        Total RF gain (dB)
     :param float load_resistor:
         Load resistor to convert power to voltage (Ohm)
     :param float baseband_gain:
-        Baseband gain (dB)
-    :param int noise_bandwidth:
-        Noise bandwith in calculating thermal noise, ``fs / 2``
+        Total baseband gain (dB)
     :param list[dict] channels:
         Properties of transmitter channels
 
@@ -329,15 +327,15 @@ class Receiver:
             {
 
             - **location** (*numpy.1darray*) -
-                3D location of the channel <x. y. z> (m)
+                3D location of the channel [x. y. z] (m)
             - **azimuth_angle** (*numpy.1darray*) -
-                Angles for azimuth pattern (deg)
+                Angles for azimuth pattern (deg). ``default [-90, 90]``
             - **azimuth_pattern** (*numpy.1darray*) -
-                Azimuth pattern (dB)
+                Azimuth pattern (dB). ``default [0, 0]``
             - **elevation_angle** (*numpy.1darray*) -
-                Angles for elevation pattern (deg)
+                Angles for elevation pattern (deg). ``default [-90, 90]``
             - **elevation_pattern** (*numpy.1darray*) -
-                Elevation pattern (dB)
+                Elevation pattern (dB). ``default [0, 0]``
 
             }
 
@@ -425,6 +423,23 @@ class Radar:
         Radar transmiter
     :param Receiver receiver:
         Radar Receiver
+    :param time:
+        Radar firing time instances
+    :type time: float or numpy.1darray
+    :param dict aperture:
+        Radar receiver aperture for ray tracing simulation
+
+        {
+
+        - **phi** (*float*) - phi angle of the aperture's normal (deg)
+        - **theta** (*float*) - theta angle of the aperture's normal (deg)
+        - **location** (*numpy.1darray*) - aperture's center location
+            ``[x, y, x]`` (m)
+        - **extension** (*numpy.1darray*) - aperture's extension of
+            ``[left, right, top, bottom]`` when facing towards its normal (m)
+
+        }
+
     :ivar int samples_per_pulse:
         Number of samples in one pulse
     :ivar int channel_size:
