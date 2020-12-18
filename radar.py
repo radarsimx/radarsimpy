@@ -357,6 +357,7 @@ class Receiver:
     **Receiver noise**
 
     .. code-block:: python
+
         #           + n1 = 10*log10(Boltzmann_constant * Ts * 1000)
         #           |      + 10*log10(noise_bandwidth)  (dBm)
         #           v
