@@ -535,21 +535,23 @@ class Radar:
         defined in ``time``.
         ``[channes/frames, pulses, samples]``
 
-        **Channel/frame order in ``timestamp``**
+    **Channel/frame order in timestamp**
 
-        0. Frame 0 - Tx 0 - Rx 0
-        1. Frame 0 - Tx 0 - Rx 1
+    ***0*** Frame 0 - Tx 0 - Rx 0
 
-        ...
+    ***1*** Frame 0 - Tx 0 - Rx 1
 
-        N. Frame 0 - Tx 1 - Rx 0
-        N+1. Frame 0 - Tx 1 - Rx 1
+    ...
 
-        ...
+    ***N*** Frame 0 - Tx 1 - Rx 0
 
-        M. Frame 1 - Tx 0 - Rx 0
-        M+1. Frame 1 - Tx 0 - Rx 1
+    ***N+1*** Frame 0 - Tx 1 - Rx 1
 
+    ...
+
+    ***M*** Frame 1 - Tx 0 - Rx 0
+
+    ***M+1*** Frame 1 - Tx 0 - Rx 1
 
     """
 
@@ -652,7 +654,28 @@ class Radar:
         Generate timestamp
 
         :return:
-            Timestamp for each sample. ``[channels, pulses, adc_samples]``
+            Timestamp for each samples. Frame start time is
+            defined in ``time``.
+            ``[channes/frames, pulses, samples]``
+
+        **Channel/frame order in timestamp**
+
+        ***0*** Frame 0 - Tx 0 - Rx 0
+
+        ***1*** Frame 0 - Tx 0 - Rx 1
+
+        ...
+
+        ***N*** Frame 0 - Tx 1 - Rx 0
+
+        ***N+1*** Frame 0 - Tx 1 - Rx 1
+
+        ...
+
+        ***M*** Frame 1 - Tx 0 - Rx 0
+
+        ***M+1*** Frame 1 - Tx 0 - Rx 1
+
         :rtype: numpy.3darray
         """
 
