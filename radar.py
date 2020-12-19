@@ -662,10 +662,11 @@ class Radar:
         """
         Generate timestamp
 
-        :return numpy.3darray:
+        :return:
             Timestamp for each samples. Frame start time is
             defined in ``time``.
             ``[channes/frames, pulses, samples]``
+        :rtype: numpy.3darray
         """
 
         channel_size = self.channel_size
@@ -713,8 +714,9 @@ class Radar:
         """
         Calculate phase sequence for frame level modulation
 
-        :return numpy.2darray:
+        :return:
             Phase sequence. ``[channes/frames, pulses, samples]``
+        :rtype: numpy.2darray
         """
 
         phase_code = np.array(self.transmitter.phase_code, dtype=complex)
@@ -726,9 +728,10 @@ class Radar:
         """
         Calculate phase code timing for pulse level modulation
 
-        :return numpy.2darray:
+        :return:
             Timing at the start position of each phase code.
             ``[channes/frames, max_code_length]``
+        :rtype: numpy.2darray
         """
 
         chip_length = np.expand_dims(
@@ -752,9 +755,10 @@ class Radar:
         """
         Calculate noise amplitudes
 
-        :return numpy.3darray:
+        :return:
             Peak to peak amplitude of noise.
             ``[channes/frames, pulses, samples]``
+        :rtype: numpy.3darray
         """
 
         noise_amp = np.zeros([

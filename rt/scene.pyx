@@ -70,19 +70,81 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
         Radar model
     :param list[dict] targets:
         Target list
-    :param float correction:
-        Amplitude correction
-    :param float density:
-        Ray density (number of rays per wavelength)
-    :param int level:
-        Fidelity level of the simulation
-    :param bool noise:
-        Flag to enable noise calculation
 
-    :return: {
-        'baseband':baseband,
-        'timestamp':timestamp
-        'rays':rays
+        [
+            {
+
+            - **model** (*str*) --
+                Path to the target model
+            - **origin** (*numpy.1darray*) --
+                Origin position of the target model (m), [x, y, z].
+                ``default [0, 0, 0]``
+            - **location** (*numpy.1darray*) --
+                Location of the target (m), [x, y, z].
+                ``default [0, 0, 0]``
+            - **speed** (*numpy.1darray*) --
+                Speed of the target (m/s), [vx, vy, vz].
+                ``default [0, 0, 0]``
+            - **rotation** (*numpy.1darray*) --
+                Target's angle (deg), [yaw, pitch, roll].
+                ``default [0, 0, 0]``
+            - **rotation_rate** (*numpy.1darray*) --
+                Target's rotation rate (deg/s),
+                [yaw rate, pitch rate, roll rate]
+                ``default [0, 0, 0]``
+
+            }
+
+        ]
+
+        *Note*: Target's parameters can be specified with
+            ``Radar.timestamp`` to customize the time varying property.
+            Example: ``location=(1e-3*np.sin(2*np.pi*1*radar.timestamp), 0, 0)``
+    :param float correction:
+        Amplitude correction (dB). ``default 0``
+    :param float density:
+        Ray density (number of rays per wavelength). ``default 10``
+    :param int level:
+        Fidelity level of the simulation, ``default None``
+
+        - ``None``: Perform one ray tracing simulation for the whole frame
+        - ``pulse``: Perform ray tracing for each pulse
+        - ``sample``: Perform ray tracing for each sample
+
+    :param bool noise:
+        Flag to enable noise calculation, ``default True``
+
+    :return:
+        {
+
+        - **baseband** (*numpy.3darray*) --
+            Time domain complex (I/Q) baseband data.
+            ``[channes/frames, pulses, samples]``
+
+            *Channel/frame order in baseband*
+
+            *[0]* ``Frame[0] -- Tx[0] -- Rx[0]``
+
+            *[1]* ``Frame[0] -- Tx[0] -- Rx[1]``
+
+            ...
+
+            *[N]* ``Frame[0] -- Tx[1] -- Rx[0]``
+
+            *[N+1]* ``Frame[0] -- Tx[1] -- Rx[1]``
+
+            ...
+
+            *[M]* ``Frame[1] -- Tx[0] -- Rx[0]``
+
+            *[M+1]* ``Frame[1] -- Tx[0] -- Rx[1]``
+
+        - **timestamp** (*numpy.3darray*) --
+            Refer to Radar.timestamp
+
+        - **rays** (*numpy.array*) --
+            Received rays
+
         }
     :rtype: dict
     """
