@@ -17,7 +17,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Simulator" href="sim.html" />
-    <link rel="prev" title="Welcome to RadarSimPy’s documentation!" href="index.html" /> 
+    <link rel="prev" title="Coordinate Systems" href="coordinate.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -32,7 +32,7 @@
           <a href="sim.html" title="Simulator"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Welcome to RadarSimPy’s documentation!"
+          <a href="coordinate.html" title="Coordinate Systems"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">RadarSimPy  documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Radar Model</a></li> 
@@ -170,29 +170,29 @@ Antenna gain is <code class="docutils literal notranslate"><span class="pre">max
 </dd>
 </dl>
 <p><strong>Waveform</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#                repetition_period</span>
-<span class="c1">#                  +-----------+</span>
-<span class="c1">#</span>
-<span class="c1">#                          /            /            /          +</span>
-<span class="c1">#                         /            /            /           |</span>
-<span class="c1">#                        /            /            /            |</span>
-<span class="c1">#                       /            /            /             |</span>
-<span class="c1">#          +---fc---&gt;  /            /            /     ...   bandwidth</span>
-<span class="c1">#                     /            /            /               |</span>
-<span class="c1">#                    /            /            /                |</span>
-<span class="c1">#                   /            /            /                 |</span>
-<span class="c1">#                  /            /            /                  +</span>
-<span class="c1">#</span>
-<span class="c1">#                  +-------+</span>
-<span class="c1">#                 pulse_length</span>
-<span class="c1">#</span>
-<span class="c1">#                  +-------------------------------------+</span>
-<span class="c1"># chip_length == 0 |  phase 0  ||  phase 1  ||  phase 2  |  ...</span>
-<span class="c1">#                  +-------------------------------------+</span>
-<span class="c1">#</span>
-<span class="c1">#                  +-------------------------------------+</span>
-<span class="c1"># chip_length != 0 | phase 0:N || phase 0:N || phase 0:N |  ...</span>
-<span class="c1">#                  +-------------------------------------+</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span>                <span class="n">repetition_period</span>
+<span class="o">|</span>                  <span class="o">+-----------+</span>
+<span class="o">|</span>
+<span class="o">|</span>                          <span class="o">/</span>            <span class="o">/</span>            <span class="o">/</span>          <span class="o">+</span>
+<span class="o">|</span>                         <span class="o">/</span>            <span class="o">/</span>            <span class="o">/</span>           <span class="o">|</span>
+<span class="o">|</span>                        <span class="o">/</span>            <span class="o">/</span>            <span class="o">/</span>            <span class="o">|</span>
+<span class="o">|</span>                       <span class="o">/</span>            <span class="o">/</span>            <span class="o">/</span>             <span class="o">|</span>
+<span class="o">|</span>          <span class="o">+---</span><span class="n">fc</span><span class="o">---&gt;</span>  <span class="o">/</span>            <span class="o">/</span>            <span class="o">/</span>     <span class="o">...</span>   <span class="n">bandwidth</span>
+<span class="o">|</span>                     <span class="o">/</span>            <span class="o">/</span>            <span class="o">/</span>               <span class="o">|</span>
+<span class="o">|</span>                    <span class="o">/</span>            <span class="o">/</span>            <span class="o">/</span>                <span class="o">|</span>
+<span class="o">|</span>                   <span class="o">/</span>            <span class="o">/</span>            <span class="o">/</span>                 <span class="o">|</span>
+<span class="o">|</span>                  <span class="o">/</span>            <span class="o">/</span>            <span class="o">/</span>                  <span class="o">+</span>
+<span class="o">|</span>
+<span class="o">|</span>                  <span class="o">+-------+</span>
+<span class="o">|</span>                 <span class="n">pulse_length</span>
+<span class="o">|</span>
+<span class="o">|</span>                  <span class="o">+-------------------------------------+</span>
+<span class="o">|</span> <span class="n">chip_length</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">|</span>  <span class="n">phase</span> <span class="mi">0</span>  <span class="o">||</span>  <span class="n">phase</span> <span class="mi">1</span>  <span class="o">||</span>  <span class="n">phase</span> <span class="mi">2</span>  <span class="o">|</span>  <span class="o">...</span>
+<span class="o">|</span>                  <span class="o">+-------------------------------------+</span>
+<span class="o">|</span>
+<span class="o">|</span>                  <span class="o">+-------------------------------------+</span>
+<span class="o">|</span> <span class="n">chip_length</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">|</span> <span class="n">phase</span> <span class="mi">0</span><span class="p">:</span><span class="n">N</span> <span class="o">||</span> <span class="n">phase</span> <span class="mi">0</span><span class="p">:</span><span class="n">N</span> <span class="o">||</span> <span class="n">phase</span> <span class="mi">0</span><span class="p">:</span><span class="n">N</span> <span class="o">|</span>  <span class="o">...</span>
+<span class="o">|</span>                  <span class="o">+-------------------------------------+</span>
 </pre></div>
 </div>
 <p>Tips:</p>
@@ -279,24 +279,24 @@ Antenna gain is <code class="docutils literal notranslate"><span class="pre">max
 </dd>
 </dl>
 <p><strong>Receiver noise</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#           + n1 = 10*log10(Boltzmann_constant * Ts * 1000)</span>
-<span class="c1">#           |      + 10*log10(noise_bandwidth)  (dBm)</span>
-<span class="c1">#           v</span>
-<span class="c1">#    +------+------+</span>
-<span class="c1">#    |rf_gain      |</span>
-<span class="c1">#    +------+------+</span>
-<span class="c1">#           | n2 = n1 + noise_figure + rf_gain (dBm)</span>
-<span class="c1">#           v n3 = 1e-3 * 10^(n2/10) (Watts)</span>
-<span class="c1">#    +------+------+</span>
-<span class="c1">#    |mixer        |</span>
-<span class="c1">#    +------+------+</span>
-<span class="c1">#           | n4 = sqrt(n3 * load_resistor) (V)</span>
-<span class="c1">#           v</span>
-<span class="c1">#    +------+------+</span>
-<span class="c1">#    |baseband_gain|</span>
-<span class="c1">#    +------+------+</span>
-<span class="c1">#           | noise amplitude (peak to peak)</span>
-<span class="c1">#           v n5 = n4 * 10^(baseband_gain / 20) * sqrt(2) (V)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span>           <span class="o">+</span> <span class="n">n1</span> <span class="o">=</span> <span class="mi">10</span><span class="o">*</span><span class="n">log10</span><span class="p">(</span><span class="n">Boltzmann_constant</span> <span class="o">*</span> <span class="n">Ts</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="o">|</span>           <span class="o">|</span>      <span class="o">+</span> <span class="mi">10</span><span class="o">*</span><span class="n">log10</span><span class="p">(</span><span class="n">noise_bandwidth</span><span class="p">)</span>  <span class="p">(</span><span class="n">dBm</span><span class="p">)</span>
+<span class="o">|</span>           <span class="n">v</span>
+<span class="o">|</span>    <span class="o">+------+------+</span>
+<span class="o">|</span>    <span class="o">|</span><span class="n">rf_gain</span>      <span class="o">|</span>
+<span class="o">|</span>    <span class="o">+------+------+</span>
+<span class="o">|</span>           <span class="o">|</span> <span class="n">n2</span> <span class="o">=</span> <span class="n">n1</span> <span class="o">+</span> <span class="n">noise_figure</span> <span class="o">+</span> <span class="n">rf_gain</span> <span class="p">(</span><span class="n">dBm</span><span class="p">)</span>
+<span class="o">|</span>           <span class="n">v</span> <span class="n">n3</span> <span class="o">=</span> <span class="mf">1e-3</span> <span class="o">*</span> <span class="mi">10</span><span class="o">^</span><span class="p">(</span><span class="n">n2</span><span class="o">/</span><span class="mi">10</span><span class="p">)</span> <span class="p">(</span><span class="n">Watts</span><span class="p">)</span>
+<span class="o">|</span>    <span class="o">+------+------+</span>
+<span class="o">|</span>    <span class="o">|</span><span class="n">mixer</span>        <span class="o">|</span>
+<span class="o">|</span>    <span class="o">+------+------+</span>
+<span class="o">|</span>           <span class="o">|</span> <span class="n">n4</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">n3</span> <span class="o">*</span> <span class="n">load_resistor</span><span class="p">)</span> <span class="p">(</span><span class="n">V</span><span class="p">)</span>
+<span class="o">|</span>           <span class="n">v</span>
+<span class="o">|</span>    <span class="o">+------+------+</span>
+<span class="o">|</span>    <span class="o">|</span><span class="n">baseband_gain</span><span class="o">|</span>
+<span class="o">|</span>    <span class="o">+------+------+</span>
+<span class="o">|</span>           <span class="o">|</span> <span class="n">noise</span> <span class="n">amplitude</span> <span class="p">(</span><span class="n">peak</span> <span class="n">to</span> <span class="n">peak</span><span class="p">)</span>
+<span class="o">|</span>           <span class="n">v</span> <span class="n">n5</span> <span class="o">=</span> <span class="n">n4</span> <span class="o">*</span> <span class="mi">10</span><span class="o">^</span><span class="p">(</span><span class="n">baseband_gain</span> <span class="o">/</span> <span class="mi">20</span><span class="p">)</span> <span class="o">*</span> <span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="p">(</span><span class="n">V</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -402,8 +402,8 @@ defined in <code class="docutils literal notranslate"><span class="pre">time</sp
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="index.html"
-                        title="previous chapter">Welcome to RadarSimPy’s documentation!</a></p>
+  <p class="topless"><a href="coordinate.html"
+                        title="previous chapter">Coordinate Systems</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="sim.html"
                         title="next chapter">Simulator</a></p>
@@ -441,7 +441,7 @@ defined in <code class="docutils literal notranslate"><span class="pre">time</sp
           <a href="sim.html" title="Simulator"
              >next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Welcome to RadarSimPy’s documentation!"
+          <a href="coordinate.html" title="Coordinate Systems"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">RadarSimPy  documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Radar Model</a></li> 

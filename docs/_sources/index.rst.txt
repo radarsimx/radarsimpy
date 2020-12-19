@@ -8,7 +8,15 @@ Welcome to RadarSimPy's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Instruction:
+
+   dependence
+   installation
+   coordinate
+
+.. toctree::
+   :maxdepth: 2
+   :caption: API:
 
    radar
    sim
