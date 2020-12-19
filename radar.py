@@ -87,24 +87,24 @@ class Transmitter:
         [
             {
 
-            - **location** (*numpy.1darray*) -
+            - **location** (*numpy.1darray*) --
                 3D location of the channel [x. y. z] (m)
-            - **delay** (*float*) -
+            - **delay** (*float*) --
                 Transmit delay (s). ``default 0``
-            - **azimuth_angle** (*numpy.1darray*) -
+            - **azimuth_angle** (*numpy.1darray*) --
                 Angles for azimuth pattern (deg). ``default [-90, 90]``
-            - **azimuth_pattern** (*numpy.1darray*) -
+            - **azimuth_pattern** (*numpy.1darray*) --
                 Azimuth pattern (dB). ``default [0, 0]``
-            - **elevation_angle** (*numpy.1darray*) -
+            - **elevation_angle** (*numpy.1darray*) --
                 Angles for elevation pattern (deg). ``default [-90, 90]``
-            - **elevation_pattern** (*numpy.1darray*) -
+            - **elevation_pattern** (*numpy.1darray*) --
                 Elevation pattern (dB). ``default [0, 0]``
-            - **phase_code** (*numpy.1darray*) -
+            - **phase_code** (*numpy.1darray*) --
                 Phase code sequence for phase modulation (deg).
                 If ``chip_length == 0``, or ``chip_length`` is not defined,
                 length of ``phase_code`` should be equal to ``pulses``.
                 ``default 0``
-            - **chip_length** (*float*) -
+            - **chip_length** (*float*) --
                 Length for each phase code (s). If ``chip_length ==
                 0``, one pulse will have one ``phase_code``. If
                 ``chip_length != 0``, all ``phase_code`` will be
@@ -346,15 +346,15 @@ class Receiver:
         [
             {
 
-            - **location** (*numpy.1darray*) -
+            - **location** (*numpy.1darray*) --
                 3D location of the channel [x. y. z] (m)
-            - **azimuth_angle** (*numpy.1darray*) -
+            - **azimuth_angle** (*numpy.1darray*) --
                 Angles for azimuth pattern (deg). ``default [-90, 90]``
-            - **azimuth_pattern** (*numpy.1darray*) -
+            - **azimuth_pattern** (*numpy.1darray*) --
                 Azimuth pattern (dB). ``default [0, 0]``
-            - **elevation_angle** (*numpy.1darray*) -
+            - **elevation_angle** (*numpy.1darray*) --
                 Angles for elevation pattern (deg). ``default [-90, 90]``
-            - **elevation_pattern** (*numpy.1darray*) -
+            - **elevation_pattern** (*numpy.1darray*) --
                 Elevation pattern (dB). ``default [0, 0]``
 
             }
@@ -498,13 +498,13 @@ class Radar:
 
         {
 
-        - **phi** (*float*) -
+        - **phi** (*float*) --
             phi angle of the aperture's normal (deg)
-        - **theta** (*float*) -
+        - **theta** (*float*) --
             theta angle of the aperture's normal (deg)
-        - **location** (*numpy.1darray*) -
+        - **location** (*numpy.1darray*) --
             aperture's center location ``[x, y, z]`` (m)
-        - **extension** (*numpy.1darray*) -
+        - **extension** (*numpy.1darray*) --
             aperture's extension of ``[left, right, top, bottom]``
             when facing towards its normal (m)
 
@@ -535,23 +535,23 @@ class Radar:
         defined in ``time``.
         ``[channes/frames, pulses, samples]``
 
-        **Channel/frame order in timestamp**
+        *Channel/frame order in timestamp*
 
-        **0** ``Frame 0 - Tx 0 - Rx 0``
+        *[0]* ``Frame[0] -- Tx[0] -- Rx[0]``
 
-        **1** ``Frame 0 - Tx 0 - Rx 1``
-
-        ...
-
-        **N** ``Frame 0 - Tx 1 - Rx 0``
-
-        **N+1** ``Frame 0 - Tx 1 - Rx 1``
+        *[1]* ``Frame[0] -- Tx[0] -- Rx[1]``
 
         ...
 
-        **M** ``Frame 1 - Tx 0 - Rx 0``
+        *[N]* ``Frame[0] -- Tx[1] -- Rx[0]``
 
-        **M+1** ``Frame 1 - Tx 0 - Rx 1``
+        *[N+1]* ``Frame[0] -- Tx[1] -- Rx[1]``
+
+        ...
+
+        *[M]* ``Frame[1] -- Tx[0] -- Rx[0]``
+
+        *[M+1]* ``Frame[1] -- Tx[0] -- Rx[1]``
 
     """
 
