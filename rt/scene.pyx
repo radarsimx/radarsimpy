@@ -104,7 +104,7 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
         Amplitude correction (dB). ``default 0``
     :param float density:
         Ray density (number of rays per wavelength). ``default 10``
-    :param int level:
+    :param str level:
         Fidelity level of the simulation, ``default None``
 
         - ``None``: Perform one ray tracing simulation for the whole frame
