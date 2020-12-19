@@ -82,37 +82,37 @@ of <code class="docutils literal notranslate"><span class="pre">pulses</span></c
 <dt>[</dt><dd><p>{</p>
 <ul>
 <li><dl class="simple">
-<dt><strong>location</strong> (<em>numpy.1darray</em>) -</dt><dd><p>3D location of the channel [x. y. z] (m)</p>
+<dt><strong>location</strong> (<em>numpy.1darray</em>) –</dt><dd><p>3D location of the channel [x. y. z] (m)</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>delay</strong> (<em>float</em>) -</dt><dd><p>Transmit delay (s). <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">0</span></code></p>
+<dt><strong>delay</strong> (<em>float</em>) –</dt><dd><p>Transmit delay (s). <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">0</span></code></p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>azimuth_angle</strong> (<em>numpy.1darray</em>) -</dt><dd><p>Angles for azimuth pattern (deg). <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[-90,</span> <span class="pre">90]</span></code></p>
+<dt><strong>azimuth_angle</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Angles for azimuth pattern (deg). <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[-90,</span> <span class="pre">90]</span></code></p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>azimuth_pattern</strong> (<em>numpy.1darray</em>) -</dt><dd><p>Azimuth pattern (dB). <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[0,</span> <span class="pre">0]</span></code></p>
+<dt><strong>azimuth_pattern</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Azimuth pattern (dB). <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[0,</span> <span class="pre">0]</span></code></p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>elevation_angle</strong> (<em>numpy.1darray</em>) -</dt><dd><p>Angles for elevation pattern (deg). <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[-90,</span> <span class="pre">90]</span></code></p>
+<dt><strong>elevation_angle</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Angles for elevation pattern (deg). <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[-90,</span> <span class="pre">90]</span></code></p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>elevation_pattern</strong> (<em>numpy.1darray</em>) -</dt><dd><p>Elevation pattern (dB). <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[0,</span> <span class="pre">0]</span></code></p>
+<dt><strong>elevation_pattern</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Elevation pattern (dB). <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[0,</span> <span class="pre">0]</span></code></p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>phase_code</strong> (<em>numpy.1darray</em>) -</dt><dd><p>Phase code sequence for phase modulation (deg).
+<dt><strong>phase_code</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Phase code sequence for phase modulation (deg).
 If <code class="docutils literal notranslate"><span class="pre">chip_length</span> <span class="pre">==</span> <span class="pre">0</span></code>, or <code class="docutils literal notranslate"><span class="pre">chip_length</span></code> is not defined,
 length of <code class="docutils literal notranslate"><span class="pre">phase_code</span></code> should be equal to <code class="docutils literal notranslate"><span class="pre">pulses</span></code>.
 <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">0</span></code></p>
@@ -120,7 +120,7 @@ length of <code class="docutils literal notranslate"><span class="pre">phase_cod
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>chip_length</strong> (<em>float</em>) -</dt><dd><p>Length for each phase code (s). If <code class="docutils literal notranslate"><span class="pre">chip_length</span> <span class="pre">==</span>
+<dt><strong>chip_length</strong> (<em>float</em>) –</dt><dd><p>Length for each phase code (s). If <code class="docutils literal notranslate"><span class="pre">chip_length</span> <span class="pre">==</span>
 <span class="pre">0</span></code>, one pulse will have one <code class="docutils literal notranslate"><span class="pre">phase_code</span></code>. If
 <code class="docutils literal notranslate"><span class="pre">chip_length</span> <span class="pre">!=</span> <span class="pre">0</span></code>, all <code class="docutils literal notranslate"><span class="pre">phase_code</span></code> will be
 applied to each pulse. <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">0</span></code></p>
@@ -137,21 +137,33 @@ applied to each pulse. <code class="docutils literal notranslate"><span class="p
 </dd>
 <dt class="field-even">Variables</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>channel_size</strong> (<em>int</em>) – Total number of transmitter channels</p></li>
-<li><p><strong>locations</strong> (<em>numpy.2darray</em>) – 3D location of the channel &lt;x. y. z&gt; (m)</p></li>
-<li><p><strong>az_angles</strong> (<em>numpy.1darray</em>) – Angles for azimuth patterns (deg)</p></li>
-<li><p><strong>az_patterns</strong> (<em>numpy.1darray</em>) – Azimuth pattern (dB)</p></li>
-<li><p><strong>el_angles</strong> (<em>numpy.1darray</em>) – Angles for elevation pattern (deg)</p></li>
-<li><p><strong>el_patterns</strong> – Elevation pattern (dB)</p></li>
-<li><p><strong>phase_code</strong> – Phase code sequence for phase modulation (deg).
-If <code class="docutils literal notranslate"><span class="pre">chip_length</span> <span class="pre">==</span> <span class="pre">0</span></code>, or <code class="docutils literal notranslate"><span class="pre">chip_length</span></code> is not
-defined, length of <code class="docutils literal notranslate"><span class="pre">phase_code</span></code> should be equal
-to <code class="docutils literal notranslate"><span class="pre">pulses</span></code></p></li>
-<li><p><strong>chip_length</strong> (<em>numpy.1darray</em>) – Length for each phase code (s). If <code class="docutils literal notranslate"><span class="pre">chip_length</span> <span class="pre">==</span>
-<span class="pre">0</span></code>, one pulse will have one <code class="docutils literal notranslate"><span class="pre">phase_code</span></code>. If
-<code class="docutils literal notranslate"><span class="pre">chip_length</span> <span class="pre">!=</span> <span class="pre">0</span></code>, all <code class="docutils literal notranslate"><span class="pre">phase_code</span></code> will be
-applied to each pulse</p></li>
-<li><p><strong>delay</strong> (<em>numpy.1darray</em>) – Transmit delay (s)</p></li>
+<li><p><strong>fc</strong> (<em>numpy.1darray</em>) – Center frequency array for the pulses</p></li>
+<li><p><strong>pulse_length</strong> (<em>float</em>) – Dwell time of each pulse (s)</p></li>
+<li><p><strong>bandwidth</strong> (<em>float</em>) – Bandwith of each pulse (Hz)</p></li>
+<li><p><strong>tx_power</strong> (<em>float</em>) – Transmitter power (dBm)</p></li>
+<li><p><strong>repetition_period</strong> (<em>numpy.1darray</em>) – Pulse repetition period (s)</p></li>
+<li><p><strong>pulses</strong> (<em>int</em>) – Total number of pulses</p></li>
+<li><p><strong>channels</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – Properties of transmitter channels</p></li>
+<li><p><strong>channel_size</strong> (<em>int</em>) – Number of transmitter channels</p></li>
+<li><p><strong>locations</strong> (<em>numpy.2darray</em>) – 3D location of the channels. Size of the aray is
+<code class="docutils literal notranslate"><span class="pre">[channel_size,</span> <span class="pre">3</span> <span class="pre">&lt;x,</span> <span class="pre">y,</span> <span class="pre">z&gt;]</span></code> (m)</p></li>
+<li><p><strong>az_angles</strong> (<em>list</em><em>[</em><em>numpy.1darray</em><em>]</em>) – Angles for each channel’s azimuth pattern (deg)</p></li>
+<li><p><strong>az_patterns</strong> (<em>list</em><em>[</em><em>numpy.1darray</em><em>]</em>) – Azimuth pattern for each channel (dB)</p></li>
+<li><p><strong>el_angles</strong> (<em>list</em><em>[</em><em>numpy.1darray</em><em>]</em>) – Angles for each channel’s elevation pattern (deg)</p></li>
+<li><p><strong>el_patterns</strong> (<em>list</em><em>[</em><em>numpy.1darray</em><em>]</em>) – Elevation pattern for each channel (dB)</p></li>
+<li><p><strong>az_func</strong> (<em>list</em>) – Azimuth patterns’ interpolation functions</p></li>
+<li><p><strong>el_func</strong> (<em>list</em>) – Elevation patterns’ interpolation functions</p></li>
+<li><p><strong>antenna_gains</strong> (<em>numpy.1darray</em>) – Antenna gain for each channel (dB).
+Antenna gain is <code class="docutils literal notranslate"><span class="pre">max(az_pattern)</span></code></p></li>
+<li><p><strong>phase_code</strong> (<em>list</em><em>[</em><em>numpy.1darray</em><em>]</em>) – Phase code sequence for phase modulation (deg)</p></li>
+<li><p><strong>chip_length</strong> (<em>numpy.1darray</em>) – Length for each phase code (s)</p></li>
+<li><p><strong>delay</strong> (<em>numpy.1darray</em>) – Delay for each channel (s)</p></li>
+<li><p><strong>polarization</strong> (<em>numpy.1darray</em>) – <p>Antenna polarization <code class="docutils literal notranslate"><span class="pre">[x,</span> <span class="pre">y,</span> <span class="pre">z]</span></code>.</p>
+<ul>
+<li><p>Horizontal polarization: <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p></li>
+<li><p>Vertical polarization: <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">1]</span></code></p></li>
+</ul>
+</p></li>
 <li><p><strong>wavelength</strong> (<em>float</em>) – Wavelength (m)</p></li>
 <li><p><strong>slope</strong> (<em>float</em>) – Waveform slope, <code class="docutils literal notranslate"><span class="pre">bandwidth</span> <span class="pre">/</span> <span class="pre">pulse_length</span></code></p></li>
 </ul>
@@ -210,27 +222,27 @@ applied to each pulse</p></li>
 <dt>[</dt><dd><p>{</p>
 <ul>
 <li><dl class="simple">
-<dt><strong>location</strong> (<em>numpy.1darray</em>) -</dt><dd><p>3D location of the channel [x. y. z] (m)</p>
+<dt><strong>location</strong> (<em>numpy.1darray</em>) –</dt><dd><p>3D location of the channel [x. y. z] (m)</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>azimuth_angle</strong> (<em>numpy.1darray</em>) -</dt><dd><p>Angles for azimuth pattern (deg). <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[-90,</span> <span class="pre">90]</span></code></p>
+<dt><strong>azimuth_angle</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Angles for azimuth pattern (deg). <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[-90,</span> <span class="pre">90]</span></code></p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>azimuth_pattern</strong> (<em>numpy.1darray</em>) -</dt><dd><p>Azimuth pattern (dB). <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[0,</span> <span class="pre">0]</span></code></p>
+<dt><strong>azimuth_pattern</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Azimuth pattern (dB). <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[0,</span> <span class="pre">0]</span></code></p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>elevation_angle</strong> (<em>numpy.1darray</em>) -</dt><dd><p>Angles for elevation pattern (deg). <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[-90,</span> <span class="pre">90]</span></code></p>
+<dt><strong>elevation_angle</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Angles for elevation pattern (deg). <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[-90,</span> <span class="pre">90]</span></code></p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>elevation_pattern</strong> (<em>numpy.1darray</em>) -</dt><dd><p>Elevation pattern (dB). <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[0,</span> <span class="pre">0]</span></code></p>
+<dt><strong>elevation_pattern</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Elevation pattern (dB). <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[0,</span> <span class="pre">0]</span></code></p>
 </dd>
 </dl>
 </li>
@@ -244,12 +256,25 @@ applied to each pulse</p></li>
 </dd>
 <dt class="field-even">Variables</dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>channel_size</strong> (<em>int</em>) – Total number of transmitter channels</p></li>
-<li><p><strong>locations</strong> (<em>numpy.2darray</em>) – 3D location of the channel &lt;x. y. z&gt; (m)</p></li>
-<li><p><strong>az_angles</strong> (<em>list</em><em>[</em><em>numpy.1darray</em><em>]</em>) – Angles for azimuth patterns (deg)</p></li>
-<li><p><strong>az_patterns</strong> (<em>list</em><em>[</em><em>numpy.1darray</em><em>]</em>) – Azimuth pattern (dB)</p></li>
-<li><p><strong>el_angles</strong> (<em>list</em><em>[</em><em>numpy.1darray</em><em>]</em>) – Angles for elevation pattern (deg)</p></li>
-<li><p><strong>el_patterns</strong> (<em>list</em><em>[</em><em>numpy.1darray</em><em>]</em>) – Elevation pattern (dB)</p></li>
+<li><p><strong>fs</strong> (<em>float</em>) – Sampling rate (sps)</p></li>
+<li><p><strong>noise_figure</strong> (<em>float</em>) – Noise figure (dB)</p></li>
+<li><p><strong>rf_gain</strong> (<em>float</em>) – Total RF gain (dB)</p></li>
+<li><p><strong>load_resistor</strong> (<em>float</em>) – Load resistor to convert power to voltage (Ohm)</p></li>
+<li><p><strong>baseband_gain</strong> (<em>float</em>) – Total baseband gain (dB)</p></li>
+<li><p><strong>noise_bandwidth</strong> (<em>float</em>) – Bandwidth in calculating the noise (Hz).
+<code class="docutils literal notranslate"><span class="pre">noise_bandwidth</span> <span class="pre">=</span> <span class="pre">fs</span> <span class="pre">/</span> <span class="pre">2</span></code></p></li>
+<li><p><strong>channels</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – Properties of receiver channels</p></li>
+<li><p><strong>channel_size</strong> (<em>int</em>) – Total number of receiver channels</p></li>
+<li><p><strong>locations</strong> (<em>numpy.2darray</em>) – 3D location of the channels. Size of the aray is
+<code class="docutils literal notranslate"><span class="pre">[channel_size,</span> <span class="pre">3</span> <span class="pre">&lt;x,</span> <span class="pre">y,</span> <span class="pre">z&gt;]</span></code> (m)</p></li>
+<li><p><strong>az_angles</strong> (<em>list</em><em>[</em><em>numpy.1darray</em><em>]</em>) – Angles for each channel’s azimuth pattern (deg)</p></li>
+<li><p><strong>az_patterns</strong> (<em>list</em><em>[</em><em>numpy.1darray</em><em>]</em>) – Azimuth pattern for each channel (dB)</p></li>
+<li><p><strong>el_angles</strong> (<em>list</em><em>[</em><em>numpy.1darray</em><em>]</em>) – Angles for each channel’s elevation pattern (deg)</p></li>
+<li><p><strong>el_patterns</strong> (<em>list</em><em>[</em><em>numpy.1darray</em><em>]</em>) – Elevation pattern for each channel (dB)</p></li>
+<li><p><strong>az_func</strong> (<em>list</em>) – Azimuth patterns’ interpolation functions</p></li>
+<li><p><strong>el_func</strong> (<em>list</em>) – Elevation patterns’ interpolation functions</p></li>
+<li><p><strong>antenna_gains</strong> (<em>numpy.1darray</em>) – Antenna gain for each channel (dB).
+Antenna gain is <code class="docutils literal notranslate"><span class="pre">max(az_pattern)</span></code></p></li>
 </ul>
 </dd>
 </dl>
@@ -281,7 +306,7 @@ applied to each pulse</p></li>
 <h2>radarsimpy.Radar<a class="headerlink" href="#radarsimpy-radar" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="radarsimpy.Radar">
-<em class="property">class </em><code class="sig-prename descclassname">radarsimpy.</code><code class="sig-name descname">Radar</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transmitter</span></em>, <em class="sig-param"><span class="n">receiver</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">type</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">aperture</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.Radar" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">radarsimpy.</code><code class="sig-name descname">Radar</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transmitter</span></em>, <em class="sig-param"><span class="n">receiver</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">aperture</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.Radar" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class defines basic parameters of a radar system</p>
 <dl class="field-list simple">
@@ -294,22 +319,22 @@ applied to each pulse</p></li>
 <p>{</p>
 <ul>
 <li><dl class="simple">
-<dt><strong>phi</strong> (<em>float</em>) -</dt><dd><p>phi angle of the aperture’s normal (deg)</p>
+<dt><strong>phi</strong> (<em>float</em>) –</dt><dd><p>phi angle of the aperture’s normal (deg)</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>theta</strong> (<em>float</em>) -</dt><dd><p>theta angle of the aperture’s normal (deg)</p>
+<dt><strong>theta</strong> (<em>float</em>) –</dt><dd><p>theta angle of the aperture’s normal (deg)</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>location</strong> (<em>numpy.1darray</em>) -</dt><dd><p>aperture’s center location <code class="docutils literal notranslate"><span class="pre">[x,</span> <span class="pre">y,</span> <span class="pre">z]</span></code> (m)</p>
+<dt><strong>location</strong> (<em>numpy.1darray</em>) –</dt><dd><p>aperture’s center location <code class="docutils literal notranslate"><span class="pre">[x,</span> <span class="pre">y,</span> <span class="pre">z]</span></code> (m)</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>extension</strong> (<em>numpy.1darray</em>) -</dt><dd><p>aperture’s extension of <code class="docutils literal notranslate"><span class="pre">[left,</span> <span class="pre">right,</span> <span class="pre">top,</span> <span class="pre">bottom]</span></code>
+<dt><strong>extension</strong> (<em>numpy.1darray</em>) –</dt><dd><p>aperture’s extension of <code class="docutils literal notranslate"><span class="pre">[left,</span> <span class="pre">right,</span> <span class="pre">top,</span> <span class="pre">bottom]</span></code>
 when facing towards its normal (m)</p>
 </dd>
 </dl>
@@ -321,9 +346,36 @@ when facing towards its normal (m)</p>
 </dd>
 <dt class="field-even">Variables</dt>
 <dd class="field-even"><ul class="simple">
+<li><p><strong>transmitter</strong> (<a class="reference internal" href="#radarsimpy.Transmitter" title="radarsimpy.Transmitter"><em>Transmitter</em></a>) – Radar transmiter</p></li>
+<li><p><strong>receiver</strong> (<a class="reference internal" href="#radarsimpy.Receiver" title="radarsimpy.Receiver"><em>Receiver</em></a>) – Radar Receiver</p></li>
 <li><p><strong>samples_per_pulse</strong> (<em>int</em>) – Number of samples in one pulse</p></li>
-<li><p><strong>channel_size</strong> (<em>int</em>) – Total number of channels</p></li>
+<li><p><strong>channel_size</strong> (<em>int</em>) – Total number of channels.
+<code class="docutils literal notranslate"><span class="pre">channel_size</span> <span class="pre">=</span> <span class="pre">transmitter.channel_size</span> <span class="pre">*</span> <span class="pre">receiver.channel_size</span></code></p></li>
 <li><p><strong>virtual_array</strong> (<em>numpy.2darray</em>) – Locations of virtual array elements. [channel_size, 3 &lt;x, y, z&gt;]</p></li>
+<li><p><strong>max_range</strong> (<em>float</em>) – Maximum range for an FMCW mode (m).
+<code class="docutils literal notranslate"><span class="pre">max_range</span> <span class="pre">=</span> <span class="pre">c</span> <span class="pre">*</span> <span class="pre">fs</span> <span class="pre">*</span> <span class="pre">pulse_length</span> <span class="pre">/</span> <span class="pre">bandwidth</span> <span class="pre">/</span> <span class="pre">2</span></code></p></li>
+<li><p><strong>unambiguous_speed</strong> (<em>float</em>) – Unambiguous speed (m/s).
+<code class="docutils literal notranslate"><span class="pre">unambiguous_speed</span> <span class="pre">=</span> <span class="pre">c</span> <span class="pre">/</span> <span class="pre">repetition_period</span> <span class="pre">/</span> <span class="pre">fc</span> <span class="pre">/</span> <span class="pre">2</span></code></p></li>
+<li><p><strong>range_resolution</strong> (<em>float</em>) – Range resolution (m).
+<code class="docutils literal notranslate"><span class="pre">range_resolution</span> <span class="pre">=</span> <span class="pre">c</span> <span class="pre">/</span> <span class="pre">2</span> <span class="pre">/</span> <span class="pre">bandwidth</span></code></p></li>
+<li><p><strong>aperture_phi</strong> (<em>float</em>) – phi angle of the aperture’s normal (deg)</p></li>
+<li><p><strong>aperture_theta</strong> (<em>float</em>) – theta angle of the aperture’s normal (deg)</p></li>
+<li><p><strong>aperture_location</strong> (<em>numpy.1darray</em>) – Aperture’s center location <code class="docutils literal notranslate"><span class="pre">[x,</span> <span class="pre">y,</span> <span class="pre">z]</span></code> (m)</p></li>
+<li><p><strong>aperture_extension</strong> (<em>numpy.1darray</em>) – Aperture’s extension of <code class="docutils literal notranslate"><span class="pre">[left,</span> <span class="pre">right,</span> <span class="pre">top,</span> <span class="pre">bottom]</span></code>
+when facing towards its normal (m)</p></li>
+<li><p><strong>timestamp</strong> (<em>numpy.3darray</em>) – <p>Timestamp for each samples. Frame start time is
+defined in <code class="docutils literal notranslate"><span class="pre">time</span></code>.
+<code class="docutils literal notranslate"><span class="pre">[channes/frames,</span> <span class="pre">pulses,</span> <span class="pre">samples]</span></code></p>
+<p><em>Channel/frame order in timestamp</em></p>
+<p><em>[0]</em> <code class="docutils literal notranslate"><span class="pre">Frame[0]</span> <span class="pre">--</span> <span class="pre">Tx[0]</span> <span class="pre">--</span> <span class="pre">Rx[0]</span></code></p>
+<p><em>[1]</em> <code class="docutils literal notranslate"><span class="pre">Frame[0]</span> <span class="pre">--</span> <span class="pre">Tx[0]</span> <span class="pre">--</span> <span class="pre">Rx[1]</span></code></p>
+<p>…</p>
+<p><em>[N]</em> <code class="docutils literal notranslate"><span class="pre">Frame[0]</span> <span class="pre">--</span> <span class="pre">Tx[1]</span> <span class="pre">--</span> <span class="pre">Rx[0]</span></code></p>
+<p><em>[N+1]</em> <code class="docutils literal notranslate"><span class="pre">Frame[0]</span> <span class="pre">--</span> <span class="pre">Tx[1]</span> <span class="pre">--</span> <span class="pre">Rx[1]</span></code></p>
+<p>…</p>
+<p><em>[M]</em> <code class="docutils literal notranslate"><span class="pre">Frame[1]</span> <span class="pre">--</span> <span class="pre">Tx[0]</span> <span class="pre">--</span> <span class="pre">Rx[0]</span></code></p>
+<p><em>[M+1]</em> <code class="docutils literal notranslate"><span class="pre">Frame[1]</span> <span class="pre">--</span> <span class="pre">Tx[0]</span> <span class="pre">--</span> <span class="pre">Rx[1]</span></code></p>
+</p></li>
 </ul>
 </dd>
 </dl>

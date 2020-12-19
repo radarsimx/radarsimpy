@@ -57,15 +57,70 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>radar</strong> (<a class="reference internal" href="radar.html#radarsimpy.Radar" title="radarsimpy.Radar"><em>Radar</em></a>) – Radar model</p></li>
-<li><p><strong>targets</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – Target list</p></li>
-<li><p><strong>noise</strong> (<em>bool</em>) – Flag to enable noise calculation</p></li>
+<li><p><strong>targets</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – <p>Ideal point target list</p>
+<dl>
+<dt>[</dt><dd><p>{</p>
+<ul>
+<li><dl class="simple">
+<dt><strong>location</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Location of the target (m), [x, y, z]</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>rcs</strong> (<em>float</em>) –</dt><dd><p>Target RCS (dBsm)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>speed</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Speed of the target (m/s), [vx, vy, vz]. <code class="docutils literal notranslate"><span class="pre">default</span>
+<span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>phase</strong> (<em>float</em>) –</dt><dd><p>Target phase (deg). <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">0</span></code></p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>}</p>
+</dd>
+</dl>
+<p>]</p>
+<dl class="simple">
+<dt><em>Note</em>: Target’s parameters can be specified with</dt><dd><p><code class="docutils literal notranslate"><span class="pre">Radar.timestamp</span></code> to customize the time varying property.
+Example: <code class="docutils literal notranslate"><span class="pre">location=(1e-3*np.sin(2*np.pi*1*radar.timestamp),</span> <span class="pre">0,</span> <span class="pre">0)</span></code></p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>noise</strong> (<em>bool</em>) – Flag to enable noise calculation. <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">True</span></code></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p>{
-‘baseband’:baseband,
-‘timestamp’:radar.timestamp
-}</p>
+<dd class="field-even"><p><p>{</p>
+<ul>
+<li><dl>
+<dt><strong>baseband</strong> (<em>numpy.3darray</em>) –</dt><dd><p>Time domain complex (I/Q) baseband data.
+<code class="docutils literal notranslate"><span class="pre">[channes/frames,</span> <span class="pre">pulses,</span> <span class="pre">samples]</span></code></p>
+<p><em>Channel/frame order in baseband</em></p>
+<p><em>[0]</em> <code class="docutils literal notranslate"><span class="pre">Frame[0]</span> <span class="pre">--</span> <span class="pre">Tx[0]</span> <span class="pre">--</span> <span class="pre">Rx[0]</span></code></p>
+<p><em>[1]</em> <code class="docutils literal notranslate"><span class="pre">Frame[0]</span> <span class="pre">--</span> <span class="pre">Tx[0]</span> <span class="pre">--</span> <span class="pre">Rx[1]</span></code></p>
+<p>…</p>
+<p><em>[N]</em> <code class="docutils literal notranslate"><span class="pre">Frame[0]</span> <span class="pre">--</span> <span class="pre">Tx[1]</span> <span class="pre">--</span> <span class="pre">Rx[0]</span></code></p>
+<p><em>[N+1]</em> <code class="docutils literal notranslate"><span class="pre">Frame[0]</span> <span class="pre">--</span> <span class="pre">Tx[1]</span> <span class="pre">--</span> <span class="pre">Rx[1]</span></code></p>
+<p>…</p>
+<p><em>[M]</em> <code class="docutils literal notranslate"><span class="pre">Frame[1]</span> <span class="pre">--</span> <span class="pre">Tx[0]</span> <span class="pre">--</span> <span class="pre">Rx[0]</span></code></p>
+<p><em>[M+1]</em> <code class="docutils literal notranslate"><span class="pre">Frame[1]</span> <span class="pre">--</span> <span class="pre">Tx[0]</span> <span class="pre">--</span> <span class="pre">Rx[1]</span></code></p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>timestamp</strong> (<em>numpy.3darray</em>) –</dt><dd><p>Refer to Radar.timestamp</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>}</p>
 </p>
 </dd>
 <dt class="field-odd">Return type</dt>
@@ -86,28 +141,28 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>radar</strong> (<a class="reference internal" href="radar.html#radarsimpy.Radar" title="radarsimpy.Radar"><em>Radar</em></a>) – Radar model</p></li>
-<li><p><strong>targets</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – <p>Targets’ properties</p>
+<li><p><strong>targets</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – <p>Ideal point target list</p>
 <dl>
 <dt>[</dt><dd><p>{</p>
 <ul>
 <li><dl class="simple">
-<dt><strong>location</strong> (<em>1D array</em>) -</dt><dd><p>Location of the target (m), (x, y, z)</p>
+<dt><strong>location</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Location of the target (m), [x, y, z]</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>rcs</strong> (<em>float</em>) -</dt><dd><p>Target RCS (dBsm)</p>
+<dt><strong>rcs</strong> (<em>float</em>) –</dt><dd><p>Target RCS (dBsm)</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>speed</strong> (<em>1D array</em>) -</dt><dd><p>Speed of the target (m/s), (vx, vy, vz). (default is
-(0, 0, 0))</p>
+<dt><strong>speed</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Speed of the target (m/s), [vx, vy, vz]. <code class="docutils literal notranslate"><span class="pre">default</span>
+<span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>phase</strong> (<em>float</em>) -</dt><dd><p>Target phase (deg). (default is 0)</p>
+<dt><strong>phase</strong> (<em>float</em>) –</dt><dd><p>Target phase (deg). <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">0</span></code></p>
 </dd>
 </dl>
 </li>
@@ -116,20 +171,35 @@
 </dd>
 </dl>
 <p>]</p>
+<dl class="simple">
+<dt><em>Note</em>: Target’s parameters can be specified with</dt><dd><p><code class="docutils literal notranslate"><span class="pre">Radar.timestamp</span></code> to customize the time varying property.
+Example: <code class="docutils literal notranslate"><span class="pre">location=(1e-3*np.sin(2*np.pi*1*radar.timestamp),</span> <span class="pre">0,</span> <span class="pre">0)</span></code></p>
+</dd>
+</dl>
 </p></li>
-<li><p><strong>noise</strong> (<em>bool</em>) – Flag to enable noise calculation</p></li>
+<li><p><strong>noise</strong> (<em>bool</em>) – Flag to enable noise calculation. <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">True</span></code></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><p>{</p>
-<ul class="simple">
-<li><dl class="simple">
-<dt><strong>timestamp</strong> (<em>3D array</em>) -</dt><dd><p>Timestamp for baseband data, <code class="docutils literal notranslate"><span class="pre">[channels,</span> <span class="pre">pulses,</span> <span class="pre">adc_samples]</span></code></p>
+<ul>
+<li><dl>
+<dt><strong>baseband</strong> (<em>numpy.3darray</em>) –</dt><dd><p>Time domain complex (I/Q) baseband data.
+<code class="docutils literal notranslate"><span class="pre">[channes/frames,</span> <span class="pre">pulses,</span> <span class="pre">samples]</span></code></p>
+<p><em>Channel/frame order in baseband</em></p>
+<p><em>[0]</em> <code class="docutils literal notranslate"><span class="pre">Frame[0]</span> <span class="pre">--</span> <span class="pre">Tx[0]</span> <span class="pre">--</span> <span class="pre">Rx[0]</span></code></p>
+<p><em>[1]</em> <code class="docutils literal notranslate"><span class="pre">Frame[0]</span> <span class="pre">--</span> <span class="pre">Tx[0]</span> <span class="pre">--</span> <span class="pre">Rx[1]</span></code></p>
+<p>…</p>
+<p><em>[N]</em> <code class="docutils literal notranslate"><span class="pre">Frame[0]</span> <span class="pre">--</span> <span class="pre">Tx[1]</span> <span class="pre">--</span> <span class="pre">Rx[0]</span></code></p>
+<p><em>[N+1]</em> <code class="docutils literal notranslate"><span class="pre">Frame[0]</span> <span class="pre">--</span> <span class="pre">Tx[1]</span> <span class="pre">--</span> <span class="pre">Rx[1]</span></code></p>
+<p>…</p>
+<p><em>[M]</em> <code class="docutils literal notranslate"><span class="pre">Frame[1]</span> <span class="pre">--</span> <span class="pre">Tx[0]</span> <span class="pre">--</span> <span class="pre">Rx[0]</span></code></p>
+<p><em>[M+1]</em> <code class="docutils literal notranslate"><span class="pre">Frame[1]</span> <span class="pre">--</span> <span class="pre">Tx[0]</span> <span class="pre">--</span> <span class="pre">Rx[1]</span></code></p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt><strong>baseband</strong> (<em>3D array</em>) -</dt><dd><p>Radar’s baseband output, <code class="docutils literal notranslate"><span class="pre">[channels,</span> <span class="pre">pulses,</span> <span class="pre">adc_samples]</span></code></p>
+<dt><strong>timestamp</strong> (<em>numpy.3darray</em>) –</dt><dd><p>Refer to Radar.timestamp</p>
 </dd>
 </dl>
 </li>

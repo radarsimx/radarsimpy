@@ -57,19 +57,99 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>radar</strong> (<a class="reference internal" href="radar.html#radarsimpy.Radar" title="radarsimpy.Radar"><em>Radar</em></a>) – Radar model</p></li>
-<li><p><strong>targets</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – Target list</p></li>
-<li><p><strong>correction</strong> (<em>float</em>) – Amplitude correction</p></li>
-<li><p><strong>density</strong> (<em>float</em>) – Ray density (number of rays per wavelength)</p></li>
-<li><p><strong>level</strong> (<em>int</em>) – Fidelity level of the simulation</p></li>
-<li><p><strong>noise</strong> (<em>bool</em>) – Flag to enable noise calculation</p></li>
+<li><p><strong>targets</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – <p>Target list</p>
+<dl>
+<dt>[</dt><dd><p>{</p>
+<ul>
+<li><dl class="simple">
+<dt><strong>model</strong> (<em>str</em>) –</dt><dd><p>Path to the target model</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>origin</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Origin position of the target model (m), [x, y, z].
+<code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>location</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Location of the target (m), [x, y, z].
+<code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>speed</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Speed of the target (m/s), [vx, vy, vz].
+<code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>rotation</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Target’s angle (deg), [yaw, pitch, roll].
+<code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>rotation_rate</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Target’s rotation rate (deg/s),
+[yaw rate, pitch rate, roll rate]
+<code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>}</p>
+</dd>
+</dl>
+<p>]</p>
+<dl class="simple">
+<dt><em>Note</em>: Target’s parameters can be specified with</dt><dd><p><code class="docutils literal notranslate"><span class="pre">Radar.timestamp</span></code> to customize the time varying property.
+Example: <code class="docutils literal notranslate"><span class="pre">location=(1e-3*np.sin(2*np.pi*1*radar.timestamp),</span> <span class="pre">0,</span> <span class="pre">0)</span></code></p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>correction</strong> (<em>float</em>) – Amplitude correction (dB). <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">0</span></code></p></li>
+<li><p><strong>density</strong> (<em>float</em>) – Ray density (number of rays per wavelength). <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">10</span></code></p></li>
+<li><p><strong>level</strong> (<em>int</em>) – <p>Fidelity level of the simulation, <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">None</span></code></p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code>: Perform one ray tracing simulation for the whole frame</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pulse</span></code>: Perform ray tracing for each pulse</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample</span></code>: Perform ray tracing for each sample</p></li>
+</ul>
+</p></li>
+<li><p><strong>noise</strong> (<em>bool</em>) – Flag to enable noise calculation, <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">True</span></code></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p>{
-‘baseband’:baseband,
-‘timestamp’:timestamp
-‘rays’:rays
-}</p>
+<dd class="field-even"><p><p>{</p>
+<ul>
+<li><dl>
+<dt><strong>baseband</strong> (<em>numpy.3darray</em>) –</dt><dd><p>Time domain complex (I/Q) baseband data.
+<code class="docutils literal notranslate"><span class="pre">[channes/frames,</span> <span class="pre">pulses,</span> <span class="pre">samples]</span></code></p>
+<p><em>Channel/frame order in baseband</em></p>
+<p><em>[0]</em> <code class="docutils literal notranslate"><span class="pre">Frame[0]</span> <span class="pre">--</span> <span class="pre">Tx[0]</span> <span class="pre">--</span> <span class="pre">Rx[0]</span></code></p>
+<p><em>[1]</em> <code class="docutils literal notranslate"><span class="pre">Frame[0]</span> <span class="pre">--</span> <span class="pre">Tx[0]</span> <span class="pre">--</span> <span class="pre">Rx[1]</span></code></p>
+<p>…</p>
+<p><em>[N]</em> <code class="docutils literal notranslate"><span class="pre">Frame[0]</span> <span class="pre">--</span> <span class="pre">Tx[1]</span> <span class="pre">--</span> <span class="pre">Rx[0]</span></code></p>
+<p><em>[N+1]</em> <code class="docutils literal notranslate"><span class="pre">Frame[0]</span> <span class="pre">--</span> <span class="pre">Tx[1]</span> <span class="pre">--</span> <span class="pre">Rx[1]</span></code></p>
+<p>…</p>
+<p><em>[M]</em> <code class="docutils literal notranslate"><span class="pre">Frame[1]</span> <span class="pre">--</span> <span class="pre">Tx[0]</span> <span class="pre">--</span> <span class="pre">Rx[0]</span></code></p>
+<p><em>[M+1]</em> <code class="docutils literal notranslate"><span class="pre">Frame[1]</span> <span class="pre">--</span> <span class="pre">Tx[0]</span> <span class="pre">--</span> <span class="pre">Rx[1]</span></code></p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>timestamp</strong> (<em>numpy.3darray</em>) –</dt><dd><p>Refer to Radar.timestamp</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>rays</strong> (<em>numpy.array</em>) –</dt><dd><p>Received rays</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>}</p>
 </p>
 </dd>
 <dt class="field-odd">Return type</dt>
