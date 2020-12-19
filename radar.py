@@ -521,6 +521,15 @@ class Radar:
         ``channel_size = transmitter.channel_size * receiver.channel_size``
     :ivar numpy.2darray virtual_array:
         Locations of virtual array elements. [channel_size, 3 <x, y, z>]
+    :ivar float max_range:
+        Maximum range for an FMCW mode (m).
+        ``max_range = c * fs * pulse_length / bandwidth / 2``
+    :ivar float unambiguous_speed:
+        Unambiguous speed (m/s).
+        ``unambiguous_speed = c / repetition_period / fc / 2``
+    :ivar float range_resolution:
+        Range resolution (m).
+        ``range_resolution = c / 2 / bandwidth``
     :ivar float aperture_phi:
         phi angle of the aperture's normal (deg)
     :ivar float aperture_theta:

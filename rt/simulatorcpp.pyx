@@ -68,15 +68,59 @@ cpdef run_simulator(radar, targets, noise=True):
     :param Radar radar:
         Radar model
     :param list[dict] targets:
-        Target list
-    :param bool noise:
-        Flag to enable noise calculation
+        Ideal point target list
+    
+        [
+            {
 
-    :return: {
-        'baseband':baseband,
-        'timestamp':radar.timestamp
+            - **location** (*numpy.1darray*) --
+                Location of the target (m), [x, y, z]
+            - **rcs** (*float*) --
+                Target RCS (dBsm)
+            - **speed** (*numpy.1darray*) --
+                Speed of the target (m/s), [vx, vy, vz]. ``default
+                [0, 0, 0]``
+            - **phase** (*float*) --
+                Target phase (deg). ``default 0``
+
+            }
+
+        ]
+        *Note*: Target's parameters can be specified with
+            ``Radar.timestamp`` to customize the time varying property.
+            Example: ``location=(1e-3*np.sin(2*np.pi*1*radar.timestamp), 0, 0)``
+    :param bool noise:
+        Flag to enable noise calculation. ``default True``
+
+    :return dict:
+        {
+
+        - **baseband** (*numpy.3darray*) --
+            Time domain complex (I/Q) baseband data.
+            ``[channes/frames, pulses, samples]``
+
+            *Channel/frame order in timestamp*
+
+            *[0]* ``Frame[0] -- Tx[0] -- Rx[0]``
+
+            *[1]* ``Frame[0] -- Tx[0] -- Rx[1]``
+
+            ...
+
+            *[N]* ``Frame[0] -- Tx[1] -- Rx[0]``
+
+            *[N+1]* ``Frame[0] -- Tx[1] -- Rx[1]``
+
+            ...
+
+            *[M]* ``Frame[1] -- Tx[0] -- Rx[0]``
+
+            *[M+1]* ``Frame[1] -- Tx[0] -- Rx[1]``
+
+        - **timestamp** (*numpy.3darray*) --
+            Refer to Radar.timestamp
+
         }
-    :rtype: dict
     """
     # cdef Radarsimc[float_t] *rec_ptr
     # rec_ptr = new Radarsimc[float_t]()
