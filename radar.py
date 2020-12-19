@@ -169,29 +169,29 @@ class Transmitter:
 
     ::
 
-        #                repetition_period
-        #                  +-----------+
-        #
-        #                          /            /            /          +
-        #                         /            /            /           |
-        #                        /            /            /            |
-        #                       /            /            /             |
-        #          +---fc--->  /            /            /     ...   bandwidth
-        #                     /            /            /               |
-        #                    /            /            /                |
-        #                   /            /            /                 |
-        #                  /            /            /                  +
-        #
-        #                  +-------+
-        #                 pulse_length
-        #
-        #                  +-------------------------------------+
-        # chip_length == 0 |  phase 0  ||  phase 1  ||  phase 2  |  ...
-        #                  +-------------------------------------+
-        #
-        #                  +-------------------------------------+
-        # chip_length != 0 | phase 0:N || phase 0:N || phase 0:N |  ...
-        #                  +-------------------------------------+
+        |                repetition_period
+        |                  +-----------+
+        |
+        |                          /            /            /          +
+        |                         /            /            /           |
+        |                        /            /            /            |
+        |                       /            /            /             |
+        |          +---fc--->  /            /            /     ...   bandwidth
+        |                     /            /            /               |
+        |                    /            /            /                |
+        |                   /            /            /                 |
+        |                  /            /            /                  +
+        |
+        |                  +-------+
+        |                 pulse_length
+        |
+        |                  +-------------------------------------+
+        | chip_length == 0 |  phase 0  ||  phase 1  ||  phase 2  |  ...
+        |                  +-------------------------------------+
+        |
+        |                  +-------------------------------------+
+        | chip_length != 0 | phase 0:N || phase 0:N || phase 0:N |  ...
+        |                  +-------------------------------------+
 
     Tips:
 
@@ -401,24 +401,24 @@ class Receiver:
 
     ::
 
-        #           + n1 = 10*log10(Boltzmann_constant * Ts * 1000)
-        #           |      + 10*log10(noise_bandwidth)  (dBm)
-        #           v
-        #    +------+------+
-        #    |rf_gain      |
-        #    +------+------+
-        #           | n2 = n1 + noise_figure + rf_gain (dBm)
-        #           v n3 = 1e-3 * 10^(n2/10) (Watts)
-        #    +------+------+
-        #    |mixer        |
-        #    +------+------+
-        #           | n4 = sqrt(n3 * load_resistor) (V)
-        #           v
-        #    +------+------+
-        #    |baseband_gain|
-        #    +------+------+
-        #           | noise amplitude (peak to peak)
-        #           v n5 = n4 * 10^(baseband_gain / 20) * sqrt(2) (V)
+        |           + n1 = 10*log10(Boltzmann_constant * Ts * 1000)
+        |           |      + 10*log10(noise_bandwidth)  (dBm)
+        |           v
+        |    +------+------+
+        |    |rf_gain      |
+        |    +------+------+
+        |           | n2 = n1 + noise_figure + rf_gain (dBm)
+        |           v n3 = 1e-3 * 10^(n2/10) (Watts)
+        |    +------+------+
+        |    |mixer        |
+        |    +------+------+
+        |           | n4 = sqrt(n3 * load_resistor) (V)
+        |           v
+        |    +------+------+
+        |    |baseband_gain|
+        |    +------+------+
+        |           | noise amplitude (peak to peak)
+        |           v n5 = n4 * 10^(baseband_gain / 20) * sqrt(2) (V)
 
     """
 
