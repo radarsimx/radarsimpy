@@ -167,7 +167,7 @@ class Transmitter:
 
     **Waveform**
 
-    .. code-block:: python
+    ::
 
         #                repetition_period
         #                  +-----------+
