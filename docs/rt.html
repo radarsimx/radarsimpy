@@ -83,13 +83,13 @@
               
             
             
-              <p class="caption"><span class="caption-text">Instruction:</span></p>
+              <p class="caption"><span class="caption-text">Instruction</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="dependence.html">Dependence</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="coordinate.html">Coordinate Systems</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API:</span></p>
+<p class="caption"><span class="caption-text">API</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="radar.html">Radar Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sim.html">Simulator</a></li>
@@ -291,9 +291,74 @@ Example: <code class="docutils literal notranslate"><span class="pre">location=(
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>lidar</strong> (<em>dict</em>) – Lidar configuration</p></li>
-<li><p><strong>targets</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – Target list</p></li>
-<li><p><strong>t</strong> (<em>time</em>) – Amplitude correction</p></li>
+<li><p><strong>lidar</strong> (<em>dict</em>) – <p>Lidar configuration</p>
+<p>{</p>
+<ul>
+<li><dl class="simple">
+<dt><strong>position</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Lidar’s position (m). [x, y, z]</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>phi</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Array of phi scanning angles (deg)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>theta</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Array of theta scanning angles (deg)</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>}</p>
+</p></li>
+<li><p><strong>targets</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – <p>Target list</p>
+<dl>
+<dt>[</dt><dd><p>{</p>
+<ul>
+<li><dl class="simple">
+<dt><strong>model</strong> (<em>str</em>) –</dt><dd><p>Path to the target model</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>origin</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Origin position of the target model (m), [x, y, z].
+<code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>location</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Location of the target (m), [x, y, z].
+<code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>speed</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Speed of the target (m/s), [vx, vy, vz].
+<code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>rotation</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Target’s angle (deg), [yaw, pitch, roll].
+<code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>rotation_rate</strong> (<em>numpy.1darray</em>) –</dt><dd><p>Target’s rotation rate (deg/s),
+[yaw rate, pitch rate, roll rate]
+<code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>}</p>
+</dd>
+</dl>
+<p>]</p>
+</p></li>
+<li><p><strong>t</strong> (<em>time</em>) – Simulation time stampes. <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">0</span></code></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -320,8 +385,8 @@ Example: <code class="docutils literal notranslate"><span class="pre">location=(
 <li><p><strong>phi</strong> (<em>float</em>) – Observation angle phi (deg)</p></li>
 <li><p><strong>theta</strong> (<em>float</em>) – Observation angle theta (deg)</p></li>
 <li><p><strong>f</strong> (<em>float</em>) – Center frequency (Hz)</p></li>
-<li><p><strong>pol</strong> (<em>list</em>) – Polarization &lt;x, y, z&gt;</p></li>
-<li><p><strong>density</strong> (<em>float</em>) – Ray density (number of rays per wavelength)</p></li>
+<li><p><strong>pol</strong> (<em>list</em>) – Polarization [x, y, z]. <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">1]</span></code></p></li>
+<li><p><strong>density</strong> (<em>float</em>) – Ray density (number of rays per wavelength). <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">10</span></code></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>

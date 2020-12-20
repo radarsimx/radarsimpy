@@ -8,7 +8,7 @@ Welcome to RadarSimPy's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Instruction:
+   :caption: Instruction
 
    dependence
    installation
@@ -16,7 +16,7 @@ Welcome to RadarSimPy's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: API:
+   :caption: API
 
    radar
    sim
