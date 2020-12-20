@@ -49,17 +49,15 @@ from scipy.special import erfc, erfcinv, gammainc
 
 
 def log_factorial(n):
-    r"""
+    """
     Compute the factorial of 'n' using logarithms to avoid overflow
 
-    Parameters
-    ----------
-    n : int
+    :param int n:
         Integer number
 
-    Return
-    ------
-    $\log(n!)$
+    :return:
+        log(n!)
+    :rtype: float
     """
 
     n = n+9.0
@@ -73,19 +71,17 @@ def threshold(pfa, N):
     """
     Threshold ratio
 
-    Parameters
-    ----------
-    :param pfa : float
+    :param float pfa:
         Probability of false alarm
-    :param N : int
+    :param int N:
         Number of pulses for integration
 
-    Return
-    ------
-    threshod ratio : float
+    :return:
+        Threshod ratio
+    :rtype: float
 
-    Reference
-    ---------
+    *Reference*
+
     Mahafza, Bassem R. Radar systems analysis and design using MATLAB.
         Chapman and Hall/CRC, 2005.
     """
