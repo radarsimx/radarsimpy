@@ -66,10 +66,49 @@ cpdef lidar_scene(lidar, targets, t=0):
 
     :param dict lidar:
         Lidar configuration
+
+        {
+
+        - **position** (*numpy.1darray*) --
+            Lidar's position (m). [x, y, z]
+        - **phi** (*numpy.1darray*) --
+            Array of phi scanning angles (deg) 
+        - **theta** (*numpy.1darray*) --
+            Array of theta scanning angles (deg)
+
+        }
+
     :param list[dict] targets:
         Target list
+
+        [
+            {
+
+            - **model** (*str*) --
+                Path to the target model
+            - **origin** (*numpy.1darray*) --
+                Origin position of the target model (m), [x, y, z].
+                ``default [0, 0, 0]``
+            - **location** (*numpy.1darray*) --
+                Location of the target (m), [x, y, z].
+                ``default [0, 0, 0]``
+            - **speed** (*numpy.1darray*) --
+                Speed of the target (m/s), [vx, vy, vz].
+                ``default [0, 0, 0]``
+            - **rotation** (*numpy.1darray*) --
+                Target's angle (deg), [yaw, pitch, roll].
+                ``default [0, 0, 0]``
+            - **rotation_rate** (*numpy.1darray*) --
+                Target's rotation rate (deg/s),
+                [yaw rate, pitch rate, roll rate]
+                ``default [0, 0, 0]``
+
+            }
+
+        ]
+
     :param time t:
-        Amplitude correction
+        Simulation time stampes. ``default 0``
 
     :return: rays
     :rtype: numpy.array

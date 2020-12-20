@@ -71,9 +71,9 @@ cpdef rcs_sbr(model, phi, theta, f, pol=[0, 0, 1], density=10):
     :param float f:
         Center frequency (Hz)
     :param list pol:
-        Polarization <x, y, z>
+        Polarization [x, y, z]. ``default [0, 0, 1]``
     :param float density:
-        Ray density (number of rays per wavelength)
+        Ray density (number of rays per wavelength). ``default 10``
     
     :return: Target's RCS (m^2), use 10*log10(RCS) to convert to dBsm
     :rtype: float
