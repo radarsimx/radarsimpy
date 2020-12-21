@@ -9,30 +9,28 @@ A **Radar** **Sim**ulator for **Py**thon
 
 ***This module needs to be built/used together with RadarSimC (the C++ engine for radar simulator)***
 
-There are 7 modules in this package:
+There are 5 modules in this package:
 
-1. `Radar`: Defines radar parameters
-
-1. `processing`: Basic radar signal processing
-
-1. `tools`: Receiver operating characteristic analysis
-
-1. `simulator`: Simulates and generates raw time domain baseband data (**in RadarSimC**)
-
-1. `simulatorcpp`: C++ enginer for simulating and generating raw time domain baseband data (**in RadarSimC**)
-
-1. `lidar_scene`: Simulates LiDAR's point cloud based on a 3D environment model with ray tracing (**in RadarSimC**)
-
-1. `rcs`: Simulates target's radar cross section (RCS) based on the 3D model with ray tracing (**in RadarSimC**)
-
-1. `scene`: Simulates radar's response signal in a 3D enviroment model with ray tracing (**in RadarSimC**)
+1. **Radar**: Classes to define a radar system
+   - `radarsimpy.Transmitter`: Radar transmitter
+   - `radarsimpy.Receiver`: Radar receiver
+   - `radarsimpy.Radar`: Radar system
+2. **Simulator**: Radar baseband signal simulator
+   - `simulator`: Simulates and generates raw time domain baseband data (Python engine)
+   - `simulatorcpp`: Simulates and generates raw time domain baseband data (C++ engine)
+3. **Raytracing**: Raytracing module for radar scene simulation
+   - `lidar_scene`: Simulates LiDAR's point cloud based on a 3D environment model with ray tracing
+   - `rcs`: Simulates target's radar cross section (RCS) based on the 3D model with ray tracing
+   - `scene`: Simulates radar's response signal in a 3D environment model with ray tracing
+4. **Processing**: Basic radar signal processing module
+5. **Tools**: Receiver operating characteristic analysis
 
 ## Dependence
 
-- radarsimc
 - numpy
 - scipy
 - numpy-stl
+- [Visual C++ Runtime](https://aka.ms/vs/16/release/vc_redist.x64.exe/) (*Windows only*)
 
 ## Installation
 
@@ -66,7 +64,7 @@ To use the module, please put the radarsimpy folder within your project folder a
 
 ### Scene Coordinate
 
-- axis (m): *[x, y, z]*
+- axis (m): `[x, y, z]`
 - phi (deg): angle on x-y plane. Positive x-axis is 0 deg, positive y-axis is 90 deg
 - theta (deg): angle on z-x plane. Positive z-axis is 0 deg, x-y plane is 90 deg
 - azimuth (deg): azimuth -90 ~ 90 deg equal to phi -90 ~ 90 deg
@@ -74,13 +72,13 @@ To use the module, please put the radarsimpy folder within your project folder a
 
 ### Object's Local Coordinate
 
-- axis (m): *[x, y, z]*
+- axis (m): `[x, y, z]`
 - yaw (deg): rotation along z-axis. Positive yaw rotates object from positive x-axis to positive y-axis
 - pitch (deg): rotation along y-axis. Positive pitch rotates object from positive x-axis to positive z-axis
 - roll (deg): rotation along x-axis. Positive roll rotates object from positive z-axis to negative y-axis
-- origin (m): *[x, y, z]*
-- rotation (deg): *[yaw, pitch, roll]*
-- rotation (deg/s): rate *[yaw rate, pitch rate, roll rate]*
+- origin (m): `[x, y, z]`
+- rotation (deg): `[yaw, pitch, roll]`
+- rotation (deg/s): rate `[yaw rate, pitch rate, roll rate]`
 
 ## Usage
 
