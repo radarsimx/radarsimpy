@@ -16,12 +16,12 @@ There are 5 modules in this package:
    - `radarsimpy.Receiver`: Radar receiver
    - `radarsimpy.Radar`: Radar system
 2. **Simulator**: Radar baseband signal simulator
-   - `simulator`: Simulates and generates raw time domain baseband data (Python engine)
-   - `simulatorcpp`: Simulates and generates raw time domain baseband data (C++ engine)
+   - `radarsimpy.simulator`: Simulates and generates raw time domain baseband data (Python engine)
+   - `radarsimpy.simulatorcpp`: Simulates and generates raw time domain baseband data (C++ engine)
 3. **Raytracing**: Raytracing module for radar scene simulation
-   - `lidar_scene`: Simulates LiDAR's point cloud based on a 3D environment model with ray tracing
-   - `rcs`: Simulates target's radar cross section (RCS) based on the 3D model with ray tracing
-   - `scene`: Simulates radar's response signal in a 3D environment model with ray tracing
+   - `radarsimpy.rt.lidar_scene`: Simulates LiDAR's point cloud based on a 3D environment model with ray tracing
+   - `radarsimpy.rt.rcs`: Simulates target's radar cross section (RCS) based on the 3D model with ray tracing
+   - `radarsimpy.rt.scene`: Simulates radar's response signal in a 3D environment model with ray tracing
 4. **Processing**: Basic radar signal processing module
 5. **Tools**: Receiver operating characteristic analysis
 
