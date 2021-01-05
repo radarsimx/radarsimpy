@@ -197,3 +197,104 @@ def ca_cfar(data, pfa=1e-5, guard=2, trailing=20, axis=0, offset='auto'):
             cfar[idx, :] = a*np.convolve(data[idx, :], cfar_win, mode='same')
 
     return cfar
+
+
+def log_factorial(n):
+    """
+    Compute the factorial of 'n' using logarithms to avoid overflow
+
+    :param int n:
+        Integer number
+
+    :return:
+        log(n!)
+    :rtype: float
+    """
+
+    n = n+9.0
+    n2 = n**2
+    return (n-1)*np.log(n)-n+np.log(np.sqrt(2*np.pi*n)) + \
+        ((1-(1/30+(1/105)/n2)/n2)/12)/n - \
+        np.log((n-1)*(n-2)*(n-3)*(n-4)*(n-5)*(n-6)*(n-7)*(n-8))
+
+
+def fun(k, n, Tos, pfa):
+    return log_factorial(n)-log_factorial(n-k) - \
+        np.sum(np.log(np.arange(n, n-k, -1)+Tos))-np.log(pfa)
+
+
+def os_cfar_threshold(k, n, pfa):
+    max_iter = 10000
+    # k=1
+    # n=32
+    # pfa=1e-6
+
+    t_max = 1e32
+    t_min = 1
+
+    for idx in range(0, max_iter):
+
+        m_n = t_max-fun(k, n, t_max, pfa)*(t_min-t_max) / \
+            (fun(k, n, t_min, pfa) -
+             fun(k, n, t_max, pfa))
+        f_m_n = fun(k, n, m_n, pfa)
+        if f_m_n == 0:
+            return m_n
+        elif np.abs(f_m_n) < 0.0001:
+            return m_n
+        elif fun(k, n, t_max, pfa)*f_m_n < 0:
+            t_max = t_max
+            t_min = m_n
+        elif fun(k, n, t_min, pfa)*f_m_n < 0:
+            t_max = m_n
+            t_min = t_min
+        else:
+            # print("Secant method fails.")
+            break
+
+    return None
+
+
+def os_cfar(
+        data,
+        n=16,
+        k=12,
+        pfa=1e-5,
+        axis=0,
+        offset='auto',
+        edge='rollover'):
+
+    data = np.abs(data)
+    data_shape = np.shape(data)
+    cfar = np.zeros_like(data)
+    leading = np.floor(n/2)
+    trailing = n-leading
+
+    if offset == 'auto':
+        a = os_cfar_threshold(k, n, pfa)
+    else:
+        a = offset
+
+    if axis == 0:
+        for idx in range(0, data_shape[0]):
+            win_idx = np.mod(
+                np.concatenate(
+                    [np.arange(idx-leading, idx, 1),
+                     np.arange(idx+1, idx+1+trailing, 1)]
+                ), data_shape[0])
+            samples = np.sort(data[win_idx.astype(int), :], axis=0)
+
+            cfar[idx, :] = a*samples[k, :]
+
+    elif axis == 1:
+        for idx in range(0, data_shape[1]):
+            win_idx = np.mod(
+                np.concatenate(
+                    [np.arange(idx-leading, idx, 1),
+                     np.arange(idx+1, idx+1+trailing, 1)]
+                ), data_shape[1])
+            samples = np.sort(data[:, win_idx.astype(int)], axis=1)
+
+            cfar[:, idx] = a*samples[:, k]
+
+    return cfar
