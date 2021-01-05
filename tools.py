@@ -131,7 +131,7 @@ def roc_pd(pfa, snr, N=1, stype='Coherent'):
 
     :return: probability of detection (Pd).
         if both ``pfa`` and ``snr`` are floats, ``pd`` is a float
-        if ``pfa`` is a 1-D array or ``snr`` is a 1-D array, ``pd`` is a 1-D array
+        if ``pfa`` or ``snr`` is a 1-D array, ``pd`` is a 1-D array
         if both ``pfa`` and ``snr`` are 1-D arrays, ``pd`` is a 2-D array
     :rtype: float or 1-D array or 2-D array
 
@@ -284,16 +284,16 @@ def roc_snr(pfa, pd, N=1, stype='Coherent'):
 
         - ``Coherent`` : Non-fluctuating coherent
         - ``Real`` : Non-fluctuating real signal
-        - ``Swerling 0`` : Non-coherent Swerling 0, Non-fluctuating non-coherent
+        - ``Swerling 0`` : Non-fluctuating non-coherent
         - ``Swerling 1`` : Non-coherent Swerling 1
         - ``Swerling 2`` : Non-coherent Swerling 2
         - ``Swerling 3`` : Non-coherent Swerling 3
         - ``Swerling 4`` : Non-coherent Swerling 4
-        - ``Swerling 5`` : Non-coherent Swerling 5, Non-fluctuating non-coherent
+        - ``Swerling 5`` : Same as ``Swerling 0``
 
     :return: Minimal signal to noise ratio in decibel (dB)
         if both ``pfa`` and ``pd`` are floats, ``SNR`` is a float
-        if ``pfa`` is a 1-D array or ``pd`` is a 1-D array, ``SNR`` is a 1-D array
+        if ``pfa`` or ``pd`` is a 1-D array, ``SNR`` is a 1-D array
         if both ``pfa`` and ``pd`` are 1-D arrays, ``SNR`` is a 2-D array
     :rtype: float or 1-D array or 2-D array
 
