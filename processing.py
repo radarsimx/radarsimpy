@@ -82,13 +82,18 @@ def cal_range_profile(radar, baseband, range_window=1, n=None):
     return rng_profile
 
 
-def cal_range_doppler(radar, range_profile, doppler_window=1, fft_shift=False, n=None):
+def cal_range_doppler(
+        radar,
+        range_profile,
+        doppler_window=1,
+        fft_shift=False,
+        n=None):
     """
     Calculate range-Doppler matrix
 
     :param Radar radar:
         A well defined radar system
-    :param numpy.3darray range_profile: 
+    :param numpy.3darray range_profile:
         Range profile matrix, ``[channels, pulses, adc_samples]``
     :param numpy.1darray doppler_window:
         Window for FFT, length should be equal to adc_samples. (default is
@@ -104,7 +109,8 @@ def cal_range_doppler(radar, range_profile, doppler_window=1, fft_shift=False, n
         rng_doppler = np.zeros(np.shape(range_profile), dtype=complex)
     else:
         rng_doppler = np.zeros(
-            (np.shape(range_profile)[0], n, np.shape(range_profile)[2]), dtype=complex)
+            (np.shape(range_profile)[0], n, np.shape(range_profile)[2]),
+            dtype=complex)
 
     for ii in range(0, radar.channel_size*radar.frames):
         for jj in range(0, np.shape(rng_doppler)[2]):
@@ -167,3 +173,27 @@ def get_polar_image(image, range_bins, angle_bins, fov_deg):
 
     polar[xx, yy] = image[a, b]
     return polar
+
+
+def ca_cfar(data, pfa=1e-5, guard=2, trailing=20, axis=0, offset='auto'):
+    data = np.abs(data)
+    data_shape = np.shape(data)
+    cfar = np.zeros_like(data)
+
+    if offset == 'auto':
+        a = trailing*2*(pfa**(-1/trailing/2)-1)
+    else:
+        a = offset
+
+    cfar_win = np.ones((guard+trailing)*2+1)
+    cfar_win[trailing:(trailing+guard*2+1)] = 0
+    cfar_win = cfar_win/np.sum(cfar_win)
+
+    if axis == 0:
+        for idx in range(0, data_shape[1]):
+            cfar[:, idx] = a*np.convolve(data[:, idx], cfar_win, mode='same')
+    elif axis == 1:
+        for idx in range(0, data_shape[0]):
+            cfar[idx, :] = a*np.convolve(data[idx, :], cfar_win, mode='same')
+
+    return cfar
