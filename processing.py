@@ -42,6 +42,7 @@
 
 
 import numpy as np
+from tools import log_factorial
 
 
 def cal_range_profile(radar, baseband, range_window=1, n=None):
@@ -175,12 +176,35 @@ def get_polar_image(image, range_bins, angle_bins, fov_deg):
     return polar
 
 
-def ca_cfar(data, pfa=1e-5, guard=2, trailing=20, axis=0, offset='auto'):
+def ca_cfar(data, guard, trailing, pfa=1e-5, axis=0, offset=None):
+    """
+    Cell Averaging CFAR (CA-CFAR)
+
+    :param data:
+        Radar data
+    :type data: numpy.1darray or numpy.2darray
+    :param int guard:
+        Number of guard cells on one side, total guard cells are ``2*guard``
+    :param int trailing:
+        Number of trailing cells on one side, total trailing cells are
+        ``2*trailing``
+    :param float pfa:
+        Probability of false alarm. ``default 1e-5``
+    :param int axis:
+        The axis to calculat CFAR. ``default 0``
+    :param float offset:
+        CFAR threshold offset. If offect is None, threshold offset is
+        ``2*trailing(pfa^(-1/2/trailing)-1)``. ``default None``
+
+    :return: CFAR threshold. The dimension is the same as ``data``
+    :rtype: numpy.1darray or numpy.2darray
+    """
+
     data = np.abs(data)
     data_shape = np.shape(data)
     cfar = np.zeros_like(data)
 
-    if offset == 'auto':
+    if offset is None:
         a = trailing*2*(pfa**(-1/trailing/2)-1)
     else:
         a = offset
@@ -199,35 +223,32 @@ def ca_cfar(data, pfa=1e-5, guard=2, trailing=20, axis=0, offset='auto'):
     return cfar
 
 
-def log_factorial(n):
+def os_cfar_threshold(k, n, pfa):
     """
-    Compute the factorial of 'n' using logarithms to avoid overflow
+    Use Secant method to calculate OS-CFAR's threshold
 
     :param int n:
-        Integer number
+        Number of cells around CUT (cell under test) for calculating
+    :param int k:
+        Rank in the order
+    :param float pfa:
+        Probability of false alarm
 
-    :return:
-        log(n!)
+    :return: CFAR threshold
     :rtype: float
+
+    *Reference*
+
+    Rohling, Hermann. "Radar CFAR thresholding in clutter and multiple target
+        situations." IEEE transactions on aerospace and electronic systems 4
+        (1983): 608-621.
     """
 
-    n = n+9.0
-    n2 = n**2
-    return (n-1)*np.log(n)-n+np.log(np.sqrt(2*np.pi*n)) + \
-        ((1-(1/30+(1/105)/n2)/n2)/12)/n - \
-        np.log((n-1)*(n-2)*(n-3)*(n-4)*(n-5)*(n-6)*(n-7)*(n-8))
+    def fun(k, n, Tos, pfa):
+        return log_factorial(n)-log_factorial(n-k) - \
+            np.sum(np.log(np.arange(n, n-k, -1)+Tos))-np.log(pfa)
 
-
-def fun(k, n, Tos, pfa):
-    return log_factorial(n)-log_factorial(n-k) - \
-        np.sum(np.log(np.arange(n, n-k, -1)+Tos))-np.log(pfa)
-
-
-def os_cfar_threshold(k, n, pfa):
     max_iter = 10000
-    # k=1
-    # n=32
-    # pfa=1e-6
 
     t_max = 1e32
     t_min = 1
@@ -257,12 +278,34 @@ def os_cfar_threshold(k, n, pfa):
 
 def os_cfar(
         data,
-        n=16,
-        k=12,
+        n,
+        k,
         pfa=1e-5,
         axis=0,
-        offset='auto',
-        edge='rollover'):
+        offset=None):
+    """
+    Ordered Statistic CFAR (OS-CFAR)
+
+    For edge cells, use rollovered cells to fill the missing cells.
+
+    :param data:
+        Radar data
+    :type data: numpy.1darray or numpy.2darray
+    :param int n:
+        Number of cells around CUT (cell under test) for calculating
+    :param int k:
+        Rank in the order
+    :param float pfa:
+        Probability of false alarm. ``default 1e-5``
+    :param int axis:
+        The axis to calculat CFAR. ``default 0``
+    :param float offset:
+        CFAR threshold offset. If offect is None, threshold offset is
+        ``2*trailing(pfa^(-1/2/trailing)-1)``. ``default None``
+
+    :return: CFAR threshold. The dimension is the same as ``data``
+    :rtype: numpy.1darray or numpy.2darray
+    """
 
     data = np.abs(data)
     data_shape = np.shape(data)
@@ -270,7 +313,7 @@ def os_cfar(
     leading = np.floor(n/2)
     trailing = n-leading
 
-    if offset == 'auto':
+    if offset is None:
         a = os_cfar_threshold(k, n, pfa)
     else:
         a = offset
@@ -280,7 +323,7 @@ def os_cfar(
             win_idx = np.mod(
                 np.concatenate(
                     [np.arange(idx-leading, idx, 1),
-                     np.arange(idx+1, idx+1+trailing, 1)]
+                        np.arange(idx+1, idx+1+trailing, 1)]
                 ), data_shape[0])
             samples = np.sort(data[win_idx.astype(int), :], axis=0)
 
