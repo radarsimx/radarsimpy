@@ -214,8 +214,12 @@ def cfar_ca(data, guard, trailing, pfa=1e-5, axis=0, offset=None):
     cfar_win = cfar_win/np.sum(cfar_win)
 
     if axis == 0:
-        for idx in range(0, data_shape[1]):
-            cfar[:, idx] = a*np.convolve(data[:, idx], cfar_win, mode='same')
+        if data.ndim == 1:
+            cfar = a*np.convolve(data, cfar_win, mode='same')
+        elif data.ndim == 2:
+            for idx in range(0, data_shape[1]):
+                cfar[:, idx] = a * \
+                    np.convolve(data[:, idx], cfar_win, mode='same')
     elif axis == 1:
         for idx in range(0, data_shape[0]):
             cfar[idx, :] = a*np.convolve(data[idx, :], cfar_win, mode='same')
@@ -331,9 +335,12 @@ def cfar_os(
                     [np.arange(idx-leading, idx, 1),
                         np.arange(idx+1, idx+1+trailing, 1)]
                 ), data_shape[0])
-            samples = np.sort(data[win_idx.astype(int), :], axis=0)
-
-            cfar[idx, :] = a*samples[k, :]
+            if data.ndim == 1:
+                samples = np.sort(data[win_idx.astype(int)])
+                cfar[idx] = a*samples[k]
+            elif data.ndim == 2:
+                samples = np.sort(data[win_idx.astype(int), :], axis=0)
+                cfar[idx, :] = a*samples[k, :]
 
     elif axis == 1:
         for idx in range(0, data_shape[1]):
