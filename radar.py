@@ -68,9 +68,9 @@ class Transmitter:
     :param float tx_power:
         Transmitter power (dBm)
     :param float repetition_period:
-        Pulse repetition period (s). ``repetition_period >=
-        pulse_length``. If it is ``None``, ``repetition_period =
-        pulse_length``.
+        Pulse repetition period (s). :math:`repetition_period >=
+        pulse_length`. If it is ``None``, :math:`repetition_period =
+        pulse_length`.
 
         ``repetition_period`` can alse be a 1-D array to specify
         different repetition period for each pulse. In this case, the
@@ -87,27 +87,34 @@ class Transmitter:
         [{
 
         - **location** (*numpy.1darray*) --
-            3D location of the channel [x. y. z] (m)
+        3D location of the channel ``[x, y, z]`` (m)
+
         - **delay** (*float*) --
-            Transmit delay (s). ``default 0``
+        Transmit delay (s). ``default 0``
+
         - **azimuth_angle** (*numpy.1darray*) --
-            Angles for azimuth pattern (deg). ``default [-90, 90]``
+        Angles for azimuth pattern (deg). ``default [-90, 90]``
+
         - **azimuth_pattern** (*numpy.1darray*) --
-            Azimuth pattern (dB). ``default [0, 0]``
+        Azimuth pattern (dB). ``default [0, 0]``
+
         - **elevation_angle** (*numpy.1darray*) --
-            Angles for elevation pattern (deg). ``default [-90, 90]``
+        Angles for elevation pattern (deg). ``default [-90, 90]``
+
         - **elevation_pattern** (*numpy.1darray*) --
-            Elevation pattern (dB). ``default [0, 0]``
+        Elevation pattern (dB). ``default [0, 0]``
+
         - **phase_code** (*numpy.1darray*) --
-            Phase code sequence for phase modulation (deg).
-            If ``chip_length == 0``, or ``chip_length`` is not defined,
-            length of ``phase_code`` should be equal to ``pulses``.
-            ``default 0``
+        Phase code sequence for phase modulation (deg).
+        If ``chip_length == 0``, or ``chip_length`` is not defined,
+        length of ``phase_code`` should be equal to ``pulses``.
+        ``default 0``
+
         - **chip_length** (*float*) --
-            Length for each phase code (s). If ``chip_length ==
-            0``, one pulse will have one ``phase_code``. If
-            ``chip_length != 0``, all ``phase_code`` will be
-            applied to each pulse. ``default 0``
+        Length for each phase code (s). If ``chip_length ==
+        0``, one pulse will have one ``phase_code``. If
+        ``chip_length != 0``, all ``phase_code`` will be
+        applied to each pulse. ``default 0``
 
         }]
 
@@ -129,7 +136,7 @@ class Transmitter:
         Number of transmitter channels
     :ivar numpy.2darray locations:
         3D location of the channels. Size of the aray is
-        ``[channel_size, 3 <x, y, z>]`` (m)
+        ``[channel_size, 3 [x, y, z]]`` (m)
     :ivar list[numpy.1darray] az_angles:
         Angles for each channel's azimuth pattern (deg)
     :ivar list[numpy.1darray] az_patterns:
@@ -514,7 +521,7 @@ class Radar:
         Total number of channels.
         ``channel_size = transmitter.channel_size * receiver.channel_size``
     :ivar numpy.2darray virtual_array:
-        Locations of virtual array elements. [channel_size, 3 <x, y, z>]
+        Locations of virtual array elements. [channel_size, 3 [x, y, z]]]
     :ivar float max_range:
         Maximum range for an FMCW mode (m).
         ``max_range = c * fs * pulse_length / bandwidth / 2``
