@@ -6,3 +6,4 @@ Processing
     :undoc-members:
     :inherited-members:
     :show-inheritance:
+    :exclude-members: os_cfar_threshold
