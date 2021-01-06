@@ -83,7 +83,7 @@ def threshold(pfa, N):
     *Reference*
 
     Mahafza, Bassem R. Radar systems analysis and design using MATLAB.
-        Chapman and Hall/CRC, 2005.
+    Chapman and Hall/CRC, 2005.
     """
 
     eps = 0.00000001
@@ -268,8 +268,8 @@ def roc_pd(pfa, snr, N=1, stype='Coherent'):
 def roc_snr(pfa, pd, N=1, stype='Coherent'):
     """
     Calculate the minimal SNR for certain probability of
-       detection (Pd) and probability of false alarm (Pfa) in
-       receiver operating characteristic (ROC) with Secant method
+    detection (Pd) and probability of false alarm (Pfa) in
+    receiver operating characteristic (ROC) with Secant method
 
     :param pfa:
         Probability of false alarm (Pfa)

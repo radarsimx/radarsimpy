@@ -57,22 +57,19 @@ cpdef run_simulator(radar, targets, noise=True):
     :param list[dict] targets:
         Ideal point target list
 
-        [
-            {
+        [{
 
-            - **location** (*numpy.1darray*) --
-                Location of the target (m), [x, y, z]
-            - **rcs** (*float*) --
-                Target RCS (dBsm)
-            - **speed** (*numpy.1darray*) --
-                Speed of the target (m/s), [vx, vy, vz]. ``default
-                [0, 0, 0]``
-            - **phase** (*float*) --
-                Target phase (deg). ``default 0``
+        - **location** (*numpy.1darray*) --
+            Location of the target (m), [x, y, z]
+        - **rcs** (*float*) --
+            Target RCS (dBsm)
+        - **speed** (*numpy.1darray*) --
+            Speed of the target (m/s), [vx, vy, vz]. ``default
+            [0, 0, 0]``
+        - **phase** (*float*) --
+            Target phase (deg). ``default 0``
 
-            }
-
-        ]
+        }]
 
         *Note*: Target's parameters can be specified with
             ``Radar.timestamp`` to customize the time varying property.

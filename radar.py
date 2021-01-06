@@ -84,35 +84,32 @@ class Transmitter:
     :param list[dict] channels:
         Properties of transmitter channels
 
-        [
-            {
+        [{
 
-            - **location** (*numpy.1darray*) --
-                3D location of the channel [x. y. z] (m)
-            - **delay** (*float*) --
-                Transmit delay (s). ``default 0``
-            - **azimuth_angle** (*numpy.1darray*) --
-                Angles for azimuth pattern (deg). ``default [-90, 90]``
-            - **azimuth_pattern** (*numpy.1darray*) --
-                Azimuth pattern (dB). ``default [0, 0]``
-            - **elevation_angle** (*numpy.1darray*) --
-                Angles for elevation pattern (deg). ``default [-90, 90]``
-            - **elevation_pattern** (*numpy.1darray*) --
-                Elevation pattern (dB). ``default [0, 0]``
-            - **phase_code** (*numpy.1darray*) --
-                Phase code sequence for phase modulation (deg).
-                If ``chip_length == 0``, or ``chip_length`` is not defined,
-                length of ``phase_code`` should be equal to ``pulses``.
-                ``default 0``
-            - **chip_length** (*float*) --
-                Length for each phase code (s). If ``chip_length ==
-                0``, one pulse will have one ``phase_code``. If
-                ``chip_length != 0``, all ``phase_code`` will be
-                applied to each pulse. ``default 0``
+        - **location** (*numpy.1darray*) --
+            3D location of the channel [x. y. z] (m)
+        - **delay** (*float*) --
+            Transmit delay (s). ``default 0``
+        - **azimuth_angle** (*numpy.1darray*) --
+            Angles for azimuth pattern (deg). ``default [-90, 90]``
+        - **azimuth_pattern** (*numpy.1darray*) --
+            Azimuth pattern (dB). ``default [0, 0]``
+        - **elevation_angle** (*numpy.1darray*) --
+            Angles for elevation pattern (deg). ``default [-90, 90]``
+        - **elevation_pattern** (*numpy.1darray*) --
+            Elevation pattern (dB). ``default [0, 0]``
+        - **phase_code** (*numpy.1darray*) --
+            Phase code sequence for phase modulation (deg).
+            If ``chip_length == 0``, or ``chip_length`` is not defined,
+            length of ``phase_code`` should be equal to ``pulses``.
+            ``default 0``
+        - **chip_length** (*float*) --
+            Length for each phase code (s). If ``chip_length ==
+            0``, one pulse will have one ``phase_code``. If
+            ``chip_length != 0``, all ``phase_code`` will be
+            applied to each pulse. ``default 0``
 
-            }
-
-        ]
+        }]
 
     :ivar numpy.1darray fc:
         Center frequency array for the pulses
@@ -343,23 +340,20 @@ class Receiver:
     :param list[dict] channels:
         Properties of transmitter channels
 
-        [
-            {
+        [{
 
-            - **location** (*numpy.1darray*) --
-                3D location of the channel [x. y. z] (m)
-            - **azimuth_angle** (*numpy.1darray*) --
-                Angles for azimuth pattern (deg). ``default [-90, 90]``
-            - **azimuth_pattern** (*numpy.1darray*) --
-                Azimuth pattern (dB). ``default [0, 0]``
-            - **elevation_angle** (*numpy.1darray*) --
-                Angles for elevation pattern (deg). ``default [-90, 90]``
-            - **elevation_pattern** (*numpy.1darray*) --
-                Elevation pattern (dB). ``default [0, 0]``
+        - **location** (*numpy.1darray*) --
+            3D location of the channel [x. y. z] (m)
+        - **azimuth_angle** (*numpy.1darray*) --
+            Angles for azimuth pattern (deg). ``default [-90, 90]``
+        - **azimuth_pattern** (*numpy.1darray*) --
+            Azimuth pattern (dB). ``default [0, 0]``
+        - **elevation_angle** (*numpy.1darray*) --
+            Angles for elevation pattern (deg). ``default [-90, 90]``
+        - **elevation_pattern** (*numpy.1darray*) --
+            Elevation pattern (dB). ``default [0, 0]``
 
-            }
-
-        ]
+        }]
 
     :ivar float fs:
         Sampling rate (sps)

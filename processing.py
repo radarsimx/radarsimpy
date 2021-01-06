@@ -240,8 +240,8 @@ def os_cfar_threshold(k, n, pfa):
     *Reference*
 
     Rohling, Hermann. "Radar CFAR thresholding in clutter and multiple target
-        situations." IEEE transactions on aerospace and electronic systems 4
-        (1983): 608-621.
+    situations." IEEE transactions on aerospace and electronic systems 4
+    (1983): 608-621.
     """
 
     def fun(k, n, Tos, pfa):
@@ -309,8 +309,8 @@ def cfar_os(
     *Reference*
 
     Rohling, Hermann. "Radar CFAR thresholding in clutter and multiple target
-        situations." IEEE transactions on aerospace and electronic systems 4
-        (1983): 608-621.
+    situations." IEEE transactions on aerospace and electronic systems 4
+    (1983): 608-621.
     """
 
     data = np.abs(data)
