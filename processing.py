@@ -176,7 +176,7 @@ def get_polar_image(image, range_bins, angle_bins, fov_deg):
     return polar
 
 
-def ca_cfar(data, guard, trailing, pfa=1e-5, axis=0, offset=None):
+def cfar_ca(data, guard, trailing, pfa=1e-5, axis=0, offset=None):
     """
     Cell Averaging CFAR (CA-CFAR)
 
@@ -276,7 +276,7 @@ def os_cfar_threshold(k, n, pfa):
     return None
 
 
-def os_cfar(
+def cfar_os(
         data,
         n,
         k,
@@ -301,10 +301,16 @@ def os_cfar(
         The axis to calculat CFAR. ``default 0``
     :param float offset:
         CFAR threshold offset. If offect is None, threshold offset is
-        ``2*trailing(pfa^(-1/2/trailing)-1)``. ``default None``
+        calculated from ``pfa``. ``default None``
 
     :return: CFAR threshold. The dimension is the same as ``data``
     :rtype: numpy.1darray or numpy.2darray
+
+    *Reference*
+
+    Rohling, Hermann. "Radar CFAR thresholding in clutter and multiple target
+        situations." IEEE transactions on aerospace and electronic systems 4
+        (1983): 608-621.
     """
 
     data = np.abs(data)
