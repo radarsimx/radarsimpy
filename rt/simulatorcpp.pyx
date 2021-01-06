@@ -72,8 +72,8 @@ cpdef run_simulator(radar, targets, noise=True):
         }]
 
         *Note*: Target's parameters can be specified with
-            ``Radar.timestamp`` to customize the time varying property.
-            Example: ``location=(1e-3*np.sin(2*np.pi*1*radar.timestamp), 0, 0)``
+        ``Radar.timestamp`` to customize the time varying property.
+        Example: ``location=(1e-3*np.sin(2*np.pi*1*radar.timestamp), 0, 0)``
     :param bool noise:
         Flag to enable noise calculation. ``default True``
 
