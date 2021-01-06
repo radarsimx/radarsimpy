@@ -42,7 +42,7 @@
 
 
 import numpy as np
-from tools import log_factorial
+from .tools import log_factorial
 
 
 def cal_range_profile(radar, baseband, range_window=1, n=None):
