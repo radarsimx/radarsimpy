@@ -312,9 +312,9 @@ def cfar_os(
 
     *Reference*
 
-    Rohling, Hermann. "Radar CFAR thresholding in clutter and multiple target
-    situations." IEEE transactions on aerospace and electronic systems 4
-    (1983): 608-621.
+    [1] H. Rohling, “Radar CFAR Thresholding in Clutter and Multiple Target
+    Situations,” IEEE Trans. Aerosp. Electron. Syst., vol. AES-19, no. 4,
+    pp. 608–621, 1983.
     """
 
     data = np.abs(data)
