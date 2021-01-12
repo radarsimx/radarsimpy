@@ -837,15 +837,15 @@ class Radar:
         ::
 
             |  0 dBc/Hz
-            |  \                                                    /
-            |   \                                                  /
-            |    \                                                /
-            |     \P dBc/Hz                                      /
-            |     .\                                            /
-            |     . \                                          /
-            |     .  \                                        /
-            |     .   \______________________________________/ <- This level
-            |     .              is defined by the power at the maximal freq
+            | \\                                                    /
+            |  \\                                                  /
+            |   \\                                                /
+            |    \\P dBc/Hz                                      /
+            |    .\\                                            /
+            |    . \\                                          /
+            |    .  \\                                        /
+            |    .   \\______________________________________/ <- This level
+            |    .              is defined by the power at the maximal freq
             |  |__| _|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__  (N)
             |  0   dF                    fs/2                       fs
             |  DC
@@ -870,18 +870,21 @@ class Radar:
 
         # Calculate input length
         [row, N] = np.shape(signal)
-        # Define M number of points (frequency resolution) in the positive spectrum
-        #  (M equally spaced points on the interval [0 fs/2] including bounds),
-        # then the number of points in the negative spectrum will be M-2
-        #  ( interval (fs/2, fs) not including bounds )
+        # Define M number of points (frequency resolution) in the
+        # positive spectrum (M equally spaced points on the interval
+        # [0 fs/2] including bounds), then the number of points in the
+        # negative spectrum will be M-2 ( interval (fs/2, fs) not
+        # including bounds )
         #
-        # The total number of points in the frequency domain will be 2*M-2, and if we want
-        #  to get the same length as the input signal, then
+        # The total number of points in the frequency domain will be
+        # 2*M-2, and if we want to get the same length as the input
+        # signal, then
         #   2*M-2 = N
         #   M-1 = N/2
         #   M = N/2 + 1
         #
-        #  So, if N is even then M = N/2 + 1, and if N is odd we will take  M = (N+1)/2 + 1
+        # So, if N is even then M = N/2 + 1, and if N is odd we will take
+        # M = (N+1)/2 + 1
         #
         if np.remainder(N, 2):
             M = int((N+1)/2 + 1)
@@ -912,34 +915,36 @@ class Radar:
                 inside = np.where(np.logical_and(
                     F >= leftBound, F < rightBound))
 
-            logP[inside] = t1 + (np.log10(F[inside] + realmin) - np.log10(leftBound + realmin)) / (
-                np.log10(rightBound + 2*realmin) - np.log10(leftBound + realmin)) * (t2-t1)
+            logP[inside] = t1 + (np.log10(F[inside] + realmin) -
+                                 np.log10(leftBound + realmin)) / \
+                (np.log10(rightBound + 2*realmin) -
+                 np.log10(leftBound + realmin)) * (t2-t1)
 
         # Interpolated P ( half spectrum [0 fs/2] ) [ dBc/Hz ]
         P = 10**(np.real(logP)/10)
 
-        # Now we will generate AWGN of power 1 in frequency domain and shape it by the desired shape
-        # as follows:
+        # Now we will generate AWGN of power 1 in frequency domain and shape
+        # it by the desired shape as follows:
         #
-        #    At the frequency offset F(m) from DC we want to get power Ptag(m) such that P(m) = Ptag/dF(m),
-        #     that is we have to choose X(m) =  sqrt( P(m)*dF(m) );
+        #    At the frequency offset F(m) from DC we want to get power Ptag(m)
+        #    such that P(m) = Ptag/dF(m), that is we have to choose
+        #    X(m) = sqrt( P(m)*dF(m) );
         #
         # Due to the normalization factors of FFT and IFFT defined as follows:
         #     For length K input vector x, the DFT is a length K vector X,
         #     with elements
-        #                      K
-        #        X(k) =       sum  x(n)*exp(-j*2*pi*(k-1)*(n-1)/K), 1 <= k <= K.
-        #                     n=1
+        #                K
+        #      X(k) =   sum  x(n)*exp(-j*2*pi*(k-1)*(n-1)/K), 1 <= k <= K.
+        #               n=1
         #     The inverse DFT (computed by IFFT) is given by
         #                      K
-        #        x(n) = (1/K) sum  X(k)*exp( j*2*pi*(k-1)*(n-1)/K), 1 <= n <= K.
+        #      x(n) = (1/K) sum  X(k)*exp( j*2*pi*(k-1)*(n-1)/K), 1 <= n <= K.
         #                     k=1
         #
-        # we have to compensate normalization factor (1/K) multiplying X(k) by K.
-        # In our case K = 2*M-2.
+        # we have to compensate normalization factor (1/K) multiplying X(k)
+        # by K. In our case K = 2*M-2.
 
         # Generate AWGN of power 1
-
         if validation:
             awgn_P1 = (np.sqrt(0.5)*(np.ones((row, M)) +
                                      1j*np.ones((row, M))))
@@ -947,11 +952,13 @@ class Radar:
             awgn_P1 = (np.sqrt(0.5)*(np.random.randn(row, M) +
                                      1j*np.random.randn(row, M)))
 
-        # Shape the noise on the positive spectrum [0, fs/2] including bounds ( M points )
+        # Shape the noise on the positive spectrum [0, fs/2] including bounds
+        # ( M points )
         X = (2*M-2) * np.sqrt(dF * P) * awgn_P1
 
         # X = np.transpose(X)
-        # Complete symmetrical negative spectrum  (fs/2, fs) not including bounds (M-2 points)
+        # Complete symmetrical negative spectrum  (fs/2, fs) not including
+        # bounds (M-2 points)
         tmp_X = np.zeros((row, int(M*2-2)), dtype=complex)
         tmp_X[:, 0:M] = X
         tmp_X[:, M:(2*M-2)] = np.fliplr(np.conjugate(X[:, 1:-1]))
