@@ -203,6 +203,8 @@ class Transmitter:
                  repetition_period=None,
                  pulses=1,
                  slop_type='rising',
+                 phase_noise_freq=None,
+                 phase_noise_power=None,
                  channels=[dict(location=(0, 0, 0))]):
 
         self.pulse_length = pulse_length
@@ -210,6 +212,9 @@ class Transmitter:
         self.tx_power = tx_power
         self.pulses = pulses
         self.channels = channels
+
+        self.phase_noise_freq = phase_noise_freq
+        self.phase_noise_power = phase_noise_power
 
         # Extend `fc` to a numpy.1darray. Length equels to `pulses`
         if isinstance(fc, (list, tuple, np.ndarray)):
@@ -652,6 +657,24 @@ class Radar:
             (self.channel_size, self.transmitter.pulses, 1)
         )
 
+        if self.transmitter.phase_noise_freq is not None and \
+                self.transmitter.phase_noise_power is not None:
+            dummy_sig = np.ones(
+                (self.channel_size*self.frames*self.transmitter.pulses,
+                 self.samples_per_pulse))
+            self.phase_noise = self.cal_phase_noise(
+                dummy_sig,
+                self.receiver.fs,
+                self.transmitter.phase_noise_freq,
+                self.transmitter.phase_noise_power)
+            self.phase_noise = np.reshape(self.phase_noise, (
+                self.channel_size*self.frames,
+                self.transmitter.pulses,
+                self.samples_per_pulse
+            ))
+        else:
+            self.phase_noise = None
+
     def gen_timestamp(self):
         """
         Generate timestamp
@@ -775,7 +798,7 @@ class Radar:
         noise_amplitude_peak = np.sqrt(2) * noise_amplitude_mixer + noise_amp
         return noise_amplitude_peak
 
-    def phase_noise(signal, fs, freq, power, validation=False):
+    def cal_phase_noise(signal, fs, freq, power, validation=False):
         """
         Oscillator Phase Noise Model
 
