@@ -199,6 +199,8 @@ cpdef run_simulator(radar, targets, noise=True):
     Transmitter
     """
     cdef vector[float_t] frame_time
+    cdef float_t[:,:,:] phase_noise_real
+    cdef float_t[:,:,:] phase_noise_imag
 
     if radar.frames > 1:
         for t_idx in range(0, radar.frames):
@@ -214,16 +216,32 @@ cpdef run_simulator(radar, targets, noise=True):
     for ct_idx in range(0, len(radar.transmitter.chirp_start_time)):
         chirp_start_time.push_back(<float_t> radar.transmitter.chirp_start_time[ct_idx])
 
-    tx = Transmitter[float_t](
-        fc_vector,
-        <float_t> radar.transmitter.slope,
-        <float_t> radar.transmitter.tx_power,
-        chirp_start_time,
-        frame_time,
-        <int> radar.frames,
-        <int> radar.transmitter.pulses,
-        <float_t> 0
-    )
+    if radar.phase_noise is None:
+        tx = Transmitter[float_t](
+            fc_vector,
+            <float_t> radar.transmitter.slope,
+            <float_t> radar.transmitter.tx_power,
+            chirp_start_time,
+            frame_time,
+            <int> radar.frames,
+            <int> radar.transmitter.pulses,
+            <float_t> 0
+        )
+    else:
+        phase_noise_real = np.real(radar.phase_noise).astype(np.float32)
+        phase_noise_imag = np.imag(radar.phase_noise).astype(np.float32)
+        tx = Transmitter[float_t](
+            fc_vector,
+            <float_t> radar.transmitter.slope,
+            <float_t> radar.transmitter.tx_power,
+            chirp_start_time,
+            frame_time,
+            <int> radar.frames,
+            <int> radar.transmitter.pulses,
+            <float_t> 0,
+            &phase_noise_real[0,0,0],
+            &phase_noise_imag[0,0,0],
+        )
 
     cdef int ptn_length
     cdef vector[float_t] az_ang
