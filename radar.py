@@ -798,7 +798,7 @@ class Radar:
         noise_amplitude_peak = np.sqrt(2) * noise_amplitude_mixer + noise_amp
         return noise_amplitude_peak
 
-    def cal_phase_noise(signal, fs, freq, power, validation=False):
+    def cal_phase_noise(self, signal, fs, freq, power, validation=False):
         """
         Oscillator Phase Noise Model
 
