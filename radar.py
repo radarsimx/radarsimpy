@@ -47,7 +47,7 @@ import scipy.constants as const
 from scipy.interpolate import interp1d
 
 
-def cal_phase_noise(signal, fs, freq, power, validation=False):
+def cal_phase_noise(signal, fs, freq, power, seed=None, validation=False):
     """
     Oscillator Phase Noise Model
 
@@ -59,6 +59,8 @@ def cal_phase_noise(signal, fs, freq, power, validation=False):
         Frequency of the phase noise
     :param numpy.1darray power:
         Power of the phase noise
+    :param int seed:
+        Seed for noise generator
     :param boolean validation:
         Validate phase noise
 
@@ -123,6 +125,11 @@ def cal_phase_noise(signal, fs, freq, power, validation=False):
         |  DC
         |
     """
+
+    if seed is None:
+        rng = np.random.default_rng()
+    else:
+        rng = np.random.default_rng(seed)
 
     signal = signal.astype(complex)
 
@@ -221,8 +228,8 @@ def cal_phase_noise(signal, fs, freq, power, validation=False):
         awgn_P1 = (np.sqrt(0.5)*(np.ones((row, M)) +
                                  1j*np.ones((row, M))))
     else:
-        awgn_P1 = (np.sqrt(0.5)*(np.random.randn(row, M) +
-                                 1j*np.random.randn(row, M)))
+        awgn_P1 = (np.sqrt(0.5)*(rng.standard_normal((row, M)) +
+                                 1j*rng.standard_normal((row, M))))
 
     # Shape the noise on the positive spectrum [0, fs/2] including bounds
     # ( M points )
@@ -711,6 +718,8 @@ class Radar:
             when facing towards its normal (m)
 
         }
+    :param int seed:
+        Seed for noise generator
 
     :ivar Transmitter transmitter:
         Radar transmiter
@@ -770,7 +779,8 @@ class Radar:
                  transmitter,
                  receiver,
                  time=0,
-                 aperture=None):
+                 aperture=None,
+                 seed=None):
 
         self.transmitter = transmitter
         self.receiver = receiver
@@ -869,7 +879,8 @@ class Radar:
                 dummy_sig,
                 self.receiver.fs,
                 self.transmitter.phase_noise_freq,
-                self.transmitter.phase_noise_power)
+                self.transmitter.phase_noise_power,
+                seed=seed)
             self.phase_noise = np.reshape(self.phase_noise, (
                 self.channel_size*self.frames,
                 self.transmitter.pulses,
