@@ -176,7 +176,7 @@
 <h2>radarsimpy.Transmitter<a class="headerlink" href="#radarsimpy-transmitter" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="radarsimpy.Transmitter">
-<em class="property">class </em><code class="sig-prename descclassname">radarsimpy.</code><code class="sig-name descname">Transmitter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fc</span></em>, <em class="sig-param"><span class="n">pulse_length</span></em>, <em class="sig-param"><span class="n">bandwidth</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">tx_power</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">repetition_period</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">pulses</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">slop_type</span><span class="o">=</span><span class="default_value">'rising'</span></em>, <em class="sig-param"><span class="n">channels</span><span class="o">=</span><span class="default_value">[{'location': (0, 0, 0)}]</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.Transmitter" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">radarsimpy.</code><code class="sig-name descname">Transmitter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fc</span></em>, <em class="sig-param"><span class="n">pulse_length</span></em>, <em class="sig-param"><span class="n">bandwidth</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">tx_power</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">repetition_period</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">pulses</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">slop_type</span><span class="o">=</span><span class="default_value">'rising'</span></em>, <em class="sig-param"><span class="n">phase_noise_freq</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">phase_noise_power</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">channels</span><span class="o">=</span><span class="default_value">[{'location': (0, 0, 0)}]</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.Transmitter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class defines basic parameters of a radar transmitter</p>
 <dl class="field-list simple">
@@ -424,7 +424,7 @@ Antenna gain is <code class="docutils literal notranslate"><span class="pre">max
 <h2>radarsimpy.Radar<a class="headerlink" href="#radarsimpy-radar" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="radarsimpy.Radar">
-<em class="property">class </em><code class="sig-prename descclassname">radarsimpy.</code><code class="sig-name descname">Radar</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transmitter</span></em>, <em class="sig-param"><span class="n">receiver</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">aperture</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.Radar" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">radarsimpy.</code><code class="sig-name descname">Radar</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transmitter</span></em>, <em class="sig-param"><span class="n">receiver</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">aperture</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">seed</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.Radar" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class defines basic parameters of a radar system</p>
 <dl class="field-list simple">
@@ -460,6 +460,7 @@ when facing towards its normal (m)</p>
 </ul>
 <p>}</p>
 </p></li>
+<li><p><strong>seed</strong> (<em>int</em>) – Seed for noise generator</p></li>
 </ul>
 </dd>
 <dt class="field-even">Variables</dt>
