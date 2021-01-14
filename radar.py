@@ -291,6 +291,10 @@ class Transmitter:
         Total number of pulses
     :param str slop_type:
         ``rising`` or ``falling`` slope for the frequency modulation
+    :param numpy.1darray phase_noise_freq:
+        Frequency of the phase noise (Hz)
+    :param numpy.1darray phase_noise_power:
+        Power of the phase noise (dB/Hz)
     :param list[dict] channels:
         Properties of transmitter channels
 
