@@ -2,7 +2,7 @@
 <a href="https://rookiepeng.github.io/radarsimpy/" target="_blank" rel="nofollow"><img src="https://img.shields.io/badge/Documentation-latest-brightgree?style=flat&logo=read-the-docs" height="20" ></a>
 
 # RadarSimPy
-                                                            
+
 <img src="./assets/radarsimpy.svg" alt="logo" width="200"/>
 
 A **Radar** **Sim**ulator for **Py**thon
@@ -87,7 +87,9 @@ To use the module, please put the radarsimpy folder within your project folder a
   - [FMCW radar simulation](https://zpeng.me/index.php/2018/10/11/fmcw-radar/)
   - [TDM MIMO FMCW radar simulation](https://zpeng.me/index.php/2019/04/07/tdm-mimo-fmcw-radar/)
   - [PMCW radar simulation](https://zpeng.me/index.php/2019/05/24/pmcw-radar/)
-
+  - [CFAR](https://zpeng.me/index.php/2021/01/10/cfar/)
+  - [Phase Noise](https://zpeng.me/index.php/2021/01/13/phase-noise/)
+  
 - Target simulation
   - [Target RCS evaluation with ray tracing](https://zpeng.me/index.php/2019/11/13/rcs-calculation-with-ray-tracing/)
 
