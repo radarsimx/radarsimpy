@@ -410,9 +410,13 @@ class Transmitter:
 
     """
 
-    def __init__(self, fc,
+    def __init__(self,
+                 fc,
                  pulse_length,
+                 freq=0,
+                 pulse_timing=0,
                  bandwidth=0,
+                 freq_offset=None,
                  tx_power=0,
                  repetition_period=None,
                  pulses=1,
@@ -429,6 +433,34 @@ class Transmitter:
 
         self.phase_noise_freq = phase_noise_freq
         self.phase_noise_power = phase_noise_power
+
+        if isinstance(freq, (list, tuple, np.ndarray)):
+            self.freq = np.array(freq)
+        else:
+            self.freq = np.array([freq, freq])
+
+        if isinstance(pulse_timing, (list, tuple, np.ndarray)):
+            self.pulse_timing = np.array(pulse_timing)
+            self.pulse_timing = self.pulse_timing - \
+                (self.pulse_timing[0]+self.pulse_timing[-1])/2
+        else:
+            self.pulse_timing = np.array([-pulse_timing/2, pulse_timing/2])
+
+        if freq_offset is not None:
+            if isinstance(freq_offset, (list, tuple, np.ndarray)):
+                self.freq_offset = np.array([freq_offset])
+            else:
+                self.freq_offset = freq_offset+np.zeros_like(self.freq)
+        else:
+            self.freq_offset = np.zeros_like(self.freq)
+
+        if len(self.freq) != len(self.pulse_timing) or \
+            len(self.freq) != len(self.freq_offset) or \
+                len(self.pulse_timing) != len(self.freq_offset):
+            raise ValueError(
+                'Length of `freq`, `freq_offset` and `pulse_timing` should be the same')
+
+        # self.pulse_length = self.pulse_timing[-1]-self.pulse_timing[0]
 
         # Extend `fc` to a numpy.1darray. Length equels to `pulses`
         if isinstance(fc, (list, tuple, np.ndarray)):
