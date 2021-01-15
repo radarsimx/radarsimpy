@@ -411,22 +411,18 @@ class Transmitter:
     """
 
     def __init__(self,
-                 fc,
-                 pulse_length,
-                 freq=0,
-                 pulse_timing=0,
-                 bandwidth=0,
+                 freq,
+                 pulse_timing,
                  freq_offset=None,
                  tx_power=0,
                  repetition_period=None,
                  pulses=1,
-                 slop_type='rising',
                  phase_noise_freq=None,
                  phase_noise_power=None,
                  channels=[dict(location=(0, 0, 0))]):
 
-        self.pulse_length = pulse_length
-        self.bandwidth = bandwidth
+        # self.pulse_length = pulse_length
+        # self.bandwidth = bandwidth
         self.tx_power = tx_power
         self.pulses = pulses
         self.channels = channels
@@ -442,35 +438,48 @@ class Transmitter:
         if isinstance(pulse_timing, (list, tuple, np.ndarray)):
             self.pulse_timing = np.array(pulse_timing)
             self.pulse_timing = self.pulse_timing - \
-                (self.pulse_timing[0]+self.pulse_timing[-1])/2
+                self.pulse_timing[0]
         else:
-            self.pulse_timing = np.array([-pulse_timing/2, pulse_timing/2])
+            self.pulse_timing = np.array([0, pulse_timing])
 
         if freq_offset is not None:
             if isinstance(freq_offset, (list, tuple, np.ndarray)):
                 self.freq_offset = np.array([freq_offset])
             else:
-                self.freq_offset = freq_offset+np.zeros_like(self.freq)
+                self.freq_offset = freq_offset+np.zeros(pulses)
         else:
-            self.freq_offset = np.zeros_like(self.freq)
+            self.freq_offset = np.zeros(pulses)
 
-        if len(self.freq) != len(self.pulse_timing) or \
-            len(self.freq) != len(self.freq_offset) or \
-                len(self.pulse_timing) != len(self.freq_offset):
+        if len(self.freq) != len(self.pulse_timing):
             raise ValueError(
                 'Length of `freq`, `freq_offset` and `pulse_timing` should be the same')
 
-        # self.pulse_length = self.pulse_timing[-1]-self.pulse_timing[0]
+        self.delta_freq = np.ediff1d(self.freq)
+        self.delta_pulse_timing = np.ediff1d(self.pulse_timing)
+        self.k = self.delta_freq/self.delta_pulse_timing
+        self.delta_fc = self.freq[0:-1]
+
+        self.bandwidth = np.max(self.freq)- np.min(self.freq)
+
+        self.fun_y = (
+            self.delta_fc+0.5*self.k*(self.delta_pulse_timing))*(self.delta_pulse_timing)
+        self.fun_y = np.cumsum(np.concatenate(([0], self.fun_y)))
+
+        self.waveform_fun = interp1d(
+            self.pulse_timing, self.fun_y, kind='linear', bounds_error=False, fill_value=(self.fun_y[0], self.fun_y[-1]))
+
+        self.pulse_length = self.pulse_timing[-1]-self.pulse_timing[0]
 
         # Extend `fc` to a numpy.1darray. Length equels to `pulses`
-        if isinstance(fc, (list, tuple, np.ndarray)):
-            if len(fc) != pulses:
-                raise ValueError(
-                    'Length of `fc` should equal to the length of `pulses`.')
-            else:
-                self.fc = np.array(fc)
-        else:
-            self.fc = fc+np.zeros(pulses)
+        self.fc = (np.min(self.freq)+np.max(self.freq))/2+self.freq_offset 
+        # if isinstance(fc, (list, tuple, np.ndarray)):
+        #     if len(fc) != pulses:
+        #         raise ValueError(
+        #             'Length of `fc` should equal to the length of `pulses`.')
+        #     else:
+        #         self.fc = np.array(fc)
+        # else:
+        #     self.fc = fc+np.zeros(pulses)
 
         # Extend `repetition_period` to a numpy.1darray.
         # Length equels to `pulses`
@@ -563,12 +572,12 @@ class Transmitter:
                 self.modulation = 'pulse'
 
         # additional transmitter parameters
-        self.wavelength = const.c / self.fc[0]
+        # self.wavelength = const.c / self.fc[0]
 
-        if slop_type == 'rising':
-            self.slope = (self.bandwidth / self.pulse_length)
-        else:
-            self.slope = (-self.bandwidth / self.pulse_length)
+        # if slop_type == 'rising':
+        #     self.slope = (self.bandwidth / self.pulse_length)
+        # else:
+        #     self.slope = (-self.bandwidth / self.pulse_length)
 
         self.box_min = np.min(self.locations, axis=0)
         self.box_max = np.max(self.locations, axis=0)
@@ -895,11 +904,16 @@ class Radar:
             self.transmitter.fc[np.newaxis, :, np.newaxis],
             (self.channel_size, 1, self.samples_per_pulse)
         )
+
+        self.freq_offset_mat = np.tile(
+            self.transmitter.freq_offset[np.newaxis, :, np.newaxis],
+            (self.channel_size, 1, self.samples_per_pulse)
+        )
         # else:
         #     self.fc_mat = np.full_like(self.timestamp, self.transmitter.fc)
 
-        beat_time_samples = np.arange(-self.samples_per_pulse / 2,
-                                      self.samples_per_pulse / 2,
+        beat_time_samples = np.arange(0,
+                                      self.samples_per_pulse,
                                       1) / self.receiver.fs
         self.beat_time = np.tile(
             beat_time_samples[np.newaxis, np.newaxis, ...],

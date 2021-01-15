@@ -66,7 +66,7 @@ cpdef rcs_sbr(model, phi, theta, f, pol=[0, 0, 1], density=10):
     :rtype: float
     """
     trig_mesh = mesh.Mesh.from_file(model)
-    cdef float_t[:, :, :] vectors = trig_mesh.vectors.astype(np.float32)
+    cdef float_t[:, :, :] vectors = trig_mesh.vectors.astype(np.float64)
 
     cdef Rcs[float_t] rcs
 

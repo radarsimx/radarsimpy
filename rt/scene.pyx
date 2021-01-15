@@ -155,9 +155,9 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
         c_rotation_rate_array.clear()
 
         t_mesh = mesh.Mesh.from_file(targets[idx]['model'])
-        mesh_memview = t_mesh.vectors.astype(np.float32)
+        mesh_memview = t_mesh.vectors.astype(np.float64)
 
-        origin = np.array(targets[idx].get('origin', (0,0,0)), dtype=np.float32)
+        origin = np.array(targets[idx].get('origin', (0,0,0)), dtype=np.float64)
 
         location = targets[idx].get('location', (0,0,0))
         speed = targets[idx].get('speed', (0,0,0))
@@ -288,7 +288,7 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
     cdef float_t[:] aperture_location
     cdef float_t[:] aperture_extension
     if radar.aperture_mesh:
-        aperture = radar.aperture_mesh.astype(np.float32)
+        aperture = radar.aperture_mesh.astype(np.float64)
 
         radar_scene.SetAperture(
             Aperture[float_t](
@@ -298,8 +298,8 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
         )
 
     else:
-        aperture_location = radar.aperture_location.astype(np.float32)
-        aperture_extension = radar.aperture_extension.astype(np.float32)
+        aperture_location = radar.aperture_location.astype(np.float64)
+        aperture_extension = radar.aperture_extension.astype(np.float64)
         radar_scene.SetAperture(
             Aperture[float_t](
                 <float_t> (radar.aperture_phi/180*np.pi),
@@ -319,9 +319,21 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
     else:
         frame_time.push_back(<float_t> (radar.t_offset))
 
-    cdef vector[float_t] fc_vector
-    for fc_idx in range(0, len(radar.transmitter.fc)):
-        fc_vector.push_back(<float_t> radar.transmitter.fc[fc_idx])
+    # cdef vector[float_t] fc_vector
+    # for fc_idx in range(0, len(radar.transmitter.fc)):
+    #     fc_vector.push_back(<float_t> radar.transmitter.fc[fc_idx])
+
+    cdef vector[float_t] freq_vector
+    for fq_idx in range(0, len(radar.transmitter.freq)):
+        freq_vector.push_back(<float_t> radar.transmitter.freq[fq_idx])
+
+    cdef vector[float_t] pulse_timing_vector
+    for pt_idx in range(0, len(radar.transmitter.pulse_timing)):
+        pulse_timing_vector.push_back(<float_t> radar.transmitter.pulse_timing[pt_idx])
+
+    cdef vector[float_t] freq_offset_vector
+    for pt_idx in range(0, len(radar.transmitter.freq_offset)):
+        freq_offset_vector.push_back(<float_t> radar.transmitter.freq_offset[pt_idx])
 
     cdef vector[float_t] chirp_start_time
     for ct_idx in range(0, len(radar.transmitter.chirp_start_time)):
@@ -329,8 +341,10 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
 
     radar_scene.SetTransmitter(
         Transmitter[float_t](
-            fc_vector,
-            <float_t> radar.transmitter.slope,
+            <float_t> radar.transmitter.fc[0],
+            freq_vector,
+            freq_offset_vector,
+            pulse_timing_vector,
             <float_t> radar.transmitter.tx_power,
             chirp_start_time,
             frame_time,
@@ -499,8 +513,8 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
                         #     Snapshot[float_t](
                         #     <float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, pulse_idx, sample_idx], frame_idx, tx_idx, pulse_idx, sample_idx))
 
-    cdef float_t[:,:,:] baseband_re = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=np.float32)
-    cdef float_t[:,:,:] baseband_im = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=np.float32)
+    cdef float_t[:,:,:] baseband_re = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=np.float64)
+    cdef float_t[:,:,:] baseband_im = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=np.float64)
 
     # cdef vector[RayPy[float_t]] ray_received
     radar_scene.RunSimulator(
@@ -508,18 +522,18 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
     )
 
     ray_type = np.dtype([
-        ('area', np.float32, (1,)),
-        ('distance', np.float32, (1,)),
-        ('range_rate', np.float32, (1,)),
+        ('area', np.float64, (1,)),
+        ('distance', np.float64, (1,)),
+        ('range_rate', np.float64, (1,)),
         ('refCount', int, (1,)),
         ('channel_id', int, (1,)),
         ('pulse_idx', int, (1,)),
         ('sample_idx', int, (1,)),
         ('level', int, (1,)),
-        ('positions', np.float32, (3,)),
-        ('directions', np.float32, (3,)),
-        ('polarization', np.float32, (3,)),
-        ('path_pos', np.float32, (20,3))
+        ('positions', np.float64, (3,)),
+        ('directions', np.float64, (3,)),
+        ('polarization', np.float64, (3,)),
+        ('path_pos', np.float64, (20,3))
         ])
 
 
