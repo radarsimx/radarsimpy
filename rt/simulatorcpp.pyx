@@ -212,17 +212,17 @@ cpdef run_simulator(radar, targets, noise=True):
     # for fc_idx in range(0, len(radar.transmitter.fc)):
     #     fc_vector.push_back(<float_t> radar.transmitter.fc[fc_idx])
 
-    cdef vector[float_t] freq_vector
-    for fq_idx in range(0, len(radar.transmitter.freq)):
-        freq_vector.push_back(<float_t> radar.transmitter.freq[fq_idx])
+    cdef vector[float_t] f_vector
+    for fq_idx in range(0, len(radar.transmitter.f)):
+        f_vector.push_back(<float_t> radar.transmitter.f[fq_idx])
 
-    cdef vector[float_t] pulse_timing_vector
-    for pt_idx in range(0, len(radar.transmitter.pulse_timing)):
-        pulse_timing_vector.push_back(<float_t> radar.transmitter.pulse_timing[pt_idx])
+    cdef vector[float_t] pulse_time_vector
+    for pt_idx in range(0, len(radar.transmitter.pulse_time)):
+        pulse_time_vector.push_back(<float_t> radar.transmitter.pulse_time[pt_idx])
 
-    cdef vector[float_t] freq_offset_vector
-    for pt_idx in range(0, len(radar.transmitter.freq_offset)):
-        freq_offset_vector.push_back(<float_t> radar.transmitter.freq_offset[pt_idx])
+    cdef vector[float_t] f_offset_vector
+    for pt_idx in range(0, len(radar.transmitter.f_offset)):
+        f_offset_vector.push_back(<float_t> radar.transmitter.f_offset[pt_idx])
     
     cdef vector[float_t] chirp_start_time
     for ct_idx in range(0, len(radar.transmitter.chirp_start_time)):
@@ -231,9 +231,9 @@ cpdef run_simulator(radar, targets, noise=True):
     if radar.phase_noise is None:
         tx = Transmitter[float_t](
             <float_t> radar.transmitter.fc[0],
-            freq_vector,
-            freq_offset_vector,
-            pulse_timing_vector,
+            f_vector,
+            f_offset_vector,
+            pulse_time_vector,
             <float_t> radar.transmitter.tx_power,
             chirp_start_time,
             frame_time,
@@ -246,9 +246,9 @@ cpdef run_simulator(radar, targets, noise=True):
         phase_noise_imag = np.imag(radar.phase_noise).astype(np.float64)
         tx = Transmitter[float_t](
             <float_t> radar.transmitter.fc[0],
-            freq_vector,
-            freq_offset_vector,
-            pulse_timing_vector,
+            f_vector,
+            f_offset_vector,
+            pulse_time_vector,
             <float_t> radar.transmitter.tx_power,
             chirp_start_time,
             frame_time,

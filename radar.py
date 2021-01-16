@@ -411,13 +411,13 @@ class Transmitter:
     """
 
     def __init__(self,
-                 freq,
-                 pulse_timing,
-                 freq_offset=None,
+                 f,
+                 pulse_time,
+                 f_offset=None,
                  tx_power=0,
                  repetition_period=None,
                  pulses=1,
-                 phase_noise_freq=None,
+                 phase_noise_f=None,
                  phase_noise_power=None,
                  channels=[dict(location=(0, 0, 0))]):
 
@@ -427,51 +427,51 @@ class Transmitter:
         self.pulses = pulses
         self.channels = channels
 
-        self.phase_noise_freq = phase_noise_freq
+        self.phase_noise_f = phase_noise_f
         self.phase_noise_power = phase_noise_power
 
-        if isinstance(freq, (list, tuple, np.ndarray)):
-            self.freq = np.array(freq)
+        if isinstance(f, (list, tuple, np.ndarray)):
+            self.f = np.array(f)
         else:
-            self.freq = np.array([freq, freq])
+            self.f = np.array([f, f])
 
-        if isinstance(pulse_timing, (list, tuple, np.ndarray)):
-            self.pulse_timing = np.array(pulse_timing)
-            self.pulse_timing = self.pulse_timing - \
-                self.pulse_timing[0]
+        if isinstance(pulse_time, (list, tuple, np.ndarray)):
+            self.pulse_time = np.array(pulse_time)
+            self.pulse_time = self.pulse_time - \
+                self.pulse_time[0]
         else:
-            self.pulse_timing = np.array([0, pulse_timing])
+            self.pulse_time = np.array([0, pulse_time])
 
-        if freq_offset is not None:
-            if isinstance(freq_offset, (list, tuple, np.ndarray)):
-                self.freq_offset = np.array([freq_offset])
+        if f_offset is not None:
+            if isinstance(f_offset, (list, tuple, np.ndarray)):
+                self.f_offset = np.array([f_offset])
             else:
-                self.freq_offset = freq_offset+np.zeros(pulses)
+                self.f_offset = f_offset+np.zeros(pulses)
         else:
-            self.freq_offset = np.zeros(pulses)
+            self.f_offset = np.zeros(pulses)
 
-        if len(self.freq) != len(self.pulse_timing):
+        if len(self.f) != len(self.pulse_time):
             raise ValueError(
-                'Length of `freq`, `freq_offset` and `pulse_timing` should be the same')
+                'Length of `f`, `f_offset` and `pulse_time` should be the same')
 
-        self.delta_freq = np.ediff1d(self.freq)
-        self.delta_pulse_timing = np.ediff1d(self.pulse_timing)
-        self.k = self.delta_freq/self.delta_pulse_timing
-        self.delta_fc = self.freq[0:-1]
+        self.delta_f = np.ediff1d(self.f)
+        self.delta_pulse_time = np.ediff1d(self.pulse_time)
+        self.k = self.delta_f/self.delta_pulse_time
+        self.delta_fc = self.f[0:-1]
 
-        self.bandwidth = np.max(self.freq)- np.min(self.freq)
+        self.bandwidth = np.max(self.f)- np.min(self.f)
 
         self.fun_y = (
-            self.delta_fc+0.5*self.k*(self.delta_pulse_timing))*(self.delta_pulse_timing)
+            self.delta_fc+0.5*self.k*(self.delta_pulse_time))*(self.delta_pulse_time)
         self.fun_y = np.cumsum(np.concatenate(([0], self.fun_y)))
 
         self.waveform_fun = interp1d(
-            self.pulse_timing, self.fun_y, kind='linear', bounds_error=False, fill_value=(self.fun_y[0], self.fun_y[-1]))
+            self.pulse_time, self.fun_y, kind='linear', bounds_error=False, fill_value=(self.fun_y[0], self.fun_y[-1]))
 
-        self.pulse_length = self.pulse_timing[-1]-self.pulse_timing[0]
+        self.pulse_length = self.pulse_time[-1]-self.pulse_time[0]
 
         # Extend `fc` to a numpy.1darray. Length equels to `pulses`
-        self.fc = (np.min(self.freq)+np.max(self.freq))/2+self.freq_offset 
+        self.fc = (np.min(self.f)+np.max(self.f))/2+self.f_offset 
         # if isinstance(fc, (list, tuple, np.ndarray)):
         #     if len(fc) != pulses:
         #         raise ValueError(
@@ -905,8 +905,8 @@ class Radar:
             (self.channel_size, 1, self.samples_per_pulse)
         )
 
-        self.freq_offset_mat = np.tile(
-            self.transmitter.freq_offset[np.newaxis, :, np.newaxis],
+        self.f_offset_mat = np.tile(
+            self.transmitter.f_offset[np.newaxis, :, np.newaxis],
             (self.channel_size, 1, self.samples_per_pulse)
         )
         # else:
@@ -920,7 +920,7 @@ class Radar:
             (self.channel_size, self.transmitter.pulses, 1)
         )
 
-        if self.transmitter.phase_noise_freq is not None and \
+        if self.transmitter.phase_noise_f is not None and \
                 self.transmitter.phase_noise_power is not None:
             dummy_sig = np.ones(
                 (self.channel_size*self.frames*self.transmitter.pulses,
@@ -928,7 +928,7 @@ class Radar:
             self.phase_noise = cal_phase_noise(
                 dummy_sig,
                 self.receiver.fs,
-                self.transmitter.phase_noise_freq,
+                self.transmitter.phase_noise_f,
                 self.transmitter.phase_noise_power,
                 seed=seed)
             self.phase_noise = np.reshape(self.phase_noise, (
