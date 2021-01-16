@@ -245,7 +245,7 @@ cpdef run_simulator(radar, targets, noise=True):
         phase_noise_real = np.real(radar.phase_noise).astype(np.float64)
         phase_noise_imag = np.imag(radar.phase_noise).astype(np.float64)
         tx = Transmitter[float_t](
-            <float_t> radar.transmitter.fc_0
+            <float_t> radar.transmitter.fc_0,
             f_vector,
             f_offset_vector,
             pulse_time_vector,
