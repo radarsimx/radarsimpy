@@ -341,7 +341,7 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
 
     radar_scene.SetTransmitter(
         Transmitter[float_t](
-            <float_t> radar.transmitter.fc[0],
+            <float_t> radar.transmitter.fc_0,
             f_vector,
             f_offset_vector,
             pulse_time_vector,

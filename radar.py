@@ -461,7 +461,9 @@ class Transmitter:
         self.pulse_length = self.pulse_time[-1]-self.pulse_time[0]
 
         # Extend `fc` to a numpy.1darray. Length equels to `pulses`
-        self.fc = (np.min(self.f)+np.max(self.f))/2+self.f_offset
+        self.fc_0 = (np.min(self.f)+np.max(self.f))/2
+        self.fc_vect = (np.min(self.f)+np.max(self.f))/2+self.f_offset
+        self.fc_frame = (np.min(self.fc_vect)+np.max(self.fc_vect))/2
         # if isinstance(fc, (list, tuple, np.ndarray)):
         #     if len(fc) != pulses:
         #         raise ValueError(
@@ -832,7 +834,7 @@ class Radar:
                               self.transmitter.bandwidth / 2)
             self.unambiguous_speed = const.c / \
                 self.transmitter.repetition_period[0] / \
-                self.transmitter.fc[0] / 2
+                self.transmitter.fc_0 / 2
             self.range_resolution = const.c / 2 / self.transmitter.bandwidth
         else:
             self.max_range = 0
@@ -891,7 +893,7 @@ class Radar:
 
         # if hasattr(self.transmitter.fc, '__len__'):
         self.fc_mat = np.tile(
-            self.transmitter.fc[np.newaxis, :, np.newaxis],
+            self.transmitter.fc_vect[np.newaxis, :, np.newaxis],
             (self.channel_size, 1, self.samples_per_pulse)
         )
 
