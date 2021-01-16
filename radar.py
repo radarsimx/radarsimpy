@@ -421,8 +421,6 @@ class Transmitter:
                  phase_noise_power=None,
                  channels=[dict(location=(0, 0, 0))]):
 
-        # self.pulse_length = pulse_length
-        # self.bandwidth = bandwidth
         self.tx_power = tx_power
         self.pulses = pulses
         self.channels = channels
@@ -442,6 +440,10 @@ class Transmitter:
         else:
             self.pulse_time = np.array([0, pulse_time])
 
+        if len(self.f) != len(self.pulse_time):
+            raise ValueError(
+                'Length of `f`, and `pulse_time` should be the same')
+
         if f_offset is not None:
             if isinstance(f_offset, (list, tuple, np.ndarray)):
                 self.f_offset = np.array([f_offset])
@@ -450,28 +452,16 @@ class Transmitter:
         else:
             self.f_offset = np.zeros(pulses)
 
-        if len(self.f) != len(self.pulse_time):
-            raise ValueError(
-                'Length of `f`, `f_offset` and `pulse_time` should be the same')
+        self.delta_f = np.ediff1d(self.f, to_begin=0)
+        self.delta_pulse_time = np.ediff1d(self.pulse_time, to_begin=0)
+        self.k = self.delta_f[1:]/self.delta_pulse_time[1:]
 
-        self.delta_f = np.ediff1d(self.f)
-        self.delta_pulse_time = np.ediff1d(self.pulse_time)
-        self.k = self.delta_f/self.delta_pulse_time
-        self.delta_fc = self.f[0:-1]
-
-        self.bandwidth = np.max(self.f)- np.min(self.f)
-
-        self.fun_y = (
-            self.delta_fc+0.5*self.k*(self.delta_pulse_time))*(self.delta_pulse_time)
-        self.fun_y = np.cumsum(np.concatenate(([0], self.fun_y)))
-
-        self.waveform_fun = interp1d(
-            self.pulse_time, self.fun_y, kind='linear', bounds_error=False, fill_value=(self.fun_y[0], self.fun_y[-1]))
+        self.bandwidth = np.max(self.f) - np.min(self.f)
 
         self.pulse_length = self.pulse_time[-1]-self.pulse_time[0]
 
         # Extend `fc` to a numpy.1darray. Length equels to `pulses`
-        self.fc = (np.min(self.f)+np.max(self.f))/2+self.f_offset 
+        self.fc = (np.min(self.f)+np.max(self.f))/2+self.f_offset
         # if isinstance(fc, (list, tuple, np.ndarray)):
         #     if len(fc) != pulses:
         #         raise ValueError(
