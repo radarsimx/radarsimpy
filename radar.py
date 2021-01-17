@@ -261,20 +261,22 @@ class Transmitter:
     """
     A class defines basic parameters of a radar transmitter
 
-    :param fc:
-        Center frequency for each pulse (Hz).
-        If ``fc`` is a single number, all the pulses have
+    :param f:
+        Frequency for each pulse (Hz).
+        If ``f`` is a single number, all the pulses have
         the same center frequency.
 
-        ``fc`` can alse be a 1-D array to specify different
-        center frequency for each pulse. In this case, the
-        length of the 1-D array should equals to the length
-        of ``pulses``
-    :type fc: float or numpy.1darray
-    :param float pulse_length:
-        Dwell time of each pulse (s)
-    :param float bandwidth:
-        Bandwith of each pulse (Hz)
+        For linear modulation, specify ``f`` with ``[f_start, f_stop]``.
+
+        ``f`` can alse be a 1-D array of an arbitrary waveform, specify
+        the time with ``pulse_time``.
+    :type f: float or numpy.1darray
+    :param pulse_time:
+        Timing of each pulse (s).
+    :type pulse_time: float or numpy.1darray
+    :param numpy.1darray f_offset:
+        Frequency offset for each pulse (Hz). The length must be the same
+        as ``pulses``.
     :param float tx_power:
         Transmitter power (dBm)
     :param float repetition_period:
@@ -289,8 +291,6 @@ class Transmitter:
     :type repetitions_period: float or numpy.1darray
     :param int pulses:
         Total number of pulses
-    :param str slop_type:
-        ``rising`` or ``falling`` slope for the frequency modulation
     :param numpy.1darray phase_noise_freq:
         Frequency of the phase noise (Hz)
     :param numpy.1darray phase_noise_power:
