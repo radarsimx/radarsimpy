@@ -182,7 +182,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>f</strong> (<em>float</em><em> or </em><em>numpy.1darray</em>) – <p>Frequency for each pulse (Hz).
+<li><p><strong>f</strong> (<em>float</em><em> or </em><em>numpy.1darray</em>) – <p>Waveform frequency (Hz).
 If <code class="docutils literal notranslate"><span class="pre">f</span></code> is a single number, all the pulses have
 the same center frequency.</p>
 <p>For linear modulation, specify <code class="docutils literal notranslate"><span class="pre">f</span></code> with <code class="docutils literal notranslate"><span class="pre">[f_start,</span> <span class="pre">f_stop]</span></code>.</p>
@@ -202,7 +202,7 @@ length of the 1-D array should equals to the length
 of <code class="docutils literal notranslate"><span class="pre">pulses</span></code></p>
 </p></li>
 <li><p><strong>pulses</strong> (<em>int</em>) – Total number of pulses</p></li>
-<li><p><strong>phase_noise_freq</strong> (<em>numpy.1darray</em>) – Frequency of the phase noise (Hz)</p></li>
+<li><p><strong>phase_noise_f</strong> (<em>numpy.1darray</em>) – Frequency of the phase noise (Hz)</p></li>
 <li><p><strong>phase_noise_power</strong> (<em>numpy.1darray</em>) – Power of the phase noise (dB/Hz)</p></li>
 <li><p><strong>channels</strong> (<em>list</em><em>[</em><em>dict</em><em>]</em>) – <p>Properties of transmitter channels</p>
 <p>[{</p>
