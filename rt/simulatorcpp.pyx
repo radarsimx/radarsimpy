@@ -213,12 +213,12 @@ cpdef run_simulator(radar, targets, noise=True):
     #     fc_vector.push_back(<float_t> radar.transmitter.fc[fc_idx])
 
     cdef vector[float_t] f_vector
-    for fq_idx in range(0, len(radar.transmitter.f)):
-        f_vector.push_back(<float_t> radar.transmitter.f[fq_idx])
+    for fq_idx in range(0, len(radar.f)):
+        f_vector.push_back(<float_t> radar.f[fq_idx])
 
     cdef vector[float_t] pulse_time_vector
-    for pt_idx in range(0, len(radar.transmitter.pulse_time)):
-        pulse_time_vector.push_back(<float_t> radar.transmitter.pulse_time[pt_idx])
+    for pt_idx in range(0, len(radar.pulse_time)):
+        pulse_time_vector.push_back(<float_t> radar.pulse_time[pt_idx])
 
     cdef vector[float_t] f_offset_vector
     for pt_idx in range(0, len(radar.transmitter.f_offset)):

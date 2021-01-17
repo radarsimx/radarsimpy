@@ -452,9 +452,9 @@ class Transmitter:
         else:
             self.f_offset = np.zeros(pulses)
 
-        self.delta_f = np.ediff1d(self.f, to_begin=0)
-        self.delta_pulse_time = np.ediff1d(self.pulse_time, to_begin=0)
-        self.k = self.delta_f[1:]/self.delta_pulse_time[1:]
+        # self.delta_f = np.ediff1d(self.f, to_begin=0)
+        # self.delta_pulse_time = np.ediff1d(self.pulse_time, to_begin=0)
+        # self.k = self.delta_f[1:]/self.delta_pulse_time[1:]
 
         self.bandwidth = np.max(self.f) - np.min(self.f)
 
@@ -893,6 +893,23 @@ class Radar:
         self.phase_code = self.cal_frame_phases()
         self.code_timestamp = self.cal_code_timestamp()
         self.noise = self.cal_noise()
+
+        if len(self.transmitter.f) > 2:
+            fun_f_t = interp1d(self.transmitter.pulse_time,
+                               self.transmitter.f, kind='linear')
+            self.pulse_time = np.linspace(
+                self.transmitter.pulse_time[0],
+                self.transmitter.pulse_time[-1],
+                self.samples_per_pulse*100)
+            self.f = fun_f_t(self.pulse_time)
+
+        else:
+            self.f = self.transmitter.f
+            self.pulse_time = self.transmitter.pulse_time
+
+        self.delta_f = np.ediff1d(self.f, to_begin=0)
+        self.delta_pulse_time = np.ediff1d(self.pulse_time, to_begin=0)
+        self.k = self.delta_f[1:]/self.delta_pulse_time[1:]
 
         # if hasattr(self.transmitter.fc, '__len__'):
         self.fc_mat = np.tile(
