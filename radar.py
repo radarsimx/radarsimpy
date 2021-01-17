@@ -262,7 +262,7 @@ class Transmitter:
     A class defines basic parameters of a radar transmitter
 
     :param f:
-        Frequency for each pulse (Hz).
+        Waveform frequency (Hz).
         If ``f`` is a single number, all the pulses have
         the same center frequency.
 
@@ -291,7 +291,7 @@ class Transmitter:
     :type repetitions_period: float or numpy.1darray
     :param int pulses:
         Total number of pulses
-    :param numpy.1darray phase_noise_freq:
+    :param numpy.1darray phase_noise_f:
         Frequency of the phase noise (Hz)
     :param numpy.1darray phase_noise_power:
         Power of the phase noise (dB/Hz)
