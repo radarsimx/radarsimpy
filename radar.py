@@ -817,7 +817,10 @@ class Radar:
                  receiver,
                  time=0,
                  aperture=None,
-                 seed=None):
+                 seed=None,
+                 **kwargs):
+
+        self.validation = kwargs.get('validation', False)
 
         self.transmitter = transmitter
         self.receiver = receiver
@@ -922,7 +925,8 @@ class Radar:
                 self.receiver.fs,
                 self.transmitter.phase_noise_f,
                 self.transmitter.phase_noise_power,
-                seed=seed)
+                seed=seed,
+                validation=self.validation)
             self.phase_noise = np.reshape(self.phase_noise, (
                 self.channel_size*self.frames,
                 self.transmitter.pulses,
