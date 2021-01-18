@@ -87,9 +87,9 @@ To use the module, please put the radarsimpy folder within your project folder a
   - [FMCW radar simulation](https://zpeng.me/index.php/2018/10/11/fmcw-radar/)
   - [TDM MIMO FMCW radar simulation](https://zpeng.me/index.php/2019/04/07/tdm-mimo-fmcw-radar/)
   - [PMCW radar simulation](https://zpeng.me/index.php/2019/05/24/pmcw-radar/)
-  - [FMCW Radar Nonlinear Chirp](https://zpeng.me/index.php/2021/01/17/fmcw-radar-nonlinear-chirp/)
+  - [FMCW radar nonlinear chirp](https://zpeng.me/index.php/2021/01/17/fmcw-radar-nonlinear-chirp/)
   - [CFAR](https://zpeng.me/index.php/2021/01/10/cfar/)
-  - [Phase Noise](https://zpeng.me/index.php/2021/01/13/phase-noise/)
+  - [Phase noise](https://zpeng.me/index.php/2021/01/13/phase-noise/)
   
 - Target simulation
   - [Target RCS evaluation with ray tracing](https://zpeng.me/index.php/2019/11/13/rcs-calculation-with-ray-tracing/)
