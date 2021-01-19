@@ -327,9 +327,9 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
     for fq_idx in range(0, len(radar.f)):
         f_vector.push_back(<float_t> radar.f[fq_idx])
 
-    cdef vector[float_t] pulse_time_vector
-    for pt_idx in range(0, len(radar.pulse_time)):
-        pulse_time_vector.push_back(<float_t> radar.pulse_time[pt_idx])
+    cdef vector[float_t] t_vector
+    for pt_idx in range(0, len(radar.t)):
+        t_vector.push_back(<float_t> radar.t[pt_idx])
 
     cdef vector[float_t] f_offset_vector
     for pt_idx in range(0, len(radar.transmitter.f_offset)):
@@ -344,7 +344,7 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
             <float_t> radar.transmitter.fc_0,
             f_vector,
             f_offset_vector,
-            pulse_time_vector,
+            t_vector,
             <float_t> radar.transmitter.tx_power,
             chirp_start_time,
             frame_time,

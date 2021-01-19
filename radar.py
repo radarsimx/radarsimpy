@@ -269,11 +269,11 @@ class Transmitter:
         For linear modulation, specify ``f`` with ``[f_start, f_stop]``.
 
         ``f`` can alse be a 1-D array of an arbitrary waveform, specify
-        the time with ``pulse_time``.
+        the time with ``t``.
     :type f: float or numpy.1darray
-    :param pulse_time:
+    :param t:
         Timing of each pulse (s).
-    :type pulse_time: float or numpy.1darray
+    :type t: float or numpy.1darray
     :param numpy.1darray f_offset:
         Frequency offset for each pulse (Hz). The length must be the same
         as ``pulses``.
@@ -412,7 +412,9 @@ class Transmitter:
 
     def __init__(self,
                  f,
-                 pulse_time,
+                 t,
+                 amp=1,
+                 phs=0,
                  f_offset=None,
                  tx_power=0,
                  repetition_period=None,
@@ -433,16 +435,16 @@ class Transmitter:
         else:
             self.f = np.array([f, f])
 
-        if isinstance(pulse_time, (list, tuple, np.ndarray)):
-            self.pulse_time = np.array(pulse_time)
-            self.pulse_time = self.pulse_time - \
-                self.pulse_time[0]
+        if isinstance(t, (list, tuple, np.ndarray)):
+            self.t = np.array(t)
+            self.t = self.t - \
+                self.t[0]
         else:
-            self.pulse_time = np.array([0, pulse_time])
+            self.t = np.array([0, t])
 
-        if len(self.f) != len(self.pulse_time):
+        if len(self.f) != len(self.t):
             raise ValueError(
-                'Length of `f`, and `pulse_time` should be the same')
+                'Length of `f`, and `t` should be the same')
 
         if f_offset is not None:
             if isinstance(f_offset, (list, tuple, np.ndarray)):
@@ -453,12 +455,12 @@ class Transmitter:
             self.f_offset = np.zeros(pulses)
 
         # self.delta_f = np.ediff1d(self.f, to_begin=0)
-        # self.delta_pulse_time = np.ediff1d(self.pulse_time, to_begin=0)
-        # self.k = self.delta_f[1:]/self.delta_pulse_time[1:]
+        # self.delta_t = np.ediff1d(self.t, to_begin=0)
+        # self.k = self.delta_f[1:]/self.delta_t[1:]
 
         self.bandwidth = np.max(self.f) - np.min(self.f)
 
-        self.pulse_length = self.pulse_time[-1]-self.pulse_time[0]
+        self.pulse_length = self.t[-1]-self.t[0]
 
         # Extend `fc` to a numpy.1darray. Length equels to `pulses`
         self.fc_0 = (np.min(self.f)+np.max(self.f))/2
@@ -895,21 +897,21 @@ class Radar:
         self.noise = self.cal_noise()
 
         if len(self.transmitter.f) > 2:
-            fun_f_t = interp1d(self.transmitter.pulse_time,
+            fun_f_t = interp1d(self.transmitter.t,
                                self.transmitter.f, kind='linear')
-            self.pulse_time = np.linspace(
-                self.transmitter.pulse_time[0],
-                self.transmitter.pulse_time[-1],
+            self.t = np.linspace(
+                self.transmitter.t[0],
+                self.transmitter.t[-1],
                 self.samples_per_pulse*100)
-            self.f = fun_f_t(self.pulse_time)
+            self.f = fun_f_t(self.t)
 
         else:
             self.f = self.transmitter.f
-            self.pulse_time = self.transmitter.pulse_time
+            self.t = self.transmitter.t
 
         self.delta_f = np.ediff1d(self.f, to_begin=0)
-        self.delta_pulse_time = np.ediff1d(self.pulse_time, to_begin=0)
-        self.k = self.delta_f[1:]/self.delta_pulse_time[1:]
+        self.delta_t = np.ediff1d(self.t, to_begin=0)
+        self.k = self.delta_f[1:]/self.delta_t[1:]
 
         # if hasattr(self.transmitter.fc, '__len__'):
         self.fc_mat = np.tile(
