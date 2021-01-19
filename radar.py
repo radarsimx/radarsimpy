@@ -291,9 +291,9 @@ class Transmitter:
     :type repetitions_period: float or numpy.1darray
     :param int pulses:
         Total number of pulses
-    :param numpy.1darray phase_noise_f:
+    :param numpy.1darray pn_f:
         Frequency of the phase noise (Hz)
-    :param numpy.1darray phase_noise_power:
+    :param numpy.1darray pn_power:
         Power of the phase noise (dB/Hz)
     :param list[dict] channels:
         Properties of transmitter channels
@@ -413,22 +413,22 @@ class Transmitter:
     def __init__(self,
                  f,
                  t,
-                 amp=1,
-                 phs=0,
+                 amp=None,
+                 phs=None,
                  f_offset=None,
                  tx_power=0,
                  repetition_period=None,
                  pulses=1,
-                 phase_noise_f=None,
-                 phase_noise_power=None,
+                 pn_f=None,
+                 pn_power=None,
                  channels=[dict(location=(0, 0, 0))]):
 
         self.tx_power = tx_power
         self.pulses = pulses
         self.channels = channels
 
-        self.phase_noise_f = phase_noise_f
-        self.phase_noise_power = phase_noise_power
+        self.pn_f = pn_f
+        self.pn_power = pn_power
 
         if isinstance(f, (list, tuple, np.ndarray)):
             self.f = np.array(f)
@@ -934,16 +934,16 @@ class Radar:
             (self.channel_size, self.transmitter.pulses, 1)
         )
 
-        if self.transmitter.phase_noise_f is not None and \
-                self.transmitter.phase_noise_power is not None:
+        if self.transmitter.pn_f is not None and \
+                self.transmitter.pn_power is not None:
             dummy_sig = np.ones(
                 (self.channel_size*self.frames*self.transmitter.pulses,
                  self.samples_per_pulse))
             self.phase_noise = cal_phase_noise(
                 dummy_sig,
                 self.receiver.fs,
-                self.transmitter.phase_noise_f,
-                self.transmitter.phase_noise_power,
+                self.transmitter.pn_f,
+                self.transmitter.pn_power,
                 seed=seed,
                 validation=self.validation)
             self.phase_noise = np.reshape(self.phase_noise, (
