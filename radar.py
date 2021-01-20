@@ -104,15 +104,15 @@ class Transmitter:
             Angles for elevation pattern (deg). ``default [-90, 90]``
         - **elevation_pattern** (*numpy.1darray*) --
             Elevation pattern (dB). ``default [0, 0]``
-        - **phase_code** (*numpy.1darray*) --
+        - **pulse_phs** (*numpy.1darray*) --
             Phase code sequence for phase modulation (deg).
             If ``chip_length == 0``, or ``chip_length`` is not defined,
-            length of ``phase_code`` should be equal to ``pulses``.
+            length of ``pulse_phs`` should be equal to ``pulses``.
             ``default 0``
         - **chip_length** (*float*) --
             Length for each phase code (s). If ``chip_length ==
-            0``, one pulse will have one ``phase_code``. If
-            ``chip_length != 0``, all ``phase_code`` will be
+            0``, one pulse will have one ``pulse_phs``. If
+            ``chip_length != 0``, all ``pulse_phs`` will be
             applied to each pulse. ``default 0``
 
         }]
@@ -151,7 +151,7 @@ class Transmitter:
     :ivar numpy.1darray antenna_gains:
         Antenna gain for each channel (dB).
         Antenna gain is ``max(az_pattern)``
-    :ivar list[numpy.1darray] phase_code:
+    :ivar list[numpy.1darray] pulse_phs:
         Phase code sequence for phase modulation (deg)
     :ivar numpy.1darray chip_length:
         Length for each phase code (s)
@@ -205,8 +205,9 @@ class Transmitter:
     def __init__(self,
                  f,
                  t,
-                 amp=None,
-                 phs=None,
+                #  amp=None,
+                #  phs=None,
+                #  t_mod=None,
                  f_offset=None,
                  tx_power=0,
                  prp=None,
@@ -218,9 +219,6 @@ class Transmitter:
         self.tx_power = tx_power
         self.pulses = pulses
         self.channels = channels
-
-        self.pn_f = pn_f
-        self.pn_power = pn_power
 
         if isinstance(f, (list, tuple, np.ndarray)):
             self.f = np.array(f)
@@ -234,21 +232,7 @@ class Transmitter:
         else:
             self.t = np.array([0, t])
 
-        if amp is not None:
-            if isinstance(amp, (list, tuple, np.ndarray)):
-                self.amp = np.array(amp)
-            else:
-                self.amp = np.array([amp, amp])
-        else:
-            self.amp = np.array([1, 1])
-
-        if phs is not None:
-            if isinstance(phs, (list, tuple, np.ndarray)):
-                self.phs = np.array(phs)
-            else:
-                self.phs = np.array([phs, phs])
-        else:
-            self.phs = np.array([0, 0])
+        
 
         if len(self.f) != len(self.t):
             raise ValueError(
@@ -268,6 +252,9 @@ class Transmitter:
         self.fc_0 = (np.min(self.f)+np.max(self.f))/2
         self.fc_vect = (np.min(self.f)+np.max(self.f))/2+self.f_offset
         self.fc_frame = (np.min(self.fc_vect)+np.max(self.fc_vect))/2
+
+        self.pn_f = pn_f
+        self.pn_power = pn_power
 
         # Extend `prp` to a numpy.1darray.
         # Length equels to `pulses`
@@ -301,7 +288,7 @@ class Transmitter:
         self.el_angles = []
         self.az_func = []
         self.el_func = []
-        self.phase_code = []
+        self.pulse_phs = []
         self.chip_length = []
         self.polarization = np.zeros((self.channel_size, 3))
         self.antenna_gains = np.zeros((self.channel_size))
@@ -309,6 +296,29 @@ class Transmitter:
         self.delay = np.zeros(self.channel_size)
         for tx_idx, tx_element in enumerate(self.channels):
             self.delay[tx_idx] = self.channels[tx_idx].get('delay', 0)
+            if amp is not None:
+                if isinstance(amp, (list, tuple, np.ndarray)):
+                    self.amp = np.array(amp)
+                else:
+                    self.amp = np.array([amp, amp])
+            else:
+                self.amp = np.array([1, 1])
+
+            if phs is not None:
+                if isinstance(phs, (list, tuple, np.ndarray)):
+                    self.phs = np.array(phs)
+                else:
+                    self.phs = np.array([phs, phs])
+            else:
+                self.phs = np.array([0, 0])
+
+            if t_mod is not None:
+                if isinstance(t_mod, (list, tuple, np.ndarray)):
+                    self.t_mod = np.array(t_mod)
+                else:
+                    self.t_mod = np.array([t_mod, t_mod])
+            else:
+                self.t_mod = np.array([0, 0])
             self.locations[tx_idx, :] = np.array(
                 tx_element.get('location'))
             self.polarization[tx_idx, :] = np.array(
@@ -342,12 +352,12 @@ class Transmitter:
                     self.el_patterns[-1]-np.max(self.el_patterns[-1]),
                     kind='linear')
             )
-            self.phase_code.append(
+            self.pulse_phs.append(
                 np.exp(1j * self.channels[tx_idx].get(
-                    'phase_code', np.zeros((self.pulses))) / 180 * np.pi))
+                    'pulse_phs', np.zeros((self.pulses))) / 180 * np.pi))
 
             self.max_code_length = max(
-                self.max_code_length, np.shape(self.phase_code[-1])[0])
+                self.max_code_length, np.shape(self.pulse_phs[-1])[0])
 
             self.chip_length.append(self.channels[tx_idx].get(
                 'chip_length', 0))
@@ -361,11 +371,6 @@ class Transmitter:
 
         # additional transmitter parameters
         # self.wavelength = const.c / self.fc[0]
-
-        # if slop_type == 'rising':
-        #     self.slope = (self.bandwidth / self.pulse_length)
-        # else:
-        #     self.slope = (-self.bandwidth / self.pulse_length)
 
         self.box_min = np.min(self.locations, axis=0)
         self.box_max = np.max(self.locations, axis=0)
@@ -686,7 +691,7 @@ class Radar:
             self.aperture_extension = np.array(aperture.get('extension'))
 
         self.timestamp = self.gen_timestamp()
-        self.phase_code = self.cal_frame_phases()
+        self.pulse_phs = self.cal_frame_phases()
         self.code_timestamp = self.cal_code_timestamp()
         self.noise = self.cal_noise()
 
@@ -809,10 +814,10 @@ class Radar:
         :rtype: numpy.2darray
         """
 
-        phase_code = np.array(self.transmitter.phase_code, dtype=complex)
-        phase_code = np.repeat(phase_code, self.receiver.channel_size, axis=0)
-        phase_code = np.repeat(phase_code, self.frames, axis=0)
-        return phase_code
+        pulse_phs = np.array(self.transmitter.pulse_phs, dtype=complex)
+        pulse_phs = np.repeat(pulse_phs, self.receiver.channel_size, axis=0)
+        pulse_phs = np.repeat(pulse_phs, self.frames, axis=0)
+        return pulse_phs
 
     def cal_code_timestamp(self):
         """

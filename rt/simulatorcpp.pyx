@@ -289,9 +289,9 @@ cpdef run_simulator(radar, targets, noise=True):
             el_ang.push_back(<float_t>el_angles[ang_idx])
             el.push_back(<float_t>el_pattern[ang_idx])
 
-        for code_idx in range(0, len(radar.transmitter.phase_code[tx_idx])):
-            mod_amp.push_back(<float_t> (np.abs(radar.transmitter.phase_code[tx_idx][code_idx])))
-            mod_phs.push_back(<float_t> (np.angle(radar.transmitter.phase_code[tx_idx][code_idx])))
+        for code_idx in range(0, len(radar.transmitter.pulse_phs[tx_idx])):
+            mod_amp.push_back(<float_t> (np.abs(radar.transmitter.pulse_phs[tx_idx][code_idx])))
+            mod_phs.push_back(<float_t> (np.angle(radar.transmitter.pulse_phs[tx_idx][code_idx])))
         
         tx.AddChannel(
             TxChannel[float_t](
