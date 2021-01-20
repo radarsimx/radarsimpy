@@ -279,12 +279,12 @@ class Transmitter:
         as ``pulses``.
     :param float tx_power:
         Transmitter power (dBm)
-    :param float repetition_period:
-        Pulse repetition period (s). ``repetition_period >=
-        pulse_length``. If it is ``None``, ``repetition_period =
+    :param float prp:
+        Pulse repetition period (s). ``prp >=
+        pulse_length``. If it is ``None``, ``prp =
         pulse_length``.
 
-        ``repetition_period`` can alse be a 1-D array to specify
+        ``prp`` can alse be a 1-D array to specify
         different repetition period for each pulse. In this case, the
         length of the 1-D array should equals to the length
         of ``pulses``
@@ -333,7 +333,7 @@ class Transmitter:
         Bandwith of each pulse (Hz)
     :ivar float tx_power:
         Transmitter power (dBm)
-    :ivar numpy.1darray repetition_period:
+    :ivar numpy.1darray prp:
         Pulse repetition period (s)
     :ivar int pulses:
         Total number of pulses
@@ -380,7 +380,7 @@ class Transmitter:
 
     ::
 
-        |                repetition_period
+        |                prp
         |                  +-----------+
         |
         |                          /            /            /          +
@@ -417,7 +417,7 @@ class Transmitter:
                  phs=None,
                  f_offset=None,
                  tx_power=0,
-                 repetition_period=None,
+                 prp=None,
                  pulses=1,
                  pn_f=None,
                  pn_power=None,
@@ -442,6 +442,22 @@ class Transmitter:
         else:
             self.t = np.array([0, t])
 
+        if amp is not None:
+            if isinstance(amp, (list, tuple, np.ndarray)):
+                self.amp = np.array(amp)
+            else:
+                self.amp = np.array([amp, amp])
+        else:
+            self.amp = np.array([1, 1])
+
+        if phs is not None:
+            if isinstance(phs, (list, tuple, np.ndarray)):
+                self.phs = np.array(phs)
+            else:
+                self.phs = np.array([phs, phs])
+        else:
+            self.phs = np.array([0, 0])
+
         if len(self.f) != len(self.t):
             raise ValueError(
                 'Length of `f`, and `t` should be the same')
@@ -454,48 +470,34 @@ class Transmitter:
         else:
             self.f_offset = np.zeros(pulses)
 
-        # self.delta_f = np.ediff1d(self.f, to_begin=0)
-        # self.delta_t = np.ediff1d(self.t, to_begin=0)
-        # self.k = self.delta_f[1:]/self.delta_t[1:]
-
         self.bandwidth = np.max(self.f) - np.min(self.f)
-
         self.pulse_length = self.t[-1]-self.t[0]
 
-        # Extend `fc` to a numpy.1darray. Length equels to `pulses`
         self.fc_0 = (np.min(self.f)+np.max(self.f))/2
         self.fc_vect = (np.min(self.f)+np.max(self.f))/2+self.f_offset
         self.fc_frame = (np.min(self.fc_vect)+np.max(self.fc_vect))/2
-        # if isinstance(fc, (list, tuple, np.ndarray)):
-        #     if len(fc) != pulses:
-        #         raise ValueError(
-        #             'Length of `fc` should equal to the length of `pulses`.')
-        #     else:
-        #         self.fc = np.array(fc)
-        # else:
-        #     self.fc = fc+np.zeros(pulses)
 
-        # Extend `repetition_period` to a numpy.1darray.
+        # Extend `prp` to a numpy.1darray.
         # Length equels to `pulses`
-        if repetition_period is None:
-            self.repetition_period = self.pulse_length + np.zeros(pulses)
+        if prp is None:
+            self.prp = self.pulse_length + np.zeros(pulses)
         else:
-            if isinstance(repetition_period, (list, tuple, np.ndarray)):
-                if len(repetition_period) != pulses:
+            if isinstance(prp, (list, tuple, np.ndarray)):
+                if len(prp) != pulses:
                     raise ValueError(
-                        'Length of `repetition_period` should equal to the \
+                        'Length of `prp` should equal to the \
                             length of `pulses`.')
                 else:
-                    self.repetition_period = repetition_period
+                    self.prp = prp
             else:
-                self.repetition_period = repetition_period + np.zeros(pulses)
+                self.prp = prp + np.zeros(pulses)
 
-        if np.min(self.repetition_period < self.pulse_length):
+        if np.min(self.prp < self.pulse_length):
             raise ValueError(
-                '`repetition_period` should be larger than `pulse_length`.')
+                '`prp` should be larger than `pulse_length`.')
 
         self.chirp_start_time = np.cumsum(
-            self.repetition_period)-self.repetition_period[0]
+            self.prp)-self.prp[0]
 
         self.max_code_length = 0
 
@@ -776,7 +778,7 @@ class Radar:
         ``max_range = c * fs * pulse_length / bandwidth / 2``
     :ivar float unambiguous_speed:
         Unambiguous speed (m/s).
-        ``unambiguous_speed = c / repetition_period / fc / 2``
+        ``unambiguous_speed = c / prp / fc / 2``
     :ivar float range_resolution:
         Range resolution (m).
         ``range_resolution = c / 2 / bandwidth``
@@ -838,7 +840,7 @@ class Radar:
                               self.transmitter.pulse_length /
                               self.transmitter.bandwidth / 2)
             self.unambiguous_speed = const.c / \
-                self.transmitter.repetition_period[0] / \
+                self.transmitter.prp[0] / \
                 self.transmitter.fc_0 / 2
             self.range_resolution = const.c / 2 / self.transmitter.bandwidth
         else:
@@ -969,7 +971,7 @@ class Radar:
         rx_channel_size = self.receiver.channel_size
         pulses = self.transmitter.pulses
         samples = self.samples_per_pulse
-        crp = self.transmitter.repetition_period
+        crp = self.transmitter.prp
         delay = self.transmitter.delay
         fs = self.receiver.fs
 
