@@ -205,9 +205,6 @@ class Transmitter:
     def __init__(self,
                  f,
                  t,
-                #  amp=None,
-                #  phs=None,
-                #  t_mod=None,
                  f_offset=None,
                  tx_power=0,
                  prp=None,
@@ -296,29 +293,30 @@ class Transmitter:
         self.delay = np.zeros(self.channel_size)
         for tx_idx, tx_element in enumerate(self.channels):
             self.delay[tx_idx] = self.channels[tx_idx].get('delay', 0)
-            if amp is not None:
-                if isinstance(amp, (list, tuple, np.ndarray)):
-                    self.amp = np.array(amp)
-                else:
-                    self.amp = np.array([amp, amp])
-            else:
-                self.amp = np.array([1, 1])
+            # if amp is not None:
+            #     if isinstance(amp, (list, tuple, np.ndarray)):
+            #         self.amp = np.array(amp)
+            #     else:
+            #         self.amp = np.array([amp, amp])
+            # else:
+            #     self.amp = np.array([1, 1])
 
-            if phs is not None:
-                if isinstance(phs, (list, tuple, np.ndarray)):
-                    self.phs = np.array(phs)
-                else:
-                    self.phs = np.array([phs, phs])
-            else:
-                self.phs = np.array([0, 0])
+            # if phs is not None:
+            #     if isinstance(phs, (list, tuple, np.ndarray)):
+            #         self.phs = np.array(phs)
+            #     else:
+            #         self.phs = np.array([phs, phs])
+            # else:
+            #     self.phs = np.array([0, 0])
 
-            if t_mod is not None:
-                if isinstance(t_mod, (list, tuple, np.ndarray)):
-                    self.t_mod = np.array(t_mod)
-                else:
-                    self.t_mod = np.array([t_mod, t_mod])
-            else:
-                self.t_mod = np.array([0, 0])
+            # if t_mod is not None:
+            #     if isinstance(t_mod, (list, tuple, np.ndarray)):
+            #         self.t_mod = np.array(t_mod)
+            #     else:
+            #         self.t_mod = np.array([t_mod, t_mod])
+            # else:
+            #     self.t_mod = np.array([0, 0])
+
             self.locations[tx_idx, :] = np.array(
                 tx_element.get('location'))
             self.polarization[tx_idx, :] = np.array(
