@@ -229,8 +229,6 @@ class Transmitter:
         else:
             self.t = np.array([0, t])
 
-        
-
         if len(self.f) != len(self.t):
             raise ValueError(
                 'Length of `f`, and `t` should be the same')
@@ -279,6 +277,12 @@ class Transmitter:
 
         self.channel_size = len(self.channels)
         self.locations = np.zeros((self.channel_size, 3))
+
+        self.mod = []
+        self.pulse_mod = np.ones(
+            (self.channel_size, self.pulses), dtype=complex)
+        self.antenna = []
+
         self.az_patterns = []
         self.az_angles = []
         self.el_patterns = []
@@ -293,29 +297,34 @@ class Transmitter:
         self.delay = np.zeros(self.channel_size)
         for tx_idx, tx_element in enumerate(self.channels):
             self.delay[tx_idx] = self.channels[tx_idx].get('delay', 0)
-            # if amp is not None:
-            #     if isinstance(amp, (list, tuple, np.ndarray)):
-            #         self.amp = np.array(amp)
-            #     else:
-            #         self.amp = np.array([amp, amp])
-            # else:
-            #     self.amp = np.array([1, 1])
 
-            # if phs is not None:
-            #     if isinstance(phs, (list, tuple, np.ndarray)):
-            #         self.phs = np.array(phs)
-            #     else:
-            #         self.phs = np.array([phs, phs])
-            # else:
-            #     self.phs = np.array([0, 0])
+            amp = self.channels[tx_idx].get('amp', None)
+            if isinstance(amp, (list, tuple, np.ndarray)):
+                amp = np.array(amp)
+            else:
+                amp = np.array([amp, amp])
 
-            # if t_mod is not None:
-            #     if isinstance(t_mod, (list, tuple, np.ndarray)):
-            #         self.t_mod = np.array(t_mod)
-            #     else:
-            #         self.t_mod = np.array([t_mod, t_mod])
-            # else:
-            #     self.t_mod = np.array([0, 0])
+            phs = self.channels[tx_idx].get('phs', None)
+            if isinstance(phs, (list, tuple, np.ndarray)):
+                phs = np.array(phs)
+            else:
+                phs = np.array([phs, phs])
+
+            t_mod = self.channels[tx_idx].get('t_mod', None)
+            if isinstance(t_mod, (list, tuple, np.ndarray)):
+                t_mod = np.array(t_mod)+self.delay[tx_idx]
+            else:
+                t_mod = np.array([0, t_mod])+self.delay[tx_idx]
+
+            self.mod.append({
+                'enabled': not (amp is None and phs is None and t_mod is None),
+                'var': amp*np.exp(1j*phs/180*np.pi)
+            })
+
+            self.pulse_mod[tx_idx, :] = self.channels[tx_idx].get(
+                'pulse_amp', np.ones((self.pulses))) * \
+                np.exp(1j * self.channels[tx_idx].get(
+                    'pulse_phs', np.zeros((self.pulses))) / 180 * np.pi)
 
             self.locations[tx_idx, :] = np.array(
                 tx_element.get('location'))
@@ -812,7 +821,7 @@ class Radar:
         :rtype: numpy.2darray
         """
 
-        pulse_phs = np.array(self.transmitter.pulse_phs, dtype=complex)
+        pulse_phs = self.transmitter.pulse_phs
         pulse_phs = np.repeat(pulse_phs, self.receiver.channel_size, axis=0)
         pulse_phs = np.repeat(pulse_phs, self.frames, axis=0)
         return pulse_phs
