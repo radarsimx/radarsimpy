@@ -298,27 +298,50 @@ class Transmitter:
         for tx_idx, tx_element in enumerate(self.channels):
             self.delay[tx_idx] = self.channels[tx_idx].get('delay', 0)
 
+            mod_enabled = True
             amp = self.channels[tx_idx].get('amp', None)
-            if isinstance(amp, (list, tuple, np.ndarray)):
-                amp = np.array(amp)
+            if amp is not None:
+                if isinstance(amp, (list, tuple, np.ndarray)):
+                    amp = np.array(amp)
+                else:
+                    amp = np.array([amp, amp])
             else:
-                amp = np.array([amp, amp])
+                mod_enabled = False
 
             phs = self.channels[tx_idx].get('phs', None)
-            if isinstance(phs, (list, tuple, np.ndarray)):
-                phs = np.array(phs)
+            if phs is not None:
+                if isinstance(phs, (list, tuple, np.ndarray)):
+                    phs = np.array(phs)
+                else:
+                    phs = np.array([phs, phs])
             else:
-                phs = np.array([phs, phs])
+                mod_enabled = False
+
+            if phs is not None and amp is None:
+                amp = np.ones_like(phs)
+                mod_enabled = True
+            elif phs is None and amp is not None:
+                phs = np.zeros_like(amp)
+                mod_enabled = True
 
             t_mod = self.channels[tx_idx].get('t_mod', None)
-            if isinstance(t_mod, (list, tuple, np.ndarray)):
-                t_mod = np.array(t_mod)+self.delay[tx_idx]
+            if t_mod is not None:
+                if isinstance(t_mod, (list, tuple, np.ndarray)):
+                    t_mod = np.array(t_mod)+self.delay[tx_idx]
+                else:
+                    t_mod = np.array([0, t_mod])+self.delay[tx_idx]
             else:
-                t_mod = np.array([0, t_mod])+self.delay[tx_idx]
+                mod_enabled = False
+
+            if mod_enabled:
+                mod_var = amp*np.exp(1j*phs/180*np.pi)
+            else:
+                mod_var = None
 
             self.mod.append({
-                'enabled': not (amp is None and phs is None and t_mod is None),
-                'var': amp*np.exp(1j*phs/180*np.pi)
+                'enabled': mod_enabled,
+                'var': mod_var,
+                't': t_mod
             })
 
             self.pulse_mod[tx_idx, :] = self.channels[tx_idx].get(
@@ -359,22 +382,22 @@ class Transmitter:
                     self.el_patterns[-1]-np.max(self.el_patterns[-1]),
                     kind='linear')
             )
-            self.pulse_phs.append(
-                np.exp(1j * self.channels[tx_idx].get(
-                    'pulse_phs', np.zeros((self.pulses))) / 180 * np.pi))
+            # self.pulse_phs.append(
+            #     np.exp(1j * self.channels[tx_idx].get(
+            #         'pulse_phs', np.zeros((self.pulses))) / 180 * np.pi))
 
-            self.max_code_length = max(
-                self.max_code_length, np.shape(self.pulse_phs[-1])[0])
+            # self.max_code_length = max(
+            #     self.max_code_length, np.shape(self.pulse_phs[-1])[0])
 
-            self.chip_length.append(self.channels[tx_idx].get(
-                'chip_length', 0))
+            # self.chip_length.append(self.channels[tx_idx].get(
+            #     'chip_length', 0))
 
             self.grid.append(self.channels[tx_idx].get('grid', 0.5))
 
-            if self.chip_length[tx_idx] == 0:
-                self.modulation = 'frame'
-            else:
-                self.modulation = 'pulse'
+            # if self.chip_length[tx_idx] == 0:
+            #     self.modulation = 'frame'
+            # else:
+            #     self.modulation = 'pulse'
 
         # additional transmitter parameters
         # self.wavelength = const.c / self.fc[0]
@@ -699,7 +722,7 @@ class Radar:
 
         self.timestamp = self.gen_timestamp()
         self.pulse_phs = self.cal_frame_phases()
-        self.code_timestamp = self.cal_code_timestamp()
+        # self.code_timestamp = self.cal_code_timestamp()
         self.noise = self.cal_noise()
 
         if len(self.transmitter.f) > 2:
@@ -821,7 +844,7 @@ class Radar:
         :rtype: numpy.2darray
         """
 
-        pulse_phs = self.transmitter.pulse_phs
+        pulse_phs = self.transmitter.pulse_mod
         pulse_phs = np.repeat(pulse_phs, self.receiver.channel_size, axis=0)
         pulse_phs = np.repeat(pulse_phs, self.frames, axis=0)
         return pulse_phs
