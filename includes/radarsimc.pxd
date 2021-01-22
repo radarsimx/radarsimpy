@@ -33,6 +33,7 @@
 from radarsimpy.includes.type_def cimport vector
 from radarsimpy.includes.zpvector cimport Vec3
 from libcpp cimport bool
+from libcpp.complex cimport complex as cpp_complex
 
 
 """
@@ -128,9 +129,10 @@ cdef extern from "transmitter.hpp":
         TxChannel() except +
         TxChannel(Vec3[T] loc,
                   Vec3[T] pol,
-                  vector[T] mod_amp,
-                  vector[T] mod_phs,
-                  T chip_length,
+                  vector[cpp_complex[T]] pulse_mod,
+                  bool mod_enabled,
+                  vector[T] mod_t,
+                  vector[cpp_complex[T]] mod_var,
                   vector[T] phi,
                   vector[T] phi_ptn,
                   vector[T] theta,
@@ -141,24 +143,6 @@ cdef extern from "transmitter.hpp":
 
     cdef cppclass Transmitter[T]:
         Transmitter() except +
-        # Transmitter(vector[T] fc,
-        #             T slope,
-        #             T tx_power,
-        #             vector[T] pulse_start_time,
-        #             vector[T] frame_time,
-        #             int frames,
-        #             int pulses,
-        #             T density) except +
-        # Transmitter(vector[T] fc,
-        #             T slope,
-        #             T tx_power,
-        #             vector[T] pulse_start_time,
-        #             vector[T] frame_time,
-        #             int frames,
-        #             int pulses,
-        #             T density,
-        #             T* phase_noise_real,
-        #             T* phase_noise_imag) except +
         Transmitter(T fc,
                     vector[T] freq,
                     vector[T] freq_offset,

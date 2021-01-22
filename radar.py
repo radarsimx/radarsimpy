@@ -327,9 +327,9 @@ class Transmitter:
             t_mod = self.channels[tx_idx].get('t_mod', None)
             if t_mod is not None:
                 if isinstance(t_mod, (list, tuple, np.ndarray)):
-                    t_mod = np.array(t_mod)+self.delay[tx_idx]
+                    t_mod = np.array(t_mod)
                 else:
-                    t_mod = np.array([0, t_mod])+self.delay[tx_idx]
+                    t_mod = np.array([0, t_mod])
             else:
                 mod_enabled = False
 

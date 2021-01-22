@@ -37,7 +37,7 @@ from libcpp cimport bool
 from radarsimpy.includes.radarsimc cimport Point, TxChannel, Transmitter, RxChannel, Receiver, Simulator
 from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t, vector
 from radarsimpy.includes.zpvector cimport Vec3
-from libcpp cimport complex
+from libcpp.complex cimport complex as cpp_complex
 
 import numpy as np
 cimport numpy as np
@@ -265,16 +265,20 @@ cpdef run_simulator(radar, targets, noise=True):
     cdef vector[float_t] el_ang
     cdef vector[float_t] el
 
-    cdef vector[float_t] mod_amp
-    cdef vector[float_t] mod_phs
+    cdef vector[cpp_complex[float_t]] pulse_mod
+
+    cdef bool mod_enabled
+    cdef vector[cpp_complex[float_t]] mod_var
+    cdef vector[float_t] mod_t
     for tx_idx in range(0, radar.transmitter.channel_size):
         az_ang.clear()
         az.clear()
         el_ang.clear()
         el.clear()
 
-        mod_amp.clear()
-        mod_phs.clear()
+        pulse_mod.clear()
+        mod_var.clear()
+        mod_t.clear()
 
         ptn_length = len(radar.transmitter.az_angles[tx_idx])
         for ang_idx in range(0, ptn_length):
@@ -289,9 +293,20 @@ cpdef run_simulator(radar, targets, noise=True):
             el_ang.push_back(<float_t>el_angles[ang_idx])
             el.push_back(<float_t>el_pattern[ang_idx])
 
-        for code_idx in range(0, len(radar.transmitter.pulse_phs[tx_idx])):
-            mod_amp.push_back(<float_t> (np.abs(radar.transmitter.pulse_phs[tx_idx][code_idx])))
-            mod_phs.push_back(<float_t> (np.angle(radar.transmitter.pulse_phs[tx_idx][code_idx])))
+        for code_idx in range(0, radar.transmitter.pulses):
+            pulse_mod.push_back(cpp_complex[float_t](
+                np.real(radar.transmitter.pulse_mod[tx_idx, code_idx]),
+                np.imag(radar.transmitter.pulse_mod[tx_idx, code_idx])
+            ))
+
+        mod_enabled = radar.transmitter.mod[tx_idx]['enabled']
+        if mod_enabled:
+            for code_idx in range(0, len(radar.transmitter.mod[tx_idx]['t'])):
+                mod_var.push_back(cpp_complex[float_t](
+                    np.real(radar.transmitter.mod[tx_idx]['var'][code_idx]),
+                    np.imag(radar.transmitter.mod[tx_idx]['var'][code_idx])
+                ))
+                mod_t.push_back(<float_t> (radar.transmitter.mod[tx_idx]['t'][code_idx]))
         
         tx.AddChannel(
             TxChannel[float_t](
@@ -305,9 +320,10 @@ cpdef run_simulator(radar, targets, noise=True):
                     <float_t> radar.transmitter.polarization[tx_idx, 1],
                     <float_t> radar.transmitter.polarization[tx_idx, 2]
                 ),
-                mod_amp,
-                mod_phs,
-                <float_t> radar.transmitter.chip_length[tx_idx],
+                pulse_mod,
+                mod_enabled,
+                mod_t,
+                mod_var,
                 az_ang,
                 az,
                 el_ang,
