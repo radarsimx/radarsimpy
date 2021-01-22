@@ -171,7 +171,8 @@ def cal_phase_noise(signal, fs, freq, power, seed=None, validation=False):
     F = np.linspace(0, fs/2, int(M))    # Freq. Grid
     dF = np.concatenate((np.diff(F), [F[-1]-F[-2]]))  # Delta F
 
-    realmin = np.finfo(float).tiny
+    realmin = np.finfo(np.float64).tiny
+    # realmin = 1e-30
 
     # Perform interpolation of power in log-scale
     intrvlNum = len(freq)
