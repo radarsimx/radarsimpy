@@ -530,13 +530,29 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
                         #     Snapshot[float_t](
                         #     <float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, pulse_idx, sample_idx], frame_idx, tx_idx, pulse_idx, sample_idx))
 
-    cdef float_t[:,:,:] baseband_re = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=np.float64)
-    cdef float_t[:,:,:] baseband_im = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=np.float64)
+    # cdef float_t[:,:,:] baseband_re = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=np.float64)
+    # cdef float_t[:,:,:] baseband_im = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=np.float64)
+
+    cdef vector[cpp_complex[float_t]] *bb_vect = new vector[cpp_complex[float_t]](
+        radar.frames*radar.channel_size*radar.transmitter.pulses*radar.samples_per_pulse,
+        cpp_complex[float_t](0.0,0.0))
 
     # cdef vector[RayPy[float_t]] ray_received
     radar_scene.RunSimulator(
-        level_id, <float_t> correction, snaps, &baseband_re[0,0,0], &baseband_im[0,0,0]
+        level_id, <float_t> correction, snaps, bb_vect[0]
     )
+
+    cdef complex[:,:,:] baseband = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=complex)
+
+    cdef int ch_stride = radar.transmitter.pulses * radar.samples_per_pulse
+    cdef int pulse_stride = radar.samples_per_pulse
+    cdef int idx_stride
+
+    for ch_idx in range(0, radar.frames*radar.channel_size):
+        for p_idx in range(0, radar.transmitter.pulses):
+            for s_idx in range(0, radar.samples_per_pulse):
+                idx_stride = ch_idx * ch_stride + p_idx * pulse_stride + s_idx
+                baseband[ch_idx, p_idx, s_idx] = bb_vect[0][idx_stride].real()+1j*bb_vect[0][idx_stride].imag()
 
     ray_type = np.dtype([
         ('area', np.float64, (1,)),
@@ -589,7 +605,7 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
 
 
     if noise:
-        baseband = np.array(baseband_re)+1j*np.array(baseband_im)+\
+        baseband = baseband+\
             radar.noise*(np.random.randn(
                     radar.frames*radar.channel_size,
                     radar.transmitter.pulses,
@@ -599,8 +615,9 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
                     radar.transmitter.pulses,
                     radar.samples_per_pulse,
                 ))
-    else:
-        baseband = np.array(baseband_re)+1j*np.array(baseband_im)
+    # else:
+    #     baseband = np.array(baseband_re)+1j*np.array(baseband_im)
+    del bb_vect
 
     return {'baseband':baseband,
             'timestamp':radar.timestamp,

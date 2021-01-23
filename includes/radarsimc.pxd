@@ -247,7 +247,6 @@ cdef extern from "scene.hpp":
         void RunSimulator(int level,
                           T correction,
                           vector[Snapshot[T]]& snapshots,
-                          T* baseband_re,
-                          T* baseband_im)
+                          vector[cpp_complex[T]]& baseband)
 
         vector[Snapshot[T]] snapshots_
