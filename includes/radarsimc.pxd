@@ -228,8 +228,7 @@ cdef extern from "simulator.hpp":
         void Run(Transmitter[T] tx,
                  Receiver[T] rx,
                  vector[Point[T]] points,
-                 T* baseband_re,
-                 T* baseband_im)
+                 vector[cpp_complex[T]]& baseband)
         
 
 """

@@ -379,13 +379,28 @@ cpdef run_simulator(radar, targets, noise=True):
             )
         )
 
-    cdef float_t[:,:,:] baseband_re = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=np.float64)
-    cdef float_t[:,:,:] baseband_im = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=np.float64)
+    cdef vector[cpp_complex[float_t]] *bb_vect = new vector[cpp_complex[float_t]](
+        radar.frames*radar.channel_size*radar.transmitter.pulses*radar.samples_per_pulse,
+        cpp_complex[float_t](0.0,0.0))
 
-    sim.Run(tx, rx, points_, &baseband_re[0,0,0], &baseband_im[0,0,0])
+    # print(bb_vect[0][0].real())
+
+    sim.Run(tx, rx, points_, bb_vect[0])
+
+    cdef complex[:,:,:] baseband = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=complex)
+
+    cdef int ch_stride = radar.transmitter.pulses * radar.samples_per_pulse
+    cdef int pulse_stride = radar.samples_per_pulse
+    cdef int idx_stride
+
+    for ch_idx in range(0, radar.frames*radar.channel_size):
+        for p_idx in range(0, radar.transmitter.pulses):
+            for s_idx in range(0, radar.samples_per_pulse):
+                idx_stride = ch_idx * ch_stride + p_idx * pulse_stride + s_idx
+                baseband[ch_idx, p_idx, s_idx] = bb_vect[0][idx_stride].real()+1j*bb_vect[0][idx_stride].imag()
 
     if noise:
-        baseband = np.array(baseband_re)+1j*np.array(baseband_im)+\
+        baseband = baseband+\
             radar.noise*(np.random.randn(
                     radar.frames*radar.channel_size,
                     radar.transmitter.pulses,
@@ -395,8 +410,8 @@ cpdef run_simulator(radar, targets, noise=True):
                     radar.transmitter.pulses,
                     radar.samples_per_pulse,
                 ))
-    else:
-        baseband = np.array(baseband_re)+1j*np.array(baseband_im)
+
+    del bb_vect
     
     return {'baseband':baseband,
             'timestamp':radar.timestamp}
