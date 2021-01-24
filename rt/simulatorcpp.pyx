@@ -116,6 +116,10 @@ cpdef run_simulator(radar, targets, noise=True):
     cdef Transmitter[float_t] tx
     cdef Receiver[float_t] rx
 
+    cdef int ch_stride = radar.transmitter.pulses * radar.samples_per_pulse
+    cdef int pulse_stride = radar.samples_per_pulse
+    cdef int idx_stride
+
     """
     Targets
     """
@@ -228,6 +232,8 @@ cpdef run_simulator(radar, targets, noise=True):
     for ct_idx in range(0, len(radar.transmitter.chirp_start_time)):
         chirp_start_time.push_back(<float_t> radar.transmitter.chirp_start_time[ct_idx])
 
+    cdef vector[cpp_complex[float_t]] phase_noise
+
     if radar.phase_noise is None:
         tx = Transmitter[float_t](
             <float_t> radar.transmitter.fc_0,
@@ -244,6 +250,16 @@ cpdef run_simulator(radar, targets, noise=True):
     else:
         phase_noise_real = np.real(radar.phase_noise).astype(np.float64)
         phase_noise_imag = np.imag(radar.phase_noise).astype(np.float64)
+
+        for ch_idx in range(0, radar.frames*radar.channel_size):
+            for p_idx in range(0, radar.transmitter.pulses):
+                for s_idx in range(0, radar.samples_per_pulse):
+                    idx_stride = ch_idx * ch_stride + p_idx * pulse_stride + s_idx
+                    phase_noise.push_back(cpp_complex[float_t](
+                        np.real(radar.phase_noise[ch_idx, p_idx, s_idx]),
+                        np.imag(radar.phase_noise[ch_idx, p_idx, s_idx])
+                    ))
+
         tx = Transmitter[float_t](
             <float_t> radar.transmitter.fc_0,
             f_vector,
@@ -255,8 +271,7 @@ cpdef run_simulator(radar, targets, noise=True):
             <int> radar.frames,
             <int> radar.transmitter.pulses,
             <float_t> 0,
-            &phase_noise_real[0,0,0],
-            &phase_noise_imag[0,0,0],
+            phase_noise
         )
 
     cdef int ptn_length
@@ -389,9 +404,9 @@ cpdef run_simulator(radar, targets, noise=True):
 
     cdef complex[:,:,:] baseband = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=complex)
 
-    cdef int ch_stride = radar.transmitter.pulses * radar.samples_per_pulse
-    cdef int pulse_stride = radar.samples_per_pulse
-    cdef int idx_stride
+    # cdef int ch_stride = radar.transmitter.pulses * radar.samples_per_pulse
+    # cdef int pulse_stride = radar.samples_per_pulse
+    # cdef int idx_stride
 
     for ch_idx in range(0, radar.frames*radar.channel_size):
         for p_idx in range(0, radar.transmitter.pulses):

@@ -163,8 +163,7 @@ cdef extern from "transmitter.hpp":
                     int frames,
                     int pulses,
                     T density,
-                    T* phase_noise_real,
-                    T* phase_noise_imag) except +
+                    vector[cpp_complex[T]]) except +
         void AddChannel(const TxChannel[T]& channel)
 
 """
