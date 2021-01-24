@@ -283,6 +283,7 @@ cpdef run_simulator(radar, targets, noise=True):
             &pn_mem[0,0,0],
             &pn_mem[0,0,0]+frames*channles*pulses*samples
             )
+        print(pn_vect.size())
 
         tx = Transmitter[float_t](
             <float_t> radar.transmitter.fc_0,
