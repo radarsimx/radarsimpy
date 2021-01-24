@@ -42,6 +42,7 @@ from radarsimpy.includes.radarsimc cimport TxChannel, Transmitter
 from radarsimpy.includes.radarsimc cimport RxChannel, Receiver
 from radarsimpy.includes.radarsimc cimport Simulator
 from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t
+from radarsimpy.includes.type_def cimport complex_t
 from radarsimpy.includes.type_def cimport vector
 from radarsimpy.includes.zpvector cimport Vec3
 
@@ -227,7 +228,7 @@ cpdef run_simulator(radar, targets, noise=True):
     cdef float_t[:] t_pstart_mem
 
     cdef vector[cpp_complex[float_t]] pn_vect
-    cdef complex[:,:,:] pn_mem
+    cdef complex_t[:,:,:] pn_mem
 
     if frames > 1:
         t_frame_mem=radar.t_offset.astype(np.float64)
@@ -301,11 +302,11 @@ cpdef run_simulator(radar, targets, noise=True):
     cdef float_t[:] el_ang_mem, el_ptn_mem
 
     cdef vector[cpp_complex[float_t]] pulse_mod_vect
-    cdef complex[:] pulse_mod_mem
+    cdef complex_t[:] pulse_mod_mem
 
     cdef bool mod_enabled
     cdef vector[cpp_complex[float_t]] mod_var_vect
-    cdef complex[:] mod_var_mem
+    cdef complex_t[:] mod_var_mem
     cdef vector[float_t] mod_t_vect
     cdef float_t[:] mod_t_mem
 
@@ -318,7 +319,7 @@ cpdef run_simulator(radar, targets, noise=True):
         mod_var_vect.clear()
         mod_t_vect.clear()
 
-        az_ang_mem = radar.transmitter.az_angles[tx_idx]/180*np.pi
+        az_ang_mem = radar.transmitter.az_angles[tx_idx].astype(np.float64)/180*np.pi
         az_ptn_mem = radar.transmitter.az_patterns[tx_idx].astype(np.float64)
         az_ang_vect.assign(
             &az_ang_mem[0],
@@ -329,7 +330,7 @@ cpdef run_simulator(radar, targets, noise=True):
             &az_ptn_mem[0]+len(radar.transmitter.az_patterns[tx_idx])
         )
 
-        el_ang_mem = np.flip(90-radar.transmitter.el_angles[tx_idx])/180*np.pi
+        el_ang_mem = np.flip(90-radar.transmitter.el_angles[tx_idx].astype(np.float64))/180*np.pi
         el_ptn_mem = np.flip(radar.transmitter.el_patterns[tx_idx].astype(np.float64))
         el_ang_vect.assign(
             &el_ang_mem[0],
@@ -402,7 +403,7 @@ cpdef run_simulator(radar, targets, noise=True):
         el_ang_vect.clear()
         el_ptn_vect.clear()
 
-        az_ang_mem = radar.receiver.az_angles[rx_idx]/180*np.pi
+        az_ang_mem = radar.receiver.az_angles[rx_idx].astype(np.float64)/180*np.pi
         az_ptn_mem = radar.receiver.az_patterns[rx_idx].astype(np.float64)
         az_ang_vect.assign(
             &az_ang_mem[0],
@@ -413,7 +414,7 @@ cpdef run_simulator(radar, targets, noise=True):
             &az_ptn_mem[0]+len(radar.receiver.az_patterns[rx_idx])
         )
 
-        el_ang_mem = np.flip(90-radar.receiver.el_angles[rx_idx])/180*np.pi
+        el_ang_mem = np.flip(90-radar.receiver.el_angles[rx_idx].astype(np.float64))/180*np.pi
         el_ptn_mem = np.flip(radar.receiver.el_patterns[rx_idx].astype(np.float64))
         el_ang_vect.assign(
             &el_ang_mem[0],
@@ -446,7 +447,7 @@ cpdef run_simulator(radar, targets, noise=True):
 
     sim.Run(tx, rx, points, bb_vect[0])
 
-    cdef complex[:,:,:] baseband = np.zeros((frames*channles, pulses, samples), dtype=complex)
+    cdef complex_t[:,:,:] baseband = np.zeros((frames*channles, pulses, samples), dtype=complex)
 
     for ch_idx in range(0, frames*channles):
         for p_idx in range(0, pulses):
