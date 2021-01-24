@@ -226,6 +226,9 @@ cpdef run_simulator(radar, targets, noise=True):
     cdef vector[float_t] t_pstart_vect
     cdef float_t[:] t_pstart_mem
 
+    cdef vector[cpp_complex[float_t]] pn_vect
+    cdef complex[:,:,:] pn_mem
+
     if frames > 1:
         t_frame_mem=radar.t_offset.astype(np.float64)
         t_frame_vect.assign(&t_frame_mem[0], &t_frame_mem[0]+frames)
@@ -254,8 +257,6 @@ cpdef run_simulator(radar, targets, noise=True):
         &t_pstart_mem[0]+len(radar.transmitter.chirp_start_time)
         )
 
-    cdef vector[cpp_complex[float_t]] phase_noise
-
     if radar.phase_noise is None:
         tx = Transmitter[float_t](
             <float_t> radar.transmitter.fc_0,
@@ -270,14 +271,11 @@ cpdef run_simulator(radar, targets, noise=True):
             0.0
         )
     else:
-        for ch_idx in range(0, frames*channles):
-            for p_idx in range(0, pulses):
-                for s_idx in range(0, samples):
-                    idx_stride = ch_idx * ch_stride + p_idx * pulse_stride + s_idx
-                    phase_noise.push_back(cpp_complex[float_t](
-                        np.real(radar.phase_noise[ch_idx, p_idx, s_idx]),
-                        np.imag(radar.phase_noise[ch_idx, p_idx, s_idx])
-                    ))
+        pn_mem = radar.phase_noise.astype(np.complex128)
+        pn_vect.assign(
+            &pn_mem[0,0,0],
+            &pn_mem[0,0,0]+frames*channles*pulses*samples
+            )
 
         tx = Transmitter[float_t](
             <float_t> radar.transmitter.fc_0,
@@ -290,9 +288,12 @@ cpdef run_simulator(radar, targets, noise=True):
             frames,
             pulses,
             0.0,
-            phase_noise
+            pn_vect
         )
 
+    """
+    Transmitter Channels
+    """
     cdef int_t ptn_length
     cdef vector[float_t] az_ang
     cdef vector[float_t] az
