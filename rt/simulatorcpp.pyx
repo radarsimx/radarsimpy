@@ -464,7 +464,7 @@ cpdef run_simulator(radar, targets, noise=True):
 
     sim.Run(tx, rx, points, bb_vect[0])
 
-    cdef complex_t[:,:,:] baseband = np.zeros((frames*channles, pulses, samples), dtype=complex)
+    baseband = np.zeros((frames*channles, pulses, samples), dtype=complex)
 
     for ch_idx in range(0, frames*channles):
         for p_idx in range(0, pulses):
