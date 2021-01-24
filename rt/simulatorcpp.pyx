@@ -212,26 +212,32 @@ cpdef run_simulator(radar, targets, noise=True):
     Transmitter
     """
     cdef vector[float_t] frame_time
-
-    if frames > 1:
-        for t_idx in range(0, frames):
-            frame_time.push_back(<float_t> (radar.t_offset[t_idx]))
-    else:
-        frame_time.push_back(<float_t> (radar.t_offset))
-    
-    # cdef vector[float_t] fc_vector
-    # for fc_idx in range(0, len(radar.transmitter.fc)):
-    #     fc_vector.push_back(<float_t> radar.transmitter.fc[fc_idx])
+    cdef float_t[:] frame_time_mem
 
     cdef vector[float_t] f_vector
-    for fq_idx in range(0, len(radar.f)):
-        f_vector.push_back(<float_t> radar.f[fq_idx])
+    cdef float_t[:] f_mem
 
     cdef vector[float_t] t_vector
-    for pt_idx in range(0, len(radar.t)):
-        t_vector.push_back(<float_t> radar.t[pt_idx])
+    cdef float_t[:] t_mem
 
     cdef vector[float_t] f_offset_vector
+    cdef float_t[:] f_offset_mem
+
+    cdef float_t[:] mod_t_mem
+
+    if frames > 1:
+        frame_time_mem=radar.t_offset.astype(np.float64)
+        frame_time.assign(&frame_time_mem[0], &frame_time_mem[0]+frames)
+    else:
+        frame_time.push_back(<float_t> (radar.t_offset))
+
+    f_mem = radar.f.astype(np.float64)
+    f_vector.assign(&f_mem[0], &f_mem[0]+len(radar.f))
+
+    t_mem = radar.t.astype(np.float64)
+    t_vector.assign(&t_mem[0], &t_mem[0]+len(radar.t))
+
+    
     for pt_idx in range(0, len(radar.transmitter.f_offset)):
         f_offset_vector.push_back(<float_t> radar.transmitter.f_offset[pt_idx])
     
@@ -289,6 +295,7 @@ cpdef run_simulator(radar, targets, noise=True):
     cdef bool mod_enabled
     cdef vector[cpp_complex[float_t]] mod_var
     cdef vector[float_t] mod_t
+
     for tx_idx in range(0, radar.transmitter.channel_size):
         az_ang.clear()
         az.clear()
@@ -325,7 +332,12 @@ cpdef run_simulator(radar, targets, noise=True):
                     np.real(radar.transmitter.mod[tx_idx]['var'][code_idx]),
                     np.imag(radar.transmitter.mod[tx_idx]['var'][code_idx])
                 ))
-                mod_t.push_back(<float_t> (radar.transmitter.mod[tx_idx]['t'][code_idx]))
+                # mod_t.push_back(radar.transmitter.mod[tx_idx]['t'][code_idx])
+
+            mod_t_mem = radar.transmitter.mod[tx_idx]['t']
+            mod_t.assign(
+                &mod_t_mem[0],
+                &mod_t_mem[0]+len(radar.transmitter.mod[tx_idx]['t']))
         
         tx.AddChannel(
             TxChannel[float_t](
