@@ -211,51 +211,60 @@ cpdef run_simulator(radar, targets, noise=True):
     """
     Transmitter
     """
-    cdef vector[float_t] frame_time
-    cdef float_t[:] frame_time_mem
+    cdef vector[float_t] t_frame_vect
+    cdef float_t[:] t_frame_mem
 
-    cdef vector[float_t] f_vector
+    cdef vector[float_t] f_vect
     cdef float_t[:] f_mem
 
-    cdef vector[float_t] t_vector
+    cdef vector[float_t] t_vect
     cdef float_t[:] t_mem
 
-    cdef vector[float_t] f_offset_vector
+    cdef vector[float_t] f_offset_vect
     cdef float_t[:] f_offset_mem
 
-    cdef float_t[:] mod_t_mem
+    cdef vector[float_t] t_pstart_vect
+    cdef float_t[:] t_pstart_mem
 
     if frames > 1:
-        frame_time_mem=radar.t_offset.astype(np.float64)
-        frame_time.assign(&frame_time_mem[0], &frame_time_mem[0]+frames)
+        t_frame_mem=radar.t_offset.astype(np.float64)
+        t_frame_vect.assign(&t_frame_mem[0], &t_frame_mem[0]+frames)
     else:
-        frame_time.push_back(<float_t> (radar.t_offset))
+        t_frame_vect.push_back(<float_t> (radar.t_offset))
 
     f_mem = radar.f.astype(np.float64)
-    f_vector.assign(&f_mem[0], &f_mem[0]+len(radar.f))
+    f_vect.assign(
+        &f_mem[0],
+        &f_mem[0]+len(radar.f))
 
     t_mem = radar.t.astype(np.float64)
-    t_vector.assign(&t_mem[0], &t_mem[0]+len(radar.t))
+    t_vect.assign(
+        &t_mem[0],
+        &t_mem[0]+len(radar.t))
 
+    f_offset_mem = radar.transmitter.f_offset.astype(np.float64)
+    f_offset_vect.assign(
+        &f_offset_mem[0],
+        &f_offset_mem[0]+len(radar.transmitter.f_offset)
+        )
     
-    for pt_idx in range(0, len(radar.transmitter.f_offset)):
-        f_offset_vector.push_back(<float_t> radar.transmitter.f_offset[pt_idx])
-    
-    cdef vector[float_t] chirp_start_time
-    for ct_idx in range(0, len(radar.transmitter.chirp_start_time)):
-        chirp_start_time.push_back(<float_t> radar.transmitter.chirp_start_time[ct_idx])
+    t_pstart_mem = radar.transmitter.chirp_start_time.astype(np.float64)
+    t_pstart_vect.assign(
+        &t_pstart_mem[0],
+        &t_pstart_mem[0]+len(radar.transmitter.chirp_start_time)
+        )
 
     cdef vector[cpp_complex[float_t]] phase_noise
 
     if radar.phase_noise is None:
         tx = Transmitter[float_t](
             <float_t> radar.transmitter.fc_0,
-            f_vector,
-            f_offset_vector,
-            t_vector,
+            f_vect,
+            f_offset_vect,
+            t_vect,
             <float_t> radar.transmitter.tx_power,
-            chirp_start_time,
-            frame_time,
+            t_pstart_vect,
+            t_frame_vect,
             frames,
             pulses,
             0.0
@@ -272,12 +281,12 @@ cpdef run_simulator(radar, targets, noise=True):
 
         tx = Transmitter[float_t](
             <float_t> radar.transmitter.fc_0,
-            f_vector,
-            f_offset_vector,
-            t_vector,
+            f_vect,
+            f_offset_vect,
+            t_vect,
             <float_t> radar.transmitter.tx_power,
-            chirp_start_time,
-            frame_time,
+            t_pstart_vect,
+            t_frame_vect,
             frames,
             pulses,
             0.0,
@@ -295,6 +304,7 @@ cpdef run_simulator(radar, targets, noise=True):
     cdef bool mod_enabled
     cdef vector[cpp_complex[float_t]] mod_var
     cdef vector[float_t] mod_t
+    cdef float_t[:] mod_t_mem
 
     for tx_idx in range(0, radar.transmitter.channel_size):
         az_ang.clear()
