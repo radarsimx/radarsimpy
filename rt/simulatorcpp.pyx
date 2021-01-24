@@ -203,8 +203,8 @@ cpdef run_simulator(radar, targets, noise=True):
     Transmitter
     """
     cdef vector[float_t] frame_time
-    cdef float_t[:,:,:] phase_noise_real
-    cdef float_t[:,:,:] phase_noise_imag
+    # cdef float_t[:,:,:] phase_noise_real
+    # cdef float_t[:,:,:] phase_noise_imag
 
     if radar.frames > 1:
         for t_idx in range(0, radar.frames):
@@ -248,8 +248,8 @@ cpdef run_simulator(radar, targets, noise=True):
             <float_t> 0
         )
     else:
-        phase_noise_real = np.real(radar.phase_noise).astype(np.float64)
-        phase_noise_imag = np.imag(radar.phase_noise).astype(np.float64)
+        # phase_noise_real = np.real(radar.phase_noise).astype(np.float64)
+        # phase_noise_imag = np.imag(radar.phase_noise).astype(np.float64)
 
         for ch_idx in range(0, radar.frames*radar.channel_size):
             for p_idx in range(0, radar.transmitter.pulses):
