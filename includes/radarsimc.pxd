@@ -258,5 +258,5 @@ cdef extern from "utils.hpp":
         Utils() except +
 
         void assign_vector(T*, int, vector[T]&)
-        void assign_complex_vector(T*, T*, int, vector[cpp_complex[T]]&)
+        void assign_vector(T*, T*, int, vector[cpp_complex[T]]&)
 
