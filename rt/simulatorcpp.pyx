@@ -41,7 +41,6 @@ from radarsimpy.includes.radarsimc cimport Point
 from radarsimpy.includes.radarsimc cimport TxChannel, Transmitter
 from radarsimpy.includes.radarsimc cimport RxChannel, Receiver
 from radarsimpy.includes.radarsimc cimport Simulator
-from radarsimpy.includes.radarsimc cimport Utils
 from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t
 from radarsimpy.includes.type_def cimport complex_t
 from radarsimpy.includes.type_def cimport vector
@@ -117,7 +116,6 @@ cpdef run_simulator(radar, targets, noise=True):
     :rtype: dict
     """
     cdef Simulator[float_t] sim
-    cdef Utils[float_t] utils
 
     cdef vector[Point[float_t]] points
     cdef Transmitter[float_t] tx
@@ -230,26 +228,50 @@ cpdef run_simulator(radar, targets, noise=True):
     cdef float_t[:] t_pstart_mem
 
     cdef vector[cpp_complex[float_t]] pn_vect
-    cdef float_t[:,:,:] pn_real_mem
-    cdef float_t[:,:,:] pn_imag_mem
+    cdef complex_t[:,:,:] pn_mem
 
     if frames > 1:
         t_frame_mem=radar.t_offset.astype(np.float64)
-        utils.assign_vector(&t_frame_mem[0], frames, t_frame_vect)
+        t_frame_vect.reserve(frames)
+        # t_frame_vect.assign(&t_frame_mem[0], &t_frame_mem[0]+frames)
+        for idx in range(0, frames):
+            t_frame_vect.push_back(t_frame_mem[idx])
     else:
         t_frame_vect.push_back(<float_t> (radar.t_offset))
 
     f_mem = radar.f.astype(np.float64)
-    utils.assign_vector(&f_mem[0], <int> (len(radar.f)), f_vect)
+    f_vect.reserve(len(radar.f))
+    # f_vect.assign(
+    #     &f_mem[0],
+    #     &f_mem[0]+len(radar.f))
+    for idx in range(0, len(radar.f)):
+        f_vect.push_back(f_mem[idx])
 
     t_mem = radar.t.astype(np.float64)
-    utils.assign_vector(&t_mem[0], <int> (len(radar.t)), t_vect)
+    t_vect.reserve(len(radar.t))
+    # t_vect.assign(
+    #     &t_mem[0],
+    #     &t_mem[0]+len(radar.t))
+    for idx in range(0, len(radar.t)):
+        t_vect.push_back(t_mem[idx])
 
     f_offset_mem = radar.transmitter.f_offset.astype(np.float64)
-    utils.assign_vector(&f_offset_mem[0], <int> (len(radar.transmitter.f_offset)), f_offset_vect)
+    f_offset_vect.reserve(len(radar.transmitter.f_offset))
+    # f_offset_vect.assign(
+    #     &f_offset_mem[0],
+    #     &f_offset_mem[0]+len(radar.transmitter.f_offset)
+    #     )
+    for idx in range(0, len(radar.transmitter.f_offset)):
+        f_offset_vect.push_back(f_offset_mem[idx])
     
     t_pstart_mem = radar.transmitter.chirp_start_time.astype(np.float64)
-    utils.assign_vector(&t_pstart_mem[0], <int> (len(radar.transmitter.chirp_start_time)), t_pstart_vect)
+    t_pstart_vect.reserve(len(radar.transmitter.chirp_start_time))
+    # t_pstart_vect.assign(
+    #     &t_pstart_mem[0],
+    #     &t_pstart_mem[0]+len(radar.transmitter.chirp_start_time)
+    #     )
+    for idx in range(0, len(radar.transmitter.chirp_start_time)):
+        t_pstart_vect.push_back(t_pstart_mem[idx])
 
     if radar.phase_noise is None:
         tx = Transmitter[float_t](
@@ -265,13 +287,17 @@ cpdef run_simulator(radar, targets, noise=True):
             0.0
         )
     else:
-        pn_real_mem = np.real(radar.phase_noise)
-        pn_imag_mem = np.imag(radar.phase_noise)
-        utils.assign_complex_vector(
-            &pn_real_mem[0, 0, 0],
-            &pn_imag_mem[0, 0, 0],
-            <int> (frames*channles*pulses*samples),
-            pn_vect)
+        # pn_mem = radar.phase_noise.astype(np.complex128)
+        pn_vect.reserve(frames*channles*pulses*samples)
+        # pn_vect.assign(
+        #     &pn_mem[0,0,0],
+        #     &pn_mem[0,0,0]+frames*channles*pulses*samples
+        #     )
+        # print(pn_vect.size())
+        for idx0 in range(0, frames*channles):
+            for idx1 in range(0, pulses):
+                for idx2 in range(0, samples):
+                    pn_vect.push_back(cpp_complex[float_t](np.real(radar.phase_noise[idx0, idx1, idx2]), np.imag(radar.phase_noise[idx0, idx1, idx2])))
 
         tx = Transmitter[float_t](
             <float_t> radar.transmitter.fc_0,

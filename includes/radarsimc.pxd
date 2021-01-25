@@ -249,14 +249,3 @@ cdef extern from "scene.hpp":
                           vector[cpp_complex[T]]& baseband)
 
         vector[Snapshot[T]] snapshots_
-
-"""
-utils interface
-"""
-cdef extern from "utils.hpp":
-    cdef cppclass Utils[T]:
-        Utils() except +
-
-        void assign_vector(T*, int, vector[T]&)
-        void assign_complex_vector(T*, T*, int, vector[cpp_complex[T]]&)
-
