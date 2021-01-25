@@ -124,7 +124,7 @@ cpdef run_simulator(radar, targets, noise=True):
     cdef Receiver[float_t] rx
 
     cdef int_t frames = radar.frames
-    cdef int_t channels = radar.channel_size
+    cdef int_t channles = radar.channel_size
     cdef int_t pulses = radar.transmitter.pulses
     cdef int_t samples = radar.samples_per_pulse
 
@@ -179,7 +179,7 @@ cpdef run_simulator(radar, targets, noise=True):
             else:
                 phs_t = np.full_like(timestamp, phase)
 
-            for ch_idx in range(0, channels*frames):
+            for ch_idx in range(0, channles*frames):
                 for ps_idx in range(0, pulses):
                     for sp_idx in range(0, samples):
                         c_loc.push_back(Vec3[float_t](
@@ -265,12 +265,12 @@ cpdef run_simulator(radar, targets, noise=True):
             0.0
         )
     else:
-        pn_real_mem = np.real(radar.phase_noise).astype(np.float64)
-        pn_imag_mem = np.imag(radar.phase_noise).astype(np.float64)
-        utils.assign_vector(
+        pn_real_mem = np.real(radar.phase_noise)
+        pn_imag_mem = np.imag(radar.phase_noise)
+        utils.assign_complex_vector(
             &pn_real_mem[0, 0, 0],
             &pn_imag_mem[0, 0, 0],
-            <int> (frames*channels*pulses*samples),
+            <int> (frames*channles*pulses*samples),
             pn_vect)
 
         tx = Transmitter[float_t](
@@ -297,13 +297,11 @@ cpdef run_simulator(radar, targets, noise=True):
     cdef float_t[:] el_ang_mem, el_ptn_mem
 
     cdef vector[cpp_complex[float_t]] pulse_mod_vect
-    cdef float_t[:] pulse_mod_real_mem
-    cdef float_t[:] pulse_mod_imag_mem
+    cdef complex_t[:] pulse_mod_mem
 
     cdef bool mod_enabled
     cdef vector[cpp_complex[float_t]] mod_var_vect
-    cdef float_t[:] mod_real_mem
-    cdef float_t[:] mod_imag_mem
+    cdef complex_t[:] mod_var_mem
     cdef vector[float_t] mod_t_vect
     cdef float_t[:] mod_t_mem
 
@@ -317,36 +315,68 @@ cpdef run_simulator(radar, targets, noise=True):
         mod_t_vect.clear()
 
         az_ang_mem = radar.transmitter.az_angles[tx_idx].astype(np.float64)/180*np.pi
-        utils.assign_vector(&az_ang_mem[0], <int> (len(radar.transmitter.az_angles[tx_idx])), az_ang_vect)
         az_ptn_mem = radar.transmitter.az_patterns[tx_idx].astype(np.float64)
-        utils.assign_vector(&az_ptn_mem[0], <int> (len(radar.transmitter.az_patterns[tx_idx])), az_ptn_vect)
+        az_ang_vect.reserve(len(radar.transmitter.az_angles[tx_idx]))
+        # az_ang_vect.assign(
+        #     &az_ang_mem[0],
+        #     &az_ang_mem[0]+len(radar.transmitter.az_angles[tx_idx])
+        # )
+        for idx in range(0, len(radar.transmitter.az_angles[tx_idx])):
+            az_ang_vect.push_back(az_ang_mem[idx])
+        az_ptn_vect.reserve(len(radar.transmitter.az_patterns[tx_idx]))
+        # az_ptn_vect.assign(
+        #     &az_ptn_mem[0],
+        #     &az_ptn_mem[0]+len(radar.transmitter.az_patterns[tx_idx])
+        # )
+        for idx in range(0, len(radar.transmitter.az_patterns[tx_idx])):
+            az_ptn_vect.push_back(az_ptn_mem[idx])
 
         el_ang_mem = np.flip(90-radar.transmitter.el_angles[tx_idx].astype(np.float64))/180*np.pi
-        utils.assign_vector(&el_ang_mem[0], <int> (len(radar.transmitter.el_angles[tx_idx])), el_ang_vect)
         el_ptn_mem = np.flip(radar.transmitter.el_patterns[tx_idx].astype(np.float64))
-        utils.assign_vector(&el_ptn_mem[0], <int> (len(radar.transmitter.el_patterns[tx_idx])), el_ptn_vect)
+        el_ang_vect.reserve(len(radar.transmitter.el_angles[tx_idx]))
+        # el_ang_vect.assign(
+        #     &el_ang_mem[0],
+        #     &el_ang_mem[0]+len(radar.transmitter.el_angles[tx_idx])
+        # )
+        for idx in range(0, len(radar.transmitter.el_angles[tx_idx])):
+            el_ang_vect.push_back(el_ang_mem[idx])
+        el_ptn_vect.reserve(len(radar.transmitter.el_patterns[tx_idx]))
+        # el_ptn_vect.assign(
+        #     &el_ptn_mem[0],
+        #     &el_ptn_mem[0]+len(radar.transmitter.el_patterns[tx_idx])
+        # )
+        for idx in range(0, len(radar.transmitter.el_patterns[tx_idx])):
+            el_ptn_vect.push_back(el_ptn_mem[idx])
 
-        pulse_mod_real_mem = np.real(radar.transmitter.pulse_mod[tx_idx, :]).astype(np.float64)
-        pulse_mod_imag_mem = np.imag(radar.transmitter.pulse_mod[tx_idx, :]).astype(np.float64)
-        utils.assign_vector(
-            &pulse_mod_real_mem[0],
-            &pulse_mod_imag_mem[0],
-            <int> (pulses),
-            pulse_mod_vect)
+        # pulse_mod_mem = radar.transmitter.pulse_mod[tx_idx, :].astype(np.complex128)
+        # pulse_mod_vect.reserve(pulses)
+        # pulse_mod_vect.assign(
+        #     &pulse_mod_mem[0],
+        #     &pulse_mod_mem[0]+pulses
+        # )
+        for idx in range(0, pulses):
+            pulse_mod_vect.push_back(cpp_complex[float_t](np.real(radar.transmitter.pulse_mod[tx_idx, idx]), np.imag(radar.transmitter.pulse_mod[tx_idx, idx])))
 
         mod_enabled = radar.transmitter.mod[tx_idx]['enabled']
         if mod_enabled:
-            mod_real_mem = np.real(radar.transmitter.mod[tx_idx]['var']).astype(np.float64)
-            mod_imag_mem = np.imag(radar.transmitter.mod[tx_idx]['var']).astype(np.float64)
-            utils.assign_vector(
-                &mod_real_mem[0],
-                &mod_imag_mem[0],
-                <int> (len(radar.transmitter.mod[tx_idx]['var'])),
-                mod_var_vect)
+            # mod_var_mem = radar.transmitter.mod[tx_idx]['var'].astype(np.complex128)
+            # mod_var_vect.reserve(len(radar.transmitter.mod[tx_idx]['var']))
+            # mod_var_vect.assign(
+            #     &mod_var_mem[0],
+            #     &mod_var_mem[0]+len(radar.transmitter.mod[tx_idx]['var'])
+            # )
+            for idx in range(0, len(radar.transmitter.mod[tx_idx]['var'])):
+                mod_var_vect.push_back(cpp_complex[float_t](np.real(radar.transmitter.mod[tx_idx]['var'][idx]), np.imag(radar.transmitter.mod[tx_idx]['var'][idx])))
 
             mod_t_mem = radar.transmitter.mod[tx_idx]['t'].astype(np.float64)
-            utils.assign_vector(&mod_t_mem[0], <int> (len(radar.transmitter.mod[tx_idx]['t'])), mod_t_vect)
+            mod_t_vect.reserve(len(radar.transmitter.mod[tx_idx]['t']))
+            # mod_t_vect.assign(
+            #     &mod_t_mem[0],
+            #     &mod_t_mem[0]+len(radar.transmitter.mod[tx_idx]['t']))
+            for idx in range(0, len(radar.transmitter.mod[tx_idx]['t'])):
+                mod_t_vect.push_back(mod_t_mem[idx])
 
+        
         tx.AddChannel(
             TxChannel[float_t](
                 Vec3[float_t](
@@ -391,14 +421,38 @@ cpdef run_simulator(radar, targets, noise=True):
         el_ptn_vect.clear()
 
         az_ang_mem = radar.receiver.az_angles[rx_idx].astype(np.float64)/180*np.pi
-        utils.assign_vector(&az_ang_mem[0], <int> (len(radar.receiver.az_angles[rx_idx])), az_ang_vect)
         az_ptn_mem = radar.receiver.az_patterns[rx_idx].astype(np.float64)
-        utils.assign_vector(&az_ptn_mem[0], <int> (len(radar.receiver.az_patterns[rx_idx])), az_ptn_vect)
+        az_ang_vect.reserve(len(radar.receiver.az_angles[rx_idx]))
+        # az_ang_vect.assign(
+        #     &az_ang_mem[0],
+        #     &az_ang_mem[0]+len(radar.receiver.az_angles[rx_idx])
+        # )
+        for idx in range(0, len(radar.receiver.az_angles[rx_idx])):
+            az_ang_vect.push_back(az_ang_mem[idx])
+        az_ptn_vect.reserve(len(radar.receiver.az_patterns[rx_idx]))
+        # az_ptn_vect.assign(
+        #     &az_ptn_mem[0],
+        #     &az_ptn_mem[0]+len(radar.receiver.az_patterns[rx_idx])
+        # )
+        for idx in range(0, len(radar.receiver.az_patterns[rx_idx])):
+            az_ptn_vect.push_back(az_ptn_mem[idx])
 
         el_ang_mem = np.flip(90-radar.receiver.el_angles[rx_idx].astype(np.float64))/180*np.pi
-        utils.assign_vector(&el_ang_mem[0], <int> (len(radar.receiver.el_angles[rx_idx])), el_ang_vect)
         el_ptn_mem = np.flip(radar.receiver.el_patterns[rx_idx].astype(np.float64))
-        utils.assign_vector(&el_ptn_mem[0], <int> (len(radar.receiver.el_patterns[rx_idx])), el_ptn_vect)
+        el_ang_vect.reserve(len(radar.receiver.el_angles[rx_idx]))
+        # el_ang_vect.assign(
+        #     &el_ang_mem[0],
+        #     &el_ang_mem[0]+len(radar.receiver.el_angles[rx_idx])
+        # )
+        for idx in range(0, len(radar.receiver.el_angles[rx_idx])):
+            el_ang_vect.push_back(el_ang_mem[idx])
+        el_ptn_vect.reserve(len(radar.receiver.el_patterns[rx_idx]))
+        # el_ptn_vect.assign(
+        #     &el_ptn_mem[0],
+        #     &el_ptn_mem[0]+len(radar.receiver.el_patterns[rx_idx])
+        # )
+        for idx in range(0, len(radar.receiver.el_patterns[rx_idx])):
+            el_ptn_vect.push_back(el_ptn_mem[idx])
 
         rx.AddChannel(
             RxChannel[float_t](
@@ -417,14 +471,14 @@ cpdef run_simulator(radar, targets, noise=True):
         )
 
     cdef vector[cpp_complex[float_t]] *bb_vect = new vector[cpp_complex[float_t]](
-        frames*channels*pulses*samples,
+        frames*channles*pulses*samples,
         cpp_complex[float_t](0.0,0.0))
 
     sim.Run(tx, rx, points, bb_vect[0])
 
-    baseband = np.zeros((frames*channels, pulses, samples), dtype=complex)
+    baseband = np.zeros((frames*channles, pulses, samples), dtype=complex)
 
-    for ch_idx in range(0, frames*channels):
+    for ch_idx in range(0, frames*channles):
         for p_idx in range(0, pulses):
             for s_idx in range(0, samples):
                 idx_stride = ch_idx * ch_stride + p_idx * pulse_stride + s_idx
@@ -433,11 +487,11 @@ cpdef run_simulator(radar, targets, noise=True):
     if noise:
         baseband = baseband+\
             radar.noise*(np.random.randn(
-                    frames*channels,
+                    frames*channles,
                     pulses,
                     samples,
                 ) + 1j * np.random.randn(
-                    frames*channels,
+                    frames*channles,
                     pulses,
                     samples,
                 ))
