@@ -297,7 +297,10 @@ cpdef run_simulator(radar, targets, noise=True):
         for idx0 in range(0, frames*channles):
             for idx1 in range(0, pulses):
                 for idx2 in range(0, samples):
-                    pn_vect.push_back(cpp_complex[float_t](np.real(radar.phase_noise[idx0, idx1, idx2]), np.imag(radar.phase_noise[idx0, idx1, idx2])))
+                    pn_vect.push_back(cpp_complex[float_t](
+                        np.real(radar.phase_noise[idx0, idx1, idx2]),
+                        np.imag(radar.phase_noise[idx0, idx1, idx2])
+                        ))
 
         tx = Transmitter[float_t](
             <float_t> radar.transmitter.fc_0,
