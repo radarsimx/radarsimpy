@@ -29,8 +29,11 @@
                .+:
 
 """
+import numpy as np
+cimport numpy as np
 
 from radarsimpy.includes.type_def cimport vector
+from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t
 from radarsimpy.includes.zpvector cimport Vec3
 from libcpp cimport bool
 from libcpp.complex cimport complex as cpp_complex
@@ -120,6 +123,71 @@ cdef extern from "point.hpp":
               const Vec3[T]& speed,
               const vector[T]& rcs,
               const vector[T]& phs) except +
+
+cdef inline Point[float_t] cp_Point(location, speed, rcs, phase, shape):
+    cdef vector[Vec3[float_t]] loc_vect
+    cdef vector[float_t] rcs_vect
+    cdef vector[float_t] phs_vect
+
+    if np.size(location[0]) > 1 or \
+        np.size(location[1])  > 1 or \
+        np.size(location[2]) > 1 or \
+        np.size(rcs) > 1 or \
+        np.size(phase) > 1:
+
+        if np.size(location[0]) > 1:
+            tgx_t = location[0]
+        else:
+            tgx_t = np.full(shape, location[0])
+
+        if np.size(location[1]) > 1:
+            tgy_t = location[1]
+        else:
+            tgy_t = np.full(shape, location[1])
+        
+        if np.size(location[2]) > 1:
+            tgz_t = location[2]
+        else:
+            tgz_t = np.full(shape, location[2])
+
+        if np.size(rcs) > 1:
+            rcs_t = rcs
+        else:
+            rcs_t = np.full(shape, rcs)
+        
+        if np.size(phase) > 1:
+            phs_t = phase
+        else:
+            phs_t = np.full(shape, phase)
+
+        for ch_idx in range(0, shape[0]):
+            for ps_idx in range(0, shape[1]):
+                for sp_idx in range(0, shape[2]):
+                    loc_vect.push_back(Vec3[float_t](
+                        <float_t> tgx_t[ch_idx, ps_idx, sp_idx],
+                        <float_t> tgy_t[ch_idx, ps_idx, sp_idx],
+                        <float_t> tgz_t[ch_idx, ps_idx, sp_idx]
+                    ))
+                    rcs_vect.push_back(<float_t> rcs_t[ch_idx, ps_idx, sp_idx])
+                    phs_vect.push_back(<float_t> (phs_t[ch_idx, ps_idx, sp_idx]/180*np.pi))
+    else:
+        loc_vect.push_back(Vec3[float_t](
+            <float_t> location[0],
+            <float_t> location[1],
+            <float_t> location[2]
+        ))
+        rcs_vect.push_back(<float_t> rcs)
+        phs_vect.push_back(<float_t> (phase/180*np.pi))
+    return Point[float_t](
+                loc_vect,
+                Vec3[float_t](
+                    <float_t> speed[0],
+                    <float_t> speed[1],
+                    <float_t> speed[2]
+                ),
+                rcs_vect,
+                phs_vect
+            )
 
 """
 transmitter

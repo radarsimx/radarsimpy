@@ -34,16 +34,19 @@ cimport cython
 from libc.math cimport sin, cos, sqrt, atan, atan2, acos
 from libc.math cimport pow, fmax
 from libc.math cimport M_PI
+
 from libcpp cimport bool
 from libcpp.complex cimport complex as cpp_complex
 
-from radarsimpy.includes.radarsimc cimport Point
+from radarsimpy.includes.radarsimc cimport Point, cp_Point
 from radarsimpy.includes.radarsimc cimport TxChannel, Transmitter
 from radarsimpy.includes.radarsimc cimport RxChannel, Receiver
 from radarsimpy.includes.radarsimc cimport Simulator
+
 from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t
 from radarsimpy.includes.type_def cimport complex_t
 from radarsimpy.includes.type_def cimport vector
+
 from radarsimpy.includes.zpvector cimport Vec3
 
 import numpy as np
@@ -135,82 +138,14 @@ cpdef run_simulator(radar, targets, noise=True):
     """
     Targets
     """
-    cdef int_t target_count = len(targets)
-    cdef vector[Vec3[float_t]] loc_vect
-    cdef vector[float_t] rcs_vect
-    cdef vector[float_t] phs_vect
-
-    for idx in range(0, target_count):
-        loc_vect.clear()
-        rcs_vect.clear()
-        phs_vect.clear()
-
+    for idx in range(0, len(targets)):
         location = targets[idx]['location']
         speed = targets[idx].get('speed', (0, 0, 0))
         rcs = targets[idx]['rcs']
         phase = targets[idx].get('phase', 0)
 
-        if np.size(location[0]) > 1 or \
-            np.size(location[1])  > 1 or \
-            np.size(location[2]) > 1 or \
-            np.size(rcs) > 1 or \
-            np.size(phase) > 1:
-
-            if np.size(location[0]) > 1:
-                tgx_t = location[0]
-            else:
-                tgx_t = np.full_like(timestamp, location[0])
-
-            if np.size(location[1]) > 1:
-                tgy_t = location[1]
-            else:
-                tgy_t = np.full_like(timestamp, location[1])
-            
-            if np.size(location[2]) > 1:
-                tgz_t = location[2]
-            else:
-                tgz_t = np.full_like(timestamp, location[2])
-
-            if np.size(rcs) > 1:
-                rcs_t = rcs
-            else:
-                rcs_t = np.full_like(timestamp, rcs)
-            
-            if np.size(phase) > 1:
-                phs_t = phase
-            else:
-                phs_t = np.full_like(timestamp, phase)
-
-            for ch_idx in range(0, channles*frames):
-                for ps_idx in range(0, pulses):
-                    for sp_idx in range(0, samples):
-                        loc_vect.push_back(Vec3[float_t](
-                            <float_t> tgx_t[ch_idx, ps_idx, sp_idx],
-                            <float_t> tgy_t[ch_idx, ps_idx, sp_idx],
-                            <float_t> tgz_t[ch_idx, ps_idx, sp_idx]
-                        ))
-                        rcs_vect.push_back(<float_t> rcs_t[ch_idx, ps_idx, sp_idx])
-                        phs_vect.push_back(<float_t> (phs_t[ch_idx, ps_idx, sp_idx]/180*np.pi))
-        else:
-            loc_vect.push_back(Vec3[float_t](
-                <float_t> location[0],
-                <float_t> location[1],
-                <float_t> location[2]
-            ))
-            rcs_vect.push_back(<float_t> rcs)
-            phs_vect.push_back(<float_t> (phase/180*np.pi))
-
         points.push_back(
-            Point[float_t](
-                loc_vect,
-                Vec3[float_t](
-                    <float_t> speed[0],
-                    <float_t> speed[1],
-                    <float_t> speed[2]
-                ),
-                rcs_vect,
-                phs_vect
-            )
+            cp_Point(location, speed, rcs, phase, np.shape(timestamp))
         )
 
     """
