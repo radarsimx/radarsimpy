@@ -130,27 +130,31 @@ cpdef run_simulator(radar, targets, noise=True):
     cdef int_t pulse_stride = samples
     cdef int_t idx_stride
 
+    timestamp = radar.timestamp
+
     """
     Targets
     """
     cdef int_t target_count = len(targets)
-    cdef vector[Vec3[float_t]] c_loc
-    cdef vector[float_t] c_rcs
-    cdef vector[float_t] c_phs
+    cdef vector[Vec3[float_t]] loc_vect
+    cdef vector[float_t] rcs_vect
+    cdef vector[float_t] phs_vect
 
-    timestamp = radar.timestamp
-    
     for idx in range(0, target_count):
-        c_loc.clear()
-        c_rcs.clear()
-        c_phs.clear()
+        loc_vect.clear()
+        rcs_vect.clear()
+        phs_vect.clear()
 
         location = targets[idx]['location']
         speed = targets[idx].get('speed', (0, 0, 0))
         rcs = targets[idx]['rcs']
         phase = targets[idx].get('phase', 0)
 
-        if np.size(location[0]) > 1 or np.size(location[1])  > 1 or np.size(location[2]) > 1 or np.size(rcs) > 1 or np.size(phase) > 1:
+        if np.size(location[0]) > 1 or \
+            np.size(location[1])  > 1 or \
+            np.size(location[2]) > 1 or \
+            np.size(rcs) > 1 or \
+            np.size(phase) > 1:
 
             if np.size(location[0]) > 1:
                 tgx_t = location[0]
@@ -180,32 +184,32 @@ cpdef run_simulator(radar, targets, noise=True):
             for ch_idx in range(0, channles*frames):
                 for ps_idx in range(0, pulses):
                     for sp_idx in range(0, samples):
-                        c_loc.push_back(Vec3[float_t](
+                        loc_vect.push_back(Vec3[float_t](
                             <float_t> tgx_t[ch_idx, ps_idx, sp_idx],
                             <float_t> tgy_t[ch_idx, ps_idx, sp_idx],
                             <float_t> tgz_t[ch_idx, ps_idx, sp_idx]
                         ))
-                        c_rcs.push_back(<float_t> rcs_t[ch_idx, ps_idx, sp_idx])
-                        c_phs.push_back(<float_t> (phs_t[ch_idx, ps_idx, sp_idx]/180*np.pi))
+                        rcs_vect.push_back(<float_t> rcs_t[ch_idx, ps_idx, sp_idx])
+                        phs_vect.push_back(<float_t> (phs_t[ch_idx, ps_idx, sp_idx]/180*np.pi))
         else:
-            c_loc.push_back(Vec3[float_t](
+            loc_vect.push_back(Vec3[float_t](
                 <float_t> location[0],
                 <float_t> location[1],
                 <float_t> location[2]
             ))
-            c_rcs.push_back(<float_t> rcs)
-            c_phs.push_back(<float_t> (phase/180*np.pi))
+            rcs_vect.push_back(<float_t> rcs)
+            phs_vect.push_back(<float_t> (phase/180*np.pi))
 
         points.push_back(
             Point[float_t](
-                c_loc,
+                loc_vect,
                 Vec3[float_t](
                     <float_t> speed[0],
                     <float_t> speed[1],
                     <float_t> speed[2]
                 ),
-                c_rcs,
-                c_phs
+                rcs_vect,
+                phs_vect
             )
         )
 
