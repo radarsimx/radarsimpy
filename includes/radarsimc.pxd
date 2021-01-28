@@ -246,19 +246,14 @@ cdef inline TxChannel[float_t] cp_TxChannel(tx, tx_idx):
     cdef int_t pulses = tx.pulses
 
     cdef vector[float_t] az_ang_vect, az_ptn_vect
-    # cdef float_t[:] az_ang_mem, az_ptn_mem
     cdef vector[float_t] el_ang_vect, el_ptn_vect
-    # cdef float_t[:] el_ang_mem, el_ptn_mem
 
     cdef vector[cpp_complex[float_t]] pulse_mod_vect
 
     cdef bool mod_enabled
     cdef vector[cpp_complex[float_t]] mod_var_vect
     cdef vector[float_t] mod_t_vect
-    # cdef float_t[:] mod_t_mem
 
-    # az_ang_mem = tx.az_angles[tx_idx].astype(np.float64)/180*np.pi
-    # az_ptn_mem = tx.az_patterns[tx_idx].astype(np.float64)
     az_ang_vect.reserve(len(tx.az_angles[tx_idx]))
     for idx in range(0, len(tx.az_angles[tx_idx])):
         az_ang_vect.push_back(<float_t> (tx.az_angles[tx_idx][idx]/180*np.pi))
@@ -283,10 +278,9 @@ cdef inline TxChannel[float_t] cp_TxChannel(tx, tx_idx):
         for idx in range(0, len(tx.mod[tx_idx]['var'])):
             mod_var_vect.push_back(cpp_complex[float_t](np.real(tx.mod[tx_idx]['var'][idx]), np.imag(tx.mod[tx_idx]['var'][idx])))
 
-        mod_t_mem = tx.mod[tx_idx]['t'].astype(np.float64)
         mod_t_vect.reserve(len(tx.mod[tx_idx]['t']))
         for idx in range(0, len(tx.mod[tx_idx]['t'])):
-            mod_t_vect.push_back(mod_t_mem[idx])
+            mod_t_vect.push_back(<float_t> tx.mod[tx_idx]['t'][idx])
     
     return TxChannel[float_t](
         Vec3[float_t](
@@ -309,7 +303,7 @@ cdef inline TxChannel[float_t] cp_TxChannel(tx, tx_idx):
         el_ptn_vect,
         <float_t> tx.antenna_gains[tx_idx],
         <float_t> tx.delay[tx_idx],
-        0.0
+        <float_t> (tx.grid[tx_idx]/180*np.pi)
         )
 
 

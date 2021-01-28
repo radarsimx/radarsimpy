@@ -34,7 +34,8 @@ cimport cython
 from libc.math cimport sin, cos, sqrt, atan, atan2, acos, pow, fmax, M_PI
 from libcpp cimport bool
 
-from radarsimpy.includes.radarsimc cimport Snapshot, Target, Aperture, Transmitter, TxChannel, Receiver, RxChannel, Scene
+from radarsimpy.includes.radarsimc cimport TxChannel, cp_TxChannel, Transmitter
+from radarsimpy.includes.radarsimc cimport Snapshot, Target, Aperture, Receiver, RxChannel, Scene
 from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t, vector
 from radarsimpy.includes.zpvector cimport Vec3
 from libcpp.complex cimport complex as cpp_complex
@@ -360,74 +361,8 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
     cdef vector[float_t] el_ang
     cdef vector[float_t] el
 
-    cdef vector[cpp_complex[float_t]] pulse_mod
-
-    cdef bool mod_enabled
-    cdef vector[cpp_complex[float_t]] mod_var
-    cdef vector[float_t] mod_t
     for tx_idx in range(0, radar.transmitter.channel_size):
-        az_ang.clear()
-        az.clear()
-        el_ang.clear()
-        el.clear()
-
-        pulse_mod.clear()
-        mod_var.clear()
-        mod_t.clear()
-
-        ptn_length = len(radar.transmitter.az_angles[tx_idx])
-        for ang_idx in range(0, ptn_length):
-            az_ang.push_back(<float_t>(radar.transmitter.az_angles[tx_idx][ang_idx]/180*np.pi))
-            az.push_back(<float_t>radar.transmitter.az_patterns[tx_idx][ang_idx])
-
-        ptn_length = len(radar.transmitter.el_angles[tx_idx])
-
-        el_angles = np.flip(90-radar.transmitter.el_angles[tx_idx])/180*np.pi
-        el_pattern = np.flip(radar.transmitter.el_patterns[tx_idx])
-        for ang_idx in range(0, ptn_length):
-            el_ang.push_back(<float_t>el_angles[ang_idx])
-            el.push_back(<float_t>el_pattern[ang_idx])
-
-        for code_idx in range(0, radar.transmitter.pulses):
-            pulse_mod.push_back(cpp_complex[float_t](
-                np.real(radar.transmitter.pulse_mod[tx_idx, code_idx]),
-                np.imag(radar.transmitter.pulse_mod[tx_idx, code_idx])
-            ))
-
-        mod_enabled = radar.transmitter.mod[tx_idx]['enabled']
-        if mod_enabled:
-            for code_idx in range(0, len(radar.transmitter.mod[tx_idx]['t'])):
-                mod_var.push_back(cpp_complex[float_t](
-                    np.real(radar.transmitter.mod[tx_idx]['var'][code_idx]),
-                    np.imag(radar.transmitter.mod[tx_idx]['var'][code_idx])
-                ))
-                mod_t.push_back(<float_t> (radar.transmitter.mod[tx_idx]['t'][code_idx]))
-
-        radar_scene.AddTxChannel(
-            TxChannel[float_t](
-                Vec3[float_t](
-                    <float_t> radar.transmitter.locations[tx_idx, 0],
-                    <float_t> radar.transmitter.locations[tx_idx, 1],
-                    <float_t> radar.transmitter.locations[tx_idx, 2]
-                ),
-                Vec3[float_t](
-                    <float_t> radar.transmitter.polarization[tx_idx, 0],
-                    <float_t> radar.transmitter.polarization[tx_idx, 1],
-                    <float_t> radar.transmitter.polarization[tx_idx, 2]
-                ),
-                pulse_mod,
-                mod_enabled,
-                mod_t,
-                mod_var,
-                az_ang,
-                az,
-                el_ang,
-                el,
-                <float_t> radar.transmitter.antenna_gains[tx_idx],
-                <float_t> radar.transmitter.delay[tx_idx],
-                <float_t> (radar.transmitter.grid[tx_idx]/180*np.pi)
-            )
-        )
+        radar_scene.AddTxChannel(cp_TxChannel(radar.transmitter, tx_idx))
 
     """
     Receiver
