@@ -320,10 +320,6 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
     else:
         frame_time.push_back(<float_t> (radar.t_offset))
 
-    # cdef vector[float_t] fc_vector
-    # for fc_idx in range(0, len(radar.transmitter.fc)):
-    #     fc_vector.push_back(<float_t> radar.transmitter.fc[fc_idx])
-
     cdef vector[float_t] f_vector
     for fq_idx in range(0, len(radar.f)):
         f_vector.push_back(<float_t> radar.f[fq_idx])
@@ -430,15 +426,6 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
                         0
                     )
                 )
-                # radar_scene.AddSnapshot(
-                #     Snapshot[float_t](
-                #         <float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, 0, 0],
-                #         frame_idx,
-                #         tx_idx,
-                #         0,
-                #         0
-                #     )
-                # )
     elif level == 'pulse':
         level_id = 1
         for frame_idx in range(0, radar.frames):
@@ -448,9 +435,6 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
                         Snapshot[float_t](
                         <float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, pulse_idx, 0], frame_idx, tx_idx, pulse_idx, 0)
                     )
-                    # radar_scene.AddSnapshot(
-                    #     Snapshot[float_t](
-                    #     <float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, pulse_idx, 0], frame_idx, tx_idx, pulse_idx, 0))
     elif level == 'sample':
         level_id = 2
         for frame_idx in range(0, radar.frames):
@@ -461,12 +445,6 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
                             Snapshot[float_t](
                             <float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, pulse_idx, sample_idx], frame_idx, tx_idx, pulse_idx, sample_idx)
                         )
-                        # radar_scene.AddSnapshot(
-                        #     Snapshot[float_t](
-                        #     <float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, pulse_idx, sample_idx], frame_idx, tx_idx, pulse_idx, sample_idx))
-
-    # cdef float_t[:,:,:] baseband_re = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=np.float64)
-    # cdef float_t[:,:,:] baseband_im = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=np.float64)
 
     cdef vector[cpp_complex[float_t]] *bb_vect = new vector[cpp_complex[float_t]](
         radar.frames*radar.channel_size*radar.transmitter.pulses*radar.samples_per_pulse,
