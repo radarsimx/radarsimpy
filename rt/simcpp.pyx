@@ -52,6 +52,76 @@ from radarsimpy.includes.zpvector cimport Vec3
 import numpy as np
 cimport numpy as np
 
+cdef inline TxChannel[float_t] cp_TxChannel(tx, tx_idx):
+    cdef int_t pulses = tx.pulses
+
+    cdef vector[float_t] az_ang_vect, az_ptn_vect
+    cdef float_t[:] az_ang_mem, az_ptn_mem
+    cdef vector[float_t] el_ang_vect, el_ptn_vect
+    cdef float_t[:] el_ang_mem, el_ptn_mem
+
+    cdef vector[cpp_complex[float_t]] pulse_mod_vect
+
+    cdef bool mod_enabled
+    cdef vector[cpp_complex[float_t]] mod_var_vect
+    cdef vector[float_t] mod_t_vect
+    cdef float_t[:] mod_t_mem
+
+    az_ang_mem = tx.az_angles[tx_idx].astype(np.float64)/180*np.pi
+    az_ptn_mem = tx.az_patterns[tx_idx].astype(np.float64)
+    az_ang_vect.reserve(len(tx.az_angles[tx_idx]))
+    for idx in range(0, len(tx.az_angles[tx_idx])):
+        az_ang_vect.push_back(az_ang_mem[idx])
+    az_ptn_vect.reserve(len(tx.az_patterns[tx_idx]))
+    for idx in range(0, len(tx.az_patterns[tx_idx])):
+        az_ptn_vect.push_back(az_ptn_mem[idx])
+
+    el_ang_mem = np.flip(90-tx.el_angles[tx_idx].astype(np.float64))/180*np.pi
+    el_ptn_mem = np.flip(tx.el_patterns[tx_idx].astype(np.float64))
+    el_ang_vect.reserve(len(tx.el_angles[tx_idx]))
+    for idx in range(0, len(tx.el_angles[tx_idx])):
+        el_ang_vect.push_back(el_ang_mem[idx])
+    el_ptn_vect.reserve(len(tx.el_patterns[tx_idx]))
+    for idx in range(0, len(tx.el_patterns[tx_idx])):
+        el_ptn_vect.push_back(el_ptn_mem[idx])
+
+    for idx in range(0, pulses):
+        pulse_mod_vect.push_back(cpp_complex[float_t](np.real(tx.pulse_mod[tx_idx, idx]), np.imag(tx.pulse_mod[tx_idx, idx])))
+
+    mod_enabled = tx.mod[tx_idx]['enabled']
+    if mod_enabled:
+        for idx in range(0, len(tx.mod[tx_idx]['var'])):
+            mod_var_vect.push_back(cpp_complex[float_t](np.real(tx.mod[tx_idx]['var'][idx]), np.imag(tx.mod[tx_idx]['var'][idx])))
+
+        mod_t_mem = tx.mod[tx_idx]['t'].astype(np.float64)
+        mod_t_vect.reserve(len(tx.mod[tx_idx]['t']))
+        for idx in range(0, len(tx.mod[tx_idx]['t'])):
+            mod_t_vect.push_back(mod_t_mem[idx])
+    
+    return TxChannel[float_t](
+        Vec3[float_t](
+            <float_t> tx.locations[tx_idx, 0],
+            <float_t> tx.locations[tx_idx, 1],
+            <float_t> tx.locations[tx_idx, 2]
+            ),
+        Vec3[float_t](
+            <float_t> tx.polarization[tx_idx, 0],
+            <float_t> tx.polarization[tx_idx, 1],
+            <float_t> tx.polarization[tx_idx, 2]
+            ),
+        pulse_mod_vect,
+        mod_enabled,
+        mod_t_vect,
+        mod_var_vect,
+        az_ang_vect,
+        az_ptn_vect,
+        el_ang_vect,
+        el_ptn_vect,
+        <float_t> tx.antenna_gains[tx_idx],
+        <float_t> tx.delay[tx_idx],
+        0.0
+        )
+
 
 @cython.cdivision(True)
 @cython.boundscheck(False)
@@ -237,87 +307,8 @@ cpdef run_simulator(radar, targets, noise=True):
     """
     Transmitter Channels
     """
-    cdef int_t ptn_length
-    cdef vector[float_t] az_ang_vect, az_ptn_vect
-    cdef float_t[:] az_ang_mem, az_ptn_mem
-    cdef vector[float_t] el_ang_vect, el_ptn_vect
-    cdef float_t[:] el_ang_mem, el_ptn_mem
-
-    cdef vector[cpp_complex[float_t]] pulse_mod_vect
-    cdef complex_t[:] pulse_mod_mem
-
-    cdef bool mod_enabled
-    cdef vector[cpp_complex[float_t]] mod_var_vect
-    cdef complex_t[:] mod_var_mem
-    cdef vector[float_t] mod_t_vect
-    cdef float_t[:] mod_t_mem
-
     for tx_idx in range(0, radar.transmitter.channel_size):
-        az_ang_vect.clear()
-        az_ptn_vect.clear()
-        el_ang_vect.clear()
-        el_ptn_vect.clear()
-        pulse_mod_vect.clear()
-        mod_var_vect.clear()
-        mod_t_vect.clear()
-
-        az_ang_mem = radar.transmitter.az_angles[tx_idx].astype(np.float64)/180*np.pi
-        az_ptn_mem = radar.transmitter.az_patterns[tx_idx].astype(np.float64)
-        az_ang_vect.reserve(len(radar.transmitter.az_angles[tx_idx]))
-        for idx in range(0, len(radar.transmitter.az_angles[tx_idx])):
-            az_ang_vect.push_back(az_ang_mem[idx])
-        az_ptn_vect.reserve(len(radar.transmitter.az_patterns[tx_idx]))
-        for idx in range(0, len(radar.transmitter.az_patterns[tx_idx])):
-            az_ptn_vect.push_back(az_ptn_mem[idx])
-
-        el_ang_mem = np.flip(90-radar.transmitter.el_angles[tx_idx].astype(np.float64))/180*np.pi
-        el_ptn_mem = np.flip(radar.transmitter.el_patterns[tx_idx].astype(np.float64))
-        el_ang_vect.reserve(len(radar.transmitter.el_angles[tx_idx]))
-        for idx in range(0, len(radar.transmitter.el_angles[tx_idx])):
-            el_ang_vect.push_back(el_ang_mem[idx])
-        el_ptn_vect.reserve(len(radar.transmitter.el_patterns[tx_idx]))
-        for idx in range(0, len(radar.transmitter.el_patterns[tx_idx])):
-            el_ptn_vect.push_back(el_ptn_mem[idx])
-
-        for idx in range(0, pulses):
-            pulse_mod_vect.push_back(cpp_complex[float_t](np.real(radar.transmitter.pulse_mod[tx_idx, idx]), np.imag(radar.transmitter.pulse_mod[tx_idx, idx])))
-
-        mod_enabled = radar.transmitter.mod[tx_idx]['enabled']
-        if mod_enabled:
-            for idx in range(0, len(radar.transmitter.mod[tx_idx]['var'])):
-                mod_var_vect.push_back(cpp_complex[float_t](np.real(radar.transmitter.mod[tx_idx]['var'][idx]), np.imag(radar.transmitter.mod[tx_idx]['var'][idx])))
-
-            mod_t_mem = radar.transmitter.mod[tx_idx]['t'].astype(np.float64)
-            mod_t_vect.reserve(len(radar.transmitter.mod[tx_idx]['t']))
-            for idx in range(0, len(radar.transmitter.mod[tx_idx]['t'])):
-                mod_t_vect.push_back(mod_t_mem[idx])
-
-        
-        tx.AddChannel(
-            TxChannel[float_t](
-                Vec3[float_t](
-                    <float_t> radar.transmitter.locations[tx_idx, 0],
-                    <float_t> radar.transmitter.locations[tx_idx, 1],
-                    <float_t> radar.transmitter.locations[tx_idx, 2]
-                ),
-                Vec3[float_t](
-                    <float_t> radar.transmitter.polarization[tx_idx, 0],
-                    <float_t> radar.transmitter.polarization[tx_idx, 1],
-                    <float_t> radar.transmitter.polarization[tx_idx, 2]
-                ),
-                pulse_mod_vect,
-                mod_enabled,
-                mod_t_vect,
-                mod_var_vect,
-                az_ang_vect,
-                az_ptn_vect,
-                el_ang_vect,
-                el_ptn_vect,
-                <float_t> radar.transmitter.antenna_gains[tx_idx],
-                <float_t> radar.transmitter.delay[tx_idx],
-                0.0
-            )
-        )
+        tx.AddChannel(cp_TxChannel(radar.transmitter, tx_idx))
 
     """
     Receiver
@@ -330,6 +321,11 @@ cpdef run_simulator(radar, targets, noise=True):
         samples
     )
     
+    cdef vector[float_t] az_ang_vect, az_ptn_vect
+    cdef float_t[:] az_ang_mem, az_ptn_mem
+    cdef vector[float_t] el_ang_vect, el_ptn_vect
+    cdef float_t[:] el_ang_mem, el_ptn_mem
+
     for rx_idx in range(0, radar.receiver.channel_size):
         az_ang_vect.clear()
         az_ptn_vect.clear()

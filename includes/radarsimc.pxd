@@ -64,6 +64,7 @@ cdef extern from "target.hpp":
                Vec3[T] rotation_rate,
                bool is_ground) except +
 
+
 cdef extern from "ray.hpp":
     cdef cppclass PathNode[T]:
         Vec3[T] dir_
@@ -80,10 +81,12 @@ cdef extern from "ray.hpp":
         int ref_count_
         vector[PathNode[T]] path_
 
+
 cdef extern from "raypool.hpp":
     cdef cppclass RayPool[T, Tg=*]:
         RayPool() except +
         vector[Ray[T]] pool_
+
 
 """
 rcs
@@ -100,6 +103,7 @@ cdef extern from "rcs.hpp":
 
         T CalculateRcs()
 
+
 """
 pointcloud
 """
@@ -113,6 +117,7 @@ cdef extern from "pointcloud.hpp":
         
         vector[Ray[T]] cloud_
 
+
 """
 point
 """
@@ -123,6 +128,7 @@ cdef extern from "point.hpp":
               const Vec3[T]& speed,
               const vector[T]& rcs,
               const vector[T]& phs) except +
+
 
 cdef inline Point[float_t] cp_Point(location, speed, rcs, phase, shape):
     cdef vector[Vec3[float_t]] loc_vect
@@ -189,6 +195,7 @@ cdef inline Point[float_t] cp_Point(location, speed, rcs, phase, shape):
                 phs_vect
             )
 
+
 """
 transmitter
 """
@@ -233,6 +240,7 @@ cdef extern from "transmitter.hpp":
                     T density,
                     vector[cpp_complex[T]]) except +
         void AddChannel(const TxChannel[T]& channel)
+
 
 """
 receiver
