@@ -43,6 +43,7 @@ from radarsimpy.rt.cp_radarsimc cimport cp_Point
 from radarsimpy.includes.radarsimc cimport TxChannel, Transmitter
 from radarsimpy.rt.cp_radarsimc cimport cp_TxChannel
 from radarsimpy.includes.radarsimc cimport RxChannel, Receiver
+from radarsimpy.rt.cp_radarsimc cimport cp_RxChannel
 from radarsimpy.includes.radarsimc cimport Simulator
 
 from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t
@@ -252,51 +253,9 @@ cpdef run_simulator(radar, targets, noise=True):
         <float_t> radar.receiver.baseband_gain,
         samples
     )
-    
-    cdef vector[float_t] az_ang_vect, az_ptn_vect
-    cdef float_t[:] az_ang_mem, az_ptn_mem
-    cdef vector[float_t] el_ang_vect, el_ptn_vect
-    cdef float_t[:] el_ang_mem, el_ptn_mem
 
     for rx_idx in range(0, radar.receiver.channel_size):
-        az_ang_vect.clear()
-        az_ptn_vect.clear()
-        el_ang_vect.clear()
-        el_ptn_vect.clear()
-
-        az_ang_mem = radar.receiver.az_angles[rx_idx].astype(np.float64)/180*np.pi
-        az_ptn_mem = radar.receiver.az_patterns[rx_idx].astype(np.float64)
-        az_ang_vect.reserve(len(radar.receiver.az_angles[rx_idx]))
-        for idx in range(0, len(radar.receiver.az_angles[rx_idx])):
-            az_ang_vect.push_back(az_ang_mem[idx])
-        az_ptn_vect.reserve(len(radar.receiver.az_patterns[rx_idx]))
-        for idx in range(0, len(radar.receiver.az_patterns[rx_idx])):
-            az_ptn_vect.push_back(az_ptn_mem[idx])
-
-        el_ang_mem = np.flip(90-radar.receiver.el_angles[rx_idx].astype(np.float64))/180*np.pi
-        el_ptn_mem = np.flip(radar.receiver.el_patterns[rx_idx].astype(np.float64))
-        el_ang_vect.reserve(len(radar.receiver.el_angles[rx_idx]))
-        for idx in range(0, len(radar.receiver.el_angles[rx_idx])):
-            el_ang_vect.push_back(el_ang_mem[idx])
-        el_ptn_vect.reserve(len(radar.receiver.el_patterns[rx_idx]))
-        for idx in range(0, len(radar.receiver.el_patterns[rx_idx])):
-            el_ptn_vect.push_back(el_ptn_mem[idx])
-
-        rx.AddChannel(
-            RxChannel[float_t](
-                Vec3[float_t](
-                    <float_t> radar.receiver.locations[rx_idx, 0],
-                    <float_t> radar.receiver.locations[rx_idx, 1],
-                    <float_t> radar.receiver.locations[rx_idx, 2]
-                ),
-                Vec3[float_t](0,0,1),
-                az_ang_vect,
-                az_ptn_vect,
-                el_ang_vect,
-                el_ptn_vect,
-                <float_t> radar.receiver.antenna_gains[rx_idx]
-            )
-        )
+        rx.AddChannel(cp_RxChannel(radar.receiver, rx_idx))
 
     cdef vector[cpp_complex[float_t]] *bb_vect = new vector[cpp_complex[float_t]](
         frames*channles*pulses*samples,

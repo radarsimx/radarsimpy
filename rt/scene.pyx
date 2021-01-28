@@ -37,6 +37,7 @@ from libcpp cimport bool
 from radarsimpy.includes.radarsimc cimport TxChannel, Transmitter
 from radarsimpy.rt.cp_radarsimc cimport cp_TxChannel
 from radarsimpy.includes.radarsimc cimport Snapshot, Target, Aperture, Receiver, RxChannel, Scene
+from radarsimpy.rt.cp_radarsimc cimport cp_RxChannel
 from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t, vector
 from radarsimpy.includes.zpvector cimport Vec3
 from libcpp.complex cimport complex as cpp_complex
@@ -352,12 +353,6 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
         )
     )
 
-    cdef int ptn_length
-    cdef vector[float_t] az_ang
-    cdef vector[float_t] az
-    cdef vector[float_t] el_ang
-    cdef vector[float_t] el
-
     for tx_idx in range(0, radar.transmitter.channel_size):
         radar_scene.AddTxChannel(cp_TxChannel(radar.transmitter, tx_idx))
 
@@ -375,38 +370,7 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
     )
 
     for rx_idx in range(0, radar.receiver.channel_size):
-        az_ang.clear()
-        az.clear()
-        el_ang.clear()
-        el.clear()
-
-        ptn_length = len(radar.receiver.az_angles[rx_idx])
-        for ang_idx in range(0, ptn_length):
-            az_ang.push_back(<float_t>(radar.receiver.az_angles[rx_idx][ang_idx]/180*np.pi))
-            az.push_back(<float_t>radar.receiver.az_patterns[rx_idx][ang_idx])
-
-        ptn_length = len(radar.receiver.el_angles[rx_idx])
-        el_angles = np.flip(90-radar.receiver.el_angles[tx_idx])/180*np.pi
-        el_pattern = np.flip(radar.receiver.el_patterns[tx_idx])
-        for ang_idx in range(0, ptn_length):
-            el_ang.push_back(<float_t>el_angles[ang_idx])
-            el.push_back(<float_t>el_pattern[ang_idx])
-
-        radar_scene.AddRxChannel(
-            RxChannel[float_t](
-                Vec3[float_t](
-                    <float_t> radar.receiver.locations[rx_idx, 0],
-                    <float_t> radar.receiver.locations[rx_idx, 1],
-                    <float_t> radar.receiver.locations[rx_idx, 2]
-                ),
-                Vec3[float_t](0,0,1),
-                az_ang,
-                az,
-                el_ang,
-                el,
-                <float_t> radar.receiver.antenna_gains[rx_idx]
-            )
-        )
+        radar_scene.AddRxChannel(cp_RxChannel(radar.receiver, rx_idx))
 
     """
     Snapshot

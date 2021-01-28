@@ -19,6 +19,7 @@ from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t
 from radarsimpy.includes.zpvector cimport Vec3
 
 from radarsimpy.includes.radarsimc cimport TxChannel
+from radarsimpy.includes.radarsimc cimport RxChannel
 from radarsimpy.includes.radarsimc cimport Point
 
 cdef Point[float_t] cp_Point(location, speed, rcs, phase, shape):
@@ -86,6 +87,7 @@ cdef Point[float_t] cp_Point(location, speed, rcs, phase, shape):
                 phs_vect
             )
 
+
 cdef TxChannel[float_t] cp_TxChannel(tx, tx_idx):
     cdef int_t pulses = tx.pulses
 
@@ -149,3 +151,42 @@ cdef TxChannel[float_t] cp_TxChannel(tx, tx_idx):
         <float_t> tx.delay[tx_idx],
         <float_t> (tx.grid[tx_idx]/180*np.pi)
         )
+
+
+cdef RxChannel[float_t] cp_RxChannel(rx, rx_idx):
+    cdef vector[float_t] az_ang_vect, az_ptn_vect
+    cdef float_t[:] az_ang_mem, az_ptn_mem
+    cdef vector[float_t] el_ang_vect, el_ptn_vect
+    cdef float_t[:] el_ang_mem, el_ptn_mem
+
+    az_ang_mem = rx.az_angles[rx_idx].astype(np.float64)/180*np.pi
+    az_ptn_mem = rx.az_patterns[rx_idx].astype(np.float64)
+    az_ang_vect.reserve(len(rx.az_angles[rx_idx]))
+    for idx in range(0, len(rx.az_angles[rx_idx])):
+        az_ang_vect.push_back(az_ang_mem[idx])
+    az_ptn_vect.reserve(len(rx.az_patterns[rx_idx]))
+    for idx in range(0, len(rx.az_patterns[rx_idx])):
+        az_ptn_vect.push_back(az_ptn_mem[idx])
+
+    el_ang_mem = np.flip(90-rx.el_angles[rx_idx].astype(np.float64))/180*np.pi
+    el_ptn_mem = np.flip(rx.el_patterns[rx_idx].astype(np.float64))
+    el_ang_vect.reserve(len(rx.el_angles[rx_idx]))
+    for idx in range(0, len(rx.el_angles[rx_idx])):
+        el_ang_vect.push_back(el_ang_mem[idx])
+    el_ptn_vect.reserve(len(rx.el_patterns[rx_idx]))
+    for idx in range(0, len(rx.el_patterns[rx_idx])):
+        el_ptn_vect.push_back(el_ptn_mem[idx])
+
+    return RxChannel[float_t](
+                Vec3[float_t](
+                    <float_t> rx.locations[rx_idx, 0],
+                    <float_t> rx.locations[rx_idx, 1],
+                    <float_t> rx.locations[rx_idx, 2]
+                ),
+                Vec3[float_t](0,0,1),
+                az_ang_vect,
+                az_ptn_vect,
+                el_ang_vect,
+                el_ptn_vect,
+                <float_t> rx.antenna_gains[rx_idx]
+            )
