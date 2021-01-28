@@ -38,8 +38,10 @@ from libc.math cimport M_PI
 from libcpp cimport bool
 from libcpp.complex cimport complex as cpp_complex
 
-from radarsimpy.includes.radarsimc cimport Point, cp_Point
-from radarsimpy.includes.radarsimc cimport TxChannel, cp_TxChannel, Transmitter
+from radarsimpy.includes.radarsimc cimport Point
+from radarsimpy.rt.cp_radarsimc cimport cp_Point
+from radarsimpy.includes.radarsimc cimport TxChannel, Transmitter
+from radarsimpy.rt.cp_radarsimc cimport cp_TxChannel
 from radarsimpy.includes.radarsimc cimport RxChannel, Receiver
 from radarsimpy.includes.radarsimc cimport Simulator
 

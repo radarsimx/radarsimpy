@@ -34,7 +34,8 @@ cimport cython
 from libc.math cimport sin, cos, sqrt, atan, atan2, acos, pow, fmax, M_PI
 from libcpp cimport bool
 
-from radarsimpy.includes.radarsimc cimport TxChannel, cp_TxChannel, Transmitter
+from radarsimpy.includes.radarsimc cimport TxChannel, Transmitter
+from radarsimpy.rt.cp_radarsimc cimport cp_TxChannel
 from radarsimpy.includes.radarsimc cimport Snapshot, Target, Aperture, Receiver, RxChannel, Scene
 from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t, vector
 from radarsimpy.includes.zpvector cimport Vec3
