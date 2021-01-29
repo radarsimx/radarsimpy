@@ -154,7 +154,7 @@ cpdef run_simulator(radar, targets, noise=True):
     """
     Transmitter
     """
-    tx = cp_Transmitter(radar)
+    tx = cp_Transmitter(radar, 0.0)
 
     """
     Transmitter Channels

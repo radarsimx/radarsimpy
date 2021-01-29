@@ -35,7 +35,7 @@ from libc.math cimport sin, cos, sqrt, atan, atan2, acos, pow, fmax, M_PI
 from libcpp cimport bool
 
 from radarsimpy.includes.radarsimc cimport TxChannel, Transmitter
-from radarsimpy.rt.cp_radarsimc cimport cp_TxChannel
+from radarsimpy.rt.cp_radarsimc cimport cp_TxChannel, cp_Transmitter
 from radarsimpy.includes.radarsimc cimport Snapshot, Target, Aperture, Receiver, RxChannel, Scene
 from radarsimpy.rt.cp_radarsimc cimport cp_RxChannel
 from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t, vector
@@ -314,44 +314,8 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
 
     """
     Transmitter
-    """ 
-    cdef vector[float_t] frame_time
-    if radar.frames > 1:
-        for t_idx in range(0, radar.frames):
-            frame_time.push_back(<float_t> (radar.t_offset[t_idx]))
-    else:
-        frame_time.push_back(<float_t> (radar.t_offset))
-
-    cdef vector[float_t] f_vector
-    for fq_idx in range(0, len(radar.f)):
-        f_vector.push_back(<float_t> radar.f[fq_idx])
-
-    cdef vector[float_t] t_vector
-    for pt_idx in range(0, len(radar.t)):
-        t_vector.push_back(<float_t> radar.t[pt_idx])
-
-    cdef vector[float_t] f_offset_vector
-    for pt_idx in range(0, len(radar.transmitter.f_offset)):
-        f_offset_vector.push_back(<float_t> radar.transmitter.f_offset[pt_idx])
-
-    cdef vector[float_t] chirp_start_time
-    for ct_idx in range(0, len(radar.transmitter.chirp_start_time)):
-        chirp_start_time.push_back(<float_t> radar.transmitter.chirp_start_time[ct_idx])
-
-    radar_scene.SetTransmitter(
-        Transmitter[float_t](
-            <float_t> radar.transmitter.fc_0,
-            f_vector,
-            f_offset_vector,
-            t_vector,
-            <float_t> radar.transmitter.tx_power,
-            chirp_start_time,
-            frame_time,
-            <int> radar.frames,
-            <int> radar.transmitter.pulses,
-            <float_t> density
-        )
-    )
+    """
+    radar_scene.SetTransmitter(cp_Transmitter(radar, density))
 
     for tx_idx in range(0, radar.transmitter.channel_size):
         radar_scene.AddTxChannel(cp_TxChannel(radar.transmitter, tx_idx))

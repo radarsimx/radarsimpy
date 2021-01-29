@@ -89,7 +89,7 @@ cdef Point[float_t] cp_Point(location, speed, rcs, phase, shape):
             )
 
 
-cdef Transmitter[float_t] cp_Transmitter(radar):
+cdef Transmitter[float_t] cp_Transmitter(radar, density):
     cdef int_t frames = radar.frames
     cdef int_t channles = radar.channel_size
     cdef int_t pulses = radar.transmitter.pulses
@@ -152,7 +152,7 @@ cdef Transmitter[float_t] cp_Transmitter(radar):
             t_frame_vect,
             frames,
             pulses,
-            0.0
+            <float_t> density
         )
     else:
         pn_vect.reserve(frames*channles*pulses*samples)
@@ -174,7 +174,7 @@ cdef Transmitter[float_t] cp_Transmitter(radar):
             t_frame_vect,
             frames,
             pulses,
-            0.0,
+            <float_t> density,
             pn_vect
         )
 
