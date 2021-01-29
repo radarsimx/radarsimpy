@@ -41,7 +41,7 @@ from libcpp.complex cimport complex as cpp_complex
 from radarsimpy.includes.radarsimc cimport Point
 from radarsimpy.rt.cp_radarsimc cimport cp_Point
 from radarsimpy.includes.radarsimc cimport TxChannel, Transmitter
-from radarsimpy.rt.cp_radarsimc cimport cp_TxChannel
+from radarsimpy.rt.cp_radarsimc cimport cp_TxChannel, cp_Transmitter
 from radarsimpy.includes.radarsimc cimport RxChannel, Receiver
 from radarsimpy.rt.cp_radarsimc cimport cp_RxChannel
 from radarsimpy.includes.radarsimc cimport Simulator
@@ -154,88 +154,7 @@ cpdef run_simulator(radar, targets, noise=True):
     """
     Transmitter
     """
-    cdef vector[float_t] t_frame_vect
-    cdef float_t[:] t_frame_mem
-
-    cdef vector[float_t] f_vect
-    cdef float_t[:] f_mem
-
-    cdef vector[float_t] t_vect
-    cdef float_t[:] t_mem
-
-    cdef vector[float_t] f_offset_vect
-    cdef float_t[:] f_offset_mem
-
-    cdef vector[float_t] t_pstart_vect
-    cdef float_t[:] t_pstart_mem
-
-    cdef vector[cpp_complex[float_t]] pn_vect
-    cdef complex_t[:,:,:] pn_mem
-
-    if frames > 1:
-        t_frame_mem=radar.t_offset.astype(np.float64)
-        t_frame_vect.reserve(frames)
-        for idx in range(0, frames):
-            t_frame_vect.push_back(t_frame_mem[idx])
-    else:
-        t_frame_vect.push_back(<float_t> (radar.t_offset))
-
-    f_mem = radar.f.astype(np.float64)
-    f_vect.reserve(len(radar.f))
-    for idx in range(0, len(radar.f)):
-        f_vect.push_back(f_mem[idx])
-
-    t_mem = radar.t.astype(np.float64)
-    t_vect.reserve(len(radar.t))
-    for idx in range(0, len(radar.t)):
-        t_vect.push_back(t_mem[idx])
-
-    f_offset_mem = radar.transmitter.f_offset.astype(np.float64)
-    f_offset_vect.reserve(len(radar.transmitter.f_offset))
-    for idx in range(0, len(radar.transmitter.f_offset)):
-        f_offset_vect.push_back(f_offset_mem[idx])
-    
-    t_pstart_mem = radar.transmitter.chirp_start_time.astype(np.float64)
-    t_pstart_vect.reserve(len(radar.transmitter.chirp_start_time))
-    for idx in range(0, len(radar.transmitter.chirp_start_time)):
-        t_pstart_vect.push_back(t_pstart_mem[idx])
-
-    if radar.phase_noise is None:
-        tx = Transmitter[float_t](
-            <float_t> radar.transmitter.fc_0,
-            f_vect,
-            f_offset_vect,
-            t_vect,
-            <float_t> radar.transmitter.tx_power,
-            t_pstart_vect,
-            t_frame_vect,
-            frames,
-            pulses,
-            0.0
-        )
-    else:
-        pn_vect.reserve(frames*channles*pulses*samples)
-        for idx0 in range(0, frames*channles):
-            for idx1 in range(0, pulses):
-                for idx2 in range(0, samples):
-                    pn_vect.push_back(cpp_complex[float_t](
-                        np.real(radar.phase_noise[idx0, idx1, idx2]),
-                        np.imag(radar.phase_noise[idx0, idx1, idx2])
-                        ))
-
-        tx = Transmitter[float_t](
-            <float_t> radar.transmitter.fc_0,
-            f_vect,
-            f_offset_vect,
-            t_vect,
-            <float_t> radar.transmitter.tx_power,
-            t_pstart_vect,
-            t_frame_vect,
-            frames,
-            pulses,
-            0.0,
-            pn_vect
-        )
+    tx = cp_Transmitter(radar)
 
     """
     Transmitter Channels
