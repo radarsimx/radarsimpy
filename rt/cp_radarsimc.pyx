@@ -26,6 +26,10 @@ from radarsimpy.includes.radarsimc cimport Target
 
 from stl import mesh
 
+
+@cython.cdivision(True)
+@cython.boundscheck(False)
+@cython.wraparound(False)
 cdef Point[float_t] cp_Point(location, speed, rcs, phase, shape):
     cdef vector[Vec3[float_t]] loc_vect
     cdef vector[float_t] rcs_vect
@@ -92,6 +96,9 @@ cdef Point[float_t] cp_Point(location, speed, rcs, phase, shape):
             )
 
 
+@cython.cdivision(True)
+@cython.boundscheck(False)
+@cython.wraparound(False)
 cdef Transmitter[float_t] cp_Transmitter(radar, density):
     cdef int_t frames = radar.frames
     cdef int_t channles = radar.channel_size
@@ -158,6 +165,9 @@ cdef Transmitter[float_t] cp_Transmitter(radar, density):
     )
 
 
+@cython.cdivision(True)
+@cython.boundscheck(False)
+@cython.wraparound(False)
 cdef TxChannel[float_t] cp_TxChannel(tx, tx_idx):
     cdef int_t pulses = tx.pulses
 
@@ -223,6 +233,9 @@ cdef TxChannel[float_t] cp_TxChannel(tx, tx_idx):
         )
 
 
+@cython.cdivision(True)
+@cython.boundscheck(False)
+@cython.wraparound(False)
 cdef RxChannel[float_t] cp_RxChannel(rx, rx_idx):
     cdef vector[float_t] az_ang_vect, az_ptn_vect
     cdef float_t[:] az_ang_mem, az_ptn_mem
@@ -262,6 +275,9 @@ cdef RxChannel[float_t] cp_RxChannel(rx, rx_idx):
             )
 
 
+@cython.cdivision(True)
+@cython.boundscheck(False)
+@cython.wraparound(False)
 cdef Target[float_t] cp_Target(radar, target, shape):
     cdef float_t[:,:,:] mesh_memview
     cdef float_t[:] origin
