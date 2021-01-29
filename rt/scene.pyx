@@ -137,10 +137,21 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
     """
     cdef Scene[float_t] radar_scene
 
+    cdef int_t frames = radar.frames
+    cdef int_t total_ch = radar.channel_size
+    cdef int_t rx_ch = radar.receiver.channel_size
+    cdef int_t tx_ch = radar.transmitter.channel_size
+    cdef int_t pulses = radar.transmitter.pulses
+    cdef int_t samples = radar.samples_per_pulse
+
+    cdef int_t ch_stride = pulses * samples
+    cdef int_t pulse_stride = samples
+    cdef int_t idx_stride
+
     """
     Targets
     """
-    timestamp = radar.timestamp
+    cdef float_t[:,:,:] timestamp = radar.timestamp
 
     cdef int_t target_count = len(targets)
     for idx in range(0, target_count):
@@ -180,7 +191,7 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
     """
     radar_scene.SetTransmitter(cp_Transmitter(radar, density))
 
-    for tx_idx in range(0, radar.transmitter.channel_size):
+    for tx_idx in range(0, tx_ch):
         radar_scene.AddTxChannel(cp_TxChannel(radar.transmitter, tx_idx))
 
     """
@@ -192,11 +203,11 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
             <float_t> radar.receiver.rf_gain,
             <float_t> radar.receiver.load_resistor,
             <float_t> radar.receiver.baseband_gain,
-            <int> radar.samples_per_pulse
+            samples
         )
     )
 
-    for rx_idx in range(0, radar.receiver.channel_size):
+    for rx_idx in range(0, rx_ch):
         radar_scene.AddRxChannel(cp_RxChannel(radar.receiver, rx_idx))
 
     """
@@ -207,12 +218,12 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
 
     if level is None:
         level_id = 0
-        for frame_idx in range(0, radar.frames):
-            for tx_idx in range(0, radar.transmitter.channel_size):
+        for fm_idx in range(0, frames):
+            for tx_idx in range(0, tx_ch):
                 snaps.push_back(
                     Snapshot[float_t](
-                        <float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, 0, 0],
-                        frame_idx,
+                        timestamp[fm_idx*total_ch+tx_idx*rx_ch, 0, 0],
+                        fm_idx,
                         tx_idx,
                         0,
                         0
@@ -220,41 +231,45 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
                 )
     elif level == 'pulse':
         level_id = 1
-        for frame_idx in range(0, radar.frames):
-            for tx_idx in range(0, radar.transmitter.channel_size):
-                for pulse_idx in range(0, radar.transmitter.pulses):
+        for fm_idx in range(0, frames):
+            for tx_idx in range(0, tx_ch):
+                for ps_idx in range(0, pulses):
                     snaps.push_back(
                         Snapshot[float_t](
-                        <float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, pulse_idx, 0], frame_idx, tx_idx, pulse_idx, 0)
+                        timestamp[fm_idx*total_ch+tx_idx*rx_ch, ps_idx, 0],
+                        fm_idx,
+                        tx_idx,
+                        ps_idx,
+                        0)
                     )
     elif level == 'sample':
         level_id = 2
-        for frame_idx in range(0, radar.frames):
-            for tx_idx in range(0, radar.transmitter.channel_size):
-                for pulse_idx in range(0, radar.transmitter.pulses):
-                    for sample_idx in range(0, radar.samples_per_pulse):
+        for fm_idx in range(0, frames):
+            for tx_idx in range(0, tx_ch):
+                for ps_idx in range(0, pulses):
+                    for sp_idx in range(0, samples):
                         snaps.push_back(
                             Snapshot[float_t](
-                            <float_t> radar.timestamp[frame_idx*radar.channel_size+tx_idx*radar.receiver.channel_size, pulse_idx, sample_idx], frame_idx, tx_idx, pulse_idx, sample_idx)
+                            timestamp[fm_idx*total_ch+tx_idx*rx_ch, ps_idx, sp_idx],
+                            fm_idx,
+                            tx_idx,
+                            ps_idx,
+                            sp_idx)
                         )
 
     cdef vector[cpp_complex[float_t]] *bb_vect = new vector[cpp_complex[float_t]](
-        radar.frames*radar.channel_size*radar.transmitter.pulses*radar.samples_per_pulse,
+        frames*total_ch*pulses*samples,
         cpp_complex[float_t](0.0,0.0))
 
     radar_scene.RunSimulator(
         level_id, <float_t> correction, snaps, bb_vect[0]
     )
 
-    cdef complex[:,:,:] baseband = np.zeros((radar.frames*radar.channel_size, radar.transmitter.pulses, radar.samples_per_pulse), dtype=complex)
+    cdef complex[:,:,:] baseband = np.zeros((frames*total_ch, pulses, samples), dtype=complex)
 
-    cdef int ch_stride = radar.transmitter.pulses * radar.samples_per_pulse
-    cdef int pulse_stride = radar.samples_per_pulse
-    cdef int idx_stride
-
-    for ch_idx in range(0, radar.frames*radar.channel_size):
-        for p_idx in range(0, radar.transmitter.pulses):
-            for s_idx in range(0, radar.samples_per_pulse):
+    for ch_idx in range(0, frames*total_ch):
+        for p_idx in range(0, pulses):
+            for s_idx in range(0, samples):
                 idx_stride = ch_idx * ch_stride + p_idx * pulse_stride + s_idx
                 baseband[ch_idx, p_idx, s_idx] = bb_vect[0][idx_stride].real()+1j*bb_vect[0][idx_stride].imag()
 
@@ -301,7 +316,7 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
             rays[count]['polarization'][1] = snaps[snapshot_idx].ray_received[idx].pol_[1]
             rays[count]['polarization'][2] = snaps[snapshot_idx].ray_received[idx].pol_[2]
             rays[count]['path_pos'] = np.zeros((20,3))
-            for path_idx in range(0, int(rays[count]['refCount']+2)):
+            for path_idx in range(0, <int_t>(rays[count]['refCount']+2)):
                 rays[count]['path_pos'][path_idx, 0] = snaps[snapshot_idx].ray_received[idx].path_[path_idx].loc_[0]
                 rays[count]['path_pos'][path_idx, 1] = snaps[snapshot_idx].ray_received[idx].path_[path_idx].loc_[1]
                 rays[count]['path_pos'][path_idx, 2] = snaps[snapshot_idx].ray_received[idx].path_[path_idx].loc_[2]
@@ -311,13 +326,13 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
     if noise:
         baseband = baseband+\
             radar.noise*(np.random.randn(
-                    radar.frames*radar.channel_size,
-                    radar.transmitter.pulses,
-                    radar.samples_per_pulse,
+                    frames*total_ch,
+                    pulses,
+                    samples,
                 ) + 1j * np.random.randn(
-                    radar.frames*radar.channel_size,
-                    radar.transmitter.pulses,
-                    radar.samples_per_pulse,
+                    frames*total_ch,
+                    pulses,
+                    samples,
                 ))
 
     del bb_vect
