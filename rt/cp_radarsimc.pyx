@@ -96,22 +96,22 @@ cdef Transmitter[float_t] cp_Transmitter(radar):
     cdef int_t samples = radar.samples_per_pulse
 
     cdef vector[float_t] t_frame_vect
-    cdef float_t[:] t_frame_mem
+    # cdef float_t[:] t_frame_mem
 
     cdef vector[float_t] f_vect
-    cdef float_t[:] f_mem
+    # cdef float_t[:] f_mem
 
     cdef vector[float_t] t_vect
-    cdef float_t[:] t_mem
+    # cdef float_t[:] t_mem
 
     cdef vector[float_t] f_offset_vect
-    cdef float_t[:] f_offset_mem
+    # cdef float_t[:] f_offset_mem
 
     cdef vector[float_t] t_pstart_vect
-    cdef float_t[:] t_pstart_mem
+    # cdef float_t[:] t_pstart_mem
 
     cdef vector[cpp_complex[float_t]] pn_vect
-    cdef complex_t[:,:,:] pn_mem
+    # cdef complex_t[:,:,:] pn_mem
 
     if frames > 1:
         t_frame_mem=radar.t_offset.astype(np.float64)
@@ -142,6 +142,19 @@ cdef Transmitter[float_t] cp_Transmitter(radar):
         t_pstart_vect.push_back(t_pstart_mem[idx])
 
     if radar.phase_noise is None:
+        return Transmitter[float_t](
+            <float_t> radar.transmitter.fc_0,
+            f_vect,
+            f_offset_vect,
+            t_vect,
+            <float_t> radar.transmitter.tx_power,
+            t_pstart_vect,
+            t_frame_vect,
+            frames,
+            pulses,
+            0.0
+        )
+    else:
         pn_vect.reserve(frames*channles*pulses*samples)
         for idx0 in range(0, frames*channles):
             for idx1 in range(0, pulses):
@@ -151,19 +164,19 @@ cdef Transmitter[float_t] cp_Transmitter(radar):
                         np.imag(radar.phase_noise[idx0, idx1, idx2])
                         ))
 
-    return Transmitter[float_t](
-        <float_t> radar.transmitter.fc_0,
-        f_vect,
-        f_offset_vect,
-        t_vect,
-        <float_t> radar.transmitter.tx_power,
-        t_pstart_vect,
-        t_frame_vect,
-        frames,
-        pulses,
-        0.0,
-        pn_vect
-    )
+        return Transmitter[float_t](
+            <float_t> radar.transmitter.fc_0,
+            f_vect,
+            f_offset_vect,
+            t_vect,
+            <float_t> radar.transmitter.tx_power,
+            t_pstart_vect,
+            t_frame_vect,
+            frames,
+            pulses,
+            0.0,
+            pn_vect
+        )
 
 
 cdef TxChannel[float_t] cp_TxChannel(tx, tx_idx):
