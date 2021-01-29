@@ -22,6 +22,9 @@ from radarsimpy.includes.radarsimc cimport Transmitter
 from radarsimpy.includes.radarsimc cimport TxChannel
 from radarsimpy.includes.radarsimc cimport RxChannel
 from radarsimpy.includes.radarsimc cimport Point
+from radarsimpy.includes.radarsimc cimport Target
+
+from stl import mesh
 
 cdef Point[float_t] cp_Point(location, speed, rcs, phase, shape):
     cdef vector[Vec3[float_t]] loc_vect
@@ -96,22 +99,11 @@ cdef Transmitter[float_t] cp_Transmitter(radar, density):
     cdef int_t samples = radar.samples_per_pulse
 
     cdef vector[float_t] t_frame_vect
-    # cdef float_t[:] t_frame_mem
-
     cdef vector[float_t] f_vect
-    # cdef float_t[:] f_mem
-
     cdef vector[float_t] t_vect
-    # cdef float_t[:] t_mem
-
     cdef vector[float_t] f_offset_vect
-    # cdef float_t[:] f_offset_mem
-
     cdef vector[float_t] t_pstart_vect
-    # cdef float_t[:] t_pstart_mem
-
-    cdef vector[cpp_complex[float_t]] pn_vect
-    # cdef complex_t[:,:,:] pn_mem
+    cdef vector[cpp_complex[float_t]] pn_vect = vector[cpp_complex[float_t]]()
 
     if frames > 1:
         t_frame_mem=radar.t_offset.astype(np.float64)
@@ -141,20 +133,7 @@ cdef Transmitter[float_t] cp_Transmitter(radar, density):
     for idx in range(0, len(radar.transmitter.chirp_start_time)):
         t_pstart_vect.push_back(t_pstart_mem[idx])
 
-    if radar.phase_noise is None:
-        return Transmitter[float_t](
-            <float_t> radar.transmitter.fc_0,
-            f_vect,
-            f_offset_vect,
-            t_vect,
-            <float_t> radar.transmitter.tx_power,
-            t_pstart_vect,
-            t_frame_vect,
-            frames,
-            pulses,
-            <float_t> density
-        )
-    else:
+    if radar.phase_noise is not None:
         pn_vect.reserve(frames*channles*pulses*samples)
         for idx0 in range(0, frames*channles):
             for idx1 in range(0, pulses):
@@ -164,19 +143,19 @@ cdef Transmitter[float_t] cp_Transmitter(radar, density):
                         np.imag(radar.phase_noise[idx0, idx1, idx2])
                         ))
 
-        return Transmitter[float_t](
-            <float_t> radar.transmitter.fc_0,
-            f_vect,
-            f_offset_vect,
-            t_vect,
-            <float_t> radar.transmitter.tx_power,
-            t_pstart_vect,
-            t_frame_vect,
-            frames,
-            pulses,
-            <float_t> density,
-            pn_vect
-        )
+    return Transmitter[float_t](
+        <float_t> radar.transmitter.fc_0,
+        f_vect,
+        f_offset_vect,
+        t_vect,
+        <float_t> radar.transmitter.tx_power,
+        t_pstart_vect,
+        t_frame_vect,
+        frames,
+        pulses,
+        <float_t> density,
+        pn_vect
+    )
 
 
 cdef TxChannel[float_t] cp_TxChannel(tx, tx_idx):
@@ -281,3 +260,139 @@ cdef RxChannel[float_t] cp_RxChannel(rx, rx_idx):
                 el_ptn_vect,
                 <float_t> rx.antenna_gains[rx_idx]
             )
+
+
+cdef Target[float_t] cp_Target(radar, target, shape):
+    cdef float_t[:,:,:] mesh_memview
+    cdef float_t[:] origin
+
+    cdef vector[Vec3[float_t]] c_loc_array
+    cdef vector[Vec3[float_t]] c_speed_array
+    cdef vector[Vec3[float_t]] c_rotation_array
+    cdef vector[Vec3[float_t]] c_rotation_rate_array
+
+    t_mesh = mesh.Mesh.from_file(target['model'])
+    mesh_memview = t_mesh.vectors.astype(np.float64)
+
+    origin = np.array(target.get('origin', (0,0,0)), dtype=np.float64)
+
+    location = target.get('location', (0,0,0))
+    speed = target.get('speed', (0,0,0))
+    rotation = target.get('rotation', (0,0,0))
+    rotation_rate = target.get('rotation_rate', (0,0,0))
+
+    if np.size(location[0]) > 1 or np.size(location[1])  > 1 or np.size(location[2]) > 1 or np.size(speed[0]) > 1 or np.size(speed[1]) > 1 or np.size(speed[2]) >1 or np.size(rotation[0]) > 1 or np.size(rotation[1]) > 1 or np.size(rotation[2]) >1 or np.size(rotation_rate[0]) > 1 or np.size(rotation_rate[1]) > 1 or np.size(rotation_rate[2])>1:
+        if np.size(location[0]) > 1:
+            tgx_t = location[0]
+        else:
+            tgx_t = np.full(shape, location[0])
+
+        if np.size(location[1]) > 1:
+            tgy_t = location[1]
+        else:
+            tgy_t = np.full(shape, location[1])
+        
+        if np.size(location[2]) > 1:
+            tgz_t = location[2]
+        else:
+            tgz_t = np.full(shape, location[2])
+
+        if np.size(speed[0]) > 1:
+            sptx_t = speed[0]
+        else:
+            sptx_t = np.full(shape, speed[0])
+
+        if np.size(speed[1]) > 1:
+            spty_t = speed[1]
+        else:
+            spty_t = np.full(shape, speed[1])
+        
+        if np.size(speed[2]) > 1:
+            sptz_t = speed[2]
+        else:
+            sptz_t = np.full(shape, speed[2])
+
+        if np.size(rotation[0]) > 1:
+            rotx_t = rotation[0]
+        else:
+            rotx_t = np.full(shape, rotation[0])
+
+        if np.size(rotation[1]) > 1:
+            roty_t = rotation[1]
+        else:
+            roty_t = np.full(shape, rotation[1])
+        
+        if np.size(rotation[2]) > 1:
+            rotz_t = rotation[2]
+        else:
+            rotz_t = np.full(shape, rotation[2])
+
+        if np.size(rotation_rate[0]) > 1:
+            rotratx_t = rotation_rate[0]
+        else:
+            rotratx_t = np.full(shape, rotation_rate[0])
+
+        if np.size(rotation_rate[1]) > 1:
+            rotraty_t = rotation_rate[1]
+        else:
+            rotraty_t = np.full(shape, rotation_rate[1])
+        
+        if np.size(rotation_rate[2]) > 1:
+            rotratz_t = rotation_rate[2]
+        else:
+            rotratz_t = np.full(shape, rotation_rate[2])
+
+        for ch_idx in range(0, radar.channel_size*radar.frames):
+            for ps_idx in range(0, radar.transmitter.pulses):
+                for sp_idx in range(0, radar.samples_per_pulse):
+                    c_loc_array.push_back(Vec3[float_t](
+                        <float_t> tgx_t[ch_idx, ps_idx, sp_idx],
+                        <float_t> tgy_t[ch_idx, ps_idx, sp_idx],
+                        <float_t> tgz_t[ch_idx, ps_idx, sp_idx]
+                    ))
+                    c_speed_array.push_back(Vec3[float_t](
+                        <float_t> sptx_t[ch_idx, ps_idx, sp_idx],
+                        <float_t> spty_t[ch_idx, ps_idx, sp_idx],
+                        <float_t> sptz_t[ch_idx, ps_idx, sp_idx])
+                    )
+                    c_rotation_array.push_back(Vec3[float_t](
+                        <float_t> (rotx_t[ch_idx, ps_idx, sp_idx]/180*np.pi),
+                        <float_t> (roty_t[ch_idx, ps_idx, sp_idx]/180*np.pi),
+                        <float_t> (rotz_t[ch_idx, ps_idx, sp_idx]/180*np.pi))
+                    )
+                    c_rotation_rate_array.push_back(Vec3[float_t](
+                        <float_t> (rotratx_t[ch_idx, ps_idx, sp_idx]/180*np.pi),
+                        <float_t> (rotraty_t[ch_idx, ps_idx, sp_idx]/180*np.pi),
+                        <float_t> (rotratz_t[ch_idx, ps_idx, sp_idx]/180*np.pi))
+                    )
+                    
+    else:
+        c_loc_array.push_back(Vec3[float_t](
+            <float_t> location[0],
+            <float_t> location[1],
+            <float_t> location[2]
+        ))
+        c_speed_array.push_back(Vec3[float_t](
+            <float_t> speed[0],
+            <float_t> speed[1],
+            <float_t> speed[2])
+        )
+        c_rotation_array.push_back(Vec3[float_t](
+            <float_t> (rotation[0]/180*np.pi),
+            <float_t> (rotation[1]/180*np.pi),
+            <float_t> (rotation[2]/180*np.pi))
+        )
+        c_rotation_rate_array.push_back(Vec3[float_t](
+            <float_t> (rotation_rate[0]/180*np.pi),
+            <float_t> (rotation_rate[1]/180*np.pi),
+            <float_t> (rotation_rate[2]/180*np.pi))
+        )
+
+    return Target[float_t](&mesh_memview[0,0,0],
+            <int_t> mesh_memview.shape[0],
+            Vec3[float_t](&origin[0]),
+            c_loc_array,
+            c_speed_array,
+            c_rotation_array,
+            c_rotation_rate_array,
+            <bool> target.get('is_ground', False))

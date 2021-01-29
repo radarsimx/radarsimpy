@@ -37,7 +37,7 @@ from libcpp cimport bool
 from radarsimpy.includes.radarsimc cimport TxChannel, Transmitter
 from radarsimpy.rt.cp_radarsimc cimport cp_TxChannel, cp_Transmitter
 from radarsimpy.includes.radarsimc cimport Snapshot, Target, Aperture, Receiver, RxChannel, Scene
-from radarsimpy.rt.cp_radarsimc cimport cp_RxChannel
+from radarsimpy.rt.cp_radarsimc cimport cp_RxChannel, cp_Target
 from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t, vector
 from radarsimpy.includes.zpvector cimport Vec3
 from libcpp.complex cimport complex as cpp_complex
@@ -142,146 +142,9 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
     """
     timestamp = radar.timestamp
 
-    cdef float_t[:,:,:] mesh_memview
-    cdef float_t[:] origin
-
     cdef int_t target_count = len(targets)
-    cdef vector[Vec3[float_t]] c_loc_array
-    cdef vector[Vec3[float_t]] c_speed_array
-    cdef vector[Vec3[float_t]] c_rotation_array
-    cdef vector[Vec3[float_t]] c_rotation_rate_array
-    
     for idx in range(0, target_count):
-        c_loc_array.clear()
-        c_speed_array.clear()
-        c_rotation_array.clear()
-        c_rotation_rate_array.clear()
-
-        t_mesh = mesh.Mesh.from_file(targets[idx]['model'])
-        mesh_memview = t_mesh.vectors.astype(np.float64)
-
-        origin = np.array(targets[idx].get('origin', (0,0,0)), dtype=np.float64)
-
-        location = targets[idx].get('location', (0,0,0))
-        speed = targets[idx].get('speed', (0,0,0))
-        rotation = targets[idx].get('rotation', (0,0,0))
-        rotation_rate = targets[idx].get('rotation_rate', (0,0,0))
-
-        if np.size(location[0]) > 1 or np.size(location[1])  > 1 or np.size(location[2]) > 1 or np.size(speed[0]) > 1 or np.size(speed[1]) > 1 or np.size(speed[2]) >1 or np.size(rotation[0]) > 1 or np.size(rotation[1]) > 1 or np.size(rotation[2]) >1 or np.size(rotation_rate[0]) > 1 or np.size(rotation_rate[1]) > 1 or np.size(rotation_rate[2])>1:
-            if np.size(location[0]) > 1:
-                tgx_t = location[0]
-            else:
-                tgx_t = np.full_like(timestamp, location[0])
-
-            if np.size(location[1]) > 1:
-                tgy_t = location[1]
-            else:
-                tgy_t = np.full_like(timestamp, location[1])
-            
-            if np.size(location[2]) > 1:
-                tgz_t = location[2]
-            else:
-                tgz_t = np.full_like(timestamp, location[2])
-
-            if np.size(speed[0]) > 1:
-                sptx_t = speed[0]
-            else:
-                sptx_t = np.full_like(timestamp, speed[0])
-
-            if np.size(speed[1]) > 1:
-                spty_t = speed[1]
-            else:
-                spty_t = np.full_like(timestamp, speed[1])
-            
-            if np.size(speed[2]) > 1:
-                sptz_t = speed[2]
-            else:
-                sptz_t = np.full_like(timestamp, speed[2])
-
-            if np.size(rotation[0]) > 1:
-                rotx_t = rotation[0]
-            else:
-                rotx_t = np.full_like(timestamp, rotation[0])
-
-            if np.size(rotation[1]) > 1:
-                roty_t = rotation[1]
-            else:
-                roty_t = np.full_like(timestamp, rotation[1])
-            
-            if np.size(rotation[2]) > 1:
-                rotz_t = rotation[2]
-            else:
-                rotz_t = np.full_like(timestamp, rotation[2])
-
-            if np.size(rotation_rate[0]) > 1:
-                rotratx_t = rotation_rate[0]
-            else:
-                rotratx_t = np.full_like(timestamp, rotation_rate[0])
-
-            if np.size(rotation_rate[1]) > 1:
-                rotraty_t = rotation_rate[1]
-            else:
-                rotraty_t = np.full_like(timestamp, rotation_rate[1])
-            
-            if np.size(rotation_rate[2]) > 1:
-                rotratz_t = rotation_rate[2]
-            else:
-                rotratz_t = np.full_like(timestamp, rotation_rate[2])
-
-            for ch_idx in range(0, radar.channel_size*radar.frames):
-                for ps_idx in range(0, radar.transmitter.pulses):
-                    for sp_idx in range(0, radar.samples_per_pulse):
-                        c_loc_array.push_back(Vec3[float_t](
-                            <float_t> tgx_t[ch_idx, ps_idx, sp_idx],
-                            <float_t> tgy_t[ch_idx, ps_idx, sp_idx],
-                            <float_t> tgz_t[ch_idx, ps_idx, sp_idx]
-                        ))
-                        c_speed_array.push_back(Vec3[float_t](
-                            <float_t> sptx_t[ch_idx, ps_idx, sp_idx],
-                            <float_t> spty_t[ch_idx, ps_idx, sp_idx],
-                            <float_t> sptz_t[ch_idx, ps_idx, sp_idx])
-                        )
-                        c_rotation_array.push_back(Vec3[float_t](
-                            <float_t> (rotx_t[ch_idx, ps_idx, sp_idx]/180*np.pi),
-                            <float_t> (roty_t[ch_idx, ps_idx, sp_idx]/180*np.pi),
-                            <float_t> (rotz_t[ch_idx, ps_idx, sp_idx]/180*np.pi))
-                        )
-                        c_rotation_rate_array.push_back(Vec3[float_t](
-                            <float_t> (rotratx_t[ch_idx, ps_idx, sp_idx]/180*np.pi),
-                            <float_t> (rotraty_t[ch_idx, ps_idx, sp_idx]/180*np.pi),
-                            <float_t> (rotratz_t[ch_idx, ps_idx, sp_idx]/180*np.pi))
-                        )
-                        
-        else:
-            c_loc_array.push_back(Vec3[float_t](
-                <float_t> location[0],
-                <float_t> location[1],
-                <float_t> location[2]
-            ))
-            c_speed_array.push_back(Vec3[float_t](
-                <float_t> speed[0],
-                <float_t> speed[1],
-                <float_t> speed[2])
-            )
-            c_rotation_array.push_back(Vec3[float_t](
-                <float_t> (rotation[0]/180*np.pi),
-                <float_t> (rotation[1]/180*np.pi),
-                <float_t> (rotation[2]/180*np.pi))
-            )
-            c_rotation_rate_array.push_back(Vec3[float_t](
-                <float_t> (rotation_rate[0]/180*np.pi),
-                <float_t> (rotation_rate[1]/180*np.pi),
-                <float_t> (rotation_rate[2]/180*np.pi))
-            )
-
-        radar_scene.AddTarget(Target[float_t](&mesh_memview[0,0,0],
-            <int_t> mesh_memview.shape[0],
-            Vec3[float_t](&origin[0]),
-            c_loc_array,
-            c_speed_array,
-            c_rotation_array,
-            c_rotation_rate_array,
-            <bool> targets[idx].get('is_ground', False)))
+        radar_scene.AddTarget(cp_Target(radar, targets[idx], np.shape(timestamp)))
     
     """
     Aperture
@@ -379,7 +242,6 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
         radar.frames*radar.channel_size*radar.transmitter.pulses*radar.samples_per_pulse,
         cpp_complex[float_t](0.0,0.0))
 
-    # cdef vector[RayPy[float_t]] ray_received
     radar_scene.RunSimulator(
         level_id, <float_t> correction, snaps, bb_vect[0]
     )
@@ -457,8 +319,7 @@ cpdef scene(radar, targets, correction=0, density=10, level=None, noise=True):
                     radar.transmitter.pulses,
                     radar.samples_per_pulse,
                 ))
-    # else:
-    #     baseband = np.array(baseband_re)+1j*np.array(baseband_im)
+
     del bb_vect
 
     return {'baseband':baseband,
