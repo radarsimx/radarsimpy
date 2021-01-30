@@ -378,54 +378,72 @@ cdef Target[float_t] cp_Target(radar, target, shape):
         for ch_idx in range(0, radar.channel_size*radar.frames):
             for ps_idx in range(0, radar.transmitter.pulses):
                 for sp_idx in range(0, radar.samples_per_pulse):
-                    c_loc_array.push_back(Vec3[float_t](
-                        tgx_t[ch_idx, ps_idx, sp_idx],
-                        tgy_t[ch_idx, ps_idx, sp_idx],
-                        tgz_t[ch_idx, ps_idx, sp_idx]
-                    ))
-                    c_speed_array.push_back(Vec3[float_t](
-                        sptx_t[ch_idx, ps_idx, sp_idx],
-                        spty_t[ch_idx, ps_idx, sp_idx],
-                        sptz_t[ch_idx, ps_idx, sp_idx])
+                    c_loc_array.push_back(
+                        Vec3[float_t](
+                            tgx_t[ch_idx, ps_idx, sp_idx],
+                            tgy_t[ch_idx, ps_idx, sp_idx],
+                            tgz_t[ch_idx, ps_idx, sp_idx]
+                        )
                     )
-                    c_rotation_array.push_back(Vec3[float_t](
-                        rotx_t[ch_idx, ps_idx, sp_idx],
-                        roty_t[ch_idx, ps_idx, sp_idx],
-                        rotz_t[ch_idx, ps_idx, sp_idx])
+                    c_speed_array.push_back(
+                        Vec3[float_t](
+                            sptx_t[ch_idx, ps_idx, sp_idx],
+                            spty_t[ch_idx, ps_idx, sp_idx],
+                            sptz_t[ch_idx, ps_idx, sp_idx]
+                        )
                     )
-                    c_rotation_rate_array.push_back(Vec3[float_t](
-                        rotratx_t[ch_idx, ps_idx, sp_idx],
-                        rotraty_t[ch_idx, ps_idx, sp_idx],
-                        rotratz_t[ch_idx, ps_idx, sp_idx])
+                    c_rotation_array.push_back(
+                        Vec3[float_t](
+                            rotx_t[ch_idx, ps_idx, sp_idx],
+                            roty_t[ch_idx, ps_idx, sp_idx],
+                            rotz_t[ch_idx, ps_idx, sp_idx]
+                        )
+                    )
+                    c_rotation_rate_array.push_back(
+                        Vec3[float_t](
+                            rotratx_t[ch_idx, ps_idx, sp_idx],
+                            rotraty_t[ch_idx, ps_idx, sp_idx],
+                            rotratz_t[ch_idx, ps_idx, sp_idx]
+                        )
                     )
                     
     else:
-        c_loc_array.push_back(Vec3[float_t](
-            <float_t> location[0],
-            <float_t> location[1],
-            <float_t> location[2]
-        ))
-        c_speed_array.push_back(Vec3[float_t](
-            <float_t> speed[0],
-            <float_t> speed[1],
-            <float_t> speed[2])
+        c_loc_array.push_back(
+            Vec3[float_t](
+                <float_t> location[0],
+                <float_t> location[1],
+                <float_t> location[2]
+            )
         )
-        c_rotation_array.push_back(Vec3[float_t](
-            <float_t> rotation[0],
-            <float_t> rotation[1],
-            <float_t> rotation[2])
+        c_speed_array.push_back(
+            Vec3[float_t](
+                <float_t> speed[0],
+                <float_t> speed[1],
+                <float_t> speed[2]
+            )
         )
-        c_rotation_rate_array.push_back(Vec3[float_t](
-            <float_t> rotation_rate[0],
-            <float_t> rotation_rate[1],
-            <float_t> rotation_rate[2])
+        c_rotation_array.push_back(
+            Vec3[float_t](
+                <float_t> rotation[0],
+                <float_t> rotation[1],
+                <float_t> rotation[2]
+            )
+        )
+        c_rotation_rate_array.push_back(
+            Vec3[float_t](
+                <float_t> rotation_rate[0],
+                <float_t> rotation_rate[1],
+                <float_t> rotation_rate[2]
+            )
         )
 
-    return Target[float_t](&mesh_memview[0,0,0],
+    return Target[float_t](
+            &mesh_memview[0,0,0],
             <int_t> mesh_memview.shape[0],
             Vec3[float_t](&origin[0]),
             c_loc_array,
             c_speed_array,
             c_rotation_array,
             c_rotation_rate_array,
-            <bool> target.get('is_ground', False))
+            <bool> target.get('is_ground', False)
+        )
