@@ -104,16 +104,18 @@ class Transmitter:
             Angles for elevation pattern (deg). ``default [-90, 90]``
         - **elevation_pattern** (*numpy.1darray*) --
             Elevation pattern (dB). ``default [0, 0]``
+        - **pulse_amp** (*numpy.1darray*) --
+            Relative amplitude sequence for pulse's amplitude modulation.
+            The array length should be the same as `pulses`. ``default 0``
         - **pulse_phs** (*numpy.1darray*) --
-            Phase code sequence for phase modulation (deg).
-            If ``chip_length == 0``, or ``chip_length`` is not defined,
-            length of ``pulse_phs`` should be equal to ``pulses``.
-            ``default 0``
-        - **chip_length** (*float*) --
-            Length for each phase code (s). If ``chip_length ==
-            0``, one pulse will have one ``pulse_phs``. If
-            ``chip_length != 0``, all ``pulse_phs`` will be
-            applied to each pulse. ``default 0``
+            Phase code sequence for pulse's phase modulation (deg).
+            The array length should be the same as `pulses`. ``default 0``
+        - **t_mod** (*numpy.1darray*) --
+            Time stamps for waveform modulation (s). ``default None``
+        - **phs** (*numpy.1darray*) --
+            Phase scheme for waveform modulation (deg). ``default None``
+        - **amp** (*numpy.1darray*) --
+            Relative amplitude scheme for waveform modulation. ``default None``
 
         }]
 
@@ -172,29 +174,30 @@ class Transmitter:
 
     ::
 
-        |                prp
+        |                       prp
         |                  +-----------+
         |
-        |                          /            /            /          +
-        |                         /            /            /           |
-        |                        /            /            /            |
-        |                       /            /            /             |
-        |          +---fc--->  /            /            /     ...   bandwidth
-        |                     /            /            /               |
-        |                    /            /            /                |
-        |                   /            /            /                 |
-        |                  /            /            /                  +
+        |            +---f[1]--->   /            /            /
+        |                         /            /            /
+        |                        /            /            /
+        |                       /            /            /
+        |                      /            /            /     ...
+        |                     /            /            /
+        |                    /            /            /
+        |                   /            /            /
+        |      +---f[0]---> /            /            /
         |
         |                  +-------+
-        |                 pulse_length
+        |                 t[0]    t[1]
         |
-        |                  +-------------------------------------+
-        | chip_length == 0 |  phase 0  ||  phase 1  ||  phase 2  |  ...
-        |                  +-------------------------------------+
+        |    Pulse         +--------------------------------------+
+        |    modulation    |pulse_amp[0]|pulse_amp[1]|pulse_amp[2]|  ...
+        |                  |pulse_phs[0]|pulse_phs[1]|pulse_phs[2]|  ...
+        |                  +--------------------------------------+
         |
-        |                  +-------------------------------------+
-        | chip_length != 0 | phase 0:N || phase 0:N || phase 0:N |  ...
-        |                  +-------------------------------------+
+        |    Waveform      +--------------------------------------+
+        |    modulation    |           amp / phs / t_mod          |  ...
+        |                  +--------------------------------------+
 
     Tips:
 
@@ -382,22 +385,8 @@ class Transmitter:
                     self.el_patterns[-1]-np.max(self.el_patterns[-1]),
                     kind='linear')
             )
-            # self.pulse_phs.append(
-            #     np.exp(1j * self.channels[tx_idx].get(
-            #         'pulse_phs', np.zeros((self.pulses))) / 180 * np.pi))
-
-            # self.max_code_length = max(
-            #     self.max_code_length, np.shape(self.pulse_phs[-1])[0])
-
-            # self.chip_length.append(self.channels[tx_idx].get(
-            #     'chip_length', 0))
 
             self.grid.append(self.channels[tx_idx].get('grid', 0.5))
-
-            # if self.chip_length[tx_idx] == 0:
-            #     self.modulation = 'frame'
-            # else:
-            #     self.modulation = 'pulse'
 
         # additional transmitter parameters
         # self.wavelength = const.c / self.fc[0]
