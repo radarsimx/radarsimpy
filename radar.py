@@ -238,7 +238,7 @@ class Transmitter:
 
         if f_offset is not None:
             if isinstance(f_offset, (list, tuple, np.ndarray)):
-                self.f_offset = np.array([f_offset])
+                self.f_offset = np.array(f_offset)
             else:
                 self.f_offset = f_offset+np.zeros(pulses)
         else:
