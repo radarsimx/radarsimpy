@@ -280,8 +280,13 @@ cpdef scene(radar, targets, density=10, level=None, noise=True):
         ('pulse_idx', int, (1,)),
         ('sample_idx', int, (1,)),
         ('level', int, (1,)),
+        ('d_theta', np.float64, (1,)),
+        ('d_phi', np.float64, (1,)),
+        ('norm', np.float64, (3,)),
+        ('E', np.complex128, (3,)),
         ('positions', np.float64, (3,)),
         ('directions', np.float64, (3,)),
+        ('inc_dir', np.float64, (3,)),
         ('polarization', np.float64, (3,)),
         ('path_pos', np.float64, (20,3))
         ])
@@ -303,13 +308,24 @@ cpdef scene(radar, targets, density=10, level=None, noise=True):
             rays[count]['channel_id'] = snaps[snapshot_idx].ch_idx_
             rays[count]['pulse_idx'] = snaps[snapshot_idx].pulse_idx_
             rays[count]['sample_idx'] = snaps[snapshot_idx].sample_idx_
+            rays[count]['d_theta'] = snaps[snapshot_idx].ray_received[idx].d_theta_
+            rays[count]['d_phi'] = snaps[snapshot_idx].ray_received[idx].d_phi_
             rays[count]['level'] = level_id
+            rays[count]['E'][0] = snaps[snapshot_idx].ray_received[idx].E_[0].real() + 1j*snaps[snapshot_idx].ray_received[idx].E_[0].imag()
+            rays[count]['E'][1] = snaps[snapshot_idx].ray_received[idx].E_[1].real() + 1j*snaps[snapshot_idx].ray_received[idx].E_[1].imag()
+            rays[count]['E'][2] = snaps[snapshot_idx].ray_received[idx].E_[2].real() + 1j*snaps[snapshot_idx].ray_received[idx].E_[2].imag()
+            rays[count]['norm'][0] = snaps[snapshot_idx].ray_received[idx].norm_[0]
+            rays[count]['norm'][1] = snaps[snapshot_idx].ray_received[idx].norm_[1]
+            rays[count]['norm'][2] = snaps[snapshot_idx].ray_received[idx].norm_[2]
             rays[count]['positions'][0] = snaps[snapshot_idx].ray_received[idx].loc_[0]
             rays[count]['positions'][1] = snaps[snapshot_idx].ray_received[idx].loc_[1]
             rays[count]['positions'][2] = snaps[snapshot_idx].ray_received[idx].loc_[2]
             rays[count]['directions'][0] = snaps[snapshot_idx].ray_received[idx].dir_[0]
             rays[count]['directions'][1] = snaps[snapshot_idx].ray_received[idx].dir_[1]
             rays[count]['directions'][2] = snaps[snapshot_idx].ray_received[idx].dir_[2]
+            rays[count]['inc_dir'][0] = snaps[snapshot_idx].ray_received[idx].inc_dir_[0]
+            rays[count]['inc_dir'][1] = snaps[snapshot_idx].ray_received[idx].inc_dir_[1]
+            rays[count]['inc_dir'][2] = snaps[snapshot_idx].ray_received[idx].inc_dir_[2]
             rays[count]['polarization'][0] = snaps[snapshot_idx].ray_received[idx].pol_[0]
             rays[count]['polarization'][1] = snaps[snapshot_idx].ray_received[idx].pol_[1]
             rays[count]['polarization'][2] = snaps[snapshot_idx].ray_received[idx].pol_[2]
