@@ -73,7 +73,6 @@ cdef extern from "ray.hpp":
     cdef cppclass Ray[T, Tg=*]:
         Ray() except +
         Vec3[T] *dir_
-        Vec3[T] inc_dir_
         Vec3[T] *loc_
         Vec3[T] *pol_
         Vec3[T] norm_
@@ -84,7 +83,6 @@ cdef extern from "ray.hpp":
         T d_theta_
         T d_phi_
         Vec3[cpp_complex[T]] E_
-        vector[PathNode[T]] path_
 
 
 cdef extern from "raypool.hpp":
