@@ -301,9 +301,10 @@ cpdef scene(radar, targets, density=10, level=None, noise=True):
     cdef int count = 0
     for snapshot_idx in range(0, snaps.size()):
         for idx in range(0, snaps[snapshot_idx].ray_received.size()):
+            refCount = snaps[snapshot_idx].ray_received[idx].ref_count_
             rays[count]['area'] = snaps[snapshot_idx].ray_received[idx].area_
-            rays[count]['distance'] = snaps[snapshot_idx].ray_received[idx].range_
-            rays[count]['range_rate'] = snaps[snapshot_idx].ray_received[idx].range_rate_
+            rays[count]['distance'] = snaps[snapshot_idx].ray_received[idx].range_[refCount]
+            rays[count]['range_rate'] = snaps[snapshot_idx].ray_received[idx].range_rate_[refCount]
             rays[count]['refCount'] = snaps[snapshot_idx].ray_received[idx].ref_count_
             rays[count]['channel_id'] = snaps[snapshot_idx].ch_idx_
             rays[count]['pulse_idx'] = snaps[snapshot_idx].pulse_idx_
@@ -317,18 +318,18 @@ cpdef scene(radar, targets, density=10, level=None, noise=True):
             rays[count]['norm'][0] = snaps[snapshot_idx].ray_received[idx].norm_[0]
             rays[count]['norm'][1] = snaps[snapshot_idx].ray_received[idx].norm_[1]
             rays[count]['norm'][2] = snaps[snapshot_idx].ray_received[idx].norm_[2]
-            rays[count]['positions'][0] = snaps[snapshot_idx].ray_received[idx].loc_[0]
-            rays[count]['positions'][1] = snaps[snapshot_idx].ray_received[idx].loc_[1]
-            rays[count]['positions'][2] = snaps[snapshot_idx].ray_received[idx].loc_[2]
-            rays[count]['directions'][0] = snaps[snapshot_idx].ray_received[idx].dir_[0]
-            rays[count]['directions'][1] = snaps[snapshot_idx].ray_received[idx].dir_[1]
-            rays[count]['directions'][2] = snaps[snapshot_idx].ray_received[idx].dir_[2]
+            rays[count]['positions'][0] = snaps[snapshot_idx].ray_received[idx].loc_[refCount][0]
+            rays[count]['positions'][1] = snaps[snapshot_idx].ray_received[idx].loc_[refCount][1]
+            rays[count]['positions'][2] = snaps[snapshot_idx].ray_received[idx].loc_[refCount][2]
+            rays[count]['directions'][0] = snaps[snapshot_idx].ray_received[idx].dir_[refCount][0]
+            rays[count]['directions'][1] = snaps[snapshot_idx].ray_received[idx].dir_[refCount][1]
+            rays[count]['directions'][2] = snaps[snapshot_idx].ray_received[idx].dir_[refCount][2]
             rays[count]['inc_dir'][0] = snaps[snapshot_idx].ray_received[idx].inc_dir_[0]
             rays[count]['inc_dir'][1] = snaps[snapshot_idx].ray_received[idx].inc_dir_[1]
             rays[count]['inc_dir'][2] = snaps[snapshot_idx].ray_received[idx].inc_dir_[2]
-            rays[count]['polarization'][0] = snaps[snapshot_idx].ray_received[idx].pol_[0]
-            rays[count]['polarization'][1] = snaps[snapshot_idx].ray_received[idx].pol_[1]
-            rays[count]['polarization'][2] = snaps[snapshot_idx].ray_received[idx].pol_[2]
+            rays[count]['polarization'][0] = snaps[snapshot_idx].ray_received[idx].pol_[refCount][0]
+            rays[count]['polarization'][1] = snaps[snapshot_idx].ray_received[idx].pol_[refCount][1]
+            rays[count]['polarization'][2] = snaps[snapshot_idx].ray_received[idx].pol_[refCount][2]
             rays[count]['path_pos'] = np.zeros((20,3))
             # for path_idx in range(0, <int_t>(rays[count]['refCount']+2)):
             #     rays[count]['path_pos'][path_idx, 0] = snaps[snapshot_idx].ray_received[idx].path_[path_idx].loc_[0]

@@ -72,13 +72,13 @@ cdef extern from "ray.hpp":
 
     cdef cppclass Ray[T, Tg=*]:
         Ray() except +
-        Vec3[T] dir_
+        Vec3[T] *dir_
         Vec3[T] inc_dir_
-        Vec3[T] loc_
-        Vec3[T] pol_
+        Vec3[T] *loc_
+        Vec3[T] *pol_
         Vec3[T] norm_
-        T range_
-        T range_rate_
+        T *range_
+        T *range_rate_
         T area_
         int ref_count_
         T d_theta_
