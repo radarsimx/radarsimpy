@@ -36,7 +36,7 @@ from libcpp cimport bool
 
 from radarsimpy.includes.radarsimc cimport TxChannel, Transmitter
 from radarsimpy.rt.cp_radarsimc cimport cp_TxChannel, cp_Transmitter
-from radarsimpy.includes.radarsimc cimport Snapshot, Target, Aperture, Receiver, RxChannel, Scene
+from radarsimpy.includes.radarsimc cimport Snapshot, Target, Receiver, RxChannel, Scene
 from radarsimpy.rt.cp_radarsimc cimport cp_RxChannel, cp_Target
 from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t, vector
 from radarsimpy.includes.zpvector cimport Vec3
@@ -154,35 +154,7 @@ cpdef scene(radar, targets, density=10, level=None, noise=True):
     cdef int_t target_count = len(targets)
     for idx in range(0, target_count):
         radar_scene.AddTarget(cp_Target(radar, targets[idx], np.shape(timestamp)))
-    
-    """
-    Aperture
-    """
-    cdef float_t[:,:,:] aperture
 
-    cdef float_t[:] aperture_location
-    cdef float_t[:] aperture_extension
-    if radar.aperture_mesh:
-        aperture = radar.aperture_mesh.astype(np.float64)
-
-        radar_scene.SetAperture(
-            Aperture[float_t](
-                &aperture[0,0,0],
-                <int_t> aperture.shape[0]
-            )
-        )
-
-    else:
-        aperture_location = radar.aperture_location.astype(np.float64)
-        aperture_extension = radar.aperture_extension.astype(np.float64)
-        radar_scene.SetAperture(
-            Aperture[float_t](
-                <float_t> (radar.aperture_phi/180*np.pi),
-                <float_t> (radar.aperture_theta/180*np.pi),
-                Vec3[float_t](&aperture_location[0]),
-                &aperture_extension[0]
-            )
-        )
 
     """
     Transmitter
