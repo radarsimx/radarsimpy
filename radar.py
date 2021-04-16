@@ -559,22 +559,6 @@ class Radar:
     :param time:
         Radar firing time instances / frames
     :type time: float or numpy.1darray
-    :param dict aperture:
-        Radar receiver aperture for ray tracing simulation
-
-        {
-
-        - **phi** (*float*) --
-            phi angle of the aperture's normal (deg)
-        - **theta** (*float*) --
-            theta angle of the aperture's normal (deg)
-        - **location** (*numpy.1darray*) --
-            aperture's center location ``[x, y, z]`` (m)
-        - **extension** (*numpy.1darray*) --
-            aperture's extension of ``[left, right, top, bottom]``
-            when facing towards its normal (m)
-
-        }
     :param int seed:
         Seed for noise generator
 
@@ -598,15 +582,6 @@ class Radar:
     :ivar float range_resolution:
         Range resolution (m).
         ``range_resolution = c / 2 / bandwidth``
-    :ivar float aperture_phi:
-        phi angle of the aperture's normal (deg)
-    :ivar float aperture_theta:
-        theta angle of the aperture's normal (deg)
-    :ivar numpy.1darray aperture_location:
-        Aperture's center location ``[x, y, z]`` (m)
-    :ivar numpy.1darray aperture_extension:
-        Aperture's extension of ``[left, right, top, bottom]``
-        when facing towards its normal (m)
     :ivar numpy.3darray timestamp:
         Timestamp for each samples. Frame start time is
         defined in ``time``.
@@ -636,7 +611,6 @@ class Radar:
                  transmitter,
                  receiver,
                  time=0,
-                 aperture=None,
                  seed=None,
                  **kwargs):
 
@@ -676,38 +650,6 @@ class Radar:
             [self.transmitter.box_min, self.receiver.box_min], axis=0)
         self.box_max = np.max(
             [self.transmitter.box_min, self.receiver.box_max], axis=0)
-
-        if aperture is None:
-            self.aperture_mesh = np.zeros((2, 3, 3))
-            self.aperture_mesh[0, 0, 0] = self.box_max[0]
-            self.aperture_mesh[0, 0, 1] = self.box_max[1]
-            self.aperture_mesh[0, 0, 2] = self.box_max[2]
-
-            self.aperture_mesh[0, 1, 0] = self.box_max[0]
-            self.aperture_mesh[0, 1, 1] = self.box_max[1]
-            self.aperture_mesh[0, 1, 2] = self.box_min[2]
-
-            self.aperture_mesh[0, 2, 0] = self.box_min[0]
-            self.aperture_mesh[0, 2, 1] = self.box_min[1]
-            self.aperture_mesh[0, 2, 2] = self.box_max[2]
-
-            self.aperture_mesh[1, 0, 0] = self.box_min[0]
-            self.aperture_mesh[1, 0, 1] = self.box_min[1]
-            self.aperture_mesh[1, 0, 2] = self.box_min[2]
-
-            self.aperture_mesh[1, 1, 0] = self.box_max[0]
-            self.aperture_mesh[1, 1, 1] = self.box_max[1]
-            self.aperture_mesh[1, 1, 2] = self.box_min[2]
-
-            self.aperture_mesh[1, 2, 0] = self.box_min[0]
-            self.aperture_mesh[1, 2, 1] = self.box_min[1]
-            self.aperture_mesh[1, 2, 2] = self.box_max[2]
-        else:
-            self.aperture_mesh = None
-            self.aperture_phi = aperture.get('phi')
-            self.aperture_theta = aperture.get('theta')
-            self.aperture_location = np.array(aperture.get('location'))
-            self.aperture_extension = np.array(aperture.get('extension'))
 
         self.timestamp = self.gen_timestamp()
         self.pulse_phs = self.cal_frame_phases()
