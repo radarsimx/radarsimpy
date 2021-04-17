@@ -388,9 +388,6 @@ class Transmitter:
 
             self.grid.append(self.channels[tx_idx].get('grid', 0.5))
 
-        # additional transmitter parameters
-        # self.wavelength = const.c / self.fc[0]
-
         self.box_min = np.min(self.locations, axis=0)
         self.box_max = np.max(self.locations, axis=0)
 
@@ -683,8 +680,6 @@ class Radar:
             self.transmitter.f_offset[np.newaxis, :, np.newaxis],
             (self.channel_size, 1, self.samples_per_pulse)
         )
-        # else:
-        #     self.fc_mat = np.full_like(self.timestamp, self.transmitter.fc)
 
         beat_time_samples = np.arange(0,
                                       self.samples_per_pulse,
