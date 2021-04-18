@@ -196,7 +196,9 @@ cpdef scene(radar, targets, density=10, level=None, noise=True):
                         fm_idx,
                         tx_idx,
                         0,
-                        0
+                        0,
+                        <size_t>tx_ch,
+                        <size_t>rx_ch
                     )
                 )
     elif level == 'pulse':
@@ -210,7 +212,9 @@ cpdef scene(radar, targets, density=10, level=None, noise=True):
                         fm_idx,
                         tx_idx,
                         ps_idx,
-                        0)
+                        0,
+                        <size_t>tx_ch,
+                        <size_t>rx_ch)
                     )
     elif level == 'sample':
         level_id = 2
@@ -224,7 +228,9 @@ cpdef scene(radar, targets, density=10, level=None, noise=True):
                             fm_idx,
                             tx_idx,
                             ps_idx,
-                            sp_idx)
+                            sp_idx,
+                            <size_t>tx_ch,
+                            <size_t>rx_ch)
                         )
 
     cdef vector[cpp_complex[float_t]] *bb_vect = new vector[cpp_complex[float_t]](
@@ -259,8 +265,7 @@ cpdef scene(radar, targets, density=10, level=None, noise=True):
         ('positions', np.float64, (3,)),
         ('directions', np.float64, (3,)),
         ('inc_dir', np.float64, (3,)),
-        ('polarization', np.float64, (3,)),
-        ('path_pos', np.float64, (20,3))
+        ('polarization', np.float64, (3,))
         ])
 
 
@@ -302,11 +307,7 @@ cpdef scene(radar, targets, density=10, level=None, noise=True):
             rays[count]['polarization'][0] = snaps[snapshot_idx].ray_received[idx].pol_[refCount][0]
             rays[count]['polarization'][1] = snaps[snapshot_idx].ray_received[idx].pol_[refCount][1]
             rays[count]['polarization'][2] = snaps[snapshot_idx].ray_received[idx].pol_[refCount][2]
-            rays[count]['path_pos'] = np.zeros((20,3))
-            # for path_idx in range(0, <int_t>(rays[count]['refCount']+2)):
-            #     rays[count]['path_pos'][path_idx, 0] = snaps[snapshot_idx].ray_received[idx].path_[path_idx].loc_[0]
-            #     rays[count]['path_pos'][path_idx, 1] = snaps[snapshot_idx].ray_received[idx].path_[path_idx].loc_[1]
-            #     rays[count]['path_pos'][path_idx, 2] = snaps[snapshot_idx].ray_received[idx].path_[path_idx].loc_[2]
+
             count=count+1
 
 

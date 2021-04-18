@@ -213,7 +213,9 @@ cdef extern from "snapshot.hpp":
                  int frame_idx,
                  int ch_idx,
                  int pulse_idx,
-                 int sample_idx) except +
+                 int sample_idx,
+                 size_t tx_size,
+                 size_t rx_size) except +
         T time_
         int sample_idx_
         int pulse_idx_
