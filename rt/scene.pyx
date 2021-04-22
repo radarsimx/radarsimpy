@@ -292,9 +292,9 @@ cpdef scene(radar, targets, density=10, level=None, noise=True):
             rays[count]['E'][0] = snaps[snapshot_idx].ray_received[idx].E_[0].real() + 1j*snaps[snapshot_idx].ray_received[idx].E_[0].imag()
             rays[count]['E'][1] = snaps[snapshot_idx].ray_received[idx].E_[1].real() + 1j*snaps[snapshot_idx].ray_received[idx].E_[1].imag()
             rays[count]['E'][2] = snaps[snapshot_idx].ray_received[idx].E_[2].real() + 1j*snaps[snapshot_idx].ray_received[idx].E_[2].imag()
-            rays[count]['norm'][0] = snaps[snapshot_idx].ray_received[idx].norm_[0]
-            rays[count]['norm'][1] = snaps[snapshot_idx].ray_received[idx].norm_[1]
-            rays[count]['norm'][2] = snaps[snapshot_idx].ray_received[idx].norm_[2]
+            rays[count]['norm'][0] = snaps[snapshot_idx].ray_received[idx].norm_[refCount][0]
+            rays[count]['norm'][1] = snaps[snapshot_idx].ray_received[idx].norm_[refCount][1]
+            rays[count]['norm'][2] = snaps[snapshot_idx].ray_received[idx].norm_[refCount][2]
             rays[count]['positions'][0] = snaps[snapshot_idx].ray_received[idx].loc_[refCount][0]
             rays[count]['positions'][1] = snaps[snapshot_idx].ray_received[idx].loc_[refCount][1]
             rays[count]['positions'][2] = snaps[snapshot_idx].ray_received[idx].loc_[refCount][2]

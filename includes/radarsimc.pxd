@@ -75,7 +75,7 @@ cdef extern from "ray.hpp":
         Vec3[T] *dir_
         Vec3[T] *loc_
         Vec3[T] *pol_
-        Vec3[T] norm_
+        Vec3[T] *norm_
         T *range_
         T *range_rate_
         T area_
