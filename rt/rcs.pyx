@@ -43,7 +43,7 @@ from radarsimpy.includes.zpvector cimport Vec3
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef rcs_sbr(model, phi, theta, f, pol=[0, 0, 1], density=10):
+cpdef rcs_sbr(model, f, obs_phi, obs_theta, inc_phi=None, inc_theta=None, pol=[0, 0, 1], density=1):
     """
     Alias: ``radarsimpy.rt.rcs()``
 
@@ -68,11 +68,27 @@ cpdef rcs_sbr(model, phi, theta, f, pol=[0, 0, 1], density=10):
     trig_mesh = mesh.Mesh.from_file(model)
     cdef float_t[:, :, :] vectors = trig_mesh.vectors.astype(np.float64)
 
+    if inc_phi is None:
+        inc_phi = obs_phi
+
+    if inc_theta is None:
+        inc_theta = obs_theta
+
+    cdef Vec3[float_t] inc_dir = Vec3[float_t](
+        <float_t> (np.sin(inc_theta/180*np.pi)*np.cos(inc_phi/180*np.pi)),
+        <float_t> (np.sin(inc_theta/180*np.pi)*np.sin(inc_phi/180*np.pi)),
+        <float_t> (np.cos(inc_theta/180*np.pi)))
+
+    cdef Vec3[float_t] obs_dir = Vec3[float_t](
+        <float_t> (np.sin(obs_theta/180*np.pi)*np.cos(obs_phi/180*np.pi)),
+        <float_t> (np.sin(obs_theta/180*np.pi)*np.sin(obs_phi/180*np.pi)),
+        <float_t> (np.cos(obs_theta/180*np.pi)))
+
     cdef Rcs[float_t] rcs
 
     rcs = Rcs[float_t](Target[float_t](&vectors[0, 0, 0], <int_t> vectors.shape[0]),
-                      <float_t> phi/180*np.pi,
-                      <float_t> theta/180*np.pi,
+                      inc_dir,
+                      obs_dir,
                       Vec3[float_t](<float_t> pol[0], <float_t> pol[1], <float_t> pol[2]),
                       <float_t> f,
                       <float_t> density)

@@ -98,8 +98,8 @@ cdef extern from "rcs.hpp":
     cdef cppclass Rcs[T]:
         Rcs() except +
         Rcs(const Target[T]& mesh,
-            const T& phi,
-            const T& theta,
+            const Vec3[T]& inc_dir,
+            const Vec3[T]& obs_dir,
             const Vec3[T]& polarization,
             const T& frequency,
             const T& density) except +
