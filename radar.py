@@ -386,7 +386,7 @@ class Transmitter:
                     kind='linear')
             )
 
-            self.grid.append(self.channels[tx_idx].get('grid', 0.5))
+            self.grid.append(self.channels[tx_idx].get('grid', 1))
 
         self.box_min = np.min(self.locations, axis=0)
         self.box_max = np.max(self.locations, axis=0)
