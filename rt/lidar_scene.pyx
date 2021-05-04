@@ -47,6 +47,7 @@ from stl import mesh
 @cython.wraparound(False)
 cpdef lidar_scene(lidar, targets, t=0):
     """
+    lidar_scene(lidar, targets, t=0)
     Alias: ``radarsimpy.rt.lidar_scene()``
     
     Lidar scene simulator

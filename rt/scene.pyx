@@ -50,8 +50,9 @@ from stl import mesh
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef scene(radar, targets, density=10, level=None, noise=True):
+cpdef scene(radar, targets, density=1, level=None, noise=True):
     """
+    scene(radar, targets, density=1, level=None, noise=True)
     Alias: ``radarsimpy.rt.scene()``
     
     Radar scene simulator
@@ -88,7 +89,7 @@ cpdef scene(radar, targets, density=10, level=None, noise=True):
         ``Radar.timestamp`` to customize the time varying property.
         Example: ``location=(1e-3*np.sin(2*np.pi*1*radar.timestamp), 0, 0)``
     :param float density:
-        Ray density (number of rays per wavelength). ``default 10``
+        Ray density (number of rays per wavelength). ``default 1``
     :param str level:
         Fidelity level of the simulation, ``default None``
 

@@ -32,6 +32,7 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
         <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
@@ -168,7 +169,7 @@
 <span id="tools"></span><h1>Tools<a class="headerlink" href="#module-radarsimpy.tools" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="radarsimpy.tools.roc_pd">
-<code class="sig-prename descclassname"><span class="pre">radarsimpy.tools.</span></code><code class="sig-name descname"><span class="pre">roc_pd</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pfa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Coherent'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.tools.roc_pd" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">radarsimpy.tools.</code><code class="sig-name descname">roc_pd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pfa</span></em>, <em class="sig-param"><span class="n">snr</span></em>, <em class="sig-param"><span class="n">N</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">stype</span><span class="o">=</span><span class="default_value">'Coherent'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.tools.roc_pd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate probability of detection (Pd) in receiver operating
 characteristic (ROC)</p>
 <dl class="field-list simple">
@@ -208,7 +209,7 @@ Chapman and Hall/CRC, 2005.</p>
 
 <dl class="py function">
 <dt id="radarsimpy.tools.roc_snr">
-<code class="sig-prename descclassname"><span class="pre">radarsimpy.tools.</span></code><code class="sig-name descname"><span class="pre">roc_snr</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pfa</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stype</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Coherent'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.tools.roc_snr" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">radarsimpy.tools.</code><code class="sig-name descname">roc_snr</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pfa</span></em>, <em class="sig-param"><span class="n">pd</span></em>, <em class="sig-param"><span class="n">N</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">stype</span><span class="o">=</span><span class="default_value">'Coherent'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.tools.roc_snr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the minimal SNR for certain probability of
 detection (Pd) and probability of false alarm (Pfa) in
 receiver operating characteristic (ROC) with Secant method</p>

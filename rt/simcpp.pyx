@@ -61,6 +61,7 @@ cimport numpy as np
 @cython.wraparound(False)
 cpdef run_simulator(radar, targets, noise=True):
     """
+    run_simulator(radar, targets, noise=True)
     Alias: ``radarsimpy.simulatorcpp()``
     
     Radar simulator with C++ engine

@@ -32,6 +32,8 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -174,7 +176,7 @@
 <span id="radarsimpy-simulatorcpp"></span><h2>radarsimpy.simulatorcpp<a class="headerlink" href="#module-radarsimpy.rt.simulatorcpp" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="radarsimpy.rt.simulatorcpp.run_simulator">
-<code class="sig-prename descclassname"><span class="pre">radarsimpy.rt.simulatorcpp.</span></code><code class="sig-name descname"><span class="pre">run_simulator</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.rt.simulatorcpp.run_simulator" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">radarsimpy.rt.simulatorcpp.</code><code class="sig-name descname">run_simulator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">radar</span></em>, <em class="sig-param"><span class="n">targets</span></em>, <em class="sig-param"><span class="n">noise</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.rt.simulatorcpp.run_simulator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias: <code class="docutils literal notranslate"><span class="pre">radarsimpy.simulatorcpp()</span></code></p>
 <p>Radar simulator with C++ engine</p>
 <dl class="field-list simple">
@@ -252,7 +254,7 @@ Example: <code class="docutils literal notranslate"><span class="pre">location=(
 <span id="radarsimpy-simulator"></span><h2>radarsimpy.simulator<a class="headerlink" href="#module-radarsimpy.simulator" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="radarsimpy.simulator.run_simulator">
-<code class="sig-prename descclassname"><span class="pre">radarsimpy.simulator.</span></code><code class="sig-name descname"><span class="pre">run_simulator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">radar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.simulator.run_simulator" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">radarsimpy.simulator.</code><code class="sig-name descname">run_simulator</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">radar</span></em>, <em class="sig-param"><span class="n">targets</span></em>, <em class="sig-param"><span class="n">noise</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.simulator.run_simulator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias: <code class="docutils literal notranslate"><span class="pre">radarsimpy.simulator()</span></code></p>
 <p>Simulate baseband response of a radar with defined targets. Python engine.</p>
 <dl class="field-list simple">

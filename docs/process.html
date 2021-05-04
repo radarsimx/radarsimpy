@@ -32,6 +32,8 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -168,7 +170,7 @@
 <span id="processing"></span><h1>Processing<a class="headerlink" href="#module-radarsimpy.processing" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="radarsimpy.processing.cal_range_doppler">
-<code class="sig-prename descclassname"><span class="pre">radarsimpy.processing.</span></code><code class="sig-name descname"><span class="pre">cal_range_doppler</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">radar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_profile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doppler_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fft_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.processing.cal_range_doppler" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">radarsimpy.processing.</code><code class="sig-name descname">cal_range_doppler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">radar</span></em>, <em class="sig-param"><span class="n">range_profile</span></em>, <em class="sig-param"><span class="n">doppler_window</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">fft_shift</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.processing.cal_range_doppler" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate range-Doppler matrix</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -191,7 +193,7 @@ a square window)</p></li>
 
 <dl class="py function">
 <dt id="radarsimpy.processing.cal_range_profile">
-<code class="sig-prename descclassname"><span class="pre">radarsimpy.processing.</span></code><code class="sig-name descname"><span class="pre">cal_range_profile</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">radar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseband</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.processing.cal_range_profile" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">radarsimpy.processing.</code><code class="sig-name descname">cal_range_profile</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">radar</span></em>, <em class="sig-param"><span class="n">baseband</span></em>, <em class="sig-param"><span class="n">range_window</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.processing.cal_range_profile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate range profile matrix</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -215,7 +217,7 @@ a square window)</p></li>
 
 <dl class="py function">
 <dt id="radarsimpy.processing.cfar_ca">
-<code class="sig-prename descclassname"><span class="pre">radarsimpy.processing.</span></code><code class="sig-name descname"><span class="pre">cfar_ca</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">guard</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trailing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pfa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.processing.cfar_ca" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">radarsimpy.processing.</code><code class="sig-name descname">cfar_ca</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">guard</span></em>, <em class="sig-param"><span class="n">trailing</span></em>, <em class="sig-param"><span class="n">pfa</span><span class="o">=</span><span class="default_value">1e-05</span></em>, <em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">offset</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.processing.cfar_ca" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cell Averaging CFAR (CA-CFAR)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -241,7 +243,7 @@ a square window)</p></li>
 
 <dl class="py function">
 <dt id="radarsimpy.processing.cfar_os">
-<code class="sig-prename descclassname"><span class="pre">radarsimpy.processing.</span></code><code class="sig-name descname"><span class="pre">cfar_os</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pfa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.processing.cfar_os" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">radarsimpy.processing.</code><code class="sig-name descname">cfar_os</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="n">k</span></em>, <em class="sig-param"><span class="n">pfa</span><span class="o">=</span><span class="default_value">1e-05</span></em>, <em class="sig-param"><span class="n">axis</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">offset</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.processing.cfar_os" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ordered Statistic CFAR (OS-CFAR)</p>
 <p>For edge cells, use rollovered cells to fill the missing cells.</p>
 <dl class="field-list simple">
@@ -271,7 +273,7 @@ pp. 608–621, 1983.</p>
 
 <dl class="py function">
 <dt id="radarsimpy.processing.get_polar_image">
-<code class="sig-prename descclassname"><span class="pre">radarsimpy.processing.</span></code><code class="sig-name descname"><span class="pre">get_polar_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_bins</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle_bins</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fov_deg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.processing.get_polar_image" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">radarsimpy.processing.</code><code class="sig-name descname">get_polar_image</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">image</span></em>, <em class="sig-param"><span class="n">range_bins</span></em>, <em class="sig-param"><span class="n">angle_bins</span></em>, <em class="sig-param"><span class="n">fov_deg</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.processing.get_polar_image" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert cartesian coordinate to polar</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
