@@ -32,7 +32,6 @@
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -176,7 +175,7 @@
 <h2>radarsimpy.Transmitter<a class="headerlink" href="#radarsimpy-transmitter" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="radarsimpy.Transmitter">
-<em class="property">class </em><code class="sig-prename descclassname">radarsimpy.</code><code class="sig-name descname">Transmitter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">f</span></em>, <em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">f_offset</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tx_power</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">prp</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">pulses</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">pn_f</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">pn_power</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">channels</span><span class="o">=</span><span class="default_value">[{'location': (0, 0, 0)}]</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.Transmitter" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">radarsimpy.</span></code><code class="sig-name descname"><span class="pre">Transmitter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tx_power</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pulses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pn_f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pn_power</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[{'location':</span> <span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">0)}]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.Transmitter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class defines basic parameters of a radar transmitter</p>
 <dl class="field-list simple">
@@ -307,7 +306,7 @@ Antenna gain is <code class="docutils literal notranslate"><span class="pre">max
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">|</span>                       <span class="n">prp</span>
 <span class="o">|</span>                  <span class="o">+-----------+</span>
 <span class="o">|</span>
-<span class="o">|</span>            <span class="o">+---</span><span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">---&gt;</span>   <span class="o">/</span>            <span class="o">/</span>            <span class="o">/</span>
+<span class="o">|</span>            <span class="o">+---</span><span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">---&gt;</span>  <span class="o">/</span>            <span class="o">/</span>            <span class="o">/</span>
 <span class="o">|</span>                         <span class="o">/</span>            <span class="o">/</span>            <span class="o">/</span>
 <span class="o">|</span>                        <span class="o">/</span>            <span class="o">/</span>            <span class="o">/</span>
 <span class="o">|</span>                       <span class="o">/</span>            <span class="o">/</span>            <span class="o">/</span>
@@ -315,7 +314,7 @@ Antenna gain is <code class="docutils literal notranslate"><span class="pre">max
 <span class="o">|</span>                     <span class="o">/</span>            <span class="o">/</span>            <span class="o">/</span>
 <span class="o">|</span>                    <span class="o">/</span>            <span class="o">/</span>            <span class="o">/</span>
 <span class="o">|</span>                   <span class="o">/</span>            <span class="o">/</span>            <span class="o">/</span>
-<span class="o">|</span>      <span class="o">+---</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">---&gt;</span> <span class="o">/</span>            <span class="o">/</span>            <span class="o">/</span>
+<span class="o">|</span>      <span class="o">+---</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">---&gt;/</span>            <span class="o">/</span>            <span class="o">/</span>
 <span class="o">|</span>
 <span class="o">|</span>                  <span class="o">+-------+</span>
 <span class="o">|</span>                 <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>    <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -341,7 +340,7 @@ Antenna gain is <code class="docutils literal notranslate"><span class="pre">max
 <h2>radarsimpy.Receiver<a class="headerlink" href="#radarsimpy-receiver" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="radarsimpy.Receiver">
-<em class="property">class </em><code class="sig-prename descclassname">radarsimpy.</code><code class="sig-name descname">Receiver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fs</span></em>, <em class="sig-param"><span class="n">noise_figure</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">rf_gain</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">load_resistor</span><span class="o">=</span><span class="default_value">500</span></em>, <em class="sig-param"><span class="n">baseband_gain</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">channels</span><span class="o">=</span><span class="default_value">[{'location': (0, 0, 0)}]</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.Receiver" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">radarsimpy.</span></code><code class="sig-name descname"><span class="pre">Receiver</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise_figure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rf_gain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_resistor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">baseband_gain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[{'location':</span> <span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">0)}]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.Receiver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class defines basic parameters of a radar receiver</p>
 <dl class="field-list simple">
@@ -437,7 +436,7 @@ Antenna gain is <code class="docutils literal notranslate"><span class="pre">max
 <h2>radarsimpy.Radar<a class="headerlink" href="#radarsimpy-radar" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="radarsimpy.Radar">
-<em class="property">class </em><code class="sig-prename descclassname">radarsimpy.</code><code class="sig-name descname">Radar</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">transmitter</span></em>, <em class="sig-param"><span class="n">receiver</span></em>, <em class="sig-param"><span class="n">time</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">aperture</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">seed</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.Radar" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">radarsimpy.</span></code><code class="sig-name descname"><span class="pre">Radar</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transmitter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">receiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.Radar" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class defines basic parameters of a radar system</p>
 <dl class="field-list simple">
@@ -446,33 +445,6 @@ Antenna gain is <code class="docutils literal notranslate"><span class="pre">max
 <li><p><strong>transmitter</strong> (<a class="reference internal" href="#radarsimpy.Transmitter" title="radarsimpy.Transmitter"><em>Transmitter</em></a>) – Radar transmiter</p></li>
 <li><p><strong>receiver</strong> (<a class="reference internal" href="#radarsimpy.Receiver" title="radarsimpy.Receiver"><em>Receiver</em></a>) – Radar Receiver</p></li>
 <li><p><strong>time</strong> (<em>float</em><em> or </em><em>numpy.1darray</em>) – Radar firing time instances / frames</p></li>
-<li><p><strong>aperture</strong> (<em>dict</em>) – <p>Radar receiver aperture for ray tracing simulation</p>
-<p>{</p>
-<ul>
-<li><dl class="simple">
-<dt><strong>phi</strong> (<em>float</em>) –</dt><dd><p>phi angle of the aperture’s normal (deg)</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><strong>theta</strong> (<em>float</em>) –</dt><dd><p>theta angle of the aperture’s normal (deg)</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><strong>location</strong> (<em>numpy.1darray</em>) –</dt><dd><p>aperture’s center location <code class="docutils literal notranslate"><span class="pre">[x,</span> <span class="pre">y,</span> <span class="pre">z]</span></code> (m)</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt><strong>extension</strong> (<em>numpy.1darray</em>) –</dt><dd><p>aperture’s extension of <code class="docutils literal notranslate"><span class="pre">[left,</span> <span class="pre">right,</span> <span class="pre">top,</span> <span class="pre">bottom]</span></code>
-when facing towards its normal (m)</p>
-</dd>
-</dl>
-</li>
-</ul>
-<p>}</p>
-</p></li>
 <li><p><strong>seed</strong> (<em>int</em>) – Seed for noise generator</p></li>
 </ul>
 </dd>
@@ -490,11 +462,6 @@ when facing towards its normal (m)</p>
 <code class="docutils literal notranslate"><span class="pre">unambiguous_speed</span> <span class="pre">=</span> <span class="pre">c</span> <span class="pre">/</span> <span class="pre">prp</span> <span class="pre">/</span> <span class="pre">fc</span> <span class="pre">/</span> <span class="pre">2</span></code></p></li>
 <li><p><strong>range_resolution</strong> (<em>float</em>) – Range resolution (m).
 <code class="docutils literal notranslate"><span class="pre">range_resolution</span> <span class="pre">=</span> <span class="pre">c</span> <span class="pre">/</span> <span class="pre">2</span> <span class="pre">/</span> <span class="pre">bandwidth</span></code></p></li>
-<li><p><strong>aperture_phi</strong> (<em>float</em>) – phi angle of the aperture’s normal (deg)</p></li>
-<li><p><strong>aperture_theta</strong> (<em>float</em>) – theta angle of the aperture’s normal (deg)</p></li>
-<li><p><strong>aperture_location</strong> (<em>numpy.1darray</em>) – Aperture’s center location <code class="docutils literal notranslate"><span class="pre">[x,</span> <span class="pre">y,</span> <span class="pre">z]</span></code> (m)</p></li>
-<li><p><strong>aperture_extension</strong> (<em>numpy.1darray</em>) – Aperture’s extension of <code class="docutils literal notranslate"><span class="pre">[left,</span> <span class="pre">right,</span> <span class="pre">top,</span> <span class="pre">bottom]</span></code>
-when facing towards its normal (m)</p></li>
 <li><p><strong>timestamp</strong> (<em>numpy.3darray</em>) – <p>Timestamp for each samples. Frame start time is
 defined in <code class="docutils literal notranslate"><span class="pre">time</span></code>.
 <code class="docutils literal notranslate"><span class="pre">[channes/frames,</span> <span class="pre">pulses,</span> <span class="pre">samples]</span></code></p>
