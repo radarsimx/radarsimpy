@@ -53,8 +53,7 @@ from stl import mesh
 cpdef scene(radar, targets, density=1, level=None, noise=True):
     """
     scene(radar, targets, density=1, level=None, noise=True)
-    Alias: ``radarsimpy.rt.scene()``
-    
+
     Radar scene simulator
 
     :param Radar radar:

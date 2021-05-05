@@ -1,28 +1,7 @@
 Raytracing
 ===============
 
-radarsimpy.rt.scene
------------------------
-
-.. automodule:: radarsimpy.rt.scene
-    :members:
-    :undoc-members:
-    :inherited-members:
-    :show-inheritance:
-
-radarsimpy.rt.lidar_scene
----------------------------
-
-.. automodule:: radarsimpy.rt.lidar_scene
-    :members:
-    :undoc-members:
-    :inherited-members:
-    :show-inheritance:
-
-radarsimpy.rt.rcs
------------------------
-
-.. automodule:: radarsimpy.rt.rcs
+.. automodule:: radarsimpy.rt
     :members:
     :undoc-members:
     :inherited-members:

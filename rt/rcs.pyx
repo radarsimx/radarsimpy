@@ -46,7 +46,6 @@ from radarsimpy.includes.zpvector cimport Vec3
 cpdef rcs_sbr(model, f, obs_phi, obs_theta, inc_phi=None, inc_theta=None, pol=[0, 0, 1], density=1):
     """
     rcs_sbr(model, f, obs_phi, obs_theta, inc_phi=None, inc_theta=None, pol=[0, 0, 1], density=1)
-    Alias: ``radarsimpy.rt.rcs()``
 
     Calculate target's RCS by using raytracing
 

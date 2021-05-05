@@ -48,8 +48,7 @@ from stl import mesh
 cpdef lidar_scene(lidar, targets, t=0):
     """
     lidar_scene(lidar, targets, t=0)
-    Alias: ``radarsimpy.rt.lidar_scene()``
-    
+
     Lidar scene simulator
 
     :param dict lidar:
