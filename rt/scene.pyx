@@ -35,9 +35,9 @@ from libc.math cimport sin, cos, sqrt, atan, atan2, acos, pow, fmax, M_PI
 from libcpp cimport bool
 
 from radarsimpy.includes.radarsimc cimport TxChannel, Transmitter
-from radarsimpy.rt.cp_radarsimc cimport cp_TxChannel, cp_Transmitter
+from radarsimpy.lib.cp_radarsimc cimport cp_TxChannel, cp_Transmitter
 from radarsimpy.includes.radarsimc cimport Snapshot, Target, Receiver, RxChannel, Scene
-from radarsimpy.rt.cp_radarsimc cimport cp_RxChannel, cp_Target
+from radarsimpy.lib.cp_radarsimc cimport cp_RxChannel, cp_Target
 from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t, vector
 from radarsimpy.includes.zpvector cimport Vec3
 from libcpp.complex cimport complex as cpp_complex

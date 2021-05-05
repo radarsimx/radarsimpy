@@ -39,11 +39,11 @@ from libcpp cimport bool
 from libcpp.complex cimport complex as cpp_complex
 
 from radarsimpy.includes.radarsimc cimport Point
-from radarsimpy.rt.cp_radarsimc cimport cp_Point
+from radarsimpy.lib.cp_radarsimc cimport cp_Point
 from radarsimpy.includes.radarsimc cimport TxChannel, Transmitter
-from radarsimpy.rt.cp_radarsimc cimport cp_TxChannel, cp_Transmitter
+from radarsimpy.lib.cp_radarsimc cimport cp_TxChannel, cp_Transmitter
 from radarsimpy.includes.radarsimc cimport RxChannel, Receiver
-from radarsimpy.rt.cp_radarsimc cimport cp_RxChannel
+from radarsimpy.lib.cp_radarsimc cimport cp_RxChannel
 from radarsimpy.includes.radarsimc cimport Simulator
 
 from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t
