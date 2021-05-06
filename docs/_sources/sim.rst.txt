@@ -1,18 +1,6 @@
 Simulator
 ===========
 
-radarsimpy.simulatorcpp
-------------------------
-
-.. automodule:: radarsimpy.simulatorcpp
-    :members:
-    :undoc-members:
-    :inherited-members:
-    :show-inheritance:
-
-radarsimpy.simulator
-------------------------
-
 .. automodule:: radarsimpy.simulator
     :members:
     :undoc-members:
