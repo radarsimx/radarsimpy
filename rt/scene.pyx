@@ -45,7 +45,6 @@ from libcpp.complex cimport complex as cpp_complex
 
 import numpy as np
 cimport numpy as np
-from stl import mesh
 
 @cython.cdivision(True)
 @cython.boundscheck(False)
