@@ -33,7 +33,8 @@ cimport cython
 
 import numpy as np
 cimport numpy as np
-from stl import mesh
+# from stl import mesh
+import meshio
 
 from radarsimpy.includes.radarsimc cimport Target, Rcs
 from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t
@@ -65,8 +66,9 @@ cpdef rcs_sbr(model, f, obs_phi, obs_theta, inc_phi=None, inc_theta=None, pol=[0
     :return: Target's RCS (m^2), use 10*log10(RCS) to convert to dBsm
     :rtype: float
     """
-    trig_mesh = mesh.Mesh.from_file(model)
-    cdef float_t[:, :, :] vectors = trig_mesh.vectors.astype(np.float64)
+    trig_mesh = meshio.read(model)
+    cdef float_t[:, :] points = trig_mesh.points.astype(np.float64)
+    cdef uint64_t[:, :] cells = trig_mesh.cells[0].data.astype(np.uint64)
 
     if inc_phi is None:
         inc_phi = obs_phi
@@ -86,7 +88,7 @@ cpdef rcs_sbr(model, f, obs_phi, obs_theta, inc_phi=None, inc_theta=None, pol=[0
 
     cdef Rcs[float_t] rcs
 
-    rcs = Rcs[float_t](Target[float_t](&vectors[0, 0, 0], <int_t> vectors.shape[0]),
+    rcs = Rcs[float_t](Target[float_t](&points[0, 0], &cells[0, 0], <int_t> cells.shape[0]),
                       inc_dir,
                       obs_dir,
                       Vec3[float_t](<float_t> pol[0], <float_t> pol[1], <float_t> pol[2]),

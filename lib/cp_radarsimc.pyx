@@ -24,7 +24,8 @@ from radarsimpy.includes.radarsimc cimport RxChannel
 from radarsimpy.includes.radarsimc cimport Point
 from radarsimpy.includes.radarsimc cimport Target
 
-from stl import mesh
+# from stl import mesh
+import meshio
 
 
 @cython.cdivision(True)
@@ -279,7 +280,8 @@ cdef RxChannel[float_t] cp_RxChannel(rx, rx_idx):
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cdef Target[float_t] cp_Target(radar, target, shape):
-    cdef float_t[:,:,:] mesh_memview
+    cdef float_t[:,:] points_memview
+    cdef uint64_t[:,:] cells_memview
     cdef float_t[:] origin
 
     cdef vector[Vec3[float_t]] c_loc_array
@@ -292,8 +294,9 @@ cdef Target[float_t] cp_Target(radar, target, shape):
     cdef float_t[:,:,:] rotx_t, roty_t, rotz_t
     cdef float_t[:,:,:] rotratx_t, rotraty_t, rotratz_t
 
-    t_mesh = mesh.Mesh.from_file(target['model'])
-    mesh_memview = t_mesh.vectors.astype(np.float64)
+    t_mesh = meshio.read(target['model'])
+    points_memview = t_mesh.points.astype(np.float64)
+    cells_memview = t_mesh.cells[0].data.astype(np.uint64)
 
     origin = np.array(target.get('origin', (0,0,0)), dtype=np.float64)
 
@@ -438,8 +441,9 @@ cdef Target[float_t] cp_Target(radar, target, shape):
         )
 
     return Target[float_t](
-            &mesh_memview[0,0,0],
-            <int_t> mesh_memview.shape[0],
+            &points_memview[0,0],
+            &cells_memview[0,0],
+            <int_t> cells_memview.shape[0],
             Vec3[float_t](&origin[0]),
             c_loc_array,
             c_speed_array,

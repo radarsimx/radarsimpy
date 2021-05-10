@@ -40,7 +40,8 @@ from radarsimpy.includes.radarsimc cimport Target, PointCloud
 
 import numpy as np
 cimport numpy as np
-from stl import mesh
+# from stl import mesh
+import meshio
 
 @cython.cdivision(True)
 @cython.boundscheck(False)
@@ -99,7 +100,8 @@ cpdef lidar_scene(lidar, targets, t=0):
     """
     cdef PointCloud[float_t] pointcloud
     
-    cdef float_t[:,:,:] mesh_memview
+    cdef float_t[:,:] points_memview
+    cdef uint64_t[:,:] cells_memview
     cdef float_t[:] origin
     cdef float_t[:] speed
     cdef float_t[:] location
@@ -110,9 +112,10 @@ cpdef lidar_scene(lidar, targets, t=0):
     cdef int_t idx
     
     for idx in range(0, target_count):
-        t_mesh = mesh.Mesh.from_file(targets[idx]['model'])
+        t_mesh = meshio.read(targets[idx]['model'])
 
-        mesh_memview = t_mesh.vectors.astype(np.float64)
+        points_memview = t_mesh.points.astype(np.float64)
+        cells_memview = t_mesh.cells[0].data.astype(np.uint64)
 
         origin = np.array(targets[idx].get('origin', (0,0,0)), dtype=np.float64)
 
@@ -122,8 +125,9 @@ cpdef lidar_scene(lidar, targets, t=0):
         rotation = np.array(targets[idx].get('rotation', (0,0,0)), dtype=np.float64)/180*np.pi+t*np.array(targets[idx].get('rotation_rate', (0,0,0)), dtype=np.float64)/180*np.pi
         rotation_rate = np.array(targets[idx].get('rotation_rate', (0,0,0)), dtype=np.float64)/180*np.pi
 
-        pointcloud.AddTarget(Target[float_t](&mesh_memview[0,0,0],
-            <int_t> mesh_memview.shape[0],
+        pointcloud.AddTarget(Target[float_t](&points_memview[0,0],
+            &cells_memview[0,0],
+            <int_t> cells_memview.shape[0],
             Vec3[float_t](&origin[0]),
             Vec3[float_t](&location[0]),
             Vec3[float_t](&speed[0]),

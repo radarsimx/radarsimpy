@@ -45,18 +45,21 @@ target interface
 cdef extern from "target.hpp":
     cdef cppclass Target[T]:
         Target() except +
-        Target(T *mesh,
-               int mesh_size,
+        Target(T *points,
+               uint64_t* cells,
+               int cell_size,
                Vec3[T] origin,
                vector[Vec3[T]] location_array,
                vector[Vec3[T]] speed_array,
                vector[Vec3[T]] rotation_array,
                vector[Vec3[T]] rotation_rate_array,
                bool is_ground) except +
-        Target(T* mesh,
-               int mesh_size) except +
-        Target(T* mesh,
-               int mesh_size,
+        Target(T* points,
+               uint64_t* cells,
+               int cell_size) except +
+        Target(T* points,
+               uint64_t* cells,
+               int cell_size,
                Vec3[T] origin,
                Vec3[T] location,
                Vec3[T] speed,
