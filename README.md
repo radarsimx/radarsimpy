@@ -17,11 +17,11 @@ There are 5 modules in this package:
    - `radarsimpy.Receiver`: Radar receiver
    - `radarsimpy.Radar`: Radar system
 2. **Simulator**: Radar baseband signal simulator
-   - `radarsimpy.simulator`: Simulates and generates raw time domain baseband data (Python engine)
-   - `radarsimpy.simulatorcpp`: Simulates and generates raw time domain baseband data (C++ engine)
+   - `radarsimpy.simulator.simpy`: Simulates and generates raw time domain baseband data (Python engine)
+   - `radarsimpy.simulator.simc`: Simulates and generates raw time domain baseband data (C++ engine)
 3. **Raytracing**: Raytracing module for radar scene simulation
    - `radarsimpy.rt.lidar_scene`: Simulates LiDAR's point cloud based on a 3D environment model with ray tracing
-   - `radarsimpy.rt.rcs`: Simulates target's radar cross section (RCS) based on the 3D model with ray tracing
+   - `radarsimpy.rt.rcs_sbr`: Simulates target's radar cross section (RCS) based on the 3D model with ray tracing
    - `radarsimpy.rt.scene`: Simulates radar's response signal in a 3D environment model with ray tracing
 4. **Processing**: Basic radar signal processing module
 5. **Tools**: Receiver operating characteristic analysis
@@ -30,7 +30,7 @@ There are 5 modules in this package:
 
 - numpy
 - scipy
-- numpy-stl
+- meshio
 - [Visual C++ Runtime](https://aka.ms/vs/16/release/vc_redist.x64.exe/) (*Windows only*)
 
 ## Installation
@@ -84,22 +84,26 @@ To use the module, please put the radarsimpy folder within your project folder a
 ## Usage
 
 - Radar system simulation
-  - [Doppler radar simulation](https://zpeng.me/index.php/2019/05/16/doppler-radar/)
-  - [FMCW radar simulation](https://zpeng.me/index.php/2018/10/11/fmcw-radar/)
-  - [TDM MIMO FMCW radar simulation](https://zpeng.me/index.php/2019/04/07/tdm-mimo-fmcw-radar/)
-  - [PMCW radar simulation](https://zpeng.me/index.php/2019/05/24/pmcw-radar/)
-  - [FMCW radar nonlinear chirp](https://zpeng.me/index.php/2021/01/17/fmcw-radar-nonlinear-chirp/)
-  - [CFAR](https://zpeng.me/index.php/2021/01/10/cfar/)
+  - [Doppler radar](https://zpeng.me/index.php/2019/05/16/doppler-radar/)
+  - [FMCW radar](https://zpeng.me/index.php/2018/10/11/fmcw-radar/)
+  - [TDM MIMO FMCW radar](https://zpeng.me/index.php/2019/04/07/tdm-mimo-fmcw-radar/)
+  - [PMCW radar](https://zpeng.me/index.php/2019/05/24/pmcw-radar/)
+  - [Arbitrary waveform](https://zpeng.me/index.php/2021/05/10/arbitrary-waveform/)
   - [Phase noise](https://zpeng.me/index.php/2021/01/13/phase-noise/)
+  - [CFAR](https://zpeng.me/index.php/2021/01/10/cfar/)
   
-- Target simulation
-  - [Target RCS evaluation with ray tracing](https://zpeng.me/index.php/2019/11/13/rcs-calculation-with-ray-tracing/)
+- RCS simulation
+  - [Corner reflector RCS](https://zpeng.me/index.php/2021/05/10/corner-reflector-rcs/)
+  - [Plate RCS](https://zpeng.me/index.php/2021/05/10/plate-rcs/)
+  - [Car RCS](https://zpeng.me/index.php/2021/05/10/car-rcs/)
 
 - Radar system and scene simulation with ray tracing
-  - [FMCW radar ray tracing](https://zpeng.me/index.php/2020/03/20/fmcw-radar-ray-tracing/)
-  - [Multi-path effect with ray tracing](https://zpeng.me/index.php/2020/03/20/multi-path-effect-with-ray-tracing/)
-  - [Micro-Doppler effect of a rotating object with a Doppler radar](https://zpeng.me/index.php/2020/05/24/micro-doppler-effect-of-a-rotating-object-with-a-doppler-radar/)
-  - [ISAR with raytracing](https://zpeng.me/index.php/2020/05/28/isar-with-raytracing/)
+  - [FMCW radar with a corner reflector](https://zpeng.me/index.php/2021/05/10/fmcw-radar-with-a-corner-reflector/)
+  - [FMCW radar with a plate](https://zpeng.me/index.php/2021/05/10/fmcw-radar-with-a-plate/)
+  - [FMCW radar with a car](https://zpeng.me/index.php/2021/05/10/fmcw-radar-with-a-car/)
+  - [Doppler of a rotating object](https://zpeng.me/index.php/2021/05/10/doppler-of-a-rotating-object/)
+  - [Micro-Doppler](https://zpeng.me/index.php/2021/05/10/micro-doppler/)
+  - [Multi-path effect](https://zpeng.me/index.php/2021/05/10/multi-path-effect/)
 
 - LIDAR (Experimental)
   - [LIDAR point cloud](https://zpeng.me/index.php/2020/02/05/lidar-point-cloud/)
