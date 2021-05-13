@@ -294,6 +294,8 @@ cdef Target[float_t] cp_Target(radar, target, shape):
     cdef float_t[:,:,:] rotx_t, roty_t, rotz_t
     cdef float_t[:,:,:] rotratx_t, rotraty_t, rotratz_t
 
+    cdef int_t ch_idx, ps_idx, sp_idx
+
     t_mesh = meshio.read(target['model'])
     points_memview = t_mesh.points.astype(np.float64)
     cells_memview = t_mesh.cells[0].data.astype(np.uint64)

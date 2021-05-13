@@ -145,6 +145,9 @@ cpdef scene(radar, targets, density=1, level=None, noise=True):
     cdef int_t pulse_stride = samples
     cdef int_t idx_stride
 
+    cdef int_t fm_idx, tx_idx, ps_idx, sp_idx 
+    cdef int_t ch_idx, p_idx, s_idx
+
     """
     Targets
     """
