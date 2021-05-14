@@ -252,7 +252,6 @@ cpdef scene(radar, targets, density=1, level=None, noise=True):
                 baseband[ch_idx, p_idx, s_idx] = bb_vect[0][idx_stride].real()+1j*bb_vect[0][idx_stride].imag()
 
     ray_type = np.dtype([
-        ('area', np.float64, (1,)),
         ('distance', np.float64, (1,)),
         ('range_rate', np.float64, (1,)),
         ('refCount', int, (1,)),
@@ -281,7 +280,6 @@ cpdef scene(radar, targets, density=1, level=None, noise=True):
     for snapshot_idx in range(0, snaps.size()):
         for idx in range(0, snaps[snapshot_idx].ray_received.size()):
             refCount = snaps[snapshot_idx].ray_received[idx].ref_count_
-            rays[count]['area'] = snaps[snapshot_idx].ray_received[idx].area_
             rays[count]['distance'] = snaps[snapshot_idx].ray_received[idx].range_[refCount]
             rays[count]['range_rate'] = snaps[snapshot_idx].ray_received[idx].range_rate_[refCount]
             rays[count]['refCount'] = snaps[snapshot_idx].ray_received[idx].ref_count_

@@ -81,7 +81,6 @@ cdef extern from "ray.hpp":
         Vec3[T] *norm_
         T *range_
         T *range_rate_
-        T area_
         int ref_count_
         T d_theta_
         T d_phi_
