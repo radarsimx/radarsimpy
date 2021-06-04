@@ -79,7 +79,7 @@ cdef extern from "ray.hpp":
         Ray() except +
         Vec3[T] *dir_
         Vec3[T] *loc_
-        Vec3[T] *pol_
+        Vec3[cpp_complex[T]] *pol_
         Vec3[T] *norm_
         T *range_
         T *range_rate_

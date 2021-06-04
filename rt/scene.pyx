@@ -304,9 +304,9 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
                 rays[count]['inc_dir'][0] = snaps[snapshot_idx].ray_received[idx].dir_[refCount-1][0]
                 rays[count]['inc_dir'][1] = snaps[snapshot_idx].ray_received[idx].dir_[refCount-1][1]
                 rays[count]['inc_dir'][2] = snaps[snapshot_idx].ray_received[idx].dir_[refCount-1][2]
-                rays[count]['polarization'][0] = snaps[snapshot_idx].ray_received[idx].pol_[refCount][0]
-                rays[count]['polarization'][1] = snaps[snapshot_idx].ray_received[idx].pol_[refCount][1]
-                rays[count]['polarization'][2] = snaps[snapshot_idx].ray_received[idx].pol_[refCount][2]
+                rays[count]['polarization'][0] = snaps[snapshot_idx].ray_received[idx].pol_[refCount][0].real()
+                rays[count]['polarization'][1] = snaps[snapshot_idx].ray_received[idx].pol_[refCount][1].real()
+                rays[count]['polarization'][2] = snaps[snapshot_idx].ray_received[idx].pol_[refCount][2].real()
 
                 count=count+1
     else:
