@@ -290,6 +290,8 @@ cdef Target[float_t] cp_Target(radar, target, shape):
     cdef float_t[:, :, :] rotx_t, roty_t, rotz_t
     cdef float_t[:, :, :] rotratx_t, rotraty_t, rotratz_t
 
+    cdef cpp_complex[float_t] ep, mu
+
     cdef int_t ch_idx, ps_idx, sp_idx
 
     t_mesh = meshio.read(target['model'])
@@ -304,6 +306,14 @@ cdef Target[float_t] cp_Target(radar, target, shape):
                         dtype=object)/180*np.pi
     rotation_rate = np.array(target.get(
         'rotation_rate', (0, 0, 0)), dtype=object)/180*np.pi
+
+    permittivity = target.get('permittivity', 'PEC')
+    if permittivity=="PEC":
+        ep = cpp_complex[float_t](-1, 0)
+        mu = cpp_complex[float_t](1, 0)
+    else:
+        ep = cpp_complex[float_t](np.real(permittivity), np.imag(permittivity))
+        mu = cpp_complex[float_t](1, 0)
 
     if np.size(location[0]) > 1 or \
             np.size(location[1]) > 1 or \
@@ -449,5 +459,7 @@ cdef Target[float_t] cp_Target(radar, target, shape):
         c_speed_array,
         c_rotation_array,
         c_rotation_rate_array,
+        ep,
+        mu,
         < bool > target.get('is_ground', False)
     )

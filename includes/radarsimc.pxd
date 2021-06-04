@@ -53,6 +53,8 @@ cdef extern from "target.hpp":
                vector[Vec3[T]] speed_array,
                vector[Vec3[T]] rotation_array,
                vector[Vec3[T]] rotation_rate_array,
+               cpp_complex[T] ep,
+               cpp_complex[T] mu,
                bool is_ground) except +
         Target(T* points,
                uint64_t* cells,
