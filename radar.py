@@ -369,7 +369,7 @@ class Transmitter:
                 np.max(self.az_patterns[-1])
             self.az_func.append(
                 interp1d(self.az_angles[-1], self.az_patterns[-1],
-                         kind='linear')
+                         kind='linear', bounds_error=False, fill_value=0)
             )
             self.el_angles.append(
                 np.array(self.channels[tx_idx].get('elevation_angle',
@@ -383,7 +383,7 @@ class Transmitter:
                 interp1d(
                     self.el_angles[-1],
                     self.el_patterns[-1]-np.max(self.el_patterns[-1]),
-                    kind='linear')
+                    kind='linear', bounds_error=False, fill_value=0)
             )
 
             self.grid.append(self.channels[tx_idx].get('grid', 1))
@@ -524,7 +524,7 @@ class Receiver:
                 np.max(self.az_patterns[-1])
             self.az_func.append(
                 interp1d(self.az_angles[-1], self.az_patterns[-1],
-                         kind='linear')
+                         kind='linear', bounds_error=False, fill_value=0)
             )
             self.el_angles.append(
                 np.array(self.channels[rx_idx].get('elevation_angle',
@@ -538,7 +538,7 @@ class Receiver:
                 interp1d(
                     self.el_angles[-1],
                     self.el_patterns[-1]-np.max(self.el_patterns[-1]),
-                    kind='linear')
+                    kind='linear', bounds_error=False, fill_value=0)
             )
 
         self.box_min = np.min(self.locations, axis=0)
