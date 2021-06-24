@@ -329,62 +329,62 @@ cdef Target[float_t] cp_Target(radar, target, shape):
             np.size(rotation_rate[2]) > 1:
 
         if np.size(location[0]) > 1:
-            tgx_t = location[0]
+            tgx_t = location[0].astype(np.float64)
         else:
             tgx_t = np.full(shape, location[0], dtype=np.float64)
 
         if np.size(location[1]) > 1:
-            tgy_t = location[1]
+            tgy_t = location[1].astype(np.float64)
         else:
             tgy_t = np.full(shape, location[1], dtype=np.float64)
 
         if np.size(location[2]) > 1:
-            tgz_t = location[2]
+            tgz_t = location[2].astype(np.float64)
         else:
             tgz_t = np.full(shape, location[2], dtype=np.float64)
 
         if np.size(speed[0]) > 1:
-            sptx_t = speed[0]
+            sptx_t = speed[0].astype(np.float64)
         else:
             sptx_t = np.full(shape, speed[0], dtype=np.float64)
 
         if np.size(speed[1]) > 1:
-            spty_t = speed[1]
+            spty_t = speed[1].astype(np.float64)
         else:
             spty_t = np.full(shape, speed[1], dtype=np.float64)
 
         if np.size(speed[2]) > 1:
-            sptz_t = speed[2]
+            sptz_t = speed[2].astype(np.float64)
         else:
             sptz_t = np.full(shape, speed[2], dtype=np.float64)
 
         if np.size(rotation[0]) > 1:
-            rotx_t = rotation[0]
+            rotx_t = rotation[0].astype(np.float64)
         else:
             rotx_t = np.full(shape, rotation[0], dtype=np.float64)
 
         if np.size(rotation[1]) > 1:
-            roty_t = rotation[1]
+            roty_t = rotation[1].astype(np.float64)
         else:
             roty_t = np.full(shape, rotation[1], dtype=np.float64)
 
         if np.size(rotation[2]) > 1:
-            rotz_t = rotation[2]
+            rotz_t = rotation[2].astype(np.float64)
         else:
             rotz_t = np.full(shape, rotation[2], dtype=np.float64)
 
         if np.size(rotation_rate[0]) > 1:
-            rotratx_t = rotation_rate[0]
+            rotratx_t = rotation_rate[0].astype(np.float64)
         else:
             rotratx_t = np.full(shape, rotation_rate[0], dtype=np.float64)
 
         if np.size(rotation_rate[1]) > 1:
-            rotraty_t = rotation_rate[1]
+            rotraty_t = rotation_rate[1].astype(np.float64)
         else:
             rotraty_t = np.full(shape, rotation_rate[1], dtype=np.float64)
 
         if np.size(rotation_rate[2]) > 1:
-            rotratz_t = rotation_rate[2]
+            rotratz_t = rotation_rate[2].astype(np.float64)
         else:
             rotratz_t = np.full(shape, rotation_rate[2], dtype=np.float64)
 
