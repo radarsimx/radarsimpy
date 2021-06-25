@@ -86,7 +86,6 @@ cdef extern from "ray.hpp":
         int ref_count_
         T d_theta_
         T d_phi_
-        Vec3[cpp_complex[T]] E_
 
 
 cdef extern from "raypool.hpp":
@@ -235,8 +234,12 @@ cdef extern from "simulator.hpp":
         void Run(Transmitter[T] tx,
                  Receiver[T] rx,
                  vector[Point[T]] points,
-                 vector[cpp_complex[T]]& baseband)
-        
+                 T* bb_real,
+                 T* bb_imag,
+                 int bb_size)
+        # void InitData(T* bb_real, T* bb_imag, int bb_size)
+        # void GetBaseband(T* bb_real, T* bb_imag, int bb_size)
+
 
 """
 scene interface
@@ -253,6 +256,8 @@ cdef extern from "scene.hpp":
         void RunSimulator(int level,
                           bool debug,
                           vector[Snapshot[T]]& snapshots,
-                          vector[cpp_complex[T]]& baseband)
+                          T* bb_real,
+                          T* bb_imag,
+                          int bb_size)
 
         vector[Snapshot[T]] snapshots_

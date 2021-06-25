@@ -34,6 +34,8 @@ cimport cython
 from libc.math cimport sin, cos, sqrt, atan, atan2, acos, pow, fmax, M_PI
 from libcpp cimport bool
 
+from libc.stdlib cimport malloc, free
+
 from radarsimpy.includes.radarsimc cimport TxChannel, Transmitter
 from radarsimpy.lib.cp_radarsimc cimport cp_TxChannel, cp_Transmitter
 from radarsimpy.includes.radarsimc cimport Snapshot, Target, Receiver, RxChannel, Scene
@@ -151,7 +153,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     """
     Targets
     """
-    cdef float_t[:,:,:] timestamp = radar.timestamp
+    cdef float_t[:,:,:] timestamp = radar.timestamp.astype(np.float64)
 
     cdef int_t target_count = len(targets)
     for idx in range(0, target_count):
@@ -235,21 +237,28 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
                             <size_t>rx_ch)
                         )
 
-    cdef vector[cpp_complex[float_t]] *bb_vect = new vector[cpp_complex[float_t]](
-        frames*total_ch*pulses*samples,
-        cpp_complex[float_t](0.0,0.0))
+    # cdef vector[cpp_complex[float_t]] *bb_vect = new vector[cpp_complex[float_t]](
+    #     frames*total_ch*pulses*samples,
+    #     cpp_complex[float_t](0.0,0.0))
+
+    cdef float_t *bb_real = <float_t *> malloc(frames*total_ch*pulses*samples * sizeof(float_t))
+    cdef float_t *bb_imag = <float_t *> malloc(frames*total_ch*pulses*samples * sizeof(float_t))
+
+    for idx in range(0, frames*total_ch*pulses*samples):
+        bb_real[idx] = 0
+        bb_imag[idx] = 0
 
     radar_scene.RunSimulator(
-        level_id, debug, snaps, bb_vect[0]
+        level_id, debug, snaps, bb_real, bb_imag, frames*total_ch*pulses*samples
     )
 
-    cdef complex[:,:,:] baseband = np.zeros((frames*total_ch, pulses, samples), dtype=complex)
+    baseband = np.zeros((frames*total_ch, pulses, samples), dtype=complex)
 
     for ch_idx in range(0, frames*total_ch):
         for p_idx in range(0, pulses):
             for s_idx in range(0, samples):
                 idx_stride = ch_idx * ch_stride + p_idx * pulse_stride + s_idx
-                baseband[ch_idx, p_idx, s_idx] = bb_vect[0][idx_stride].real()+1j*bb_vect[0][idx_stride].imag()
+                baseband[ch_idx, p_idx, s_idx] = bb_real[idx_stride]+1j*bb_imag[idx_stride]
 
     cdef int total_size = 0
     cdef int count = 0
@@ -265,7 +274,6 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
             ('d_theta', np.float64, (1,)),
             ('d_phi', np.float64, (1,)),
             ('norm', np.float64, (3,)),
-            ('E', np.complex128, (3,)),
             ('positions', np.float64, (3,)),
             ('directions', np.float64, (3,)),
             ('inc_dir', np.float64, (3,)),
@@ -289,9 +297,6 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
                 rays[count]['d_theta'] = snaps[snapshot_idx].ray_received[idx].d_theta_
                 rays[count]['d_phi'] = snaps[snapshot_idx].ray_received[idx].d_phi_
                 rays[count]['level'] = level_id
-                rays[count]['E'][0] = snaps[snapshot_idx].ray_received[idx].E_[0].real() + 1j*snaps[snapshot_idx].ray_received[idx].E_[0].imag()
-                rays[count]['E'][1] = snaps[snapshot_idx].ray_received[idx].E_[1].real() + 1j*snaps[snapshot_idx].ray_received[idx].E_[1].imag()
-                rays[count]['E'][2] = snaps[snapshot_idx].ray_received[idx].E_[2].real() + 1j*snaps[snapshot_idx].ray_received[idx].E_[2].imag()
                 rays[count]['norm'][0] = snaps[snapshot_idx].ray_received[idx].norm_[refCount][0]
                 rays[count]['norm'][1] = snaps[snapshot_idx].ray_received[idx].norm_[refCount][1]
                 rays[count]['norm'][2] = snaps[snapshot_idx].ray_received[idx].norm_[refCount][2]
@@ -325,7 +330,8 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
                     samples,
                 ))
 
-    del bb_vect
+    free(bb_real)
+    free(bb_imag)
 
     return {'baseband':baseband,
             'timestamp':radar.timestamp,
