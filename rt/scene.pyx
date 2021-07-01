@@ -257,64 +257,6 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
                 idx_stride = ch_idx * ch_stride + p_idx * pulse_stride + s_idx
                 baseband[ch_idx, p_idx, s_idx] = bb_real[idx_stride]+1j*bb_imag[idx_stride]
 
-    cdef int total_size = 0
-    cdef int count = 0
-    if debug:
-        ray_type = np.dtype([
-            ('distance', np.float64, (1,)),
-            ('range_rate', np.float64, (1,)),
-            ('refCount', int, (1,)),
-            ('channel_id', int, (1,)),
-            ('pulse_idx', int, (1,)),
-            ('sample_idx', int, (1,)),
-            ('level', int, (1,)),
-            ('d_theta', np.float64, (1,)),
-            ('d_phi', np.float64, (1,)),
-            ('norm', np.float64, (3,)),
-            ('positions', np.float64, (3,)),
-            ('directions', np.float64, (3,)),
-            ('inc_dir', np.float64, (3,)),
-            ('polarization', np.float64, (3,))
-            ])
-        
-        for snapshot_idx in range(0, snaps.size()):
-            total_size = total_size+snaps[snapshot_idx].ray_received.size()
-
-        rays = np.zeros(total_size, dtype=ray_type)
-
-        for snapshot_idx in range(0, snaps.size()):
-            for idx in range(0, snaps[snapshot_idx].ray_received.size()):
-                refCount = snaps[snapshot_idx].ray_received[idx].ref_count_
-                rays[count]['distance'] = snaps[snapshot_idx].ray_received[idx].range_[refCount]
-                rays[count]['range_rate'] = snaps[snapshot_idx].ray_received[idx].range_rate_[refCount]
-                rays[count]['refCount'] = snaps[snapshot_idx].ray_received[idx].ref_count_
-                rays[count]['channel_id'] = snaps[snapshot_idx].ch_idx_
-                rays[count]['pulse_idx'] = snaps[snapshot_idx].pulse_idx_
-                rays[count]['sample_idx'] = snaps[snapshot_idx].sample_idx_
-                rays[count]['d_theta'] = snaps[snapshot_idx].ray_received[idx].d_theta_
-                rays[count]['d_phi'] = snaps[snapshot_idx].ray_received[idx].d_phi_
-                rays[count]['level'] = level_id
-                rays[count]['norm'][0] = snaps[snapshot_idx].ray_received[idx].norm_[refCount][0]
-                rays[count]['norm'][1] = snaps[snapshot_idx].ray_received[idx].norm_[refCount][1]
-                rays[count]['norm'][2] = snaps[snapshot_idx].ray_received[idx].norm_[refCount][2]
-                rays[count]['positions'][0] = snaps[snapshot_idx].ray_received[idx].loc_[refCount][0]
-                rays[count]['positions'][1] = snaps[snapshot_idx].ray_received[idx].loc_[refCount][1]
-                rays[count]['positions'][2] = snaps[snapshot_idx].ray_received[idx].loc_[refCount][2]
-                rays[count]['directions'][0] = snaps[snapshot_idx].ray_received[idx].dir_[refCount][0]
-                rays[count]['directions'][1] = snaps[snapshot_idx].ray_received[idx].dir_[refCount][1]
-                rays[count]['directions'][2] = snaps[snapshot_idx].ray_received[idx].dir_[refCount][2]
-                rays[count]['inc_dir'][0] = snaps[snapshot_idx].ray_received[idx].dir_[refCount-1][0]
-                rays[count]['inc_dir'][1] = snaps[snapshot_idx].ray_received[idx].dir_[refCount-1][1]
-                rays[count]['inc_dir'][2] = snaps[snapshot_idx].ray_received[idx].dir_[refCount-1][2]
-                rays[count]['polarization'][0] = snaps[snapshot_idx].ray_received[idx].pol_[refCount][0].real()
-                rays[count]['polarization'][1] = snaps[snapshot_idx].ray_received[idx].pol_[refCount][1].real()
-                rays[count]['polarization'][2] = snaps[snapshot_idx].ray_received[idx].pol_[refCount][2].real()
-
-                count=count+1
-    else:
-        rays=None
-
-
     if noise:
         baseband = baseband+\
             radar.noise*(np.random.randn(
@@ -331,5 +273,4 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     free(bb_imag)
 
     return {'baseband':baseband,
-            'timestamp':radar.timestamp,
-            'rays':rays}
+            'timestamp':radar.timestamp}
