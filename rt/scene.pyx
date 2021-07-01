@@ -237,9 +237,6 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
                             <size_t>rx_ch)
                         )
 
-    # cdef vector[cpp_complex[float_t]] *bb_vect = new vector[cpp_complex[float_t]](
-    #     frames*total_ch*pulses*samples,
-    #     cpp_complex[float_t](0.0,0.0))
 
     cdef float_t *bb_real = <float_t *> malloc(frames*total_ch*pulses*samples * sizeof(float_t))
     cdef float_t *bb_imag = <float_t *> malloc(frames*total_ch*pulses*samples * sizeof(float_t))
