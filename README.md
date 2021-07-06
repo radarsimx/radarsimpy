@@ -10,7 +10,7 @@ A **Radar** **Sim**ulator for **Py**thon
 
 ***This module needs to be built/used together with RadarSimC (the C++ engine for radar simulator)***
 
-There are 5 modules in this package:
+## Key Features
 
 1. **Radar**: Classes to define a radar system
    - `radarsimpy.Transmitter`: Radar transmitter
@@ -25,6 +25,10 @@ There are 5 modules in this package:
    - `radarsimpy.rt.scene`: Simulates radar's response signal in a 3D environment model with ray tracing
 4. **Processing**: Basic radar signal processing module
 5. **Tools**: Receiver operating characteristic analysis
+
+This module supports CPU/GPU parallelization.
+CPU parallelization is implemented through OpenMP.
+GPU parallelization (CUDA) has been added since v6.0.0, and it is still working in progress.
 
 ## Dependence
 
