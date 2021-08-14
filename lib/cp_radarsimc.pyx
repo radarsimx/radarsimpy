@@ -181,8 +181,6 @@ cdef Transmitter[float_t] cp_Transmitter(radar, density):
         < float_t > radar.transmitter.tx_power,
         t_pstart_vect,
         t_frame_vect,
-        frames,
-        pulses,
         < float_t > density,
         pn_vect
     )

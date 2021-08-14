@@ -165,8 +165,6 @@ cdef extern from "transmitter.hpp":
                     T tx_power,
                     vector[T] pulse_start_time,
                     vector[T] frame_time,
-                    int frames,
-                    int pulses,
                     T density) except +
         Transmitter(T fc,
                     vector[T] freq,
@@ -175,8 +173,6 @@ cdef extern from "transmitter.hpp":
                     T tx_power,
                     vector[T] pulse_start_time,
                     vector[T] frame_time,
-                    int frames,
-                    int pulses,
                     T density,
                     vector[cpp_complex[T]]) except +
         void AddChannel(const TxChannel[T]& channel)
