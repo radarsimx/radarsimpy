@@ -174,7 +174,6 @@ cdef Transmitter[float_t] cp_Transmitter(radar, density):
                     ))
 
     return Transmitter[float_t](
-        < float_t > radar.transmitter.fc_0,
         f_vect,
         f_offset_vect,
         t_vect,

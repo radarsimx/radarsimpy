@@ -158,16 +158,14 @@ cdef extern from "transmitter.hpp":
 
     cdef cppclass Transmitter[T]:
         Transmitter() except +
-        Transmitter(T fc,
-                    vector[T] freq,
+        Transmitter(vector[T] freq,
                     vector[T] freq_offset,
                     vector[T] freq_time,
                     T tx_power,
                     vector[T] pulse_start_time,
                     vector[T] frame_start_time,
                     T density) except +
-        Transmitter(T fc,
-                    vector[T] freq,
+        Transmitter(vector[T] freq,
                     vector[T] freq_offset,
                     vector[T] freq_time,
                     T tx_power,
