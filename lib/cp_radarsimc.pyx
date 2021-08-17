@@ -241,15 +241,14 @@ cdef TxChannel[float_t] cp_TxChannel(tx, tx_idx):
             < float_t > tx.polarization[tx_idx, 1],
             < float_t > tx.polarization[tx_idx, 2]
         ),
-        pulse_mod_vect,
-        mod_enabled,
-        mod_t_vect,
-        mod_var_vect,
         az_ang_vect,
         az_ptn_vect,
         el_ang_vect,
         el_ptn_vect,
         < float_t > tx.antenna_gains[tx_idx],
+        mod_t_vect,
+        mod_var_vect,
+        pulse_mod_vect,
         < float_t > tx.delay[tx_idx],
         < float_t > (tx.grid[tx_idx]/180*np.pi)
     )

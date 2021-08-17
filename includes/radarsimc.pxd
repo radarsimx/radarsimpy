@@ -144,15 +144,14 @@ cdef extern from "transmitter.hpp":
         TxChannel() except +
         TxChannel(Vec3[T] loc,
                   Vec3[T] pol,
-                  vector[cpp_complex[T]] pulse_mod,
-                  bool mod_enabled,
-                  vector[T] mod_t,
-                  vector[cpp_complex[T]] mod_var,
                   vector[T] phi,
                   vector[T] phi_ptn,
                   vector[T] theta,
                   vector[T] theta_ptn,
                   T antenna_gain,
+                  vector[T] mod_t,
+                  vector[cpp_complex[T]] mod_var,
+                  vector[cpp_complex[T]] pulse_mod,
                   T delay,
                   T grid) except +
 
