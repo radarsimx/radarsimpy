@@ -220,15 +220,15 @@ cdef TxChannel[float_t] cp_TxChannel(tx, tx_idx):
         pulse_mod_vect.push_back(cpp_complex[float_t](
             np.real(tx.pulse_mod[tx_idx, idx]), np.imag(tx.pulse_mod[tx_idx, idx])))
 
-    mod_enabled = tx.mod[tx_idx]['enabled']
+    mod_enabled = tx.waveform_mod[tx_idx]['enabled']
     if mod_enabled:
-        for idx in range(0, len(tx.mod[tx_idx]['var'])):
+        for idx in range(0, len(tx.waveform_mod[tx_idx]['var'])):
             mod_var_vect.push_back(cpp_complex[float_t](
-                np.real(tx.mod[tx_idx]['var'][idx]), np.imag(tx.mod[tx_idx]['var'][idx])))
+                np.real(tx.waveform_mod[tx_idx]['var'][idx]), np.imag(tx.waveform_mod[tx_idx]['var'][idx])))
 
-        mod_t_vect.reserve(len(tx.mod[tx_idx]['t']))
-        for idx in range(0, len(tx.mod[tx_idx]['t'])):
-            mod_t_vect.push_back(< float_t > tx.mod[tx_idx]['t'][idx])
+        mod_t_vect.reserve(len(tx.waveform_mod[tx_idx]['t']))
+        for idx in range(0, len(tx.waveform_mod[tx_idx]['t'])):
+            mod_t_vect.push_back(< float_t > tx.waveform_mod[tx_idx]['t'][idx])
 
     return TxChannel[float_t](
         Vec3[float_t](
