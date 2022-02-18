@@ -241,8 +241,7 @@ class Transmitter:
             if isinstance(f_offset, (list, tuple, np.ndarray)):
                 if len(f_offset) != pulses:
                     raise ValueError(
-                        'Lengths of `f_offset` and `pulses` \
-                            should be the same')
+                        'Lengths of `f_offset` and `pulses` should be the same')
                 self.f_offset = np.array(f_offset)
             else:
                 self.f_offset = f_offset+np.zeros(pulses)
@@ -360,8 +359,7 @@ class Transmitter:
 
         if len(self.azimuth_angle) != len(self.azimuth_pattern):
             raise ValueError(
-                'Lengths of `azimuth_angle` and `azimuth_pattern` \
-                    should be the same')
+                'Lengths of `azimuth_angle` and `azimuth_pattern` should be the same')
 
         self.antenna_gain = np.max(self.azimuth_pattern)
         self.azimuth_pattern = self.azimuth_pattern - \
@@ -501,54 +499,59 @@ class Receiver:
                  rf_gain=0,
                  load_resistor=500,
                  baseband_gain=0,
-                 location=(0, 0, 0),
-                 **kwargs):
+                 channels=[dict(location=(0, 0, 0))]):
         self.fs = fs
         self.noise_figure = noise_figure
         self.rf_gain = rf_gain
         self.load_resistor = load_resistor
         self.baseband_gain = baseband_gain
-        self.location = np.array(location)
-
-        # polarization
-        self.polarization = np.array(kwargs.get('polarization', [0, 0, 1]))
-
-        # azimuth pattern
-        self.azimuth_angle = np.array(kwargs.get('azimuth_angle',
-                                                 np.arange(-90, 91, 1)))
-        self.azimuth_pattern = np.array(kwargs.get('azimuth_pattern',
-                                                   np.zeros(181)))
-
-        if len(self.azimuth_angle) != len(self.azimuth_pattern):
-            raise ValueError(
-                'Lengths of `azimuth_angle` and `azimuth_pattern` \
-                    should be the same')
-
-        self.antenna_gain = np.max(self.azimuth_pattern)
-        self.azimuth_pattern = self.azimuth_pattern - \
-            np.max(self.azimuth_pattern)
-
-        self.azimuth_func = interp1d(
-            self.azimuth_angle, self.azimuth_pattern,
-            kind='linear', bounds_error=False, fill_value=-10000)
-
-        # elevation pattern
-        self.elevation_angle = np.array(kwargs.get('elevation_angle',
-                                                   np.arange(-90, 91, 1)))
-        self.elevation_pattern = np.array(kwargs.get('elevation_pattern',
-                                                     np.zeros(181)))
-        self.elevation_pattern = self.elevation_pattern - \
-            np.max(self.elevation_pattern)
-
-        self.elevation_func = interp1d(
-            self.elevation_angle,
-            self.elevation_pattern-np.max(self.elevation_pattern),
-            kind='linear', bounds_error=False, fill_value=-10000)
-
         self.noise_bandwidth = self.fs / 2
 
-        # self.box_min = np.min(self.locations, axis=0)
-        # self.box_max = np.max(self.locations, axis=0)
+        # additional receiver parameters
+
+        self.channels = channels
+        self.channel_size = len(self.channels)
+        self.locations = np.zeros((self.channel_size, 3))
+        self.az_patterns = []
+        self.az_angles = []
+        self.az_func = []
+        self.el_patterns = []
+        self.el_angles = []
+        self.antenna_gains = np.zeros((self.channel_size))
+        self.el_func = []
+        for rx_idx, rx_element in enumerate(self.channels):
+            self.locations[rx_idx, :] = np.array(
+                rx_element.get('location'))
+            self.az_angles.append(
+                np.array(self.channels[rx_idx].get('azimuth_angle',
+                                                   np.arange(-90, 91, 1))))
+            self.az_patterns.append(
+                np.array(self.channels[rx_idx].get('azimuth_pattern',
+                                                   np.zeros(181))))
+            self.antenna_gains[rx_idx] = np.max(self.az_patterns[-1])
+            self.az_patterns[-1] = self.az_patterns[-1] - \
+                np.max(self.az_patterns[-1])
+            self.az_func.append(
+                interp1d(self.az_angles[-1], self.az_patterns[-1],
+                         kind='linear', bounds_error=False, fill_value=-10000)
+            )
+            self.el_angles.append(
+                np.array(self.channels[rx_idx].get('elevation_angle',
+                                                   np.arange(-90, 91, 1))))
+            self.el_patterns.append(
+                np.array(self.channels[rx_idx].get('elevation_pattern',
+                                                   np.zeros(181))))
+            self.el_patterns[-1] = self.el_patterns[-1] - \
+                np.max(self.el_patterns[-1])
+            self.el_func.append(
+                interp1d(
+                    self.el_angles[-1],
+                    self.el_patterns[-1]-np.max(self.el_patterns[-1]),
+                    kind='linear', bounds_error=False, fill_value=-10000)
+            )
+
+        self.box_min = np.min(self.locations, axis=0)
+        self.box_max = np.max(self.locations, axis=0)
 
 
 class Radar:
