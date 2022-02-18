@@ -293,28 +293,38 @@ class Transmitter:
             raise ValueError(
                 '`prp` should be larger than `pulse_length`')
 
-        self.chirp_start_time = np.cumsum(
+        # start time of each pulse, without considering the delay
+        self.pulse_start_time = np.cumsum(
             self.prp)-self.prp[0]
 
+        # number of transmitter channels
         self.channel_size = len(self.channels)
 
+        # firing delay for each channel
         self.delay = np.zeros(self.channel_size)
 
         self.locations = np.zeros((self.channel_size, 3))
         self.polarization = np.zeros((self.channel_size, 3))
 
+        # waveform modulation parameters
         self.waveform_mod = []
+
+        # pulse modulation parameters
         self.pulse_mod = np.ones(
             (self.channel_size, self.pulses), dtype=complex)
 
+        # azimuth patterns
         self.az_patterns = []
         self.az_angles = []
         self.az_func = []
 
+        # elevation patterns
         self.el_patterns = []
         self.el_angles = []
         self.el_func = []
 
+        # antenna peak gain
+        # antenna gain is calculated based on azimuth pattern
         self.antenna_gains = np.zeros((self.channel_size))
 
         self.grid = []
@@ -466,7 +476,7 @@ class Receiver:
         [{
 
         - **location** (*numpy.1darray*) --
-            3D location of the channel [x. y. z] (m)
+            3D location of the channel [x, y, z] (m)
         - **azimuth_angle** (*numpy.1darray*) --
             Angles for azimuth pattern (deg). ``default [-90, 90]``
         - **azimuth_pattern** (*numpy.1darray*) --

@@ -158,9 +158,9 @@ cdef Transmitter[float_t] cp_Transmitter(radar, density):
     for idx in range(0, len(radar.transmitter.f_offset)):
         f_offset_vect.push_back(f_offset_mem[idx])
 
-    t_pstart_mem = radar.transmitter.chirp_start_time.astype(np.float64)
-    t_pstart_vect.reserve(len(radar.transmitter.chirp_start_time))
-    for idx in range(0, len(radar.transmitter.chirp_start_time)):
+    t_pstart_mem = radar.transmitter.pulse_start_time.astype(np.float64)
+    t_pstart_vect.reserve(len(radar.transmitter.pulse_start_time))
+    for idx in range(0, len(radar.transmitter.pulse_start_time)):
         t_pstart_vect.push_back(t_pstart_mem[idx])
 
     if radar.phase_noise is not None:
