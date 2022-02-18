@@ -209,10 +209,10 @@ class Transmitter:
     def __init__(self,
                  f,
                  t,
-                 f_offset=None,
                  tx_power=0,
-                 prp=None,
                  pulses=1,
+                 prp=None,
+                 f_offset=None,
                  pn_f=None,
                  pn_power=None,
                  channels=[dict(location=(0, 0, 0))]):
@@ -293,11 +293,15 @@ class Transmitter:
             raise ValueError(
                 '`prp` should be larger than `pulse_length`')
 
-        self.chirp_start_time = np.cumsum(
-            self.prp)-self.prp[0]
+        # self.chirp_start_time = np.cumsum(
+        #     self.prp)-self.prp[0]
 
         self.channel_size = len(self.channels)
+
+        self.delay = np.zeros(self.channel_size)
+
         self.locations = np.zeros((self.channel_size, 3))
+        self.polarization = np.zeros((self.channel_size, 3))
 
         self.waveform_mod = []
         self.pulse_mod = np.ones(
@@ -305,15 +309,18 @@ class Transmitter:
 
         self.az_patterns = []
         self.az_angles = []
+        self.az_func = []
+
         self.el_patterns = []
         self.el_angles = []
-        self.az_func = []
         self.el_func = []
-        self.polarization = np.zeros((self.channel_size, 3))
+
         self.antenna_gains = np.zeros((self.channel_size))
+
         self.grid = []
-        self.delay = np.zeros(self.channel_size)
+
         for tx_idx, tx_element in enumerate(self.channels):
+
             self.delay[tx_idx] = self.channels[tx_idx].get('delay', 0)
 
             self.locations[tx_idx, :] = np.array(
@@ -364,7 +371,8 @@ class Transmitter:
                 mod_var = amp*np.exp(1j*phs/180*np.pi)
                 if len(self.mod_t) != len(self.mod_var):
                     raise ValueError(
-                        'Lengths of `mod_t`, `amp`, and `phs` should be the same')
+                        'Lengths of `mod_t`, `amp`, and `phs` \
+                            should be the same')
             else:
                 mod_var = None
 
@@ -548,15 +556,20 @@ class Receiver:
 
         self.channels = channels
         self.channel_size = len(self.channels)
+
         self.locations = np.zeros((self.channel_size, 3))
         self.polarization = np.zeros((self.channel_size, 3))
+
         self.az_patterns = []
         self.az_angles = []
         self.az_func = []
+
         self.el_patterns = []
         self.el_angles = []
-        self.antenna_gains = np.zeros((self.channel_size))
         self.el_func = []
+
+        self.antenna_gains = np.zeros((self.channel_size))
+
         for rx_idx, rx_element in enumerate(self.channels):
             self.locations[rx_idx, :] = np.array(
                 rx_element.get('location'))
