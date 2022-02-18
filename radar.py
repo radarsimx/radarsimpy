@@ -683,14 +683,23 @@ class Radar:
     def __init__(self,
                  transmitter,
                  receiver,
+                 location=(0, 0, 0),
+                 speed=(0, 0, 0),
+                 rotation=(0, 0, 0),
+                 rotation_rate=(0, 0, 0),
                  time=0,
                  seed=None,
                  **kwargs):
 
-        self.validation = kwargs.get('validation', False)
-
         self.transmitter = transmitter
         self.receiver = receiver
+
+        self.location = np.array(location)
+        self.speed = np.array(speed)
+        self.rotation = np.array(rotation)
+        self.rotation_rate = np.array(rotation_rate)
+
+        self.validation = kwargs.get('validation', False)
 
         self.samples_per_pulse = int(self.transmitter.pulse_length *
                                      self.receiver.fs)
