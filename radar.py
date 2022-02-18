@@ -56,8 +56,7 @@ class Transmitter:
 
     :param f:
         Waveform frequency (Hz).
-        If ``f`` is a single number, all the pulses have
-        the same center frequency.
+        If ``f`` is a single number, radar transmits a single-tone waveform.
 
         For linear modulation, specify ``f`` with ``[f_start, f_stop]``.
 
@@ -67,11 +66,10 @@ class Transmitter:
     :param t:
         Timing of each pulse (s).
     :type t: float or numpy.1darray
-    :param numpy.1darray f_offset:
-        Frequency offset for each pulse (Hz). The length must be the same
-        as ``pulses``.
     :param float tx_power:
         Transmitter power (dBm)
+    :param int pulses:
+        Total number of pulses
     :param float prp:
         Pulse repetition period (s). ``prp >=
         pulse_length``. If it is ``None``, ``prp =
@@ -82,8 +80,9 @@ class Transmitter:
         length of the 1-D array should equals to the length
         of ``pulses``
     :type repetitions_period: float or numpy.1darray
-    :param int pulses:
-        Total number of pulses
+    :param numpy.1darray f_offset:
+        Frequency offset for each pulse (Hz). The length must be the same
+        as ``pulses``.
     :param numpy.1darray pn_f:
         Frequency of the phase noise (Hz)
     :param numpy.1darray pn_power:
@@ -94,7 +93,10 @@ class Transmitter:
         [{
 
         - **location** (*numpy.1darray*) --
-            3D location of the channel [x. y. z] (m)
+            3D location of the channel [x, y, z] (m)
+        - **polarization** (*numpy.1darray*) --
+            Antenna polarization [x, y, z].
+            ``default = [0, 0, 1] (vertical polarization)``
         - **delay** (*float*) --
             Transmit delay (s). ``default 0``
         - **azimuth_angle** (*numpy.1darray*) --
@@ -199,10 +201,6 @@ class Transmitter:
         |    Waveform      +--------------------------------------+
         |    modulation    |           amp / phs / mod_t          |  ...
         |                  +--------------------------------------+
-
-    Tips:
-
-    - Set ``bandwidth`` to 0 get a tone waveform for a Doppler radar
 
     """
 
