@@ -293,8 +293,8 @@ class Transmitter:
             raise ValueError(
                 '`prp` should be larger than `pulse_length`')
 
-        # self.chirp_start_time = np.cumsum(
-        #     self.prp)-self.prp[0]
+        self.chirp_start_time = np.cumsum(
+            self.prp)-self.prp[0]
 
         self.channel_size = len(self.channels)
 
@@ -369,7 +369,7 @@ class Transmitter:
                     raise ValueError(
                         'Lengths of `amp` and `phs` should be the same')
                 mod_var = amp*np.exp(1j*phs/180*np.pi)
-                if len(self.mod_t) != len(self.mod_var):
+                if len(mod_t) != len(mod_var):
                     raise ValueError(
                         'Lengths of `mod_t`, `amp`, and `phs` \
                             should be the same')
