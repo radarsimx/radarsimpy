@@ -253,7 +253,7 @@ class Transmitter:
         self.bandwidth = np.max(self.f) - np.min(self.f)
         self.pulse_length = self.t[-1]-self.t[0]
 
-        self.fc_0 = (np.min(self.f)+np.max(self.f))/2
+        # self.fc_0 = (np.min(self.f)+np.max(self.f))/2
         self.fc_vect = (np.min(self.f)+np.max(self.f))/2+self.f_offset
         self.fc_frame = (np.min(self.fc_vect)+np.max(self.fc_vect))/2
 
@@ -715,18 +715,18 @@ class Radar:
         self.t_offset = np.array(time)
         self.frames = np.size(time)
 
-        if self.transmitter.bandwidth > 0:
-            self.max_range = (const.c * self.receiver.fs *
-                              self.transmitter.pulse_length /
-                              self.transmitter.bandwidth / 2)
-            self.unambiguous_speed = const.c / \
-                self.transmitter.prp[0] / \
-                self.transmitter.fc_0 / 2
-            self.range_resolution = const.c / 2 / self.transmitter.bandwidth
-        else:
-            self.max_range = 0
-            self.unambiguous_speed = 0
-            self.range_resolution = 0
+        # if self.transmitter.bandwidth > 0:
+        #     self.max_range = (const.c * self.receiver.fs *
+        #                       self.transmitter.pulse_length /
+        #                       self.transmitter.bandwidth / 2)
+        #     self.unambiguous_speed = const.c / \
+        #         self.transmitter.prp[0] / \
+        #         self.transmitter.fc_0 / 2
+        #     self.range_resolution = const.c / 2 / self.transmitter.bandwidth
+        # else:
+        #     self.max_range = 0
+        #     self.unambiguous_speed = 0
+        #     self.range_resolution = 0
 
         # virtual array
         self.channel_size = self.transmitter.channel_size * \
