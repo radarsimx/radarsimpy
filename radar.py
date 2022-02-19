@@ -135,7 +135,7 @@ class Transmitter:
     :ivar numpy.2darray locations:
         3D location of the channels. Size of the aray is
         ``[channel_size, 3 <x, y, z>]`` (m)
-        :ivar numpy.1darray delay:
+    :ivar numpy.1darray delay:
         Delay for each channel (s)
     :ivar numpy.1darray polarization:
         Antenna polarization ``[x, y, z]``.
@@ -474,6 +474,9 @@ class Receiver:
 
         - **location** (*numpy.1darray*) --
             3D location of the channel [x, y, z] (m)
+        - **polarization** (*numpy.1darray*) --
+            Antenna polarization [x, y, z].
+            ``default = [0, 0, 1] (vertical polarization)``
         - **azimuth_angle** (*numpy.1darray*) --
             Angles for azimuth pattern (deg). ``default [-90, 90]``
         - **azimuth_pattern** (*numpy.1darray*) --
@@ -485,26 +488,19 @@ class Receiver:
 
         }]
 
-    :ivar float fs:
-        Sampling rate (sps)
-    :ivar float noise_figure:
-        Noise figure (dB)
-    :ivar float rf_gain:
-        Total RF gain (dB)
-    :ivar float load_resistor:
-        Load resistor to convert power to voltage (Ohm)
-    :ivar float baseband_gain:
-        Total baseband gain (dB)
     :ivar float noise_bandwidth:
         Bandwidth in calculating the noise (Hz).
         ``noise_bandwidth = fs / 2``
-    :ivar list[dict] channels:
-        Properties of receiver channels
     :ivar int channel_size:
         Total number of receiver channels
     :ivar numpy.2darray locations:
         3D location of the channels. Size of the aray is
         ``[channel_size, 3 <x, y, z>]`` (m)
+    :ivar numpy.1darray polarization:
+        Antenna polarization ``[x, y, z]``.
+
+        - Horizontal polarization: ``[1, 0, 0]``
+        - Vertical polarization: ``[0, 0, 1]``
     :ivar list[numpy.1darray] az_angles:
         Angles for each channel's azimuth pattern (deg)
     :ivar list[numpy.1darray] az_patterns:
@@ -520,6 +516,10 @@ class Receiver:
     :ivar numpy.1darray antenna_gains:
         Antenna gain for each channel (dB).
         Antenna gain is ``max(az_pattern)``
+    :ivar numpy.1darray box_min:
+        Minimum location of the transmitter box (m)
+    :ivar numpy.1darray box_max:
+        Maximum location of the transmitter box (m)
 
     **Receiver noise**
 
@@ -642,10 +642,6 @@ class Radar:
     :param int seed:
         Seed for noise generator
 
-    :ivar Transmitter transmitter:
-        Radar transmiter
-    :ivar Receiver receiver:
-        Radar Receiver
     :ivar int samples_per_pulse:
         Number of samples in one pulse
     :ivar int channel_size:
@@ -653,15 +649,6 @@ class Radar:
         ``channel_size = transmitter.channel_size * receiver.channel_size``
     :ivar numpy.2darray virtual_array:
         Locations of virtual array elements. [channel_size, 3 <x, y, z>]
-    :ivar float max_range:
-        Maximum range for an FMCW mode (m).
-        ``max_range = c * fs * pulse_length / bandwidth / 2``
-    :ivar float unambiguous_speed:
-        Unambiguous speed (m/s).
-        ``unambiguous_speed = c / prp / fc / 2``
-    :ivar float range_resolution:
-        Range resolution (m).
-        ``range_resolution = c / 2 / bandwidth``
     :ivar numpy.3darray timestamp:
         Timestamp for each samples. Frame start time is
         defined in ``time``.
