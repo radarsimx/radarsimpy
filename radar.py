@@ -122,25 +122,26 @@ class Transmitter:
 
         }]
 
-    :ivar numpy.1darray fc:
-        Center frequency array for the pulses
-    :ivar float pulse_length:
-        Dwell time of each pulse (s)
+    :ivar numpy.1darray fc_vect:
+        Center frequency array for the pulses (Hz)
+    :ivar float fc_frame:
+        Center frequency of the whole frame (Hz)
     :ivar float bandwidth:
-        Bandwith of each pulse (Hz)
-    :ivar float tx_power:
-        Transmitter power (dBm)
-    :ivar numpy.1darray prp:
-        Pulse repetition period (s)
-    :ivar int pulses:
-        Total number of pulses
-    :ivar list[dict] channels:
-        Properties of transmitter channels
+        Bandwith of each pulse (Hz), calculated from ``max(f) - min(f)``
+    :ivar float pulse_length:
+        Dwell time of each pulse (s), calculated from ``t[-1] - t[0]``
     :ivar int channel_size:
         Number of transmitter channels
     :ivar numpy.2darray locations:
         3D location of the channels. Size of the aray is
         ``[channel_size, 3 <x, y, z>]`` (m)
+        :ivar numpy.1darray delay:
+        Delay for each channel (s)
+    :ivar numpy.1darray polarization:
+        Antenna polarization ``[x, y, z]``.
+
+        - Horizontal polarization: ``[1, 0, 0]``
+        - Vertical polarization: ``[0, 0, 1]``
     :ivar list[numpy.1darray] az_angles:
         Angles for each channel's azimuth pattern (deg)
     :ivar list[numpy.1darray] az_patterns:
@@ -156,22 +157,20 @@ class Transmitter:
     :ivar numpy.1darray antenna_gains:
         Antenna gain for each channel (dB).
         Antenna gain is ``max(az_pattern)``
-    :ivar list[numpy.1darray] pulse_phs:
-        Phase code sequence for phase modulation (deg)
-    :ivar numpy.1darray chip_length:
-        Length for each phase code (s)
-    :ivar numpy.1darray delay:
-        Delay for each channel (s)
-    :ivar numpy.1darray polarization:
-        Antenna polarization ``[x, y, z]``.
-
-        - Horizontal polarization: ``[1, 0, 0]``
-        - Vertical polarization: ``[0, 0, 1]``
-
-    :ivar float wavelength:
-        Wavelength (m)
-    :ivar float slope:
-        Waveform slope, ``bandwidth / pulse_length``
+    :ivar list[numpy.1darray] pulse_mod:
+        Complex modulation code sequence for phase modulation.
+        Lentgh of ``pulse_mod`` is the same as ``pulses``
+    :ivar list[dict] waveform_mod:
+        Waveform modulation properties for each channel.
+        {
+            ``enabled`` (*bool*) -- Enable waveform modulation
+            ``var`` (*numpy.1darray*) -- Variance of the modulation
+            ``t`` (*numpy.1darray*) -- Time stamps for waveform modulation
+        }
+    :ivar numpy.1darray box_min:
+        Minimum location of the transmitter box (m)
+    :ivar numpy.1darray box_max:
+        Maximum location of the transmitter box (m)
 
     **Waveform**
 
