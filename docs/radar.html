@@ -371,6 +371,15 @@ Antenna gain is <code class="docutils literal notranslate"><span class="pre">max
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>transmitter</strong> (<a class="reference internal" href="#radarsimpy.Transmitter" title="radarsimpy.Transmitter"><em>Transmitter</em></a>) – Radar transmiter</p></li>
 <li><p><strong>receiver</strong> (<a class="reference internal" href="#radarsimpy.Receiver" title="radarsimpy.Receiver"><em>Receiver</em></a>) – Radar Receiver</p></li>
+<li><p><strong>location</strong> (<em>numpy.1darray</em>) – 3D location of the radar [x, y, z] (m). <code class="docutils literal notranslate"><span class="pre">default</span>
+<span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p></li>
+<li><p><strong>speed</strong> (<em>numpy.1darray</em>) – Speed of the radar (m/s), [vx, vy, vz]. <code class="docutils literal notranslate"><span class="pre">default</span>
+<span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p></li>
+<li><p><strong>rotation</strong> (<em>numpy.1darray</em>) – Radar’s angle (deg), [yaw, pitch, roll].
+<code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p></li>
+<li><p><strong>rotation_rate</strong> (<em>numpy.1darray</em>) – Radar’s rotation rate (deg/s),
+[yaw rate, pitch rate, roll rate]
+<code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">0]</span></code></p></li>
 <li><p><strong>time</strong> (<em>float</em><em> or </em><em>numpy.1darray</em>) – Radar firing time instances / frames</p></li>
 <li><p><strong>seed</strong> (<em>int</em>) – Seed for noise generator</p></li>
 </ul>
