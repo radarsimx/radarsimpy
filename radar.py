@@ -636,6 +636,19 @@ class Radar:
         Radar transmiter
     :param Receiver receiver:
         Radar Receiver
+    :param numpy.1darray location:
+        3D location of the radar [x, y, z] (m). ``default
+        [0, 0, 0]``
+    :param numpy.1darray speed:
+        Speed of the radar (m/s), [vx, vy, vz]. ``default
+        [0, 0, 0]``
+    :param numpy.1darray rotation:
+        Radar's angle (deg), [yaw, pitch, roll].
+        ``default [0, 0, 0]``
+    :param numpy.1darray rotation_rate:
+        Radar's rotation rate (deg/s),
+        [yaw rate, pitch rate, roll rate]
+        ``default [0, 0, 0]``
     :param time:
         Radar firing time instances / frames
     :type time: float or numpy.1darray
