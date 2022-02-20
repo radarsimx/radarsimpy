@@ -29,14 +29,15 @@
 #           :##:
 #            .+:
 
+from libcpp cimport bool
+from libcpp.complex cimport complex as cpp_complex
+
 import numpy as np
 cimport numpy as np
 
 from radarsimpy.includes.type_def cimport vector
 from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t
 from radarsimpy.includes.zpvector cimport Vec3
-from libcpp cimport bool
-from libcpp.complex cimport complex as cpp_complex
 
 
 """
@@ -218,6 +219,7 @@ cdef extern from "snapshot.hpp":
         int ch_idx_
         vector[Ray[T]] ray_received
 
+
 """
 simulator
 """
@@ -230,8 +232,6 @@ cdef extern from "simulator.hpp":
                  T* bb_real,
                  T* bb_imag,
                  int bb_size)
-        # void InitData(T* bb_real, T* bb_imag, int bb_size)
-        # void GetBaseband(T* bb_real, T* bb_imag, int bb_size)
 
 
 """

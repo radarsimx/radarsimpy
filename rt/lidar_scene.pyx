@@ -35,14 +35,15 @@ cimport cython
 from libc.math cimport sin, cos, sqrt, atan, atan2, acos, pow, fmax, M_PI
 from libcpp cimport bool
 
+import numpy as np
+cimport numpy as np
+
+import meshio
+
 from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t, vector
 from radarsimpy.includes.zpvector cimport Vec3
 from radarsimpy.includes.radarsimc cimport Target, PointCloud
 
-import numpy as np
-cimport numpy as np
-# from stl import mesh
-import meshio
 
 @cython.cdivision(True)
 @cython.boundscheck(False)

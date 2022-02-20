@@ -29,6 +29,8 @@
 #           :##:
 #            .+:
 
+from libcpp cimport bool
+
 ctypedef int int_t
 ctypedef double float_t
 ctypedef unsigned int uint_t
@@ -39,7 +41,6 @@ IF UNAME_SYSNAME == "Windows":
 ELSE:
     ctypedef unsigned long uint64_t
 
-from libcpp cimport bool
 
 """
 C++ vector
@@ -61,7 +62,6 @@ cdef extern from "<vector>" namespace "std" nogil:
         bint operator<=(vector&, vector&)
         bint operator>=(vector&, vector&)
         void assign(size_type, const T&)
-        # void assign[input_iterator](input_iterator, input_iterator) except +
         T& at(size_type)
         T& back()
         size_type capacity()
