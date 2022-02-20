@@ -467,6 +467,9 @@ class Receiver:
         Load resistor to convert power to voltage (Ohm)
     :param float baseband_gain:
         Total baseband gain (dB)
+    :param string bb_type:
+        Baseband data type, ``complex`` or ``real``.
+        Deafult is ``complex``
     :param list[dict] channels:
         Properties of transmitter channels
 
@@ -551,13 +554,20 @@ class Receiver:
                  rf_gain=0,
                  load_resistor=500,
                  baseband_gain=0,
+                 bb_type='complex',
                  channels=[dict(location=(0, 0, 0))]):
         self.fs = fs
         self.noise_figure = noise_figure
         self.rf_gain = rf_gain
         self.load_resistor = load_resistor
         self.baseband_gain = baseband_gain
-        self.noise_bandwidth = self.fs / 2
+        self.bb_type = bb_type
+        if bb_type == 'complex':
+            self.noise_bandwidth = self.fs
+        elif bb_type == 'real':
+            self.noise_bandwidth = self.fs / 2
+        else:
+            raise ValueError('Invalid baseband type')
 
         # additional receiver parameters
 
