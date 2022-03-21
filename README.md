@@ -29,7 +29,9 @@ A **Radar** **Sim**ulator for **Py**thon
 
 This module supports CPU/GPU parallelization.
 CPU parallelization is implemented through OpenMP.
-GPU parallelization (CUDA) has been added since v6.0.0, and it is still working in progress.
+GPU parallelization (CUDA) has been added since v6.0.0.
+
+![performance]('./../assets/performance_7.0.0.png')
 
 ## Dependence
 
