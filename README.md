@@ -31,7 +31,7 @@ This module supports CPU/GPU parallelization.
 CPU parallelization is implemented through OpenMP.
 GPU parallelization (CUDA) has been added since v6.0.0.
 
-![performance]('./../assets/performance_7.0.0.png')
+![performance](./assets/performance_7.0.0.png)
 
 ## Dependence
 
