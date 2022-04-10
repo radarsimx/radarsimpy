@@ -38,6 +38,7 @@ from libcpp cimport bool
 from libc.stdlib cimport malloc, free
 
 from radarsimpy.includes.radarsimc cimport TxChannel, Transmitter
+from radarsimpy.includes.radarsimc cimport Radar
 from radarsimpy.lib.cp_radarsimc cimport cp_TxChannel, cp_Transmitter
 from radarsimpy.includes.radarsimc cimport Snapshot, Target, Receiver, RxChannel, Scene
 from radarsimpy.lib.cp_radarsimc cimport cp_RxChannel, cp_Target
@@ -135,6 +136,9 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
         }
     :rtype: dict
     """
+    cdef Transmitter[float_t] c_tx
+    cdef Receiver[float_t] c_rx
+    cdef Radar[float_t] c_radar
     cdef Scene[float_t] radar_scene
 
     cdef int_t frames = radar.frames
@@ -164,26 +168,38 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     """
     Transmitter
     """
-    radar_scene.SetTransmitter(cp_Transmitter(radar, density))
-
+    c_tx = cp_Transmitter(radar, density)
     for tx_idx in range(0, tx_ch):
-        radar_scene.AddTxChannel(cp_TxChannel(radar.transmitter, tx_idx))
+        c_tx.AddChannel(cp_TxChannel(radar.transmitter, tx_idx))
+
+    # radar_scene.SetTransmitter(c_tx)
+
+    # for tx_idx in range(0, tx_ch):
+    #     radar_scene.AddTxChannel(cp_TxChannel(radar.transmitter, tx_idx))
 
     """
     Receiver
     """ 
-    radar_scene.SetReceiver(
-        Receiver[float_t](
+    c_rx = Receiver[float_t](
             <float_t> radar.receiver.fs,
             <float_t> radar.receiver.rf_gain,
             <float_t> radar.receiver.load_resistor,
             <float_t> radar.receiver.baseband_gain,
             samples
         )
-    )
-
     for rx_idx in range(0, rx_ch):
-        radar_scene.AddRxChannel(cp_RxChannel(radar.receiver, rx_idx))
+        c_rx.AddChannel(cp_RxChannel(radar.receiver, rx_idx))
+
+    # radar_scene.SetReceiver(c_rx)
+
+
+    c_radar = Radar[float_t](c_tx, c_rx)
+
+    radar_scene.SetRadar(c_radar)
+
+
+    # for rx_idx in range(0, rx_ch):
+    #     radar_scene.AddRxChannel(cp_RxChannel(radar.receiver, rx_idx))
 
     """
     Snapshot

@@ -136,7 +136,6 @@ cdef extern from "point.hpp":
               const vector[T]& rcs,
               const vector[T]& phs) except +
 
-
 """
 transmitter
 """
@@ -201,6 +200,20 @@ cdef extern from "receiver.hpp":
 
 
 """
+radar
+"""
+cdef extern from "radar.hpp":
+    cdef cppclass Radar[T]:
+        Radar() except +
+        Radar(const Transmitter[T]& tx,
+              const Receiver[T]& rx) except +
+
+        void SetMotion(vector[Vec3[T]] location_array,
+                       vector[Vec3[T]] speed_array,
+                       vector[Vec3[T]] rotation_array,
+                       vector[Vec3[T]] rotation_rate_array)
+
+"""
 snapshot
 """    
 cdef extern from "snapshot.hpp":
@@ -246,6 +259,7 @@ cdef extern from "scene.hpp":
         void AddTxChannel(const TxChannel[T]& channel)
         void SetReceiver(const Receiver[T]& rx)
         void AddRxChannel(const RxChannel[T]& channel)
+        void SetRadar(const Radar[T]& radar)
         void RunSimulator(int level,
                           bool debug,
                           vector[Snapshot[T]]& snapshots,

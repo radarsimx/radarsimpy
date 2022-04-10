@@ -42,6 +42,7 @@ from radarsimpy.includes.radarsimc cimport Target
 from radarsimpy.includes.radarsimc cimport Transmitter
 from radarsimpy.includes.radarsimc cimport TxChannel
 from radarsimpy.includes.radarsimc cimport RxChannel
+from radarsimpy.includes.radarsimc cimport Radar
 
 cdef Point[float_t] cp_Point(location, speed, rcs, phase, shape)
 cdef Transmitter[float_t] cp_Transmitter(radar, density)
