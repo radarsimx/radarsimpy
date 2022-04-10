@@ -255,10 +255,6 @@ cdef extern from "scene.hpp":
         Scene() except +
 
         void AddTarget(const Target[T]& mesh)
-        void SetTransmitter(const Transmitter[T]& tx)
-        void AddTxChannel(const TxChannel[T]& channel)
-        void SetReceiver(const Receiver[T]& rx)
-        void AddRxChannel(const RxChannel[T]& channel)
         void SetRadar(const Radar[T]& radar)
         void RunSimulator(int level,
                           bool debug,
