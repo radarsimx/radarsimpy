@@ -148,6 +148,16 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     cdef int_t pulses = radar.transmitter.pulses
     cdef int_t samples = radar.samples_per_pulse
 
+    cdef float_t[:, :, :] radx_t, rady_t, radz_t
+    cdef float_t[:, :, :] sptx_t, spty_t, sptz_t
+    cdef float_t[:, :, :] rotx_t, roty_t, rotz_t
+    cdef float_t[:, :, :] rotratx_t, rotraty_t, rotratz_t
+
+    cdef vector[Vec3[float_t]] c_loc_array
+    cdef vector[Vec3[float_t]] c_speed_array
+    cdef vector[Vec3[float_t]] c_rotation_array
+    cdef vector[Vec3[float_t]] c_rotation_rate_array
+
     cdef int_t ch_stride = pulses * samples
     cdef int_t pulse_stride = samples
     cdef int_t idx_stride
@@ -195,8 +205,57 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
 
     c_radar = Radar[float_t](c_tx, c_rx)
 
-    radar_scene.SetRadar(c_radar)
+    radx_t = radar.loc_x
+    rady_t = radar.loc_y
+    radz_t = radar.loc_z
+    sptx_t = radar.speed_x
+    spty_t = radar.speed_y
+    sptz_t = radar.speed_z
+    rotx_t = radar.rot_x
+    roty_t = radar.rot_y
+    rotz_t = radar.rot_z
+    rotratx_t = radar.rotrat_x
+    rotraty_t = radar.rotrat_y
+    rotratz_t = radar.rotrat_z
 
+    for ch_idx in range(0, radar.channel_size*radar.frames):
+        for ps_idx in range(0, radar.transmitter.pulses):
+            for sp_idx in range(0, radar.samples_per_pulse):
+                c_loc_array.push_back(
+                    Vec3[float_t](
+                        radx_t[ch_idx, ps_idx, sp_idx],
+                        rady_t[ch_idx, ps_idx, sp_idx],
+                        radz_t[ch_idx, ps_idx, sp_idx]
+                    )
+                )
+                c_speed_array.push_back(
+                    Vec3[float_t](
+                        sptx_t[ch_idx, ps_idx, sp_idx],
+                        spty_t[ch_idx, ps_idx, sp_idx],
+                        sptz_t[ch_idx, ps_idx, sp_idx]
+                    )
+                )
+                c_rotation_array.push_back(
+                    Vec3[float_t](
+                        rotx_t[ch_idx, ps_idx, sp_idx],
+                        roty_t[ch_idx, ps_idx, sp_idx],
+                        rotz_t[ch_idx, ps_idx, sp_idx]
+                    )
+                )
+                c_rotation_rate_array.push_back(
+                    Vec3[float_t](
+                        rotratx_t[ch_idx, ps_idx, sp_idx],
+                        rotraty_t[ch_idx, ps_idx, sp_idx],
+                        rotratz_t[ch_idx, ps_idx, sp_idx]
+                    )
+                )
+
+    c_radar.SetMotion(c_loc_array,
+                      c_speed_array,
+                      c_rotation_array,
+                      c_rotation_rate_array)
+
+    radar_scene.SetRadar(c_radar)
 
     # for rx_idx in range(0, rx_ch):
     #     radar_scene.AddRxChannel(cp_RxChannel(radar.receiver, rx_idx))
