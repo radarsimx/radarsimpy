@@ -239,8 +239,7 @@ simulator
 cdef extern from "simulator.hpp":
     cdef cppclass Simulator[T]:
         Simulator() except +
-        void Run(Transmitter[T] tx,
-                 Receiver[T] rx,
+        void Run(Radar[T] radar,
                  vector[Point[T]] points,
                  T* bb_real,
                  T* bb_imag,
