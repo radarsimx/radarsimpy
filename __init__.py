@@ -28,8 +28,6 @@
 #           :##:
 #            .+:
 
-import numpy
-
 # radar
 from .radar import Radar
 from .radar import Transmitter
