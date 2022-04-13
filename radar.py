@@ -844,34 +844,37 @@ class Radar:
             self.loc_z = location[2] + self.speed_z*self.timestamp
 
         if np.size(rotation_rate[0]) > 1:
-            self.rotrat_x = rotation_rate[0].astype(np.float64)
+            self.rotrat_x = rotation_rate[0].astype(np.float64)/180*np.pi
         else:
-            self.rotrat_x = np.full(shape, rotation_rate[0], dtype=np.float64)
+            self.rotrat_x = np.full(
+                shape, rotation_rate[0]/180*np.pi, dtype=np.float64)
 
         if np.size(rotation_rate[1]) > 1:
-            self.rotrat_y = rotation_rate[1].astype(np.float64)
+            self.rotrat_y = rotation_rate[1].astype(np.float64)/180*np.pi
         else:
-            self.rotrat_y = np.full(shape, rotation_rate[1], dtype=np.float64)
+            self.rotrat_y = np.full(
+                shape, rotation_rate[1]/180*np.pi, dtype=np.float64)
 
         if np.size(rotation_rate[2]) > 1:
-            self.rotrat_z = rotation_rate[2].astype(np.float64)
+            self.rotrat_z = rotation_rate[2].astype(np.float64)/180*np.pi
         else:
-            self.rotrat_z = np.full(shape, rotation_rate[2], dtype=np.float64)
+            self.rotrat_z = np.full(
+                shape, rotation_rate[2]/180*np.pi, dtype=np.float64)
 
         if np.size(rotation[0]) > 1:
-            self.rot_x = rotation[0].astype(np.float64)
+            self.rot_x = rotation[0].astype(np.float64)/180*np.pi
         else:
-            self.rot_x = rotation[0] + self.rotrat_x*self.timestamp
+            self.rot_x = rotation[0]/180*np.pi + self.rotrat_x*self.timestamp
 
         if np.size(rotation[1]) > 1:
-            self.rot_y = rotation[1].astype(np.float64)
+            self.rot_y = rotation[1].astype(np.float64)/180*np.pi
         else:
-            self.rot_y = rotation[1] + self.rotrat_y*self.timestamp
+            self.rot_y = rotation[1]/180*np.pi + self.rotrat_y*self.timestamp
 
         if np.size(rotation[2]) > 1:
-            self.rot_z = rotation[2].astype(np.float64)
+            self.rot_z = rotation[2].astype(np.float64)/180*np.pi
         else:
-            self.rot_z = rotation[2] + self.rotrat_z*self.timestamp
+            self.rot_z = rotation[2]/180*np.pi + self.rotrat_z*self.timestamp
 
     def gen_timestamp(self):
         """
