@@ -205,18 +205,18 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
 
     c_radar = Radar[float_t](c_tx, c_rx)
 
-    radx_t = radar.loc_x
-    rady_t = radar.loc_y
-    radz_t = radar.loc_z
-    sptx_t = radar.speed_x
-    spty_t = radar.speed_y
-    sptz_t = radar.speed_z
-    rotx_t = radar.rot_x
-    roty_t = radar.rot_y
-    rotz_t = radar.rot_z
-    rotratx_t = radar.rotrat_x
-    rotraty_t = radar.rotrat_y
-    rotratz_t = radar.rotrat_z
+    radx_t = radar.loc_x.astype(np.float64)
+    rady_t = radar.loc_y.astype(np.float64)
+    radz_t = radar.loc_z.astype(np.float64)
+    sptx_t = radar.speed_x.astype(np.float64)
+    spty_t = radar.speed_y.astype(np.float64)
+    sptz_t = radar.speed_z.astype(np.float64)
+    rotx_t = radar.rot_x.astype(np.float64)
+    roty_t = radar.rot_y.astype(np.float64)
+    rotz_t = radar.rot_z.astype(np.float64)
+    rotratx_t = radar.rotrat_x.astype(np.float64)
+    rotraty_t = radar.rotrat_y.astype(np.float64)
+    rotratz_t = radar.rotrat_z.astype(np.float64)
 
     for ch_idx in range(0, radar.channel_size*radar.frames):
         for ps_idx in range(0, radar.transmitter.pulses):
