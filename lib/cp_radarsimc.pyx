@@ -89,9 +89,9 @@ cdef Point[float_t] cp_Point(location,
             rcs_t = np.full(shape, rcs)
 
         if np.size(phase) > 1:
-            phs_t = phase
+            phs_t = np.radians(phase)
         else:
-            phs_t = np.full(shape, phase)
+            phs_t = np.full(shape, np.radians(phase))
 
         for ch_idx in range(0, shape[0]):
             for ps_idx in range(0, shape[1]):
@@ -102,7 +102,7 @@ cdef Point[float_t] cp_Point(location,
                         <float_t> tgz_t[ch_idx, ps_idx, sp_idx]
                     ))
                     rcs_vect.push_back(<float_t> rcs_t[ch_idx, ps_idx, sp_idx])
-                    phs_vect.push_back(<float_t> (phs_t[ch_idx, ps_idx, sp_idx]/180*np.pi))
+                    phs_vect.push_back(<float_t> phs_t[ch_idx, ps_idx, sp_idx])
     else:
         loc_vect.push_back(Vec3[float_t](
             <float_t> location[0],
@@ -110,7 +110,7 @@ cdef Point[float_t] cp_Point(location,
             <float_t> location[2]
         ))
         rcs_vect.push_back(<float_t> rcs)
-        phs_vect.push_back(<float_t> (phase/180*np.pi))
+        phs_vect.push_back(<float_t> (np.radians(phase)))
     return Point[float_t](
         loc_vect,
         Vec3[float_t](
