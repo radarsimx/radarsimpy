@@ -53,7 +53,11 @@ cimport numpy as np
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef Point[float_t] cp_Point(location, speed, rcs, phase, shape):
+cdef Point[float_t] cp_Point(location,
+                             speed,
+                             rcs,
+                             phase,
+                             shape):
     cdef vector[Vec3[float_t]] loc_vect
     cdef vector[float_t] rcs_vect
     cdef vector[float_t] phs_vect
@@ -93,26 +97,26 @@ cdef Point[float_t] cp_Point(location, speed, rcs, phase, shape):
             for ps_idx in range(0, shape[1]):
                 for sp_idx in range(0, shape[2]):
                     loc_vect.push_back(Vec3[float_t](
-                        < float_t > tgx_t[ch_idx, ps_idx, sp_idx],
-                        < float_t > tgy_t[ch_idx, ps_idx, sp_idx],
-                        < float_t > tgz_t[ch_idx, ps_idx, sp_idx]
+                        <float_t> tgx_t[ch_idx, ps_idx, sp_idx],
+                        <float_t> tgy_t[ch_idx, ps_idx, sp_idx],
+                        <float_t> tgz_t[ch_idx, ps_idx, sp_idx]
                     ))
-                    rcs_vect.push_back(< float_t > rcs_t[ch_idx, ps_idx, sp_idx])
-                    phs_vect.push_back(< float_t > (phs_t[ch_idx, ps_idx, sp_idx]/180*np.pi))
+                    rcs_vect.push_back(<float_t> rcs_t[ch_idx, ps_idx, sp_idx])
+                    phs_vect.push_back(<float_t> (phs_t[ch_idx, ps_idx, sp_idx]/180*np.pi))
     else:
         loc_vect.push_back(Vec3[float_t](
-            < float_t > location[0],
-            < float_t > location[1],
-            < float_t > location[2]
+            <float_t> location[0],
+            <float_t> location[1],
+            <float_t> location[2]
         ))
-        rcs_vect.push_back(< float_t > rcs)
-        phs_vect.push_back(< float_t > (phase/180*np.pi))
+        rcs_vect.push_back(<float_t> rcs)
+        phs_vect.push_back(<float_t> (phase/180*np.pi))
     return Point[float_t](
         loc_vect,
         Vec3[float_t](
-            < float_t > speed[0],
-            < float_t > speed[1],
-            < float_t > speed[2]
+            <float_t> speed[0],
+            <float_t> speed[1],
+            <float_t> speed[2]
         ),
         rcs_vect,
         phs_vect
@@ -122,7 +126,8 @@ cdef Point[float_t] cp_Point(location, speed, rcs, phase, shape):
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef Transmitter[float_t] cp_Transmitter(radar, density):
+cdef Transmitter[float_t] cp_Transmitter(radar,
+                                         density):
     cdef int_t frames = radar.frames
     cdef int_t channles = radar.channel_size
     cdef int_t pulses = radar.transmitter.pulses
@@ -141,7 +146,7 @@ cdef Transmitter[float_t] cp_Transmitter(radar, density):
         for idx in range(0, frames):
             t_frame_vect.push_back(t_frame_mem[idx])
     else:
-        t_frame_vect.push_back(< float_t > (radar.t_offset))
+        t_frame_vect.push_back(<float_t> (radar.t_offset))
 
     f_mem = radar.f.astype(np.float64)
     f_vect.reserve(len(radar.f))
@@ -177,10 +182,10 @@ cdef Transmitter[float_t] cp_Transmitter(radar, density):
         f_vect,
         f_offset_vect,
         t_vect,
-        < float_t > radar.transmitter.tx_power,
+        <float_t> radar.transmitter.tx_power,
         t_pstart_vect,
         t_frame_vect,
-        < float_t > density,
+        <float_t> density,
         pn_vect
     )
 
@@ -188,7 +193,8 @@ cdef Transmitter[float_t] cp_Transmitter(radar, density):
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef TxChannel[float_t] cp_TxChannel(tx, tx_idx):
+cdef TxChannel[float_t] cp_TxChannel(tx,
+                                     tx_idx):
     cdef int_t pulses = tx.pulses
 
     cdef vector[float_t] az_ang_vect, az_ptn_vect
@@ -202,10 +208,10 @@ cdef TxChannel[float_t] cp_TxChannel(tx, tx_idx):
 
     az_ang_vect.reserve(len(tx.az_angles[tx_idx]))
     for idx in range(0, len(tx.az_angles[tx_idx])):
-        az_ang_vect.push_back(< float_t > (tx.az_angles[tx_idx][idx]/180*np.pi))
+        az_ang_vect.push_back(<float_t> (tx.az_angles[tx_idx][idx]/180*np.pi))
     az_ptn_vect.reserve(len(tx.az_patterns[tx_idx]))
     for idx in range(0, len(tx.az_patterns[tx_idx])):
-        az_ptn_vect.push_back(< float_t > (tx.az_patterns[tx_idx][idx]))
+        az_ptn_vect.push_back(<float_t> (tx.az_patterns[tx_idx][idx]))
 
     el_ang_mem = np.flip(90-tx.el_angles[tx_idx].astype(np.float64))/180*np.pi
     el_ptn_mem = np.flip(tx.el_patterns[tx_idx].astype(np.float64))
@@ -228,36 +234,37 @@ cdef TxChannel[float_t] cp_TxChannel(tx, tx_idx):
 
         mod_t_vect.reserve(len(tx.waveform_mod[tx_idx]['t']))
         for idx in range(0, len(tx.waveform_mod[tx_idx]['t'])):
-            mod_t_vect.push_back(< float_t > tx.waveform_mod[tx_idx]['t'][idx])
+            mod_t_vect.push_back(<float_t> tx.waveform_mod[tx_idx]['t'][idx])
 
     return TxChannel[float_t](
         Vec3[float_t](
-            < float_t > tx.locations[tx_idx, 0],
-            < float_t > tx.locations[tx_idx, 1],
-            < float_t > tx.locations[tx_idx, 2]
+            <float_t> tx.locations[tx_idx, 0],
+            <float_t> tx.locations[tx_idx, 1],
+            <float_t> tx.locations[tx_idx, 2]
         ),
         Vec3[float_t](
-            < float_t > tx.polarization[tx_idx, 0],
-            < float_t > tx.polarization[tx_idx, 1],
-            < float_t > tx.polarization[tx_idx, 2]
+            <float_t> tx.polarization[tx_idx, 0],
+            <float_t> tx.polarization[tx_idx, 1],
+            <float_t> tx.polarization[tx_idx, 2]
         ),
         az_ang_vect,
         az_ptn_vect,
         el_ang_vect,
         el_ptn_vect,
-        < float_t > tx.antenna_gains[tx_idx],
+        <float_t> tx.antenna_gains[tx_idx],
         mod_t_vect,
         mod_var_vect,
         pulse_mod_vect,
-        < float_t > tx.delay[tx_idx],
-        < float_t > (tx.grid[tx_idx]/180*np.pi)
+        <float_t> tx.delay[tx_idx],
+        <float_t> (tx.grid[tx_idx]/180*np.pi)
     )
 
 
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef RxChannel[float_t] cp_RxChannel(rx, rx_idx):
+cdef RxChannel[float_t] cp_RxChannel(rx,
+                                     rx_idx):
     cdef vector[float_t] az_ang_vect, az_ptn_vect
     cdef float_t[:] az_ang_mem, az_ptn_mem
     cdef vector[float_t] el_ang_vect, el_ptn_vect
@@ -283,23 +290,25 @@ cdef RxChannel[float_t] cp_RxChannel(rx, rx_idx):
 
     return RxChannel[float_t](
         Vec3[float_t](
-            < float_t > rx.locations[rx_idx, 0],
-            < float_t > rx.locations[rx_idx, 1],
-            < float_t > rx.locations[rx_idx, 2]
+            <float_t> rx.locations[rx_idx, 0],
+            <float_t> rx.locations[rx_idx, 1],
+            <float_t> rx.locations[rx_idx, 2]
         ),
         Vec3[float_t](0, 0, 1),
         az_ang_vect,
         az_ptn_vect,
         el_ang_vect,
         el_ptn_vect,
-        < float_t > rx.antenna_gains[rx_idx]
+        <float_t> rx.antenna_gains[rx_idx]
     )
 
 
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef Target[float_t] cp_Target(radar, target, shape):
+cdef Target[float_t] cp_Target(radar,
+                               target,
+                               shape):
     timestamp = radar.timestamp.astype(np.float64)
     cdef float_t[:, :] points_memview
     cdef uint64_t[:, :] cells_memview
@@ -333,7 +342,7 @@ cdef Target[float_t] cp_Target(radar, target, shape):
         'rotation_rate', (0, 0, 0)), dtype=object)/180*np.pi
 
     permittivity = target.get('permittivity', 'PEC')
-    if permittivity=="PEC":
+    if permittivity == "PEC":
         ep = cpp_complex[float_t](-1, 0)
         mu = cpp_complex[float_t](1, 0)
     else:
@@ -343,17 +352,17 @@ cdef Target[float_t] cp_Target(radar, target, shape):
     if np.size(location[0]) > 1:
         tgx_t = location[0].astype(np.float64)
     else:
-        tgx_t = <float_t>location[0]+  <float_t>speed[0]*timestamp
+        tgx_t = <float_t > location[0] + <float_t > speed[0]*timestamp
 
     if np.size(location[1]) > 1:
         tgy_t = location[1].astype(np.float64)
     else:
-        tgy_t =  <float_t>location[1]+ <float_t>speed[1]*timestamp
+        tgy_t = <float_t > location[1] + <float_t > speed[1]*timestamp
 
     if np.size(location[2]) > 1:
         tgz_t = location[2].astype(np.float64)
     else:
-        tgz_t =  <float_t>location[2]+ <float_t>speed[2]*timestamp
+        tgz_t = <float_t > location[2] + <float_t > speed[2]*timestamp
 
     if np.size(speed[0]) > 1:
         sptx_t = speed[0].astype(np.float64)
@@ -373,17 +382,17 @@ cdef Target[float_t] cp_Target(radar, target, shape):
     if np.size(rotation[0]) > 1:
         rotx_t = rotation[0].astype(np.float64)
     else:
-        rotx_t =  <float_t>rotation[0]+ <float_t>rotation_rate[0]*timestamp
+        rotx_t = <float_t > rotation[0] + <float_t > rotation_rate[0]*timestamp
 
     if np.size(rotation[1]) > 1:
         roty_t = rotation[1].astype(np.float64)
     else:
-        roty_t =  <float_t>rotation[1]+ <float_t>rotation_rate[1]*timestamp
+        roty_t = <float_t > rotation[1] + <float_t > rotation_rate[1]*timestamp
 
     if np.size(rotation[2]) > 1:
         rotz_t = rotation[2].astype(np.float64)
     else:
-        rotz_t =  <float_t>rotation[2]+ <float_t>rotation_rate[2]*timestamp
+        rotz_t = <float_t > rotation[2] + <float_t > rotation_rate[2]*timestamp
 
     if np.size(rotation_rate[0]) > 1:
         rotratx_t = rotation_rate[0].astype(np.float64)
@@ -432,16 +441,14 @@ cdef Target[float_t] cp_Target(radar, target, shape):
                     )
                 )
 
-    return Target[float_t](
-        & points_memview[0, 0],
-        & cells_memview[0, 0],
-        < int_t > cells_memview.shape[0],
-        Vec3[float_t](& origin[0]),
-        c_loc_array,
-        c_speed_array,
-        c_rotation_array,
-        c_rotation_rate_array,
-        ep,
-        mu,
-        < bool > target.get('is_ground', False)
-    )
+    return Target[float_t](& points_memview[0, 0],
+                           & cells_memview[0, 0],
+                           <int_t> cells_memview.shape[0],
+                           Vec3[float_t](& origin[0]),
+                           c_loc_array,
+                           c_speed_array,
+                           c_rotation_array,
+                           c_rotation_rate_array,
+                           ep,
+                           mu,
+                           <bool> target.get('is_ground', False))
