@@ -110,7 +110,7 @@ cdef Point[float_t] cp_Point(location,
             <float_t> location[2]
         ))
         rcs_vect.push_back(<float_t> rcs)
-        phs_vect.push_back(<float_t> (np.radians(phase)))
+        phs_vect.push_back(<float_t> np.radians(phase))
     return Point[float_t](
         loc_vect,
         Vec3[float_t](
@@ -208,12 +208,12 @@ cdef TxChannel[float_t] cp_TxChannel(tx,
 
     az_ang_vect.reserve(len(tx.az_angles[tx_idx]))
     for idx in range(0, len(tx.az_angles[tx_idx])):
-        az_ang_vect.push_back(<float_t> (tx.az_angles[tx_idx][idx]/180*np.pi))
+        az_ang_vect.push_back(<float_t> np.radians(tx.az_angles[tx_idx][idx]))
     az_ptn_vect.reserve(len(tx.az_patterns[tx_idx]))
     for idx in range(0, len(tx.az_patterns[tx_idx])):
         az_ptn_vect.push_back(<float_t> (tx.az_patterns[tx_idx][idx]))
 
-    el_ang_mem = np.flip(90-tx.el_angles[tx_idx].astype(np.float64))/180*np.pi
+    el_ang_mem = np.radians(np.flip(90-tx.el_angles[tx_idx].astype(np.float64)))
     el_ptn_mem = np.flip(tx.el_patterns[tx_idx].astype(np.float64))
     el_ang_vect.reserve(len(tx.el_angles[tx_idx]))
     for idx in range(0, len(tx.el_angles[tx_idx])):
@@ -256,7 +256,7 @@ cdef TxChannel[float_t] cp_TxChannel(tx,
         mod_var_vect,
         pulse_mod_vect,
         <float_t> tx.delay[tx_idx],
-        <float_t> (tx.grid[tx_idx]/180*np.pi)
+        <float_t> np.radians(tx.grid[tx_idx])
     )
 
 
@@ -270,7 +270,7 @@ cdef RxChannel[float_t] cp_RxChannel(rx,
     cdef vector[float_t] el_ang_vect, el_ptn_vect
     cdef float_t[:] el_ang_mem, el_ptn_mem
 
-    az_ang_mem = rx.az_angles[rx_idx].astype(np.float64)/180*np.pi
+    az_ang_mem = np.radians(rx.az_angles[rx_idx].astype(np.float64))
     az_ptn_mem = rx.az_patterns[rx_idx].astype(np.float64)
     az_ang_vect.reserve(len(rx.az_angles[rx_idx]))
     for idx in range(0, len(rx.az_angles[rx_idx])):
@@ -279,7 +279,7 @@ cdef RxChannel[float_t] cp_RxChannel(rx,
     for idx in range(0, len(rx.az_patterns[rx_idx])):
         az_ptn_vect.push_back(az_ptn_mem[idx])
 
-    el_ang_mem = np.flip(90-rx.el_angles[rx_idx].astype(np.float64))/180*np.pi
+    el_ang_mem = np.radians(np.flip(90-rx.el_angles[rx_idx].astype(np.float64)))
     el_ptn_mem = np.flip(rx.el_patterns[rx_idx].astype(np.float64))
     el_ang_vect.reserve(len(rx.el_angles[rx_idx]))
     for idx in range(0, len(rx.el_angles[rx_idx])):
@@ -337,9 +337,9 @@ cdef Target[float_t] cp_Target(radar,
     location = target.get('location', (0, 0, 0))
     speed = target.get('speed', (0, 0, 0))
     rotation = np.array(target.get('rotation', (0, 0, 0)),
-                        dtype=object)/180*np.pi
+                        dtype=object)
     rotation_rate = np.array(target.get(
-        'rotation_rate', (0, 0, 0)), dtype=object)/180*np.pi
+        'rotation_rate', (0, 0, 0)), dtype=object)
 
     permittivity = target.get('permittivity', 'PEC')
     if permittivity == "PEC":
@@ -380,34 +380,34 @@ cdef Target[float_t] cp_Target(radar,
         sptz_t = np.full(shape, speed[2], dtype=np.float64)
 
     if np.size(rotation[0]) > 1:
-        rotx_t = rotation[0].astype(np.float64)
+        rotx_t = np.radians(rotation[0]).astype(np.float64)
     else:
-        rotx_t = <float_t > rotation[0] + <float_t > rotation_rate[0]*timestamp
+        rotx_t = np.radians(rotation[0] + rotation_rate[0]*timestamp).astype(np.float64)
 
     if np.size(rotation[1]) > 1:
-        roty_t = rotation[1].astype(np.float64)
+        roty_t = np.radians(rotation[1]).astype(np.float64)
     else:
-        roty_t = <float_t > rotation[1] + <float_t > rotation_rate[1]*timestamp
+        roty_t = np.radians(rotation[1] + rotation_rate[1]*timestamp).astype(np.float64)
 
     if np.size(rotation[2]) > 1:
-        rotz_t = rotation[2].astype(np.float64)
+        rotz_t = np.radians(rotation[2]).astype(np.float64)
     else:
-        rotz_t = <float_t > rotation[2] + <float_t > rotation_rate[2]*timestamp
+        rotz_t = np.radians(rotation[2] + rotation_rate[2]*timestamp).astype(np.float64)
 
     if np.size(rotation_rate[0]) > 1:
-        rotratx_t = rotation_rate[0].astype(np.float64)
+        rotratx_t = np.radians(rotation_rate[0]).astype(np.float64)
     else:
-        rotratx_t = np.full(shape, rotation_rate[0], dtype=np.float64)
+        rotratx_t = np.full(shape, np.radians(rotation_rate[0]), dtype=np.float64)
 
     if np.size(rotation_rate[1]) > 1:
-        rotraty_t = rotation_rate[1].astype(np.float64)
+        rotraty_t = np.radians(rotation_rate[1]).astype(np.float64)
     else:
-        rotraty_t = np.full(shape, rotation_rate[1], dtype=np.float64)
+        rotraty_t = np.full(shape, np.radians(rotation_rate[1]), dtype=np.float64)
 
     if np.size(rotation_rate[2]) > 1:
-        rotratz_t = rotation_rate[2].astype(np.float64)
+        rotratz_t = np.radians(rotation_rate[2]).astype(np.float64)
     else:
-        rotratz_t = np.full(shape, rotation_rate[2], dtype=np.float64)
+        rotratz_t = np.full(shape, np.radians(rotation_rate[2]), dtype=np.float64)
 
     for ch_idx in range(0, radar.channel_size*radar.frames):
         for ps_idx in range(0, radar.transmitter.pulses):
