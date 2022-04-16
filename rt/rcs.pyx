@@ -76,16 +76,21 @@ cpdef rcs_sbr(model, f, obs_phi, obs_theta, inc_phi=None, inc_theta=None, pol=[0
 
     if inc_theta is None:
         inc_theta = obs_theta
+    
+    inc_phi_rad = np.radians(inc_phi)
+    inc_theta_rad = np.radians(inc_theta)
+    obs_phi_rad = np.radians(obs_phi)
+    obs_theta_rad = np.radians(obs_theta)
 
     cdef Vec3[float_t] inc_dir = Vec3[float_t](
-        <float_t> (np.sin(inc_theta/180*np.pi)*np.cos(inc_phi/180*np.pi)),
-        <float_t> (np.sin(inc_theta/180*np.pi)*np.sin(inc_phi/180*np.pi)),
-        <float_t> (np.cos(inc_theta/180*np.pi)))
+        <float_t> (np.sin(inc_theta_rad)*np.cos(inc_phi_rad)),
+        <float_t> (np.sin(inc_theta_rad)*np.sin(inc_phi_rad)),
+        <float_t> (np.cos(inc_theta_rad)))
 
     cdef Vec3[float_t] obs_dir = Vec3[float_t](
-        <float_t> (np.sin(obs_theta/180*np.pi)*np.cos(obs_phi/180*np.pi)),
-        <float_t> (np.sin(obs_theta/180*np.pi)*np.sin(obs_phi/180*np.pi)),
-        <float_t> (np.cos(obs_theta/180*np.pi)))
+        <float_t> (np.sin(obs_theta_rad)*np.cos(obs_phi_rad)),
+        <float_t> (np.sin(obs_theta_rad)*np.sin(obs_phi_rad)),
+        <float_t> (np.cos(obs_theta_rad)))
 
     cdef Rcs[float_t] rcs
 
