@@ -241,9 +241,9 @@ cdef extern from "simulator.hpp":
         Simulator() except +
         void Run(Radar[T] radar,
                  vector[Point[T]] points,
+                 int bb_size,
                  T* bb_real,
-                 T* bb_imag,
-                 int bb_size)
+                 T* bb_imag)
 
 
 """
