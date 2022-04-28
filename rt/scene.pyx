@@ -322,8 +322,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
         bb_imag[idx] = 0
 
     radar_scene.RunSimulator(
-        level_id, debug, snaps, bb_real, bb_imag, frames*total_ch*pulses*samples
-    )
+        level_id, debug, snaps, bb_real, bb_imag)
 
     baseband = np.zeros((frames*total_ch, pulses, samples), dtype=complex)
 

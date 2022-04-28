@@ -258,7 +258,6 @@ cdef extern from "scene.hpp":
                           bool debug,
                           vector[Snapshot[T]]& snapshots,
                           T* bb_real,
-                          T* bb_imag,
-                          int bb_size)
+                          T* bb_imag)
 
         vector[Snapshot[T]] snapshots_
