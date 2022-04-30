@@ -276,10 +276,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
                         fm_idx,
                         tx_idx,
                         0,
-                        0,
-                        <size_t>tx_ch,
-                        <size_t>rx_ch
-                    )
+                        0)
                 )
     elif level == 'pulse':
         level_id = 1
@@ -292,9 +289,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
                         fm_idx,
                         tx_idx,
                         ps_idx,
-                        0,
-                        <size_t>tx_ch,
-                        <size_t>rx_ch)
+                        0)
                     )
     elif level == 'sample':
         level_id = 2
@@ -308,9 +303,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
                             fm_idx,
                             tx_idx,
                             ps_idx,
-                            sp_idx,
-                            <size_t>tx_ch,
-                            <size_t>rx_ch)
+                            sp_idx)
                         )
 
 
