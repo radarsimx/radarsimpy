@@ -72,21 +72,11 @@ cdef extern from "target.hpp":
 
 
 cdef extern from "ray.hpp":
-    cdef cppclass PathNode[T]:
-        Vec3[T] dir_
-        Vec3[T] loc_
-
     cdef cppclass Ray[T, Tg=*]:
         Ray() except +
-        Vec3[T] *dir_
-        Vec3[T] *loc_
-        Vec3[cpp_complex[T]] *pol_
-        Vec3[T] *norm_
-        T *range_
-        T *range_rate_
-        int ref_count_
-        T d_theta_
-        T d_phi_
+        Vec3[T] *direction_
+        Vec3[T] *location_
+        int reflections_
 
 
 cdef extern from "raypool.hpp":
