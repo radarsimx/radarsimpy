@@ -307,8 +307,8 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
                         )
 
 
-    cdef float_t *bb_real = <float_t *> malloc(frames*total_ch*pulses*samples * sizeof(float_t))
-    cdef float_t *bb_imag = <float_t *> malloc(frames*total_ch*pulses*samples * sizeof(float_t))
+    cdef double *bb_real = <double *> malloc(frames*total_ch*pulses*samples * sizeof(double))
+    cdef double *bb_imag = <double *> malloc(frames*total_ch*pulses*samples * sizeof(double))
 
     for idx in range(0, frames*total_ch*pulses*samples):
         bb_real[idx] = 0

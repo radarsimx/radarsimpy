@@ -229,8 +229,8 @@ cdef extern from "simulator.hpp":
         Simulator() except +
         void Run(Radar[T] radar,
                  vector[Point[T]] points,
-                 T* bb_real,
-                 T* bb_imag)
+                 double* bb_real,
+                 double* bb_imag)
 
 
 """
@@ -245,7 +245,7 @@ cdef extern from "scene.hpp":
         void RunSimulator(int level,
                           bool debug,
                           vector[Snapshot[T]]& snapshots,
-                          T* bb_real,
-                          T* bb_imag)
+                          double* bb_real,
+                          double* bb_imag)
 
         vector[Snapshot[T]] snapshots_
