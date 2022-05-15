@@ -38,7 +38,7 @@ cimport numpy as np
 import meshio
 
 from radarsimpy.includes.radarsimc cimport Target, Rcs
-from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t
+from radarsimpy.includes.type_def cimport uint64_t, int_t
 from radarsimpy.includes.zpvector cimport Vec3
 
 
@@ -68,7 +68,7 @@ cpdef rcs_sbr(model, f, obs_phi, obs_theta, inc_phi=None, inc_theta=None, pol=[0
     :rtype: float
     """
     trig_mesh = meshio.read(model)
-    cdef float_t[:, :] points = trig_mesh.points.astype(np.float32)
+    cdef double[:, :] points = trig_mesh.points.astype(np.float64)
     cdef uint64_t[:, :] cells = trig_mesh.cells[0].data.astype(np.uint64)
 
     if inc_phi is None:
@@ -82,23 +82,23 @@ cpdef rcs_sbr(model, f, obs_phi, obs_theta, inc_phi=None, inc_theta=None, pol=[0
     obs_phi_rad = np.radians(obs_phi)
     obs_theta_rad = np.radians(obs_theta)
 
-    cdef Vec3[float_t] inc_dir = Vec3[float_t](
-        <float_t> (np.sin(inc_theta_rad)*np.cos(inc_phi_rad)),
-        <float_t> (np.sin(inc_theta_rad)*np.sin(inc_phi_rad)),
-        <float_t> (np.cos(inc_theta_rad)))
+    cdef Vec3[double] inc_dir = Vec3[double](
+        <double> (np.sin(inc_theta_rad)*np.cos(inc_phi_rad)),
+        <double> (np.sin(inc_theta_rad)*np.sin(inc_phi_rad)),
+        <double> (np.cos(inc_theta_rad)))
 
-    cdef Vec3[float_t] obs_dir = Vec3[float_t](
-        <float_t> (np.sin(obs_theta_rad)*np.cos(obs_phi_rad)),
-        <float_t> (np.sin(obs_theta_rad)*np.sin(obs_phi_rad)),
-        <float_t> (np.cos(obs_theta_rad)))
+    cdef Vec3[double] obs_dir = Vec3[double](
+        <double> (np.sin(obs_theta_rad)*np.cos(obs_phi_rad)),
+        <double> (np.sin(obs_theta_rad)*np.sin(obs_phi_rad)),
+        <double> (np.cos(obs_theta_rad)))
 
-    cdef Rcs[float_t] rcs
+    cdef Rcs[double] rcs
 
-    rcs = Rcs[float_t](Target[float_t](&points[0, 0], &cells[0, 0], <int_t> cells.shape[0]),
+    rcs = Rcs[double](Target[double](&points[0, 0], &cells[0, 0], <int_t> cells.shape[0]),
                       inc_dir,
                       obs_dir,
-                      Vec3[float_t](<float_t> pol[0], <float_t> pol[1], <float_t> pol[2]),
-                      <float_t> f,
-                      <float_t> density)
+                      Vec3[double](<double> pol[0], <double> pol[1], <double> pol[2]),
+                      <double> f,
+                      <double> density)
 
     return rcs.CalculateRcs()
