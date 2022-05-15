@@ -147,21 +147,21 @@ cdef extern from "transmitter.hpp":
 
     cdef cppclass Transmitter[T]:
         Transmitter() except +
-        Transmitter(vector[T] freq,
-                    vector[T] freq_offset,
-                    vector[T] freq_time,
+        Transmitter(vector[double] freq,
+                    vector[double] freq_offset,
+                    vector[double] freq_time,
                     T tx_power,
-                    vector[T] pulse_start_time,
-                    vector[T] frame_start_time,
+                    vector[double] pulse_start_time,
+                    vector[double] frame_start_time,
                     T density) except +
-        Transmitter(vector[T] freq,
-                    vector[T] freq_offset,
-                    vector[T] freq_time,
+        Transmitter(vector[double] freq,
+                    vector[double] freq_offset,
+                    vector[double] freq_time,
                     T tx_power,
-                    vector[T] pulse_start_time,
-                    vector[T] frame_start_time,
+                    vector[double] pulse_start_time,
+                    vector[double] frame_start_time,
                     T density,
-                    vector[cpp_complex[T]]) except +
+                    vector[cpp_complex[double]]) except +
         void AddChannel(const TxChannel[T]& channel)
 
 
