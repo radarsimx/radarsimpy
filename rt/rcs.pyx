@@ -68,7 +68,7 @@ cpdef rcs_sbr(model, f, obs_phi, obs_theta, inc_phi=None, inc_theta=None, pol=[0
     :rtype: float
     """
     trig_mesh = meshio.read(model)
-    cdef float_t[:, :] points = trig_mesh.points.astype(np.float64)
+    cdef float_t[:, :] points = trig_mesh.points.astype(np.float32)
     cdef uint64_t[:, :] cells = trig_mesh.cells[0].data.astype(np.uint64)
 
     if inc_phi is None:

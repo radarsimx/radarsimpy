@@ -116,16 +116,16 @@ cpdef lidar_scene(lidar, targets, t=0):
     for idx in range(0, target_count):
         t_mesh = meshio.read(targets[idx]['model'])
 
-        points_memview = t_mesh.points.astype(np.float64)
+        points_memview = t_mesh.points.astype(np.float32)
         cells_memview = t_mesh.cells[0].data.astype(np.uint64)
 
-        origin = np.array(targets[idx].get('origin', (0,0,0)), dtype=np.float64)
+        origin = np.array(targets[idx].get('origin', (0,0,0)), dtype=np.float32)
 
-        location = np.array(targets[idx].get('location', (0,0,0)), dtype=np.float64)+t*np.array(targets[idx].get('speed', (0,0,0)), dtype=np.float64)
-        speed = np.array(targets[idx].get('speed', (0,0,0)), dtype=np.float64)
+        location = np.array(targets[idx].get('location', (0,0,0)), dtype=np.float32)+t*np.array(targets[idx].get('speed', (0,0,0)), dtype=np.float32)
+        speed = np.array(targets[idx].get('speed', (0,0,0)), dtype=np.float32)
 
-        rotation = np.radians(np.array(targets[idx].get('rotation', (0,0,0)), dtype=np.float64)+t*np.array(targets[idx].get('rotation_rate', (0,0,0)), dtype=np.float64))
-        rotation_rate = np.radians(np.array(targets[idx].get('rotation_rate', (0,0,0)), dtype=np.float64))
+        rotation = np.radians(np.array(targets[idx].get('rotation', (0,0,0)), dtype=np.float32)+t*np.array(targets[idx].get('rotation_rate', (0,0,0)), dtype=np.float32))
+        rotation_rate = np.radians(np.array(targets[idx].get('rotation_rate', (0,0,0)), dtype=np.float32))
 
         pointcloud.AddTarget(Target[float_t](&points_memview[0,0],
             &cells_memview[0,0],
@@ -137,8 +137,8 @@ cpdef lidar_scene(lidar, targets, t=0):
             Vec3[float_t](&rotation_rate[0]),
             <bool> targets[idx].get('is_ground', False)))
 
-    cdef float_t[:] phi = np.radians(np.array(lidar['phi'], dtype=np.float64))
-    cdef float_t[:] theta = np.radians(np.array(lidar['theta'], dtype=np.float64))
+    cdef float_t[:] phi = np.radians(np.array(lidar['phi'], dtype=np.float32))
+    cdef float_t[:] theta = np.radians(np.array(lidar['theta'], dtype=np.float32))
 
     cdef vector[float_t] phi_vector
     phi_vector.reserve(phi.shape[0])
@@ -157,7 +157,7 @@ cpdef lidar_scene(lidar, targets, t=0):
         Vec3[float_t](<float_t> lidar['position'][0], <float_t> lidar['position'][1], <float_t> lidar['position'][2])
     )
 
-    ray_type = np.dtype([('positions', np.float64, (3,)), ('directions', np.float64, (3,))])
+    ray_type = np.dtype([('positions', np.float32, (3,)), ('directions', np.float32, (3,))])
 
     rays = np.zeros(pointcloud.cloud_.size(), dtype=ray_type)
 
