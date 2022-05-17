@@ -49,8 +49,3 @@ cdef Transmitter[float_t] cp_Transmitter(radar, density)
 cdef TxChannel[float_t] cp_TxChannel(tx, tx_idx)
 cdef RxChannel[float_t] cp_RxChannel(rx, rx_idx)
 cdef Target[float_t] cp_Target(radar, target, shape)
-
-cdef Transmitter[double] cp_Transmitter_double(radar, density)
-cdef TxChannel[double] cp_TxChannel_double(tx, tx_idx)
-cdef RxChannel[double] cp_RxChannel_double(rx, rx_idx)
-cdef Target[double] cp_Target_double(radar, target, shape)
