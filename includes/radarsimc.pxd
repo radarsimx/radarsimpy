@@ -209,16 +209,15 @@ snapshot
 cdef extern from "snapshot.hpp":
     cdef cppclass Snapshot[T]:
         Snapshot() except +
-        Snapshot(T time,
+        Snapshot(double time,
                  int frame_idx,
                  int ch_idx,
                  int pulse_idx,
                  int sample_idx) except +
-        T time_
+        double time_
         int sample_idx_
         int pulse_idx_
         int ch_idx_
-        vector[Ray[T]] ray_received
 
 
 """

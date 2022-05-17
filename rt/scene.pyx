@@ -359,7 +359,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
             for tx_idx in range(0, tx_ch):
                 snaps.push_back(
                     Snapshot[float_t](
-                        <float_t>timestamp[fm_idx*total_ch+tx_idx*rx_ch, 0, 0],
+                        <double>timestamp[fm_idx*total_ch+tx_idx*rx_ch, 0, 0],
                         fm_idx,
                         tx_idx,
                         0,
