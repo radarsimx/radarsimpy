@@ -243,7 +243,7 @@ cdef extern from "scene.hpp":
         void SetRadar(const Radar[F]& radar)
         void RunSimulator(int level,
                           bool debug,
-                          vector[Snapshot[T]]& snapshots,
+                          vector[Snapshot[F]]& snapshots,
                           double* bb_real,
                           double* bb_imag)
 
