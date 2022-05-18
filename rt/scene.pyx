@@ -141,7 +141,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     cdef Transmitter[float_t] c_tx
     cdef Receiver[float_t] c_rx
     cdef Radar[float_t] c_radar
-    cdef Scene[float_t] radar_scene
+    cdef Scene[float_t, float_t] radar_scene
 
     cdef float_t[:, :, :] radx_t, rady_t, radz_t
     cdef float_t[:, :, :] sptx_t, spty_t, sptz_t
@@ -154,20 +154,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     cdef vector[Vec3[float_t]] c_rotation_rate_array
 
 # for "pulse" and "sample" level
-    cdef Transmitter[double] c_tx_double
-    cdef Receiver[double] c_rx_double
-    cdef Radar[double] c_radar_double
-    cdef Scene[double] radar_scene_double
-
-    cdef double[:, :, :] radx_t_double, rady_t_double, radz_t_double
-    cdef double[:, :, :] sptx_t_double, spty_t_double, sptz_t_double
-    cdef double[:, :, :] rotx_t_double, roty_t_double, rotz_t_double
-    cdef double[:, :, :] rotratx_t_double, rotraty_t_double, rotratz_t_double
-
-    cdef vector[Vec3[double]] c_loc_array_double
-    cdef vector[Vec3[double]] c_speed_array_double
-    cdef vector[Vec3[double]] c_rotation_array_double
-    cdef vector[Vec3[double]] c_rotation_rate_array_double
+    cdef Scene[double, float_t] radar_scene_double
 
     cdef int_t frames = radar.frames
     cdef int_t total_ch = radar.channel_size
@@ -200,151 +187,82 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     """
     Transmitter
     """
-    if level is None:
-        c_tx = cp_Transmitter(radar, density)
-        for tx_idx in range(0, tx_ch):
-            c_tx.AddChannel(cp_TxChannel(radar.transmitter, tx_idx))
-    else:
-        c_tx_double = cp_Transmitter_double(radar, density)
-        for tx_idx in range(0, tx_ch):
-            c_tx_double.AddChannel(cp_TxChannel_double(radar.transmitter, tx_idx))
+    c_tx = cp_Transmitter(radar, density)
+    for tx_idx in range(0, tx_ch):
+        c_tx.AddChannel(cp_TxChannel(radar.transmitter, tx_idx))
 
     """
     Receiver
     """
-    if level is None:
-        c_rx = Receiver[float_t](
-                <float_t> radar.receiver.fs,
-                <float_t> radar.receiver.rf_gain,
-                <float_t> radar.receiver.load_resistor,
-                <float_t> radar.receiver.baseband_gain,
-                samples
-            )
-        for rx_idx in range(0, rx_ch):
-            c_rx.AddChannel(cp_RxChannel(radar.receiver, rx_idx))
-    else:
-        c_rx_double = Receiver[double](
-                <double> radar.receiver.fs,
-                <double> radar.receiver.rf_gain,
-                <double> radar.receiver.load_resistor,
-                <double> radar.receiver.baseband_gain,
-                samples
-            )
-        for rx_idx in range(0, rx_ch):
-            c_rx_double.AddChannel(cp_RxChannel_double(radar.receiver, rx_idx))
-
+    c_rx = Receiver[float_t](
+            <float_t> radar.receiver.fs,
+            <float_t> radar.receiver.rf_gain,
+            <float_t> radar.receiver.load_resistor,
+            <float_t> radar.receiver.baseband_gain,
+            samples
+        )
+    for rx_idx in range(0, rx_ch):
+        c_rx.AddChannel(cp_RxChannel(radar.receiver, rx_idx))
 
     """
     Radar
     """
+    c_radar = Radar[float_t](c_tx, c_rx)
+
+    radx_t = radar.loc_x.astype(np.float32)
+    rady_t = radar.loc_y.astype(np.float32)
+    radz_t = radar.loc_z.astype(np.float32)
+    sptx_t = radar.speed_x.astype(np.float32)
+    spty_t = radar.speed_y.astype(np.float32)
+    sptz_t = radar.speed_z.astype(np.float32)
+    rotx_t = radar.rot_x.astype(np.float32)
+    roty_t = radar.rot_y.astype(np.float32)
+    rotz_t = radar.rot_z.astype(np.float32)
+    rotratx_t = radar.rotrat_x.astype(np.float32)
+    rotraty_t = radar.rotrat_y.astype(np.float32)
+    rotratz_t = radar.rotrat_z.astype(np.float32)
+
+    for ch_idx in range(0, radar.channel_size*radar.frames):
+        for ps_idx in range(0, radar.transmitter.pulses):
+            for sp_idx in range(0, radar.samples_per_pulse):
+                c_loc_array.push_back(
+                    Vec3[float_t](
+                        radx_t[ch_idx, ps_idx, sp_idx],
+                        rady_t[ch_idx, ps_idx, sp_idx],
+                        radz_t[ch_idx, ps_idx, sp_idx]
+                    )
+                )
+                c_speed_array.push_back(
+                    Vec3[float_t](
+                        sptx_t[ch_idx, ps_idx, sp_idx],
+                        spty_t[ch_idx, ps_idx, sp_idx],
+                        sptz_t[ch_idx, ps_idx, sp_idx]
+                    )
+                )
+                c_rotation_array.push_back(
+                    Vec3[float_t](
+                        rotx_t[ch_idx, ps_idx, sp_idx],
+                        roty_t[ch_idx, ps_idx, sp_idx],
+                        rotz_t[ch_idx, ps_idx, sp_idx]
+                    )
+                )
+                c_rotation_rate_array.push_back(
+                    Vec3[float_t](
+                        rotratx_t[ch_idx, ps_idx, sp_idx],
+                        rotraty_t[ch_idx, ps_idx, sp_idx],
+                        rotratz_t[ch_idx, ps_idx, sp_idx]
+                    )
+                )
+
+    c_radar.SetMotion(c_loc_array,
+                    c_speed_array,
+                    c_rotation_array,
+                    c_rotation_rate_array)
+
     if level is None:
-        c_radar = Radar[float_t](c_tx, c_rx)
-
-        radx_t = radar.loc_x.astype(np.float32)
-        rady_t = radar.loc_y.astype(np.float32)
-        radz_t = radar.loc_z.astype(np.float32)
-        sptx_t = radar.speed_x.astype(np.float32)
-        spty_t = radar.speed_y.astype(np.float32)
-        sptz_t = radar.speed_z.astype(np.float32)
-        rotx_t = radar.rot_x.astype(np.float32)
-        roty_t = radar.rot_y.astype(np.float32)
-        rotz_t = radar.rot_z.astype(np.float32)
-        rotratx_t = radar.rotrat_x.astype(np.float32)
-        rotraty_t = radar.rotrat_y.astype(np.float32)
-        rotratz_t = radar.rotrat_z.astype(np.float32)
-
-        for ch_idx in range(0, radar.channel_size*radar.frames):
-            for ps_idx in range(0, radar.transmitter.pulses):
-                for sp_idx in range(0, radar.samples_per_pulse):
-                    c_loc_array.push_back(
-                        Vec3[float_t](
-                            radx_t[ch_idx, ps_idx, sp_idx],
-                            rady_t[ch_idx, ps_idx, sp_idx],
-                            radz_t[ch_idx, ps_idx, sp_idx]
-                        )
-                    )
-                    c_speed_array.push_back(
-                        Vec3[float_t](
-                            sptx_t[ch_idx, ps_idx, sp_idx],
-                            spty_t[ch_idx, ps_idx, sp_idx],
-                            sptz_t[ch_idx, ps_idx, sp_idx]
-                        )
-                    )
-                    c_rotation_array.push_back(
-                        Vec3[float_t](
-                            rotx_t[ch_idx, ps_idx, sp_idx],
-                            roty_t[ch_idx, ps_idx, sp_idx],
-                            rotz_t[ch_idx, ps_idx, sp_idx]
-                        )
-                    )
-                    c_rotation_rate_array.push_back(
-                        Vec3[float_t](
-                            rotratx_t[ch_idx, ps_idx, sp_idx],
-                            rotraty_t[ch_idx, ps_idx, sp_idx],
-                            rotratz_t[ch_idx, ps_idx, sp_idx]
-                        )
-                    )
-
-        c_radar.SetMotion(c_loc_array,
-                        c_speed_array,
-                        c_rotation_array,
-                        c_rotation_rate_array)
-
         radar_scene.SetRadar(c_radar)
-    else:
-        c_radar_double = Radar[double](c_tx_double, c_rx_double)
-
-        radx_t_double = radar.loc_x.astype(np.float64)
-        rady_t_double = radar.loc_y.astype(np.float64)
-        radz_t_double = radar.loc_z.astype(np.float64)
-        sptx_t_double = radar.speed_x.astype(np.float64)
-        spty_t_double = radar.speed_y.astype(np.float64)
-        sptz_t_double = radar.speed_z.astype(np.float64)
-        rotx_t_double = radar.rot_x.astype(np.float64)
-        roty_t_double = radar.rot_y.astype(np.float64)
-        rotz_t_double = radar.rot_z.astype(np.float64)
-        rotratx_t_double = radar.rotrat_x.astype(np.float64)
-        rotraty_t_double = radar.rotrat_y.astype(np.float64)
-        rotratz_t_double = radar.rotrat_z.astype(np.float64)
-
-        for ch_idx in range(0, radar.channel_size*radar.frames):
-            for ps_idx in range(0, radar.transmitter.pulses):
-                for sp_idx in range(0, radar.samples_per_pulse):
-                    c_loc_array_double.push_back(
-                        Vec3[double](
-                            radx_t_double[ch_idx, ps_idx, sp_idx],
-                            rady_t_double[ch_idx, ps_idx, sp_idx],
-                            radz_t_double[ch_idx, ps_idx, sp_idx]
-                        )
-                    )
-                    c_speed_array_double.push_back(
-                        Vec3[double](
-                            sptx_t_double[ch_idx, ps_idx, sp_idx],
-                            spty_t_double[ch_idx, ps_idx, sp_idx],
-                            sptz_t_double[ch_idx, ps_idx, sp_idx]
-                        )
-                    )
-                    c_rotation_array_double.push_back(
-                        Vec3[double](
-                            rotx_t_double[ch_idx, ps_idx, sp_idx],
-                            roty_t_double[ch_idx, ps_idx, sp_idx],
-                            rotz_t_double[ch_idx, ps_idx, sp_idx]
-                        )
-                    )
-                    c_rotation_rate_array_double.push_back(
-                        Vec3[double](
-                            rotratx_t_double[ch_idx, ps_idx, sp_idx],
-                            rotraty_t_double[ch_idx, ps_idx, sp_idx],
-                            rotratz_t_double[ch_idx, ps_idx, sp_idx]
-                        )
-                    )
-
-        c_radar_double.SetMotion(c_loc_array_double,
-                        c_speed_array_double,
-                        c_rotation_array_double,
-                        c_rotation_rate_array_double)
-
-        radar_scene_double.SetRadar(c_radar_double)
+    else: 
+        radar_scene_double.SetRadar(c_radar)
 
     """
     Snapshot

@@ -236,11 +236,11 @@ cdef extern from "simulator.hpp":
 scene interface
 """
 cdef extern from "scene.hpp":
-    cdef cppclass Scene[T]:
+    cdef cppclass Scene[T, F]:
         Scene() except +
 
         void AddTarget(const Target[T]& mesh)
-        void SetRadar(const Radar[T]& radar)
+        void SetRadar(const Radar[F]& radar)
         void RunSimulator(int level,
                           bool debug,
                           vector[Snapshot[T]]& snapshots,
