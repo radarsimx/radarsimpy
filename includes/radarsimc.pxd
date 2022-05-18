@@ -239,7 +239,7 @@ cdef extern from "scene.hpp":
     cdef cppclass Scene[T, F]:
         Scene() except +
 
-        void AddTarget(const Target[T]& mesh)
+        void AddTarget(const Target[F]& mesh)
         void SetRadar(const Radar[F]& radar)
         void RunSimulator(int level,
                           bool debug,
