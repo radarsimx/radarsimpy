@@ -40,10 +40,9 @@ from libc.stdlib cimport malloc, free
 from radarsimpy.includes.radarsimc cimport TxChannel, Transmitter
 from radarsimpy.includes.radarsimc cimport Radar
 from radarsimpy.lib.cp_radarsimc cimport cp_TxChannel, cp_Transmitter
-from radarsimpy.lib.cp_radarsimc cimport cp_TxChannel_double, cp_Transmitter_double
 from radarsimpy.includes.radarsimc cimport Snapshot, Target, Receiver, RxChannel, Scene
 from radarsimpy.lib.cp_radarsimc cimport cp_RxChannel, cp_Target
-from radarsimpy.lib.cp_radarsimc cimport cp_RxChannel_double, cp_Target_double
+from radarsimpy.lib.cp_radarsimc cimport cp_Target_double
 from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t, vector
 from radarsimpy.includes.zpvector cimport Vec3
 from libcpp.complex cimport complex as cpp_complex
