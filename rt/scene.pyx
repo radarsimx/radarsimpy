@@ -176,12 +176,12 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     cdef double[:,:,:] timestamp = radar.timestamp.astype(np.float64)
 
     cdef int_t target_count = len(targets)
-
-    for idx in range(0, target_count):
-        radar_scene.AddTarget(cp_Target(radar, targets[idx], np.shape(timestamp)))
-
-    for idx in range(0, target_count):
-        radar_scene_double.AddTarget(cp_Target(radar, targets[idx], np.shape(timestamp)))
+    if level is None:
+        for idx in range(0, target_count):
+            radar_scene.AddTarget(cp_Target(radar, targets[idx], np.shape(timestamp)))
+    else:
+        for idx in range(0, target_count):
+            radar_scene_double.AddTarget(cp_Target_double(radar, targets[idx], np.shape(timestamp)))
 
     """
     Transmitter
