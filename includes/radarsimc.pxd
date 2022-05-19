@@ -91,7 +91,7 @@ rcs
 cdef extern from "rcs.hpp":
     cdef cppclass Rcs[T]:
         Rcs() except +
-        Rcs(const Target[T]& mesh,
+        Rcs(const Target[float]& mesh,
             const Vec3[T]& inc_dir,
             const Vec3[T]& obs_dir,
             const Vec3[T]& polarization,
@@ -239,7 +239,7 @@ cdef extern from "scene.hpp":
     cdef cppclass Scene[T, F]:
         Scene() except +
 
-        void AddTarget(const Target[T]& mesh)
+        void AddTarget(const Target[F]& mesh)
         void SetRadar(const Radar[F]& radar)
         void RunSimulator(int level,
                           bool debug,
