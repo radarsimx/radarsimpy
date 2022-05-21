@@ -42,7 +42,6 @@ from radarsimpy.includes.radarsimc cimport Radar
 from radarsimpy.lib.cp_radarsimc cimport cp_TxChannel, cp_Transmitter
 from radarsimpy.includes.radarsimc cimport Snapshot, Target, Receiver, RxChannel, Scene
 from radarsimpy.lib.cp_radarsimc cimport cp_RxChannel, cp_Target
-from radarsimpy.lib.cp_radarsimc cimport cp_Target_double
 from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t, vector
 from radarsimpy.includes.zpvector cimport Vec3
 from libcpp.complex cimport complex as cpp_complex
@@ -266,7 +265,6 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     Snapshot
     """
     cdef vector[Snapshot[float_t]] snaps
-    cdef vector[Snapshot[double]] snaps_double
     cdef int level_id
 
     if level is None:
@@ -286,8 +284,8 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
         for fm_idx in range(0, frames):
             for tx_idx in range(0, tx_ch):
                 for ps_idx in range(0, pulses):
-                    snaps_double.push_back(
-                        Snapshot[double](
+                    snaps.push_back(
+                        Snapshot[float_t](
                         timestamp[fm_idx*total_ch+tx_idx*rx_ch, ps_idx, 0],
                         fm_idx,
                         tx_idx,
@@ -300,8 +298,8 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
             for tx_idx in range(0, tx_ch):
                 for ps_idx in range(0, pulses):
                     for sp_idx in range(0, samples):
-                        snaps_double.push_back(
-                            Snapshot[double](
+                        snaps.push_back(
+                            Snapshot[float_t](
                             timestamp[fm_idx*total_ch+tx_idx*rx_ch, ps_idx, sp_idx],
                             fm_idx,
                             tx_idx,
@@ -322,7 +320,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
             level_id, debug, snaps, bb_real, bb_imag)
     else:
         radar_scene_double.RunSimulator(
-            level_id, debug, snaps_double, bb_real, bb_imag)
+            level_id, debug, snaps, bb_real, bb_imag)
 
     baseband = np.zeros((frames*total_ch, pulses, samples), dtype=complex)
 
