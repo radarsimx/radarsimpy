@@ -29,15 +29,14 @@
 #           :##:
 #            .+:
 
+from radarsimpy.includes.zpvector cimport Vec3
+from radarsimpy.includes.type_def cimport float_t, int_t
+from radarsimpy.includes.type_def cimport vector
 from libcpp cimport bool
 from libcpp.complex cimport complex as cpp_complex
 
 import numpy as np
 cimport numpy as np
-
-from radarsimpy.includes.type_def cimport vector
-from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t
-from radarsimpy.includes.zpvector cimport Vec3
 
 
 """
@@ -46,8 +45,8 @@ target interface
 cdef extern from "target.hpp":
     cdef cppclass Target[T]:
         Target() except +
-        Target(T *points,
-               uint64_t* cells,
+        Target(T * points,
+               int_t * cells,
                int cell_size,
                Vec3[T] origin,
                vector[Vec3[T]] location_array,
@@ -57,11 +56,11 @@ cdef extern from "target.hpp":
                cpp_complex[T] ep,
                cpp_complex[T] mu,
                bool is_ground) except +
-        Target(T* points,
-               uint64_t* cells,
+        Target(T * points,
+               int_t * cells,
                int cell_size) except +
-        Target(T* points,
-               uint64_t* cells,
+        Target(T * points,
+               int_t * cells,
                int cell_size,
                Vec3[T] origin,
                Vec3[T] location,
@@ -72,15 +71,15 @@ cdef extern from "target.hpp":
 
 
 cdef extern from "ray.hpp":
-    cdef cppclass Ray[T, Tg=*]:
+    cdef cppclass Ray[T, Tg = *]:
         Ray() except +
-        Vec3[T] *direction_
-        Vec3[T] *location_
+        Vec3[T] * direction_
+        Vec3[T] * location_
         int reflections_
 
 
 cdef extern from "raypool.hpp":
-    cdef cppclass RayPool[T, Tg=*]:
+    cdef cppclass RayPool[T, Tg = *]:
         RayPool() except +
         vector[Ray[T]] pool_
 
@@ -91,12 +90,12 @@ rcs
 cdef extern from "rcs.hpp":
     cdef cppclass Rcs[T]:
         Rcs() except +
-        Rcs(const Target[float]& mesh,
-            const Vec3[T]& inc_dir,
-            const Vec3[T]& obs_dir,
-            const Vec3[T]& polarization,
-            const T& frequency,
-            const T& density) except +
+        Rcs(const Target[float] & mesh,
+            const Vec3[T] & inc_dir,
+            const Vec3[T] & obs_dir,
+            const Vec3[T] & polarization,
+            const T & frequency,
+            const T & density) except +
 
         T CalculateRcs()
 
@@ -107,11 +106,11 @@ pointcloud
 cdef extern from "pointcloud.hpp":
     cdef cppclass PointCloud[T]:
         PointCloud() except +
-        void AddTarget(const Target[T]& target)
-        void Sbr(const vector[T]& phi,
-                 const vector[T]& theta,
-                 const Vec3[T]& position)
-        
+        void AddTarget(const Target[T] & target)
+        void Sbr(const vector[T] & phi,
+                 const vector[T] & theta,
+                 const Vec3[T] & position)
+
         vector[Ray[T]] cloud_
 
 
@@ -121,10 +120,10 @@ point
 cdef extern from "point.hpp":
     cdef cppclass Point[T]:
         Point() except +
-        Point(const vector[Vec3[T]]& loc,
-              const Vec3[T]& speed,
-              const vector[T]& rcs,
-              const vector[T]& phs) except +
+        Point(const vector[Vec3[T]] & loc,
+              const Vec3[T] & speed,
+              const vector[T] & rcs,
+              const vector[T] & phs) except +
 
 """
 transmitter
@@ -162,7 +161,7 @@ cdef extern from "transmitter.hpp":
                     vector[double] frame_start_time,
                     T density,
                     vector[cpp_complex[double]]) except +
-        void AddChannel(const TxChannel[T]& channel)
+        void AddChannel(const TxChannel[T] & channel)
 
 
 """
@@ -186,7 +185,7 @@ cdef extern from "receiver.hpp":
                  T resistor,
                  T baseband_gain,
                  int samples) except +
-        void AddChannel(const RxChannel[T]& channel) 
+        void AddChannel(const RxChannel[T] & channel)
 
 
 """
@@ -195,8 +194,8 @@ radar
 cdef extern from "radar.hpp":
     cdef cppclass Radar[T]:
         Radar() except +
-        Radar(const Transmitter[T]& tx,
-              const Receiver[T]& rx) except +
+        Radar(const Transmitter[T] & tx,
+              const Receiver[T] & rx) except +
 
         void SetMotion(vector[Vec3[T]] location_array,
                        vector[Vec3[T]] speed_array,
@@ -205,7 +204,7 @@ cdef extern from "radar.hpp":
 
 """
 snapshot
-"""    
+"""
 cdef extern from "snapshot.hpp":
     cdef cppclass Snapshot[T]:
         Snapshot() except +
@@ -228,8 +227,8 @@ cdef extern from "simulator.hpp":
         Simulator() except +
         void Run(Radar[T] radar,
                  vector[Point[T]] points,
-                 double* bb_real,
-                 double* bb_imag)
+                 double * bb_real,
+                 double * bb_imag)
 
 
 """
@@ -239,10 +238,10 @@ cdef extern from "scene.hpp":
     cdef cppclass Scene[T, F]:
         Scene() except +
 
-        void AddTarget(const Target[F]& mesh)
-        void SetRadar(const Radar[F]& radar)
+        void AddTarget(const Target[F] & mesh)
+        void SetRadar(const Radar[F] & radar)
         void RunSimulator(int level,
                           bool debug,
-                          vector[Snapshot[F]]& snapshots,
-                          double* bb_real,
-                          double* bb_imag)
+                          vector[Snapshot[F]] & snapshots,
+                          double * bb_real,
+                          double * bb_imag)

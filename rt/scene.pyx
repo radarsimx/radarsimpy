@@ -30,25 +30,23 @@
 #            .+:
 
 
+import numpy as np
+from libcpp.complex cimport complex as cpp_complex
+from radarsimpy.includes.zpvector cimport Vec3
+from radarsimpy.includes.type_def cimport float_t, int_t, vector
+from radarsimpy.lib.cp_radarsimc cimport cp_RxChannel, cp_Target
+from radarsimpy.includes.radarsimc cimport Snapshot, Target, Receiver, RxChannel, Scene
+from radarsimpy.lib.cp_radarsimc cimport cp_TxChannel, cp_Transmitter
+from radarsimpy.includes.radarsimc cimport Radar
+from radarsimpy.includes.radarsimc cimport TxChannel, Transmitter
+from libc.stdlib cimport malloc, free
+from libcpp cimport bool
+from libc.math cimport sin, cos, sqrt, atan, atan2, acos, pow, fmax, M_PI
 cimport cython
 
-from libc.math cimport sin, cos, sqrt, atan, atan2, acos, pow, fmax, M_PI
-from libcpp cimport bool
 
-from libc.stdlib cimport malloc, free
-
-from radarsimpy.includes.radarsimc cimport TxChannel, Transmitter
-from radarsimpy.includes.radarsimc cimport Radar
-from radarsimpy.lib.cp_radarsimc cimport cp_TxChannel, cp_Transmitter
-from radarsimpy.includes.radarsimc cimport Snapshot, Target, Receiver, RxChannel, Scene
-from radarsimpy.lib.cp_radarsimc cimport cp_RxChannel, cp_Target
-from radarsimpy.includes.type_def cimport uint64_t, float_t, int_t, vector
-from radarsimpy.includes.zpvector cimport Vec3
-from libcpp.complex cimport complex as cpp_complex
-
-
-import numpy as np
 cimport numpy as np
+
 
 @cython.cdivision(True)
 @cython.boundscheck(False)
@@ -166,20 +164,22 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     cdef int_t pulse_stride = samples
     cdef int_t idx_stride
 
-    cdef int_t fm_idx, tx_idx, ps_idx, sp_idx 
+    cdef int_t fm_idx, tx_idx, ps_idx, sp_idx
     cdef int_t ch_idx, p_idx, s_idx
 
     """
     Targets
     """
-    cdef double[:,:,:] timestamp = radar.timestamp.astype(np.float64)
+    cdef double[:, :, :] timestamp = radar.timestamp.astype(np.float64)
 
     cdef int_t target_count = len(targets)
 
     for idx in range(0, target_count):
-        radar_scene.AddTarget(cp_Target(radar, targets[idx], np.shape(timestamp)))
+        radar_scene.AddTarget(
+            cp_Target(radar, targets[idx], np.shape(timestamp)))
 
-        radar_scene_double.AddTarget(cp_Target(radar, targets[idx], np.shape(timestamp)))
+        radar_scene_double.AddTarget(
+            cp_Target(radar, targets[idx], np.shape(timestamp)))
 
     """
     Transmitter
@@ -192,12 +192,12 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     Receiver
     """
     c_rx = Receiver[float_t](
-            <float_t> radar.receiver.fs,
-            <float_t> radar.receiver.rf_gain,
-            <float_t> radar.receiver.load_resistor,
-            <float_t> radar.receiver.baseband_gain,
-            samples
-        )
+        < float_t > radar.receiver.fs,
+        < float_t > radar.receiver.rf_gain,
+        < float_t > radar.receiver.load_resistor,
+        < float_t > radar.receiver.baseband_gain,
+        samples
+    )
     for rx_idx in range(0, rx_ch):
         c_rx.AddChannel(cp_RxChannel(radar.receiver, rx_idx))
 
@@ -252,20 +252,20 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
                 )
 
     c_radar.SetMotion(c_loc_array,
-                    c_speed_array,
-                    c_rotation_array,
-                    c_rotation_rate_array)
+                      c_speed_array,
+                      c_rotation_array,
+                      c_rotation_rate_array)
 
     if level is None:
         radar_scene.SetRadar(c_radar)
-    else: 
+    else:
         radar_scene_double.SetRadar(c_radar)
 
     """
     Snapshot
     """
     cdef vector[Snapshot[float_t]] snaps
-    cdef int level_id
+    cdef int_t level_id
 
     if level is None:
         level_id = 0
@@ -273,7 +273,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
             for tx_idx in range(0, tx_ch):
                 snaps.push_back(
                     Snapshot[float_t](
-                        <double>timestamp[fm_idx*total_ch+tx_idx*rx_ch, 0, 0],
+                        < double > timestamp[fm_idx*total_ch+tx_idx*rx_ch, 0, 0],
                         fm_idx,
                         tx_idx,
                         0,
@@ -286,11 +286,11 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
                 for ps_idx in range(0, pulses):
                     snaps.push_back(
                         Snapshot[float_t](
-                        timestamp[fm_idx*total_ch+tx_idx*rx_ch, ps_idx, 0],
-                        fm_idx,
-                        tx_idx,
-                        ps_idx,
-                        0)
+                            timestamp[fm_idx*total_ch+tx_idx*rx_ch, ps_idx, 0],
+                            fm_idx,
+                            tx_idx,
+                            ps_idx,
+                            0)
                     )
     elif level == 'sample':
         level_id = 2
@@ -300,16 +300,16 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
                     for sp_idx in range(0, samples):
                         snaps.push_back(
                             Snapshot[float_t](
-                            timestamp[fm_idx*total_ch+tx_idx*rx_ch, ps_idx, sp_idx],
-                            fm_idx,
-                            tx_idx,
-                            ps_idx,
-                            sp_idx)
+                                timestamp[fm_idx*total_ch +
+                                          tx_idx*rx_ch, ps_idx, sp_idx],
+                                fm_idx,
+                                tx_idx,
+                                ps_idx,
+                                sp_idx)
                         )
 
-
-    cdef double *bb_real = <double *> malloc(frames*total_ch*pulses*samples * sizeof(double))
-    cdef double *bb_imag = <double *> malloc(frames*total_ch*pulses*samples * sizeof(double))
+    cdef double * bb_real = <double * > malloc(frames*total_ch*pulses*samples * sizeof(double))
+    cdef double * bb_imag = <double * > malloc(frames*total_ch*pulses*samples * sizeof(double))
 
     for idx in range(0, frames*total_ch*pulses*samples):
         bb_real[idx] = 0
@@ -328,22 +328,23 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
         for p_idx in range(0, pulses):
             for s_idx in range(0, samples):
                 idx_stride = ch_idx * ch_stride + p_idx * pulse_stride + s_idx
-                baseband[ch_idx, p_idx, s_idx] = bb_real[idx_stride]+1j*bb_imag[idx_stride]
+                baseband[ch_idx, p_idx, s_idx] = bb_real[idx_stride] + \
+                    1j*bb_imag[idx_stride]
 
     if noise:
-        baseband = baseband+\
+        baseband = baseband +\
             radar.noise*(np.random.randn(
-                    frames*total_ch,
-                    pulses,
-                    samples,
-                ) + 1j * np.random.randn(
-                    frames*total_ch,
-                    pulses,
-                    samples,
-                ))
+                frames*total_ch,
+                pulses,
+                samples,
+            ) + 1j * np.random.randn(
+                frames*total_ch,
+                pulses,
+                samples,
+            ))
 
     free(bb_real)
     free(bb_imag)
 
-    return {'baseband':baseband,
-            'timestamp':radar.timestamp}
+    return {'baseband': baseband,
+            'timestamp': radar.timestamp}
