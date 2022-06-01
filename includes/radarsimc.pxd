@@ -131,8 +131,30 @@ transmitter
 cdef extern from "transmitter.hpp":
     cdef cppclass TxChannel[T]:
         TxChannel() except +
-        TxChannel(Vec3[T] loc,
-                  Vec3[T] pol,
+
+        """
+        * Constructor of TxChannel
+        *
+        * @param[in] location location of the channel [x, y, z] (m)
+        * @param[in] polar polarization of the channel [x, y, z]
+        * @param[in] phi phi angles of the channel's radiation pattern (rad)
+        *                angles must be equal-spaced incremental array
+        * @param[in] phi_ptn normalized radiation pattern along phi (dB)
+        * @param[in] theta theta angles of the channel's radiation pattern (rad)
+        *                  angles must be equal-spaced incremental array
+        * @param[in] theta_ptn normalized radiation pattern along theta (dB)
+        * @param[in] antenna_gain antenna gain (dB)
+        * @param[in] mod_t timestamp of the modulation data (s)
+        *                  mod_t must be equal-spaced incremental array
+        * @param[in] mod_var modulation value vector
+        * @param[in] pulse_mod pulse modulation vector
+        *                      the length should be the same
+        *                      as the number of pulses defined in Transmitter
+        * @param[in] delay transmitting delay (s)
+        * @param[in] grid ray occupancy checking grid (rad)
+        """
+        TxChannel(Vec3[T] location,
+                  Vec3[T] polar,
                   vector[T] phi,
                   vector[T] phi_ptn,
                   vector[T] theta,
@@ -146,6 +168,22 @@ cdef extern from "transmitter.hpp":
 
     cdef cppclass Transmitter[T]:
         Transmitter() except +
+
+        """
+        * Constructor of Transmitter without phase noise
+        *
+        * @param[in] freq frequency vector (Hz)
+        * @param[in] freq_offset frequency offset per pulse (Hz)
+        *                        length should equal to the number of pulses
+        * @param[in] freq_time timestamp vector for the frequency vector (s)
+        *                      freq_time should be equal-spaced incremental array
+        * @param[in] tx_power transmitter std::power (dBm)
+        * @param[in] pulse_start_time pulse start time vector (s)
+        *                             length should equal to the number of pulses
+        * @param[in] frame_start_time frame start time vector (s)
+        *                             length should equal to the number of frames
+        * @param[in] density ray density, number of rays per wavelength
+        """
         Transmitter(vector[double] freq,
                     vector[double] freq_offset,
                     vector[double] freq_time,
@@ -153,6 +191,24 @@ cdef extern from "transmitter.hpp":
                     vector[double] pulse_start_time,
                     vector[double] frame_start_time,
                     T density) except +
+
+        """
+        * Constructor of Transmitter with phase noise
+        *
+        * @param[in] freq frequency vector (Hz)
+        * @param[in] freq_offset frequency offset per pulse (Hz)
+        *                        length should equal to the number of pulses
+        * @param[in] freq_time timestamp vector for the frequency vector (s)
+        *                      freq_time should be an equal-spaced incremental array
+        * @param[in] tx_power transmitter std::power (dBm)
+        * @param[in] pulse_start_time pulse start time vector (s)
+        *                             length should equal to the number of pulses
+        * @param[in] frame_start_time frame start time vector (s)
+        *                             length should equal to the number of frames
+        * @param[in] density ray density, number of rays per wavelength
+        * @param[in] phase_noise phase noise vector
+        *                        the size should be the same as the full baseband time matrix
+        """
         Transmitter(vector[double] freq,
                     vector[double] freq_offset,
                     vector[double] freq_time,
@@ -160,7 +216,14 @@ cdef extern from "transmitter.hpp":
                     vector[double] pulse_start_time,
                     vector[double] frame_start_time,
                     T density,
-                    vector[cpp_complex[double]]) except +
+                    vector[cpp_complex[double]] phase_noise) except +
+
+        """
+        * AddChannel
+        *  add a channel and calcuate transmitter's dimension
+        *
+        * @param[in] channel transmitter channel
+        """
         void AddChannel(const TxChannel[T] & channel)
 
 
