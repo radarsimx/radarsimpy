@@ -33,4 +33,4 @@ from .radar import Radar
 from .radar import Transmitter
 from .radar import Receiver
 
-__version__ = '8.0.0'
+__version__ = '8.1.0'
