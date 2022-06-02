@@ -70,18 +70,12 @@ cdef extern from "target.hpp":
                bool is_ground) except +
 
 
-cdef extern from "ray.hpp":
-    cdef cppclass Ray[T, Tg = *]:
-        Ray() except +
+cdef extern from "simpleray.hpp":
+    cdef cppclass SimpleRay[T]:
+        SimpleRay() except +
         Vec3[T] * direction_
         Vec3[T] * location_
         int reflections_
-
-
-cdef extern from "raypool.hpp":
-    cdef cppclass RayPool[T, Tg = *]:
-        RayPool() except +
-        vector[Ray[T]] pool_
 
 
 """
@@ -111,7 +105,7 @@ cdef extern from "pointcloud.hpp":
                  const vector[T] & theta,
                  const Vec3[T] & position)
 
-        vector[Ray[T]] cloud_
+        vector[SimpleRay[T]] cloud_
 
 
 """
@@ -131,36 +125,36 @@ transmitter
 cdef extern from "transmitter.hpp":
     cdef cppclass TxChannel[T]:
         TxChannel() except +
-        TxChannel(Vec3[T] location,
-                  Vec3[T] polar,
-                  vector[T] phi,
-                  vector[T] phi_ptn,
-                  vector[T] theta,
-                  vector[T] theta_ptn,
-                  T antenna_gain,
-                  vector[T] mod_t,
-                  vector[cpp_complex[T]] mod_var,
-                  vector[cpp_complex[T]] pulse_mod,
-                  T delay,
-                  T grid) except +
+        TxChannel(const Vec3[T] & location,
+                  const Vec3[T] & polar,
+                  const vector[T] & phi,
+                  const vector[T] & phi_ptn,
+                  const vector[T] & theta,
+                  const vector[T] & theta_ptn,
+                  const T & antenna_gain,
+                  const vector[T] & mod_t,
+                  const vector[cpp_complex[T]] & mod_var,
+                  const vector[cpp_complex[T]] & pulse_mod,
+                  const T & delay,
+                  const T & grid) except +
 
     cdef cppclass Transmitter[T]:
         Transmitter() except +
-        Transmitter(vector[double] freq,
-                    vector[double] freq_offset,
-                    vector[double] freq_time,
-                    T tx_power,
-                    vector[double] pulse_start_time,
-                    vector[double] frame_start_time,
-                    T density) except +
-        Transmitter(vector[double] freq,
-                    vector[double] freq_offset,
-                    vector[double] freq_time,
-                    T tx_power,
-                    vector[double] pulse_start_time,
-                    vector[double] frame_start_time,
-                    T density,
-                    vector[cpp_complex[double]] phase_noise) except +
+        Transmitter(const vector[double] & freq,
+                    const vector[double] & freq_offset,
+                    const vector[double] & freq_time,
+                    const T & tx_power,
+                    const vector[double] & pulse_start_time,
+                    const vector[double] & frame_start_time,
+                    const T & density) except +
+        Transmitter(const vector[double] & freq,
+                    const vector[double] & freq_offset,
+                    const vector[double] & freq_time,
+                    const T & tx_power,
+                    const vector[double] & pulse_start_time,
+                    const vector[double] & frame_start_time,
+                    const T & density,
+                    const vector[cpp_complex[double]] & phase_noise) except +
         void AddChannel(const TxChannel[T] & channel)
 
 
