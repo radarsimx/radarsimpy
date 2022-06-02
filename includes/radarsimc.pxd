@@ -203,11 +203,11 @@ snapshot
 cdef extern from "snapshot.hpp":
     cdef cppclass Snapshot[T]:
         Snapshot() except +
-        Snapshot(double time,
-                 int frame_idx,
-                 int ch_idx,
-                 int pulse_idx,
-                 int sample_idx) except +
+        Snapshot(const double & time,
+                 const int & frame_idx,
+                 const int & ch_idx,
+                 const int & pulse_idx,
+                 const int & sample_idx) except +
 
 
 """
