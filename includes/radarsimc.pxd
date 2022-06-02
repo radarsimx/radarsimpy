@@ -45,29 +45,29 @@ target interface
 cdef extern from "target.hpp":
     cdef cppclass Target[T]:
         Target() except +
-        Target(T * points,
-               int_t * cells,
-               int cell_size,
-               Vec3[T] origin,
-               vector[Vec3[T]] location_array,
-               vector[Vec3[T]] speed_array,
-               vector[Vec3[T]] rotation_array,
-               vector[Vec3[T]] rotation_rate_array,
-               cpp_complex[T] ep,
-               cpp_complex[T] mu,
-               bool is_ground) except +
-        Target(T * points,
-               int_t * cells,
-               int cell_size) except +
-        Target(T * points,
-               int_t * cells,
-               int cell_size,
-               Vec3[T] origin,
-               Vec3[T] location,
-               Vec3[T] speed,
-               Vec3[T] rotation,
-               Vec3[T] rotation_rate,
-               bool is_ground) except +
+        Target(const T * points,
+               const int_t * cells,
+               const int_t & cell_size,
+               const Vec3[T] & origin,
+               const vector[Vec3[T]] & location_array,
+               const vector[Vec3[T]] & speed_array,
+               const vector[Vec3[T]] & rotation_array,
+               const vector[Vec3[T]] & rotation_rate_array,
+               const cpp_complex[T] & ep,
+               const cpp_complex[T] & mu,
+               const bool & is_ground) except +
+        Target(const T * points,
+               const int_t * cells,
+               const int_t & cell_size) except +
+        Target(const T * points,
+               const int_t * cells,
+               const int_t & cell_size,
+               const Vec3[T] & origin,
+               const Vec3[T] & location,
+               const Vec3[T] & speed,
+               const Vec3[T] & rotation,
+               const Vec3[T] & rotation_rate,
+               const bool & is_ground) except +
 
 
 cdef extern from "simpleray.hpp":
@@ -191,10 +191,10 @@ cdef extern from "radar.hpp":
         Radar(const Transmitter[T] & tx,
               const Receiver[T] & rx) except +
 
-        void SetMotion(vector[Vec3[T]] location_array,
-                       vector[Vec3[T]] speed_array,
-                       vector[Vec3[T]] rotation_array,
-                       vector[Vec3[T]] rotrate_array)
+        void SetMotion(const vector[Vec3[T]] & location_array,
+                       const vector[Vec3[T]] & speed_array,
+                       const vector[Vec3[T]] & rotation_array,
+                       const vector[Vec3[T]] & rotrate_array)
 
 
 """
