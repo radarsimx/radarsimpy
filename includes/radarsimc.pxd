@@ -170,8 +170,8 @@ receiver
 cdef extern from "receiver.hpp":
     cdef cppclass RxChannel[T]:
         RxChannel() except +
-        RxChannel(Vec3[T] loc,
-                  Vec3[T] pol,
+        RxChannel(Vec3[T] location,
+                  Vec3[T] polar,
                   vector[T] phi,
                   vector[T] phi_ptn,
                   vector[T] theta,
@@ -200,7 +200,8 @@ cdef extern from "radar.hpp":
         void SetMotion(vector[Vec3[T]] location_array,
                        vector[Vec3[T]] speed_array,
                        vector[Vec3[T]] rotation_array,
-                       vector[Vec3[T]] rotation_rate_array)
+                       vector[Vec3[T]] rotrate_array)
+
 
 """
 snapshot
@@ -213,10 +214,6 @@ cdef extern from "snapshot.hpp":
                  int ch_idx,
                  int pulse_idx,
                  int sample_idx) except +
-        double time_
-        int sample_idx_
-        int pulse_idx_
-        int ch_idx_
 
 
 """
