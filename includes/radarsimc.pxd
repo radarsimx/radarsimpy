@@ -164,21 +164,21 @@ receiver
 cdef extern from "receiver.hpp":
     cdef cppclass RxChannel[T]:
         RxChannel() except +
-        RxChannel(Vec3[T] location,
-                  Vec3[T] polar,
-                  vector[T] phi,
-                  vector[T] phi_ptn,
-                  vector[T] theta,
-                  vector[T] theta_ptn,
-                  T antenna_gain) except +
+        RxChannel(const Vec3[T] & location,
+                  const Vec3[T] & polar,
+                  const vector[T] & phi,
+                  const vector[T] & phi_ptn,
+                  const vector[T] & theta,
+                  const vector[T] & theta_ptn,
+                  const T & antenna_gain) except +
 
     cdef cppclass Receiver[T]:
         Receiver() except +
-        Receiver(T fs,
-                 T rf_gain,
-                 T resistor,
-                 T baseband_gain,
-                 int samples) except +
+        Receiver(const T & fs,
+                 const T & rf_gain,
+                 const T & resistor,
+                 const T & baseband_gain,
+                 const int & samples) except +
         void AddChannel(const RxChannel[T] & channel)
 
 
