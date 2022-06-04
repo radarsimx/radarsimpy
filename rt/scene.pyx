@@ -137,7 +137,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     cdef Transmitter[float_t] c_tx
     cdef Receiver[float_t] c_rx
     cdef Radar[float_t] c_radar
-    cdef Scene[float_t, float_t] radar_scene
+    cdef Scene[double, float_t] radar_scene
 
     cdef float_t[:, :, :] radx_t, rady_t, radz_t
     cdef float_t[:, :, :] sptx_t, spty_t, sptz_t
@@ -148,9 +148,6 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     cdef vector[Vec3[float_t]] c_speed_array
     cdef vector[Vec3[float_t]] c_rotation_array
     cdef vector[Vec3[float_t]] c_rotation_rate_array
-
-# for "pulse" and "sample" level
-    cdef Scene[double, float_t] radar_scene_double
 
     cdef int_t frames = radar.frames
     cdef int_t total_ch = radar.channel_size
@@ -176,9 +173,6 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
 
     for idx in range(0, target_count):
         radar_scene.AddTarget(
-            cp_Target(radar, targets[idx], np.shape(timestamp)))
-
-        radar_scene_double.AddTarget(
             cp_Target(radar, targets[idx], np.shape(timestamp)))
 
     """
@@ -256,10 +250,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
                       c_rotation_array,
                       c_rotation_rate_array)
 
-    if level is None:
-        radar_scene.SetRadar(c_radar)
-    else:
-        radar_scene_double.SetRadar(c_radar)
+    radar_scene.SetRadar(c_radar)
 
     """
     Snapshot
@@ -315,12 +306,8 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
         bb_real[idx] = 0
         bb_imag[idx] = 0
 
-    if level is None:
-        radar_scene.RunSimulator(
-            level_id, debug, snaps, bb_real, bb_imag)
-    else:
-        radar_scene_double.RunSimulator(
-            level_id, debug, snaps, bb_real, bb_imag)
+    radar_scene.RunSimulator(
+        level_id, debug, snaps, bb_real, bb_imag)
 
     baseband = np.zeros((frames*total_ch, pulses, samples), dtype=complex)
 
