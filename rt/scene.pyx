@@ -254,7 +254,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     Snapshot
     """
     cdef vector[Snapshot[float_t]] snaps
-    cdef int_t level_id
+    cdef int_t level_id = 0
 
     if level is None:
         level_id = 0
