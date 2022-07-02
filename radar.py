@@ -1,5 +1,5 @@
 #!python
-# cython: language_level=3
+# distutils: language = c++
 
 # This script contains classes that define all the parameters for
 # a radar system

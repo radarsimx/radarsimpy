@@ -1,5 +1,5 @@
 #!python
-# cython: language_level=3
+# distutils: language = c++
 
 # Script for radar signal processing
 

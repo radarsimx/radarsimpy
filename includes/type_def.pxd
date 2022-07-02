@@ -1,5 +1,4 @@
 # distutils: language = c++
-# cython: language_level=3
 
 # ----------
 # RadarSimPy - A Radar Simulator Built with Python
