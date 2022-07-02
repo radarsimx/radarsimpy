@@ -1,5 +1,4 @@
 # distutils: language = c++
-# distutils: define_macros=NPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION
 # cython: language_level=3
 
 # ----------
@@ -36,10 +35,10 @@ ctypedef float float_t
 ctypedef unsigned int uint_t
 ctypedef float complex complex_t
 
-IF UNAME_SYSNAME == "Windows":
-    ctypedef unsigned long long uint64_t
-ELSE:
-    ctypedef unsigned long uint64_t
+# IF UNAME_SYSNAME == "Windows":
+#     ctypedef unsigned long long uint64
+# ELSE:
+#     ctypedef unsigned long long uint64
 
 
 """
