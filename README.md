@@ -35,7 +35,7 @@ GPU parallelization (CUDA) has been added since v6.0.0.
 |---------|-----|------------|
 | Windows | ✅  | ✅         |
 | Linux   | ✅  | ✅         |
-| Mac     | ❎  | ❎         |
+| Mac     | ❌   | ❌          |
 
 ![performance](./assets/performance.png)
 
