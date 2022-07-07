@@ -14,6 +14,7 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -77,7 +78,7 @@
            <div itemprop="articleBody">
              
   <section id="module-radarsimpy.rt">
-<span id="raytracing"></span><h1>Raytracing<a class="headerlink" href="#module-radarsimpy.rt" title="Permalink to this headline"></a></h1>
+<span id="raytracing"></span><h1>Raytracing<a class="headerlink" href="#module-radarsimpy.rt" title="Permalink to this heading"></a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="radarsimpy.rt.lidar_scene">
 <span class="sig-prename descclassname"><span class="pre">radarsimpy.rt.</span></span><span class="sig-name descname"><span class="pre">lidar_scene</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lidar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.rt.lidar_scene" title="Permalink to this definition"></a></dt>
@@ -148,7 +149,7 @@
 </ul>
 <p>}]</p>
 </p></li>
-<li><p><strong>t</strong> (<em>time</em>) – Simulation time stampes. <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">0</span></code></p></li>
+<li><p><strong>t</strong> (<em>float</em>) – Simulation timestamp. <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">0</span></code></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -163,16 +164,22 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="radarsimpy.rt.rcs_sbr">
 <span class="sig-prename descclassname"><span class="pre">radarsimpy.rt.</span></span><span class="sig-name descname"><span class="pre">rcs_sbr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs_theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inc_phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inc_theta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">1]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">density</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.rt.rcs_sbr" title="Permalink to this definition"></a></dt>
-<dd><p>Calculate target’s RCS by using raytracing</p>
+<dd><p>Calculate target’s RCS by using shooting and bouncing rays (SBR)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> (<em>str</em>) – Path of the model</p></li>
-<li><p><strong>phi</strong> (<em>float</em>) – Observation angle phi (deg)</p></li>
-<li><p><strong>theta</strong> (<em>float</em>) – Observation angle theta (deg)</p></li>
+<li><p><strong>model</strong> (<em>str</em>) – Path of the model file</p></li>
 <li><p><strong>f</strong> (<em>float</em>) – Center frequency (Hz)</p></li>
-<li><p><strong>pol</strong> (<em>list</em>) – Polarization [x, y, z]. <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">1]</span></code></p></li>
-<li><p><strong>density</strong> (<em>float</em>) – Ray density (number of rays per wavelength). <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">10</span></code></p></li>
+<li><p><strong>obs_phi</strong> (<em>float</em>) – Observation angle phi (deg)</p></li>
+<li><p><strong>obs_theta</strong> (<em>float</em>) – Observation angle theta (deg)</p></li>
+<li><p><strong>inc_phi</strong> (<em>float</em>) – Incidence angle phi (deg).
+<code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">None</span></code> means <code class="docutils literal notranslate"><span class="pre">inc_phi</span> <span class="pre">=</span> <span class="pre">obs_phi</span></code></p></li>
+<li><p><strong>inc_theta</strong> (<em>float</em>) – Incidence angle theta (deg).
+<code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">None</span></code> means <code class="docutils literal notranslate"><span class="pre">inc_theta</span> <span class="pre">=</span> <span class="pre">obs_theta</span></code></p></li>
+<li><p><strong>pol</strong> (<em>list</em>) – Polarization [x, y, z].
+<code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">1]</span></code></p></li>
+<li><p><strong>density</strong> (<em>float</em>) – Ray density (number of rays per wavelength).
+<code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">1</span></code></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -246,6 +253,7 @@ Example: <code class="docutils literal notranslate"><span class="pre">location=(
 </ul>
 </p></li>
 <li><p><strong>noise</strong> (<em>bool</em>) – Flag to enable noise calculation, <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">True</span></code></p></li>
+<li><p><strong>debug</strong> (<em>bool</em>) – Flag to enable debug output, <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">False</span></code></p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
