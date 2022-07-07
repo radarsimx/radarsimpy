@@ -97,6 +97,8 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
 
     :param bool noise:
         Flag to enable noise calculation, ``default True``
+    :param bool debug:
+        Flag to enable debug output, ``default False``
 
     :return:
         {
