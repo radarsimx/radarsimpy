@@ -231,7 +231,9 @@ def cal_phase_noise(signal, fs, freq, power, seed=None, validation=False):
 
     # Shape the noise on the positive spectrum [0, fs/2] including bounds
     # ( M points )
-    X = (2*M-2) * np.sqrt(dF * P) * awgn_P1
+    # X = (2*M-2) * np.sqrt(dF * P) * awgn_P1
+    X = M * np.sqrt(dF * P) * awgn_P1
+    ## NOTE: this normalization should be M vs. (2*M-2) since on line 222 he creates the two-sided spectrum by adding the negative frequency spectrum.
 
     # X = np.transpose(X)
     # Complete symmetrical negative spectrum  (fs/2, fs) not including
@@ -249,7 +251,7 @@ def cal_phase_noise(signal, fs, freq, power, seed=None, validation=False):
     x_t = np.fft.ifft(X, axis=1)
 
     # Calculate phase noise
-    phase_noise = np.exp(1j * np.real(x_t[:, 0:N]))
+    phase_noise = np.exp(-1j * np.real(x_t[:, 0:N]))
 
     # Add phase noise
     return signal * phase_noise
