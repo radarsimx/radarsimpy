@@ -349,103 +349,145 @@ cdef Target[float_t] cp_Target(radar,
         ep = cpp_complex[float_t](np.real(permittivity), np.imag(permittivity))
         mu = cpp_complex[float_t](1, 0)
 
-    if np.size(location[0]) > 1:
-        tgx_t = location[0].astype(np.float32)
-    else:
-        tgx_t = <float_t > location[0] + <float_t > speed[0]*timestamp
+    if np.size(location[0]) > 1 or \
+        np.size(location[1]) > 1 or \
+        np.size(location[2]) > 1 or \
+        np.size(speed[0]) > 1 or \
+        np.size(speed[1]) > 1 or \
+        np.size(speed[2]) > 1 or \
+        np.size(rotation[0]) > 1 or \
+        np.size(rotation[1]) > 1 or \
+        np.size(rotation[2]) > 1 or \
+        np.size(rotation_rate[0]) > 1 or \
+        np.size(rotation_rate[1]) > 1 or \
+        np.size(rotation_rate[2]) > 1:
 
-    if np.size(location[1]) > 1:
-        tgy_t = location[1].astype(np.float32)
-    else:
-        tgy_t = <float_t > location[1] + <float_t > speed[1]*timestamp
+        if np.size(location[0]) > 1:
+            tgx_t = location[0].astype(np.float32)
+        else:
+            tgx_t = <float_t > location[0] + <float_t > speed[0]*timestamp
 
-    if np.size(location[2]) > 1:
-        tgz_t = location[2].astype(np.float32)
-    else:
-        tgz_t = <float_t > location[2] + <float_t > speed[2]*timestamp
+        if np.size(location[1]) > 1:
+            tgy_t = location[1].astype(np.float32)
+        else:
+            tgy_t = <float_t > location[1] + <float_t > speed[1]*timestamp
 
-    if np.size(speed[0]) > 1:
-        sptx_t = speed[0].astype(np.float32)
-    else:
-        sptx_t = np.full(shape, speed[0], dtype=np.float32)
+        if np.size(location[2]) > 1:
+            tgz_t = location[2].astype(np.float32)
+        else:
+            tgz_t = <float_t > location[2] + <float_t > speed[2]*timestamp
 
-    if np.size(speed[1]) > 1:
-        spty_t = speed[1].astype(np.float32)
-    else:
-        spty_t = np.full(shape, speed[1], dtype=np.float32)
+        if np.size(speed[0]) > 1:
+            sptx_t = speed[0].astype(np.float32)
+        else:
+            sptx_t = np.full(shape, speed[0], dtype=np.float32)
 
-    if np.size(speed[2]) > 1:
-        sptz_t = speed[2].astype(np.float32)
-    else:
-        sptz_t = np.full(shape, speed[2], dtype=np.float32)
+        if np.size(speed[1]) > 1:
+            spty_t = speed[1].astype(np.float32)
+        else:
+            spty_t = np.full(shape, speed[1], dtype=np.float32)
 
-    if np.size(rotation[0]) > 1:
-        rotx_t = np.radians(rotation[0]).astype(np.float32)
-    else:
-        rotx_t = np.radians(
-            rotation[0] + rotation_rate[0]*timestamp).astype(np.float32)
+        if np.size(speed[2]) > 1:
+            sptz_t = speed[2].astype(np.float32)
+        else:
+            sptz_t = np.full(shape, speed[2], dtype=np.float32)
 
-    if np.size(rotation[1]) > 1:
-        roty_t = np.radians(rotation[1]).astype(np.float32)
-    else:
-        roty_t = np.radians(
-            rotation[1] + rotation_rate[1]*timestamp).astype(np.float32)
+        if np.size(rotation[0]) > 1:
+            rotx_t = np.radians(rotation[0]).astype(np.float32)
+        else:
+            rotx_t = np.radians(
+                rotation[0] + rotation_rate[0]*timestamp).astype(np.float32)
 
-    if np.size(rotation[2]) > 1:
-        rotz_t = np.radians(rotation[2]).astype(np.float32)
-    else:
-        rotz_t = np.radians(
-            rotation[2] + rotation_rate[2]*timestamp).astype(np.float32)
+        if np.size(rotation[1]) > 1:
+            roty_t = np.radians(rotation[1]).astype(np.float32)
+        else:
+            roty_t = np.radians(
+                rotation[1] + rotation_rate[1]*timestamp).astype(np.float32)
 
-    if np.size(rotation_rate[0]) > 1:
-        rotratx_t = np.radians(rotation_rate[0]).astype(np.float32)
-    else:
-        rotratx_t = np.full(shape, np.radians(
-            rotation_rate[0]), dtype=np.float32)
+        if np.size(rotation[2]) > 1:
+            rotz_t = np.radians(rotation[2]).astype(np.float32)
+        else:
+            rotz_t = np.radians(
+                rotation[2] + rotation_rate[2]*timestamp).astype(np.float32)
 
-    if np.size(rotation_rate[1]) > 1:
-        rotraty_t = np.radians(rotation_rate[1]).astype(np.float32)
-    else:
-        rotraty_t = np.full(shape, np.radians(
-            rotation_rate[1]), dtype=np.float32)
+        if np.size(rotation_rate[0]) > 1:
+            rotratx_t = np.radians(rotation_rate[0]).astype(np.float32)
+        else:
+            rotratx_t = np.full(shape, np.radians(
+                rotation_rate[0]), dtype=np.float32)
 
-    if np.size(rotation_rate[2]) > 1:
-        rotratz_t = np.radians(rotation_rate[2]).astype(np.float32)
-    else:
-        rotratz_t = np.full(shape, np.radians(
-            rotation_rate[2]), dtype=np.float32)
+        if np.size(rotation_rate[1]) > 1:
+            rotraty_t = np.radians(rotation_rate[1]).astype(np.float32)
+        else:
+            rotraty_t = np.full(shape, np.radians(
+                rotation_rate[1]), dtype=np.float32)
 
-    for ch_idx in range(0, radar.channel_size*radar.frames):
-        for ps_idx in range(0, radar.transmitter.pulses):
-            for sp_idx in range(0, radar.samples_per_pulse):
-                c_loc_array.push_back(
-                    Vec3[float_t](
-                        tgx_t[ch_idx, ps_idx, sp_idx],
-                        tgy_t[ch_idx, ps_idx, sp_idx],
-                        tgz_t[ch_idx, ps_idx, sp_idx]
+        if np.size(rotation_rate[2]) > 1:
+            rotratz_t = np.radians(rotation_rate[2]).astype(np.float32)
+        else:
+            rotratz_t = np.full(shape, np.radians(
+                rotation_rate[2]), dtype=np.float32)
+
+        for ch_idx in range(0, radar.channel_size*radar.frames):
+            for ps_idx in range(0, radar.transmitter.pulses):
+                for sp_idx in range(0, radar.samples_per_pulse):
+                    c_loc_array.push_back(
+                        Vec3[float_t](
+                            tgx_t[ch_idx, ps_idx, sp_idx],
+                            tgy_t[ch_idx, ps_idx, sp_idx],
+                            tgz_t[ch_idx, ps_idx, sp_idx]
+                        )
                     )
-                )
-                c_speed_array.push_back(
-                    Vec3[float_t](
-                        sptx_t[ch_idx, ps_idx, sp_idx],
-                        spty_t[ch_idx, ps_idx, sp_idx],
-                        sptz_t[ch_idx, ps_idx, sp_idx]
+                    c_speed_array.push_back(
+                        Vec3[float_t](
+                            sptx_t[ch_idx, ps_idx, sp_idx],
+                            spty_t[ch_idx, ps_idx, sp_idx],
+                            sptz_t[ch_idx, ps_idx, sp_idx]
+                        )
                     )
-                )
-                c_rotation_array.push_back(
-                    Vec3[float_t](
-                        rotx_t[ch_idx, ps_idx, sp_idx],
-                        roty_t[ch_idx, ps_idx, sp_idx],
-                        rotz_t[ch_idx, ps_idx, sp_idx]
+                    c_rotation_array.push_back(
+                        Vec3[float_t](
+                            rotx_t[ch_idx, ps_idx, sp_idx],
+                            roty_t[ch_idx, ps_idx, sp_idx],
+                            rotz_t[ch_idx, ps_idx, sp_idx]
+                        )
                     )
-                )
-                c_rotation_rate_array.push_back(
-                    Vec3[float_t](
-                        rotratx_t[ch_idx, ps_idx, sp_idx],
-                        rotraty_t[ch_idx, ps_idx, sp_idx],
-                        rotratz_t[ch_idx, ps_idx, sp_idx]
+                    c_rotation_rate_array.push_back(
+                        Vec3[float_t](
+                            rotratx_t[ch_idx, ps_idx, sp_idx],
+                            rotraty_t[ch_idx, ps_idx, sp_idx],
+                            rotratz_t[ch_idx, ps_idx, sp_idx]
+                        )
                     )
-                )
+    else:
+        c_loc_array.push_back(
+            Vec3[float_t](
+                <float_t>location[0],
+                <float_t>location[1],
+                <float_t>location[2]
+            )
+        )
+        c_speed_array.push_back(
+            Vec3[float_t](
+                <float_t>speed[0],
+                <float_t>speed[1],
+                <float_t>speed[2]
+            )
+        )
+        c_rotation_array.push_back(
+            Vec3[float_t](
+                <float_t>np.radians(rotation[0]),
+                <float_t>np.radians(rotation[1]),
+                <float_t>np.radians(rotation[2])
+            )
+        )
+        c_rotation_rate_array.push_back(
+            Vec3[float_t](
+                <float_t>np.radians(rotation_rate[0]),
+                <float_t>np.radians(rotation_rate[1]),
+                <float_t>np.radians(rotation_rate[2])
+            )
+        )
 
     return Target[float_t]( & points_memview[0, 0],
                            & cells_memview[0, 0],
