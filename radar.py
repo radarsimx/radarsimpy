@@ -794,71 +794,96 @@ class Radar:
 
         shape = np.shape(self.timestamp)
 
-        if np.size(speed[0]) > 1:
+        if np.size(location[0]) > 1 or \
+                np.size(location[1]) > 1 or \
+                np.size(location[2]) > 1 or \
+                np.size(speed[0]) > 1 or \
+                np.size(speed[1]) > 1 or \
+                np.size(speed[2]) > 1 or \
+                np.size(rotation[0]) > 1 or \
+                np.size(rotation[1]) > 1 or \
+                np.size(rotation[2]) > 1 or \
+                np.size(rotation_rate[0]) > 1 or \
+                np.size(rotation_rate[1]) > 1 or \
+                np.size(rotation_rate[2]) > 1:
+            if np.size(speed[0]) > 1:
+                self.speed_x = speed[0]
+            else:
+                self.speed_x = np.full(shape, speed[0])
+
+            if np.size(speed[1]) > 1:
+                self.speed_y = speed[1]
+            else:
+                self.speed_y = np.full(shape, speed[1])
+
+            if np.size(speed[2]) > 1:
+                self.speed_z = speed[2]
+            else:
+                self.speed_z = np.full(shape, speed[2])
+
+            if np.size(location[0]) > 1:
+                self.loc_x = location[0]
+            else:
+                self.loc_x = location[0] + speed[0]*self.timestamp
+
+            if np.size(location[1]) > 1:
+                self.loc_y = location[1]
+            else:
+                self.loc_y = location[1] + speed[1]*self.timestamp
+
+            if np.size(location[2]) > 1:
+                self.loc_z = location[2]
+            else:
+                self.loc_z = location[2] + speed[2]*self.timestamp
+
+            if np.size(rotation_rate[0]) > 1:
+                self.rotrat_x = np.radians(rotation_rate[0])
+            else:
+                self.rotrat_x = np.full(
+                    shape, np.radians(rotation_rate[0]))
+
+            if np.size(rotation_rate[1]) > 1:
+                self.rotrat_y = np.radians(rotation_rate[1])
+            else:
+                self.rotrat_y = np.full(
+                    shape, np.radians(rotation_rate[1]))
+
+            if np.size(rotation_rate[2]) > 1:
+                self.rotrat_z = np.radians(rotation_rate[2])
+            else:
+                self.rotrat_z = np.full(
+                    shape, np.radians(rotation_rate[2]))
+
+            if np.size(rotation[0]) > 1:
+                self.rot_x = np.radians(rotation[0])
+            else:
+                self.rot_x = np.radians(
+                    rotation[0] + rotation_rate[0]*self.timestamp)
+
+            if np.size(rotation[1]) > 1:
+                self.rot_y = np.radians(rotation[1])
+            else:
+                self.rot_y = np.radians(
+                    rotation[1] + rotation_rate[1]*self.timestamp)
+
+            if np.size(rotation[2]) > 1:
+                self.rot_z = np.radians(rotation[2])
+            else:
+                self.rot_z = np.radians(
+                    rotation[2] + rotation_rate[2]*self.timestamp)
+        else:
             self.speed_x = speed[0]
-        else:
-            self.speed_x = np.full(shape, speed[0])
-
-        if np.size(speed[1]) > 1:
             self.speed_y = speed[1]
-        else:
-            self.speed_y = np.full(shape, speed[1])
-
-        if np.size(speed[2]) > 1:
             self.speed_z = speed[2]
-        else:
-            self.speed_z = np.full(shape, speed[2])
-
-        if np.size(location[0]) > 1:
             self.loc_x = location[0]
-        else:
-            self.loc_x = location[0] + speed[0]*self.timestamp
-
-        if np.size(location[1]) > 1:
             self.loc_y = location[1]
-        else:
-            self.loc_y = location[1] + speed[1]*self.timestamp
-
-        if np.size(location[2]) > 1:
             self.loc_z = location[2]
-        else:
-            self.loc_z = location[2] + speed[2]*self.timestamp
-
-        if np.size(rotation_rate[0]) > 1:
             self.rotrat_x = np.radians(rotation_rate[0])
-        else:
-            self.rotrat_x = np.full(
-                shape, np.radians(rotation_rate[0]))
-
-        if np.size(rotation_rate[1]) > 1:
             self.rotrat_y = np.radians(rotation_rate[1])
-        else:
-            self.rotrat_y = np.full(
-                shape, np.radians(rotation_rate[1]))
-
-        if np.size(rotation_rate[2]) > 1:
             self.rotrat_z = np.radians(rotation_rate[2])
-        else:
-            self.rotrat_z = np.full(
-                shape, np.radians(rotation_rate[2]))
-
-        if np.size(rotation[0]) > 1:
             self.rot_x = np.radians(rotation[0])
-        else:
-            self.rot_x = np.radians(
-                rotation[0] + rotation_rate[0]*self.timestamp)
-
-        if np.size(rotation[1]) > 1:
             self.rot_y = np.radians(rotation[1])
-        else:
-            self.rot_y = np.radians(
-                rotation[1] + rotation_rate[1]*self.timestamp)
-
-        if np.size(rotation[2]) > 1:
             self.rot_z = np.radians(rotation[2])
-        else:
-            self.rot_z = np.radians(
-                rotation[2] + rotation_rate[2]*self.timestamp)
 
     def gen_timestamp(self):
         """
