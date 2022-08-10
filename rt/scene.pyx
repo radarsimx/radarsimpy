@@ -178,7 +178,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     """
     Transmitter
     """
-    c_tx = cp_Transmitter(radar, density)
+    c_tx = cp_Transmitter(radar)
     for tx_idx in range(0, tx_ch):
         c_tx.AddChannel(cp_TxChannel(radar.transmitter, tx_idx))
 
@@ -329,7 +329,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
         bb_imag[idx] = 0
 
     radar_scene.RunSimulator(
-        level_id, debug, snaps, bb_real, bb_imag)
+        level_id, debug, snaps, <float_t>density, bb_real, bb_imag)
 
     baseband = np.zeros((frames*total_ch, pulses, samples), dtype=complex)
 

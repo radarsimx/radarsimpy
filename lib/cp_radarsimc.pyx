@@ -124,8 +124,7 @@ cdef Point[float_t] cp_Point(location,
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef Transmitter[float_t] cp_Transmitter(radar,
-                                         density):
+cdef Transmitter[float_t] cp_Transmitter(radar):
     cdef int_t frames = radar.frames
     cdef int_t channles = radar.channel_size
     cdef int_t pulses = radar.transmitter.pulses
@@ -183,7 +182,6 @@ cdef Transmitter[float_t] cp_Transmitter(radar,
         < float_t > radar.transmitter.tx_power,
         t_pstart_vect,
         t_frame_vect,
-        < float_t > density,
         pn_vect
     )
 

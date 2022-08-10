@@ -143,15 +143,13 @@ cdef extern from "transmitter.hpp":
                     const vector[double] & freq_time,
                     const T & tx_power,
                     const vector[double] & pulse_start_time,
-                    const vector[double] & frame_start_time,
-                    const T & density) except +
+                    const vector[double] & frame_start_time) except +
         Transmitter(const vector[double] & freq,
                     const vector[double] & freq_offset,
                     const vector[double] & freq_time,
                     const T & tx_power,
                     const vector[double] & pulse_start_time,
                     const vector[double] & frame_start_time,
-                    const T & density,
                     const vector[cpp_complex[double]] & phase_noise) except +
         void AddChannel(const TxChannel[T] & channel)
 
@@ -232,5 +230,6 @@ cdef extern from "scene.hpp":
         void RunSimulator(int level,
                           bool debug,
                           vector[Snapshot[F]] & snapshots,
+                          F density,
                           double * bb_real,
                           double * bb_imag)
