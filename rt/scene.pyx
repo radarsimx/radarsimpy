@@ -139,10 +139,10 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     cdef Radar[float_t] c_radar
     cdef Scene[double, float_t] radar_scene
 
-    cdef float_t[:, :, :] radx_t, rady_t, radz_t
-    cdef float_t[:, :, :] sptx_t, spty_t, sptz_t
-    cdef float_t[:, :, :] rotx_t, roty_t, rotz_t
-    cdef float_t[:, :, :] rotratx_t, rotraty_t, rotratz_t
+    cdef float_t[:, :, :, :] loc_t
+    cdef float_t[:, :, :, :] spd_t
+    cdef float_t[:, :, :, :] rot_t
+    cdef float_t[:, :, :, :] rrt_t
 
     cdef vector[Vec3[float_t]] c_loc_array
     cdef vector[Vec3[float_t]] c_speed_array
@@ -200,78 +200,70 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     """
     c_radar = Radar[float_t](c_tx, c_rx)
 
-    if isinstance(radar.loc_x, (np.ndarray)):
-        radx_t = radar.loc_x.astype(np.float32)
-        rady_t = radar.loc_y.astype(np.float32)
-        radz_t = radar.loc_z.astype(np.float32)
-        sptx_t = radar.speed_x.astype(np.float32)
-        spty_t = radar.speed_y.astype(np.float32)
-        sptz_t = radar.speed_z.astype(np.float32)
-        rotx_t = radar.rot_x.astype(np.float32)
-        roty_t = radar.rot_y.astype(np.float32)
-        rotz_t = radar.rot_z.astype(np.float32)
-        rotratx_t = radar.rotrat_x.astype(np.float32)
-        rotraty_t = radar.rotrat_y.astype(np.float32)
-        rotratz_t = radar.rotrat_z.astype(np.float32)
+    if len(np.shape(radar.location)) == 4:
+        loc_t = radar.location.astype(np.float32)
+        spd_t = radar.speed.astype(np.float32)
+        rot_t = radar.rotation.astype(np.float32)
+        rrt_t = radar.rotation_rate.astype(np.float32)
 
         for ch_idx in range(0, radar.channel_size*radar.frames):
             for ps_idx in range(0, radar.transmitter.pulses):
                 for sp_idx in range(0, radar.samples_per_pulse):
                     c_loc_array.push_back(
                         Vec3[float_t](
-                            radx_t[ch_idx, ps_idx, sp_idx],
-                            rady_t[ch_idx, ps_idx, sp_idx],
-                            radz_t[ch_idx, ps_idx, sp_idx]
+                            loc_t[ch_idx, ps_idx, sp_idx,0],
+                            loc_t[ch_idx, ps_idx, sp_idx,1],
+                            loc_t[ch_idx, ps_idx, sp_idx,2]
                         )
                     )
                     c_speed_array.push_back(
                         Vec3[float_t](
-                            sptx_t[ch_idx, ps_idx, sp_idx],
-                            spty_t[ch_idx, ps_idx, sp_idx],
-                            sptz_t[ch_idx, ps_idx, sp_idx]
+                            spd_t[ch_idx, ps_idx, sp_idx,0],
+                            spd_t[ch_idx, ps_idx, sp_idx,1],
+                            spd_t[ch_idx, ps_idx, sp_idx,2]
                         )
                     )
                     c_rotation_array.push_back(
                         Vec3[float_t](
-                            rotx_t[ch_idx, ps_idx, sp_idx],
-                            roty_t[ch_idx, ps_idx, sp_idx],
-                            rotz_t[ch_idx, ps_idx, sp_idx]
+                            rot_t[ch_idx, ps_idx, sp_idx,0],
+                            rot_t[ch_idx, ps_idx, sp_idx,1],
+                            rot_t[ch_idx, ps_idx, sp_idx,2]
                         )
                     )
                     c_rotation_rate_array.push_back(
                         Vec3[float_t](
-                            rotratx_t[ch_idx, ps_idx, sp_idx],
-                            rotraty_t[ch_idx, ps_idx, sp_idx],
-                            rotratz_t[ch_idx, ps_idx, sp_idx]
+                            rrt_t[ch_idx, ps_idx, sp_idx,0],
+                            rrt_t[ch_idx, ps_idx, sp_idx,1],
+                            rrt_t[ch_idx, ps_idx, sp_idx,2]
                         )
                     )
     else:
         c_loc_array.push_back(
             Vec3[float_t](
-                <float_t>radar.loc_x,
-                <float_t>radar.loc_y,
-                <float_t>radar.loc_z
+                <float_t>radar.location[0],
+                <float_t>radar.location[1],
+                <float_t>radar.location[2]
             )
         )
         c_speed_array.push_back(
             Vec3[float_t](
-                <float_t>radar.speed_x,
-                <float_t>radar.speed_y,
-                <float_t>radar.speed_z
+                <float_t>radar.speed[0],
+                <float_t>radar.speed[1],
+                <float_t>radar.speed[2]
             )
         )
         c_rotation_array.push_back(
             Vec3[float_t](
-                <float_t>radar.rot_x,
-                <float_t>radar.rot_y,
-                <float_t>radar.rot_z
+                <float_t>radar.rotation[0],
+                <float_t>radar.rotation[1],
+                <float_t>radar.rotation[2]
             )
         )
         c_rotation_rate_array.push_back(
             Vec3[float_t](
-                <float_t>radar.rotrat_x,
-                <float_t>radar.rotrat_y,
-                <float_t>radar.rotrat_z
+                <float_t>radar.rotation_rate[0],
+                <float_t>radar.rotation_rate[1],
+                <float_t>radar.rotation_rate[2]
             )
         )
 

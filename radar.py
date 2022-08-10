@@ -792,6 +792,10 @@ class Radar:
         else:
             self.phase_noise = None
 
+        self.location = np.array(location)
+        self.speed = np.array(speed)
+        self.rotation = np.array(rotation)
+        self.rotation_rate = np.array(rotation_rate)
         shape = np.shape(self.timestamp)
 
         if np.size(location[0]) > 1 or \
@@ -806,84 +810,133 @@ class Radar:
                 np.size(rotation_rate[0]) > 1 or \
                 np.size(rotation_rate[1]) > 1 or \
                 np.size(rotation_rate[2]) > 1:
+
+            self.location = np.zeros(shape+(3,))
+            self.speed = np.zeros(shape+(3,))
+            self.rotation = np.zeros(shape+(3,))
+            self.rotation_rate = np.zeros(shape+(3,))
+
             if np.size(speed[0]) > 1:
-                self.speed_x = speed[0]
+                if np.shape(speed[0]) != shape:
+                    raise ValueError(
+                        'speed[0] must be a scalar or have the same shape as '
+                        'timestamp')
+                self.speed[:, :, :, 0] = speed[0]
             else:
-                self.speed_x = np.full(shape, speed[0])
+                self.speed[:, :, :, 0] = np.full(shape, speed[0])
 
             if np.size(speed[1]) > 1:
-                self.speed_y = speed[1]
+                if np.shape(speed[1]) != shape:
+                    raise ValueError(
+                        'speed[1] must be a scalar or have the same shape as '
+                        'timestamp')
+                self.speed[:, :, :, 1] = speed[1]
             else:
-                self.speed_y = np.full(shape, speed[1])
+                self.speed[:, :, :, 1] = np.full(shape, speed[1])
 
             if np.size(speed[2]) > 1:
-                self.speed_z = speed[2]
+                if np.shape(speed[2]) != shape:
+                    raise ValueError(
+                        'speed[2] must be a scalar or have the same shape as '
+                        'timestamp')
+                self.speed[:, :, :, 2] = speed[2]
             else:
-                self.speed_z = np.full(shape, speed[2])
+                self.speed[:, :, :, 2] = np.full(shape, speed[2])
 
             if np.size(location[0]) > 1:
-                self.loc_x = location[0]
+                if np.shape(location[0]) != shape:
+                    raise ValueError(
+                        'location[0] must be a scalar or have the same shape as '
+                        'timestamp')
+                self.location[:, :, :, 0] = location[0]
             else:
-                self.loc_x = location[0] + speed[0]*self.timestamp
+                self.location[:, :, :, 0] = location[0] + \
+                    speed[0]*self.timestamp
 
             if np.size(location[1]) > 1:
-                self.loc_y = location[1]
+                if np.shape(location[1]) != shape:
+                    raise ValueError(
+                        'location[1] must be a scalar or have the same shape as '
+                        'timestamp')
+                self.location[:, :, :, 1] = location[1]
             else:
-                self.loc_y = location[1] + speed[1]*self.timestamp
+                self.location[:, :, :, 1] = location[1] + \
+                    speed[1]*self.timestamp
 
             if np.size(location[2]) > 1:
-                self.loc_z = location[2]
+                if np.shape(location[2]) != shape:
+                    raise ValueError(
+                        'location[2] must be a scalar or have the same shape as '
+                        'timestamp')
+                self.location[:, :, :, 2] = location[2]
             else:
-                self.loc_z = location[2] + speed[2]*self.timestamp
+                self.location[:, :, :, 2] = location[2] + \
+                    speed[2]*self.timestamp
 
             if np.size(rotation_rate[0]) > 1:
-                self.rotrat_x = np.radians(rotation_rate[0])
+                if np.shape(rotation_rate[0]) != shape:
+                    raise ValueError(
+                        'rotation_rate[0] must be a scalar or have the same shape as '
+                        'timestamp')
+                self.rotation_rate[:, :, :, 0] = np.radians(rotation_rate[0])
             else:
-                self.rotrat_x = np.full(
+                self.rotation_rate[:, :, :, 0] = np.full(
                     shape, np.radians(rotation_rate[0]))
 
             if np.size(rotation_rate[1]) > 1:
-                self.rotrat_y = np.radians(rotation_rate[1])
+                if np.shape(rotation_rate[1]) != shape:
+                    raise ValueError(
+                        'rotation_rate[1] must be a scalar or have the same shape as '
+                        'timestamp')
+                self.rotation_rate[:, :, :, 1] = np.radians(rotation_rate[1])
             else:
-                self.rotrat_y = np.full(
+                self.rotation_rate[:, :, :, 1] = np.full(
                     shape, np.radians(rotation_rate[1]))
 
             if np.size(rotation_rate[2]) > 1:
-                self.rotrat_z = np.radians(rotation_rate[2])
+                if np.shape(rotation_rate[2]) != shape:
+                    raise ValueError(
+                        'rotation_rate[2] must be a scalar or have the same shape as '
+                        'timestamp')
+                self.rotation_rate[:, :, :, 2] = np.radians(rotation_rate[2])
             else:
-                self.rotrat_z = np.full(
+                self.rotation_rate[:, :, :, 2] = np.full(
                     shape, np.radians(rotation_rate[2]))
 
             if np.size(rotation[0]) > 1:
-                self.rot_x = np.radians(rotation[0])
+                if np.shape(rotation[0]) != shape:
+                    raise ValueError(
+                        'rotation[0] must be a scalar or have the same shape as '
+                        'timestamp')
+                self.rotation[:, :, :, 0] = np.radians(rotation[0])
             else:
-                self.rot_x = np.radians(
+                self.rotation[:, :, :, 0] = np.radians(
                     rotation[0] + rotation_rate[0]*self.timestamp)
 
             if np.size(rotation[1]) > 1:
-                self.rot_y = np.radians(rotation[1])
+                if np.shape(rotation[1]) != shape:
+                    raise ValueError(
+                        'rotation[1] must be a scalar or have the same shape as '
+                        'timestamp')
+                self.rotation[:, :, :, 1] = np.radians(rotation[1])
             else:
-                self.rot_y = np.radians(
+                self.rotation[:, :, :, 1] = np.radians(
                     rotation[1] + rotation_rate[1]*self.timestamp)
 
             if np.size(rotation[2]) > 1:
-                self.rot_z = np.radians(rotation[2])
+                if np.shape(rotation[2]) != shape:
+                    raise ValueError(
+                        'rotation[2] must be a scalar or have the same shape as '
+                        'timestamp')
+                self.rotation[:, :, :, 2] = np.radians(rotation[2])
             else:
-                self.rot_z = np.radians(
+                self.rotation[:, :, :, 2] = np.radians(
                     rotation[2] + rotation_rate[2]*self.timestamp)
         else:
-            self.speed_x = speed[0]
-            self.speed_y = speed[1]
-            self.speed_z = speed[2]
-            self.loc_x = location[0]
-            self.loc_y = location[1]
-            self.loc_z = location[2]
-            self.rotrat_x = np.radians(rotation_rate[0])
-            self.rotrat_y = np.radians(rotation_rate[1])
-            self.rotrat_z = np.radians(rotation_rate[2])
-            self.rot_x = np.radians(rotation[0])
-            self.rot_y = np.radians(rotation[1])
-            self.rot_z = np.radians(rotation[2])
+            self.speed = np.array(speed)
+            self.loccation = np.array(location)
+            self.rotation = np.array(np.radians(rotation))
+            self.rotation_rate = np.array(np.radians(rotation_rate))
 
     def gen_timestamp(self):
         """

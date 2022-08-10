@@ -334,8 +334,10 @@ cdef Target[float_t] cp_Target(radar,
 
     origin = np.array(target.get('origin', (0, 0, 0)), dtype=np.float32)
 
-    location = target.get('location', (0, 0, 0))
-    speed = target.get('speed', (0, 0, 0))
+    location = np.array(target.get('location', (0, 0, 0)),
+                        dtype=object)
+    speed = np.array(target.get('speed', (0, 0, 0)),
+                        dtype=object)
     rotation = np.array(target.get('rotation', (0, 0, 0)),
                         dtype=object)
     rotation_rate = np.array(target.get(
