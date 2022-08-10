@@ -405,10 +405,10 @@ class Transmitter:
             # azimuth pattern
             self.az_angles.append(
                 np.array(self.channels[tx_idx].get('azimuth_angle',
-                                                   np.arange(-90, 91, 1))))
+                                                   np.arange(-90, 91, 180))))
             self.az_patterns.append(
                 np.array(self.channels[tx_idx].get('azimuth_pattern',
-                                                   np.zeros(181))))
+                                                   np.zeros(2))))
 
             if len(self.az_angles[-1]) != len(self.az_patterns[-1]):
                 raise ValueError(
@@ -427,10 +427,10 @@ class Transmitter:
             # elevation pattern
             self.el_angles.append(
                 np.array(self.channels[tx_idx].get('elevation_angle',
-                                                   np.arange(-90, 91, 1))))
+                                                   np.arange(-90, 91, 180))))
             self.el_patterns.append(
                 np.array(self.channels[tx_idx].get('elevation_pattern',
-                                                   np.zeros(181))))
+                                                   np.zeros(2))))
 
             if len(self.el_angles[-1]) != len(self.el_patterns[-1]):
                 raise ValueError(
@@ -595,10 +595,10 @@ class Receiver:
             # azimuth pattern
             self.az_angles.append(
                 np.array(self.channels[rx_idx].get('azimuth_angle',
-                                                   np.arange(-90, 91, 1))))
+                                                   np.arange(-90, 91, 180))))
             self.az_patterns.append(
                 np.array(self.channels[rx_idx].get('azimuth_pattern',
-                                                   np.zeros(181))))
+                                                   np.zeros(2))))
             if len(self.az_angles[-1]) != len(self.az_patterns[-1]):
                 raise ValueError(
                     'Lengths of `azimuth_angle` and `azimuth_pattern` \
@@ -615,10 +615,10 @@ class Receiver:
             # elevation pattern
             self.el_angles.append(
                 np.array(self.channels[rx_idx].get('elevation_angle',
-                                                   np.arange(-90, 91, 1))))
+                                                   np.arange(-90, 91, 180))))
             self.el_patterns.append(
                 np.array(self.channels[rx_idx].get('elevation_pattern',
-                                                   np.zeros(181))))
+                                                   np.zeros(2))))
             if len(self.el_angles[-1]) != len(self.el_patterns[-1]):
                 raise ValueError(
                     'Lengths of `elevation_angle` and `elevation_pattern` \
@@ -846,8 +846,8 @@ class Radar:
             if np.size(location[0]) > 1:
                 if np.shape(location[0]) != shape:
                     raise ValueError(
-                        'location[0] must be a scalar or have the same shape as '
-                        'timestamp')
+                        'location[0] must be a scalar or have the same shape '
+                        'as timestamp')
                 self.location[:, :, :, 0] = location[0]
             else:
                 self.location[:, :, :, 0] = location[0] + \
@@ -856,8 +856,8 @@ class Radar:
             if np.size(location[1]) > 1:
                 if np.shape(location[1]) != shape:
                     raise ValueError(
-                        'location[1] must be a scalar or have the same shape as '
-                        'timestamp')
+                        'location[1] must be a scalar or have the same shape '
+                        'as timestamp')
                 self.location[:, :, :, 1] = location[1]
             else:
                 self.location[:, :, :, 1] = location[1] + \
@@ -866,8 +866,8 @@ class Radar:
             if np.size(location[2]) > 1:
                 if np.shape(location[2]) != shape:
                     raise ValueError(
-                        'location[2] must be a scalar or have the same shape as '
-                        'timestamp')
+                        'location[2] must be a scalar or have the same shape '
+                        'as timestamp')
                 self.location[:, :, :, 2] = location[2]
             else:
                 self.location[:, :, :, 2] = location[2] + \
@@ -876,8 +876,8 @@ class Radar:
             if np.size(rotation_rate[0]) > 1:
                 if np.shape(rotation_rate[0]) != shape:
                     raise ValueError(
-                        'rotation_rate[0] must be a scalar or have the same shape as '
-                        'timestamp')
+                        'rotation_rate[0] must be a scalar or have the same '
+                        'shape as timestamp')
                 self.rotation_rate[:, :, :, 0] = np.radians(rotation_rate[0])
             else:
                 self.rotation_rate[:, :, :, 0] = np.full(
@@ -886,8 +886,8 @@ class Radar:
             if np.size(rotation_rate[1]) > 1:
                 if np.shape(rotation_rate[1]) != shape:
                     raise ValueError(
-                        'rotation_rate[1] must be a scalar or have the same shape as '
-                        'timestamp')
+                        'rotation_rate[1] must be a scalar or have the same '
+                        'shape as timestamp')
                 self.rotation_rate[:, :, :, 1] = np.radians(rotation_rate[1])
             else:
                 self.rotation_rate[:, :, :, 1] = np.full(
@@ -896,8 +896,8 @@ class Radar:
             if np.size(rotation_rate[2]) > 1:
                 if np.shape(rotation_rate[2]) != shape:
                     raise ValueError(
-                        'rotation_rate[2] must be a scalar or have the same shape as '
-                        'timestamp')
+                        'rotation_rate[2] must be a scalar or have the same '
+                        'shape as timestamp')
                 self.rotation_rate[:, :, :, 2] = np.radians(rotation_rate[2])
             else:
                 self.rotation_rate[:, :, :, 2] = np.full(
@@ -906,8 +906,8 @@ class Radar:
             if np.size(rotation[0]) > 1:
                 if np.shape(rotation[0]) != shape:
                     raise ValueError(
-                        'rotation[0] must be a scalar or have the same shape as '
-                        'timestamp')
+                        'rotation[0] must be a scalar or have the same shape '
+                        'as timestamp')
                 self.rotation[:, :, :, 0] = np.radians(rotation[0])
             else:
                 self.rotation[:, :, :, 0] = np.radians(
@@ -916,8 +916,8 @@ class Radar:
             if np.size(rotation[1]) > 1:
                 if np.shape(rotation[1]) != shape:
                     raise ValueError(
-                        'rotation[1] must be a scalar or have the same shape as '
-                        'timestamp')
+                        'rotation[1] must be a scalar or have the same shape '
+                        'as timestamp')
                 self.rotation[:, :, :, 1] = np.radians(rotation[1])
             else:
                 self.rotation[:, :, :, 1] = np.radians(
@@ -926,8 +926,8 @@ class Radar:
             if np.size(rotation[2]) > 1:
                 if np.shape(rotation[2]) != shape:
                     raise ValueError(
-                        'rotation[2] must be a scalar or have the same shape as '
-                        'timestamp')
+                        'rotation[2] must be a scalar or have the same shape '
+                        'as timestamp')
                 self.rotation[:, :, :, 2] = np.radians(rotation[2])
             else:
                 self.rotation[:, :, :, 2] = np.radians(
