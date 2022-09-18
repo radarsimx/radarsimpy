@@ -324,10 +324,6 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     cdef double * bb_real = <double * > malloc(frames*total_ch*pulses*samples * sizeof(double))
     cdef double * bb_imag = <double * > malloc(frames*total_ch*pulses*samples * sizeof(double))
 
-    for idx in range(0, frames*total_ch*pulses*samples):
-        bb_real[idx] = 0
-        bb_imag[idx] = 0
-
     radar_scene.RunSimulator(
         level_id, debug, snaps, <float_t>density, bb_real, bb_imag)
 
