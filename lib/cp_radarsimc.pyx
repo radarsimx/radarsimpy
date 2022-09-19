@@ -55,6 +55,13 @@ cdef Point[float_t] cp_Point(location,
     cdef vector[float_t] rcs_vect
     cdef vector[float_t] phs_vect
 
+    cdef float_t[:, :, :] tgt_loc_x
+    cdef float_t[:, :, :] tgt_loc_y
+    cdef float_t[:, :, :] tgt_loc_z
+
+    cdef float_t[:, :, :] rcs_mem
+    cdef float_t[:, :, :] phs_mem
+
     if np.size(location[0]) > 1 or \
             np.size(location[1]) > 1 or \
             np.size(location[2]) > 1 or \
@@ -62,40 +69,40 @@ cdef Point[float_t] cp_Point(location,
             np.size(phase) > 1:
 
         if np.size(location[0]) > 1:
-            tgx_t = location[0]
+            tgt_loc_x = location[0].astype(np.float32)
         else:
-            tgx_t = np.full(shape, location[0])
+            tgt_loc_x = np.full(shape, location[0], dtype=np.float32)
 
         if np.size(location[1]) > 1:
-            tgy_t = location[1]
+            tgt_loc_y = location[1].astype(np.float32)
         else:
-            tgy_t = np.full(shape, location[1])
+            tgt_loc_y = np.full(shape, location[1], dtype=np.float32)
 
         if np.size(location[2]) > 1:
-            tgz_t = location[2]
+            tgt_loc_z = location[2].astype(np.float32)
         else:
-            tgz_t = np.full(shape, location[2])
+            tgt_loc_z = np.full(shape, location[2], dtype=np.float32)
 
         if np.size(rcs) > 1:
-            rcs_t = rcs
+            rcs_mem = rcs.astype(np.float32)
         else:
-            rcs_t = np.full(shape, rcs)
+            rcs_mem = np.full(shape, rcs, dtype=np.float32)
 
         if np.size(phase) > 1:
-            phs_t = np.radians(phase)
+            phs_mem = np.radians(phase).astype(np.float32)
         else:
-            phs_t = np.full(shape, np.radians(phase))
+            phs_mem = np.full(shape, np.radians(phase), dtype=np.float32)
 
         for ch_idx in range(0, shape[0]):
             for ps_idx in range(0, shape[1]):
                 for sp_idx in range(0, shape[2]):
                     loc_vect.push_back(Vec3[float_t](
-                        <float_t> tgx_t[ch_idx, ps_idx, sp_idx],
-                        <float_t> tgy_t[ch_idx, ps_idx, sp_idx],
-                        <float_t> tgz_t[ch_idx, ps_idx, sp_idx]
+                        <float_t> tgt_loc_x[ch_idx, ps_idx, sp_idx],
+                        <float_t> tgt_loc_y[ch_idx, ps_idx, sp_idx],
+                        <float_t> tgt_loc_z[ch_idx, ps_idx, sp_idx]
                     ))
-                    rcs_vect.push_back(<float_t> rcs_t[ch_idx, ps_idx, sp_idx])
-                    phs_vect.push_back(<float_t> phs_t[ch_idx, ps_idx, sp_idx])
+                    rcs_vect.push_back(<float_t> rcs_mem[ch_idx, ps_idx, sp_idx])
+                    phs_vect.push_back(<float_t> phs_mem[ch_idx, ps_idx, sp_idx])
     else:
         loc_vect.push_back(Vec3[float_t](
             <float_t> location[0],
@@ -104,6 +111,7 @@ cdef Point[float_t] cp_Point(location,
         ))
         rcs_vect.push_back(<float_t> rcs)
         phs_vect.push_back(<float_t> np.radians(phase))
+    
     return Point[float_t](
         loc_vect,
         Vec3[float_t](
@@ -312,7 +320,7 @@ cdef Target[float_t] cp_Target(radar,
     cdef vector[Vec3[float_t]] c_rotation_array
     cdef vector[Vec3[float_t]] c_rotation_rate_array
 
-    cdef float_t[:, :, :] tgx_t, tgy_t, tgz_t
+    cdef float_t[:, :, :] tgt_loc_x, tgt_loc_y, tgt_loc_z
     cdef float_t[:, :, :] sptx_t, spty_t, sptz_t
     cdef float_t[:, :, :] rotx_t, roty_t, rotz_t
     cdef float_t[:, :, :] rotratx_t, rotraty_t, rotratz_t
@@ -358,19 +366,19 @@ cdef Target[float_t] cp_Target(radar,
         np.size(rotation_rate[2]) > 1:
 
         if np.size(location[0]) > 1:
-            tgx_t = location[0].astype(np.float32)
+            tgt_loc_x = location[0].astype(np.float32)
         else:
-            tgx_t = <float_t > location[0] + <float_t > speed[0]*timestamp
+            tgt_loc_x = <float_t > location[0] + <float_t > speed[0]*timestamp
 
         if np.size(location[1]) > 1:
-            tgy_t = location[1].astype(np.float32)
+            tgt_loc_y = location[1].astype(np.float32)
         else:
-            tgy_t = <float_t > location[1] + <float_t > speed[1]*timestamp
+            tgt_loc_y = <float_t > location[1] + <float_t > speed[1]*timestamp
 
         if np.size(location[2]) > 1:
-            tgz_t = location[2].astype(np.float32)
+            tgt_loc_z = location[2].astype(np.float32)
         else:
-            tgz_t = <float_t > location[2] + <float_t > speed[2]*timestamp
+            tgt_loc_z = <float_t > location[2] + <float_t > speed[2]*timestamp
 
         if np.size(speed[0]) > 1:
             sptx_t = speed[0].astype(np.float32)
@@ -428,9 +436,9 @@ cdef Target[float_t] cp_Target(radar,
                 for sp_idx in range(0, radar.samples_per_pulse):
                     c_loc_array.push_back(
                         Vec3[float_t](
-                            tgx_t[ch_idx, ps_idx, sp_idx],
-                            tgy_t[ch_idx, ps_idx, sp_idx],
-                            tgz_t[ch_idx, ps_idx, sp_idx]
+                            tgt_loc_x[ch_idx, ps_idx, sp_idx],
+                            tgt_loc_y[ch_idx, ps_idx, sp_idx],
+                            tgt_loc_z[ch_idx, ps_idx, sp_idx]
                         )
                     )
                     c_speed_array.push_back(
