@@ -128,8 +128,8 @@ cpdef lidar_scene(lidar, targets, t=0):
             np.array(targets[idx].get('rotation_rate', (0, 0, 0)), dtype=np.float32)
             )
 
-        pointcloud.AddTarget(Target[float_t](& points_memview[0, 0],
-                                             & cells_memview[0, 0],
+        pointcloud.AddTarget(Target[float_t](&points_memview[0, 0],
+                                             &cells_memview[0, 0],
                                              <int_t> cells_memview.shape[0],
                                              Vec3[float_t](& origin[0]),
                                              Vec3[float_t](& location[0]),
@@ -165,7 +165,7 @@ cpdef lidar_scene(lidar, targets, t=0):
 
     rays = np.zeros(pointcloud.cloud_.size(), dtype=ray_type)
 
-    for idx in range(0, <int_t>pointcloud.cloud_.size()):
+    for idx in range(0, <int_t> pointcloud.cloud_.size()):
         rays[idx]['positions'][0] = pointcloud.cloud_[idx].location_[1][0]
         rays[idx]['positions'][1] = pointcloud.cloud_[idx].location_[1][1]
         rays[idx]['positions'][2] = pointcloud.cloud_[idx].location_[1][2]
