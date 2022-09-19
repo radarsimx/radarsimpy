@@ -51,6 +51,35 @@ cdef Point[float_t] cp_Point(location,
                              rcs,
                              phase,
                              shape):
+    """
+    cp_Point(location, speed, rcs, phase, shape)
+
+    Creat Point object in Cython
+
+    :param list location:
+        Target's location (m), [x, y, z]
+
+        *Note*: Target's parameters can be specified with
+        ``Radar.timestamp`` to customize the time varying property.
+        Example: ``location=(1e-3*np.sin(2*np.pi*1*radar.timestamp), 0, 0)``
+    :param list speed:
+        Target's velocity (m/s), [x, y, z]
+    :param float rcs:
+        Target's RCS (dBsm)
+
+        *Note*: Target's RCS can be specified with
+        ``Radar.timestamp`` to customize the time varying property.
+    :param float phase:
+        Target's phase (deg)
+
+        *Note*: Target's phase can be specified with
+        ``Radar.timestamp`` to customize the time varying property.
+    :param tuple shape:
+        Shape of the time matrix
+
+    :return: C++ object of a point target
+    :rtype: Point
+    """
     cdef vector[Vec3[float_t]] loc_vect
     cdef vector[float_t] rcs_vect
     cdef vector[float_t] phs_vect
@@ -62,6 +91,7 @@ cdef Point[float_t] cp_Point(location,
     cdef float_t[:, :, :] rcs_mem
     cdef float_t[:, :, :] phs_mem
 
+    # check if there are any time varying parameters
     if np.size(location[0]) > 1 or \
             np.size(location[1]) > 1 or \
             np.size(location[2]) > 1 or \
