@@ -147,7 +147,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     cdef vector[Vec3[float_t]] c_rrt_vect
 
     cdef int_t frames = radar.frames
-    cdef int_t total_ch = radar.channel_size
+    cdef int_t channles = radar.channel_size
     cdef int_t rx_ch = radar.receiver.channel_size
     cdef int_t tx_ch = radar.transmitter.channel_size
     cdef int_t pulses = radar.transmitter.pulses
@@ -241,30 +241,30 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     else:
         c_loc_vect.push_back(
             Vec3[float_t](
-                <float_t>radar.location[0],
-                <float_t>radar.location[1],
-                <float_t>radar.location[2]
+                <float_t> radar.location[0],
+                <float_t> radar.location[1],
+                <float_t> radar.location[2]
             )
         )
         c_spd_vect.push_back(
             Vec3[float_t](
-                <float_t>radar.speed[0],
-                <float_t>radar.speed[1],
-                <float_t>radar.speed[2]
+                <float_t> radar.speed[0],
+                <float_t> radar.speed[1],
+                <float_t> radar.speed[2]
             )
         )
         c_rot_vect.push_back(
             Vec3[float_t](
-                <float_t>radar.rotation[0],
-                <float_t>radar.rotation[1],
-                <float_t>radar.rotation[2]
+                <float_t> radar.rotation[0],
+                <float_t> radar.rotation[1],
+                <float_t> radar.rotation[2]
             )
         )
         c_rrt_vect.push_back(
             Vec3[float_t](
-                <float_t>radar.rotation_rate[0],
-                <float_t>radar.rotation_rate[1],
-                <float_t>radar.rotation_rate[2]
+                <float_t> radar.rotation_rate[0],
+                <float_t> radar.rotation_rate[1],
+                <float_t> radar.rotation_rate[2]
             )
         )
 
@@ -287,7 +287,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
             for tx_idx in range(0, tx_ch):
                 snaps.push_back(
                     Snapshot[float_t](
-                        <double> timestamp[fm_idx*total_ch+tx_idx*rx_ch, 0, 0],
+                        <double> timestamp[fm_idx*channles+tx_idx*rx_ch, 0, 0],
                         fm_idx,
                         tx_idx,
                         0,
@@ -300,7 +300,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
                 for ps_idx in range(0, pulses):
                     snaps.push_back(
                         Snapshot[float_t](
-                            timestamp[fm_idx*total_ch+tx_idx*rx_ch, ps_idx, 0],
+                            timestamp[fm_idx*channles+tx_idx*rx_ch, ps_idx, 0],
                             fm_idx,
                             tx_idx,
                             ps_idx,
@@ -314,27 +314,27 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
                     for sp_idx in range(0, samples):
                         snaps.push_back(
                             Snapshot[float_t](
-                                timestamp[fm_idx*total_ch + tx_idx*rx_ch, ps_idx, sp_idx],
+                                timestamp[fm_idx*channles + tx_idx*rx_ch, ps_idx, sp_idx],
                                 fm_idx,
                                 tx_idx,
                                 ps_idx,
                                 sp_idx)
                         )
 
-    cdef double * bb_real = <double *> malloc(frames*total_ch*pulses*samples*sizeof(double))
-    cdef double * bb_imag = <double *> malloc(frames*total_ch*pulses*samples*sizeof(double))
+    cdef double * bb_real = <double *> malloc(frames*channles*pulses*samples*sizeof(double))
+    cdef double * bb_imag = <double *> malloc(frames*channles*pulses*samples*sizeof(double))
 
     c_scene.RunSimulator(
         level_id,
         debug,
         snaps,
-        <float_t>density,
+        <float_t> density,
         bb_real,
         bb_imag)
 
-    baseband = np.zeros((frames*total_ch, pulses, samples), dtype=complex)
+    baseband = np.zeros((frames*channles, pulses, samples), dtype=complex)
 
-    for ch_idx in range(0, frames*total_ch):
+    for ch_idx in range(0, frames*channles):
         for p_idx in range(0, pulses):
             for s_idx in range(0, samples):
                 bb_idx = ch_idx * ch_stride + p_idx * pulse_stride + s_idx
@@ -344,12 +344,12 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
         baseband = baseband +\
             radar.noise*(
                 np.random.randn(
-                    frames*total_ch,
+                    frames*channles,
                     pulses,
                     samples,
                 ) + \
                 1j * np.random.randn(
-                    frames*total_ch,
+                    frames*channles,
                     pulses,
                     samples,
                 )

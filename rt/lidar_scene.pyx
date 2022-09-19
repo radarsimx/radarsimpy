@@ -31,13 +31,12 @@
 from radarsimpy.includes.radarsimc cimport Target, PointCloud
 from radarsimpy.includes.zpvector cimport Vec3
 from radarsimpy.includes.type_def cimport float_t, int_t, vector
+
 import meshio
 import numpy as np
 from libcpp cimport bool
-from libc.math cimport sin, cos, sqrt, atan, atan2, acos, pow, fmax, M_PI
+
 cimport cython
-
-
 cimport numpy as np
 
 

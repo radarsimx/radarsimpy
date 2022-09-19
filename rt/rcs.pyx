@@ -31,6 +31,7 @@
 from radarsimpy.includes.zpvector cimport Vec3
 from radarsimpy.includes.type_def cimport int_t
 from radarsimpy.includes.radarsimc cimport Target, Rcs
+
 import meshio
 import numpy as np
 
@@ -105,7 +106,7 @@ cpdef rcs_sbr(model,
 
     cdef Rcs[double] rcs
 
-    rcs = Rcs[double](Target[float](& points[0, 0], & cells[0, 0], < int_t > cells.shape[0]),
+    rcs = Rcs[double](Target[float](&points[0, 0], &cells[0, 0], <int_t> cells.shape[0]),
                       inc_dir,
                       obs_dir,
                       Vec3[double](<double> pol[0], <double> pol[1], <double> pol[2]),

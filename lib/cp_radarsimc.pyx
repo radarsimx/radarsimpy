@@ -29,19 +29,14 @@
 
 
 import meshio
-from radarsimpy.includes.radarsimc cimport Target
-from radarsimpy.includes.radarsimc cimport Point
-from radarsimpy.includes.radarsimc cimport RxChannel
-from radarsimpy.includes.radarsimc cimport TxChannel
-from radarsimpy.includes.radarsimc cimport Transmitter
+
 from radarsimpy.includes.zpvector cimport Vec3
-from radarsimpy.includes.type_def cimport float_t, int_t
-from radarsimpy.includes.type_def cimport vector, complex_t
+from radarsimpy.includes.type_def cimport int_t
+from radarsimpy.includes.type_def cimport vector
+
 from libcpp.complex cimport complex as cpp_complex
 from libcpp cimport bool
-from libc.math cimport M_PI
-from libc.math cimport pow, fmax
-from libc.math cimport sin, cos, sqrt, atan, atan2, acos
+
 import numpy as np
 
 cimport cython
@@ -95,26 +90,26 @@ cdef Point[float_t] cp_Point(location,
             for ps_idx in range(0, shape[1]):
                 for sp_idx in range(0, shape[2]):
                     loc_vect.push_back(Vec3[float_t](
-                        < float_t > tgx_t[ch_idx, ps_idx, sp_idx],
-                        < float_t > tgy_t[ch_idx, ps_idx, sp_idx],
-                        < float_t > tgz_t[ch_idx, ps_idx, sp_idx]
+                        <float_t> tgx_t[ch_idx, ps_idx, sp_idx],
+                        <float_t> tgy_t[ch_idx, ps_idx, sp_idx],
+                        <float_t> tgz_t[ch_idx, ps_idx, sp_idx]
                     ))
-                    rcs_vect.push_back( < float_t > rcs_t[ch_idx, ps_idx, sp_idx])
-                    phs_vect.push_back( < float_t > phs_t[ch_idx, ps_idx, sp_idx])
+                    rcs_vect.push_back(<float_t> rcs_t[ch_idx, ps_idx, sp_idx])
+                    phs_vect.push_back(<float_t> phs_t[ch_idx, ps_idx, sp_idx])
     else:
         loc_vect.push_back(Vec3[float_t](
-            < float_t > location[0],
-            < float_t > location[1],
-            < float_t > location[2]
+            <float_t> location[0],
+            <float_t> location[1],
+            <float_t> location[2]
         ))
-        rcs_vect.push_back( < float_t > rcs)
-        phs_vect.push_back( < float_t > np.radians(phase))
+        rcs_vect.push_back(<float_t> rcs)
+        phs_vect.push_back(<float_t> np.radians(phase))
     return Point[float_t](
         loc_vect,
         Vec3[float_t](
-            < float_t > speed[0],
-            < float_t > speed[1],
-            < float_t > speed[2]
+            <float_t> speed[0],
+            <float_t> speed[1],
+            <float_t> speed[2]
         ),
         rcs_vect,
         phs_vect
@@ -135,7 +130,7 @@ cdef Transmitter[float_t] cp_Transmitter(radar):
     cdef vector[double] t_vect
     cdef vector[double] f_offset_vect
     cdef vector[double] t_pstart_vect
-    cdef vector[cpp_complex[double]] pn_vect = vector[cpp_complex[double]]()
+    cdef vector[cpp_complex[double]] pn_vect
 
     if frames > 1:
         t_frame_mem = radar.t_offset.astype(np.float64)
@@ -143,7 +138,7 @@ cdef Transmitter[float_t] cp_Transmitter(radar):
         for idx in range(0, frames):
             t_frame_vect.push_back(t_frame_mem[idx])
     else:
-        t_frame_vect.push_back( < double > (radar.t_offset))
+        t_frame_vect.push_back(<double> (radar.t_offset))
 
     f_mem = radar.f.astype(np.float64)
     f_vect.reserve(len(radar.f))
@@ -179,7 +174,7 @@ cdef Transmitter[float_t] cp_Transmitter(radar):
         f_vect,
         f_offset_vect,
         t_vect,
-        < float_t > radar.transmitter.tx_power,
+        <float_t> radar.transmitter.tx_power,
         t_pstart_vect,
         t_frame_vect,
         pn_vect
@@ -204,10 +199,10 @@ cdef TxChannel[float_t] cp_TxChannel(tx,
 
     az_ang_vect.reserve(len(tx.az_angles[tx_idx]))
     for idx in range(0, len(tx.az_angles[tx_idx])):
-        az_ang_vect.push_back( < float_t > np.radians(tx.az_angles[tx_idx][idx]))
+        az_ang_vect.push_back(<float_t> np.radians(tx.az_angles[tx_idx][idx]))
     az_ptn_vect.reserve(len(tx.az_patterns[tx_idx]))
     for idx in range(0, len(tx.az_patterns[tx_idx])):
-        az_ptn_vect.push_back( < float_t > (tx.az_patterns[tx_idx][idx]))
+        az_ptn_vect.push_back(<float_t> (tx.az_patterns[tx_idx][idx]))
 
     el_ang_mem = np.radians(
         np.flip(90-tx.el_angles[tx_idx].astype(np.float32)))
@@ -231,29 +226,29 @@ cdef TxChannel[float_t] cp_TxChannel(tx,
 
         mod_t_vect.reserve(len(tx.waveform_mod[tx_idx]['t']))
         for idx in range(0, len(tx.waveform_mod[tx_idx]['t'])):
-            mod_t_vect.push_back( < float_t > tx.waveform_mod[tx_idx]['t'][idx])
+            mod_t_vect.push_back(<float_t> tx.waveform_mod[tx_idx]['t'][idx])
 
     return TxChannel[float_t](
         Vec3[float_t](
-            < float_t > tx.locations[tx_idx, 0],
-            < float_t > tx.locations[tx_idx, 1],
-            < float_t > tx.locations[tx_idx, 2]
+            <float_t> tx.locations[tx_idx, 0],
+            <float_t> tx.locations[tx_idx, 1],
+            <float_t> tx.locations[tx_idx, 2]
         ),
         Vec3[float_t](
-            < float_t > tx.polarization[tx_idx, 0],
-            < float_t > tx.polarization[tx_idx, 1],
-            < float_t > tx.polarization[tx_idx, 2]
+            <float_t> tx.polarization[tx_idx, 0],
+            <float_t> tx.polarization[tx_idx, 1],
+            <float_t> tx.polarization[tx_idx, 2]
         ),
         az_ang_vect,
         az_ptn_vect,
         el_ang_vect,
         el_ptn_vect,
-        < float_t > tx.antenna_gains[tx_idx],
+        <float_t> tx.antenna_gains[tx_idx],
         mod_t_vect,
         mod_var_vect,
         pulse_mod_vect,
-        < float_t > tx.delay[tx_idx],
-        < float_t > np.radians(tx.grid[tx_idx])
+        <float_t> tx.delay[tx_idx],
+        <float_t> np.radians(tx.grid[tx_idx])
     )
 
 
@@ -288,16 +283,16 @@ cdef RxChannel[float_t] cp_RxChannel(rx,
 
     return RxChannel[float_t](
         Vec3[float_t](
-            < float_t > rx.locations[rx_idx, 0],
-            < float_t > rx.locations[rx_idx, 1],
-            < float_t > rx.locations[rx_idx, 2]
+            <float_t> rx.locations[rx_idx, 0],
+            <float_t> rx.locations[rx_idx, 1],
+            <float_t> rx.locations[rx_idx, 2]
         ),
         Vec3[float_t](0, 0, 1),
         az_ang_vect,
         az_ptn_vect,
         el_ang_vect,
         el_ptn_vect,
-        < float_t > rx.antenna_gains[rx_idx]
+        <float_t> rx.antenna_gains[rx_idx]
     )
 
 
@@ -489,15 +484,15 @@ cdef Target[float_t] cp_Target(radar,
             )
         )
 
-    return Target[float_t]( & points_memview[0, 0],
-                           & cells_memview[0, 0],
-                           < int_t > cells_memview.shape[0],
-                           Vec3[float_t]( & origin[0]),
+    return Target[float_t](&points_memview[0, 0],
+                           &cells_memview[0, 0],
+                           <int_t> cells_memview.shape[0],
+                           Vec3[float_t]( &origin[0]),
                            c_loc_array,
                            c_speed_array,
                            c_rotation_array,
                            c_rotation_rate_array,
                            ep,
                            mu,
-                           < bool > target.get('is_ground', False))
+                           <bool> target.get('is_ground', False))
 

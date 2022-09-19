@@ -26,19 +26,13 @@
 #           :##:
 #           :##:
 #            .+:
-from radarsimpy.includes.radarsimc cimport Radar
+
 from radarsimpy.includes.radarsimc cimport RxChannel
 from radarsimpy.includes.radarsimc cimport TxChannel
 from radarsimpy.includes.radarsimc cimport Transmitter
 from radarsimpy.includes.radarsimc cimport Target
 from radarsimpy.includes.radarsimc cimport Point
-from libcpp.complex cimport complex as cpp_complex
-from libcpp cimport bool
-from radarsimpy.includes.zpvector cimport Vec3
-from radarsimpy.includes.type_def cimport float_t, int_t
-from radarsimpy.includes.type_def cimport vector
-import numpy as np
-cimport numpy as np
+from radarsimpy.includes.type_def cimport float_t
 
 
 cdef Point[float_t] cp_Point(location, speed, rcs, phase, shape)
