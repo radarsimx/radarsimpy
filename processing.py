@@ -173,7 +173,7 @@ def get_polar_image(image, range_bins, angle_bins, fov_deg):
     return polar
 
 
-def cfar_ca(data, guard, trailing, pfa=1e-5, axis=0, offset=None):
+def cfar_ca_1d(data, guard, trailing, pfa=1e-5, axis=0, offset=None):
     """
     Cell Averaging CFAR (CA-CFAR)
 
@@ -277,9 +277,10 @@ def os_cfar_threshold(k, n, pfa):
     return None
 
 
-def cfar_os(
+def cfar_os_1d(
         data,
-        n,
+        guard,
+        trailing,
         k,
         pfa=1e-5,
         axis=0,
@@ -292,8 +293,11 @@ def cfar_os(
     :param data:
         Radar data
     :type data: numpy.1darray or numpy.2darray
-    :param int n:
-        Number of cells around CUT (cell under test) for calculating
+    :param int guard:
+        Number of guard cells on one side, total guard cells are ``2*guard``
+    :param int trailing:
+        Number of trailing cells on one side, total trailing cells are
+        ``2*trailing``
     :param int k:
         Rank in the order
     :param float pfa:
@@ -311,17 +315,17 @@ def cfar_os(
 
     [1] H. Rohling, “Radar CFAR Thresholding in Clutter and Multiple Target
     Situations,” IEEE Trans. Aerosp. Electron. Syst., vol. AES-19, no. 4,
-    pp. 608–621, 1983.
+    pp. 608-621, 1983.
     """
 
     data = np.abs(data)
     data_shape = np.shape(data)
     cfar = np.zeros_like(data)
-    leading = np.floor(n/2)
-    trailing = n-leading
+    leading = trailing
+    # trailing = n-leading
 
     if offset is None:
-        a = os_cfar_threshold(k, n, pfa)
+        a = os_cfar_threshold(k, trailing*2, pfa)
     else:
         a = offset
 
@@ -329,8 +333,8 @@ def cfar_os(
         for idx in range(0, data_shape[0]):
             win_idx = np.mod(
                 np.concatenate(
-                    [np.arange(idx-leading, idx, 1),
-                        np.arange(idx+1, idx+1+trailing, 1)]
+                    [np.arange(idx-leading-guard, idx-guard, 1),
+                        np.arange(idx+1+guard, idx+1+trailing+guard, 1)]
                 ), data_shape[0])
             if data.ndim == 1:
                 samples = np.sort(data[win_idx.astype(int)])
@@ -343,8 +347,8 @@ def cfar_os(
         for idx in range(0, data_shape[1]):
             win_idx = np.mod(
                 np.concatenate(
-                    [np.arange(idx-leading, idx, 1),
-                     np.arange(idx+1, idx+1+trailing, 1)]
+                    [np.arange(idx-leading-guard, idx-guard, 1),
+                     np.arange(idx+1+guard, idx+1+trailing+guard, 1)]
                 ), data_shape[1])
             samples = np.sort(data[:, win_idx.astype(int)], axis=1)
 
