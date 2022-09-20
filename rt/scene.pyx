@@ -48,7 +48,7 @@ cimport numpy as np
 @cython.wraparound(False)
 cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     """
-    scene(radar, targets, density=1, level=None, noise=True)
+    scene(radar, targets, density=1, level=None, noise=True, debug=False)
 
     Radar scene simulator
 
