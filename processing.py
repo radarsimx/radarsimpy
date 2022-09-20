@@ -45,15 +45,13 @@ import numpy as np
 from .tools import log_factorial
 
 
-def cal_range_profile(radar, baseband, range_window=1, n=None):
+def range_fft(data, rwin=None, n=None):
     """
     Calculate range profile matrix
 
-    :param Radar radar:
-        A well defined radar system
-    :param numpy.3darray baseband:
+    :param numpy.3darray data:
         Baseband data, ``[channels, pulses, adc_samples]``
-    :param numpy.1darray range_window:
+    :param numpy.1darray rwin:
         Window for FFT, length should be equal to adc_samples. (default is
         a square window)
     :param int n:
@@ -64,70 +62,69 @@ def cal_range_profile(radar, baseband, range_window=1, n=None):
     :rtype: numpy.3darray
     """
 
-    if n is None:
-        rng_profile = np.zeros(np.shape(baseband), dtype=complex)
+    shape = np.shape(data)
+
+    if rwin is None:
+        rwin = 1
     else:
-        rng_profile = np.zeros((
-            radar.channel_size*radar.frames,
-            radar.transmitter.pulses,
-            n,
-        ),
-            dtype=complex)
-    for ii in range(0, radar.channel_size*radar.frames):
-        for jj in range(0, radar.transmitter.pulses):
-            rng_profile[ii, jj, :] = np.fft.fft(
-                baseband[ii, jj, :] * range_window,
-                n=n,
-            )
+        rwin = np.tile(rwin[np.newaxis, np.newaxis, ...],
+                       (shape[0], shape[1], 1))
 
-    return rng_profile
+    return np.fft.fft(data * rwin, n=n, axis=2)
 
 
-def cal_range_doppler(
-        radar,
-        range_profile,
-        doppler_window=1,
-        fft_shift=False,
-        n=None):
+def doppler_fft(data, dwin=None, n=None):
     """
     Calculate range-Doppler matrix
 
-    :param Radar radar:
-        A well defined radar system
-    :param numpy.3darray range_profile:
+    :param numpy.3darray data:
         Range profile matrix, ``[channels, pulses, adc_samples]``
-    :param numpy.1darray doppler_window:
+    :param numpy.1darray dwin:
         Window for FFT, length should be equal to adc_samples. (default is
         a square window)
-    :param bool fft_shift:
-        Perform FFT shift.  (default is False)
+    :param int n:
+        FFT size, if n > adc_samples, zero-padding will be applied.
+        (default is None)
 
-    :return: A 3D array of range profile, ``[channels, Doppler, range]``
+    :return: A 3D array of range-Doppler map, ``[channels, Doppler, range]``
     :rtype: numpy.3darray
     """
 
-    if n is None:
-        rng_doppler = np.zeros(np.shape(range_profile), dtype=complex)
+    shape = np.shape(data)
+
+    if dwin is None:
+        dwin = 1
     else:
-        rng_doppler = np.zeros(
-            (np.shape(range_profile)[0], n, np.shape(range_profile)[2]),
-            dtype=complex)
+        dwin = np.tile(dwin[np.newaxis, ..., np.newaxis],
+                       (shape[0], 1, shape[2]))
 
-    for ii in range(0, radar.channel_size*radar.frames):
-        for jj in range(0, np.shape(rng_doppler)[2]):
-            if fft_shift:
-                rng_doppler[ii, :, jj] = np.fft.fftshift(
-                    np.fft.fft(
-                        range_profile[ii, :, jj] * doppler_window,
-                        n=n,
-                    ))
-            else:
-                rng_doppler[ii, :, jj] = np.fft.fft(
-                    range_profile[ii, :, jj] * doppler_window,
-                    n=n,
-                )
+    return np.fft.fft(data * dwin, n=n, axis=1)
 
-    return rng_doppler
+
+def range_doppler_fft(data, rwin=None, dwin=None, rn=None, dn=None):
+    """
+    Range-Doppler processing
+
+    :param numpy.3darray data:
+        Baseband data, ``[channels, pulses, adc_samples]``
+    :param numpy.1darray rwin:
+        Range window for FFT, length should be equal to adc_samples.
+        (default is a square window)
+    :param numpy.1darray dwin:
+        Doppler window for FFT, length should be equal to adc_samples.
+        (default is a square window)
+    :param int rn:
+        Range FFT size, if n > adc_samples, zero-padding will be applied.
+        (default is None)
+    :param int dn:
+        Doppler FFT size, if n > adc_samples, zero-padding will be applied.
+        (default is None)
+
+    :return: A 3D array of range-Doppler map, ``[channels, Doppler, range]``
+    :rtype: numpy.3darray
+    """
+
+    return doppler_fft(range_fft(data, rwin=rwin, n=rn), dwin=dwin, n=dn)
 
 
 def get_polar_image(image, range_bins, angle_bins, fov_deg):
