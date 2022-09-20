@@ -733,7 +733,7 @@ class Radar:
 
         self.timestamp = self.gen_timestamp()
         self.pulse_phs = self.cal_frame_phases()
-        # self.code_timestamp = self.cal_code_timestamp()
+
         self.noise = self.cal_noise()
 
         if len(self.transmitter.f) > 2:
