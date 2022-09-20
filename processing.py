@@ -176,7 +176,7 @@ def get_polar_image(image, range_bins, angle_bins, fov_deg):
 
 def cfar_ca_1d(data, guard, trailing, pfa=1e-5, axis=0, offset=None):
     """
-    Cell Averaging CFAR (CA-CFAR)
+    1-D Cell Averaging CFAR (CA-CFAR)
 
     :param data:
         Radar data
@@ -227,7 +227,7 @@ def cfar_ca_1d(data, guard, trailing, pfa=1e-5, axis=0, offset=None):
 
 def cfar_ca_2d(data, guard, trailing, pfa=1e-5, offset=None):
     """
-    Cell Averaging CFAR (CA-CFAR)
+    2-D Cell Averaging CFAR (CA-CFAR)
 
     :param data:
         Radar data
@@ -333,7 +333,7 @@ def cfar_os_1d(
         axis=0,
         offset=None):
     """
-    Ordered Statistic CFAR (OS-CFAR)
+    1-D Ordered Statistic CFAR (OS-CFAR)
 
     For edge cells, use rollovered cells to fill the missing cells.
 
@@ -412,7 +412,7 @@ def cfar_os_2d(
         pfa=1e-5,
         offset=None):
     """
-    Ordered Statistic CFAR (OS-CFAR)
+    2-D Ordered Statistic CFAR (OS-CFAR)
 
     For edge cells, use rollovered cells to fill the missing cells.
 
