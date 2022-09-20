@@ -233,11 +233,15 @@ def cfar_ca_2d(data, guard, trailing, pfa=1e-5, offset=None):
         Radar data
     :type data: numpy.1darray or numpy.2darray
     :param guard:
-        Number of guard cells on one side, total guard cells are ``2*guard``
+        Number of guard cells on one side, total guard cells are ``2*guard``.
+        When ``guard`` is a list, ``guard[0]`` is for axis 0, and ``guard[1]``
+        is for axis 1. If ``guard`` is a number, axis 0 and axis 1 are the same
     :type guard: int or list[int]
     :param trailing:
         Number of trailing cells on one side, total trailing cells are
-        ``2*trailing``
+        ``2*trailing``. When ``trailing`` is a list, ``trailing[0]`` is for
+        axis 0, and ``trailing[1]`` is for axis 1. If ``trailing`` is a number,
+        axis 0 and axis 1 are the same
     :type trailing: int or list[int]
     :param float pfa:
         Probability of false alarm. ``default 1e-5``
@@ -420,11 +424,15 @@ def cfar_os_2d(
         Radar data
     :type data: numpy.1darray or numpy.2darray
     :param guard:
-        Number of guard cells on one side, total guard cells are ``2*guard``
+        Number of guard cells on one side, total guard cells are ``2*guard``.
+        When ``guard`` is a list, ``guard[0]`` is for axis 0, and ``guard[1]``
+        is for axis 1. If ``guard`` is a number, axis 0 and axis 1 are the same
     :type guard: int or list[int]
     :param trailing:
         Number of trailing cells on one side, total trailing cells are
-        ``2*trailing``
+        ``2*trailing``. When ``trailing`` is a list, ``trailing[0]`` is for
+        axis 0, and ``trailing[1]`` is for axis 1. If ``trailing`` is a number,
+        axis 0 and axis 1 are the same
     :type trailing: int or list[int]
     :param int k:
         Rank in the order
