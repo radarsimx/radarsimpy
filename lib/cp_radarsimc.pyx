@@ -158,6 +158,17 @@ cdef Point[float_t] cp_Point(location,
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cdef Transmitter[float_t] cp_Transmitter(radar):
+    """
+    cp_Transmitter(radar)
+
+    Creat Transmitter object in Cython
+
+    :param Radar radar:
+        Radar object
+
+    :return: C++ object of a radar transmitter
+    :rtype: Transmitter
+    """
     cdef int_t frames = radar.frames
     cdef int_t channles = radar.channel_size
     cdef int_t pulses = radar.transmitter.pulses
