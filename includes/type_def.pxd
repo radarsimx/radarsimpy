@@ -27,17 +27,9 @@
 #           :##:
 #            .+:
 
-from libcpp cimport bool
-
 ctypedef int int_t
 ctypedef float float_t
 ctypedef unsigned int uint_t
-ctypedef float complex complex_t
-
-# IF UNAME_SYSNAME == "Windows":
-#     ctypedef unsigned long long uint64
-# ELSE:
-#     ctypedef unsigned long long uint64
 
 
 """

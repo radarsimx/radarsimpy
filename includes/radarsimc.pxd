@@ -28,17 +28,14 @@
 #            .+:
 
 from radarsimpy.includes.zpvector cimport Vec3
-from radarsimpy.includes.type_def cimport float_t, int_t
+from radarsimpy.includes.type_def cimport int_t
 from radarsimpy.includes.type_def cimport vector
 from libcpp cimport bool
 from libcpp.complex cimport complex as cpp_complex
 
-import numpy as np
-cimport numpy as np
-
 
 """
-target interface
+Target
 """
 cdef extern from "target.hpp":
     cdef cppclass Target[T]:
@@ -68,6 +65,9 @@ cdef extern from "target.hpp":
                const bool & is_ground) except +
 
 
+"""
+SimpleRay
+"""
 cdef extern from "simpleray.hpp":
     cdef cppclass SimpleRay[T]:
         SimpleRay() except +
@@ -77,7 +77,7 @@ cdef extern from "simpleray.hpp":
 
 
 """
-rcs
+Rcs
 """
 cdef extern from "rcs.hpp":
     cdef cppclass Rcs[T]:
@@ -93,7 +93,7 @@ cdef extern from "rcs.hpp":
 
 
 """
-pointcloud
+PointCloud
 """
 cdef extern from "pointcloud.hpp":
     cdef cppclass PointCloud[T]:
@@ -107,7 +107,7 @@ cdef extern from "pointcloud.hpp":
 
 
 """
-point
+Point
 """
 cdef extern from "point.hpp":
     cdef cppclass Point[T]:
@@ -118,7 +118,7 @@ cdef extern from "point.hpp":
               const vector[T] & phs) except +
 
 """
-transmitter
+Transmitter and TxChannel
 """
 cdef extern from "transmitter.hpp":
     cdef cppclass TxChannel[T]:
@@ -155,7 +155,7 @@ cdef extern from "transmitter.hpp":
 
 
 """
-receiver
+Receiver and RxChannel
 """
 cdef extern from "receiver.hpp":
     cdef cppclass RxChannel[T]:
@@ -179,7 +179,7 @@ cdef extern from "receiver.hpp":
 
 
 """
-radar
+Radar
 """
 cdef extern from "radar.hpp":
     cdef cppclass Radar[T]:
@@ -194,7 +194,7 @@ cdef extern from "radar.hpp":
 
 
 """
-snapshot
+Snapshot
 """
 cdef extern from "snapshot.hpp":
     cdef cppclass Snapshot[T]:
@@ -207,7 +207,7 @@ cdef extern from "snapshot.hpp":
 
 
 """
-simulator
+Simulator
 """
 cdef extern from "simulator.hpp":
     cdef cppclass Simulator[T]:
@@ -219,7 +219,7 @@ cdef extern from "simulator.hpp":
 
 
 """
-scene interface
+Scene
 """
 cdef extern from "scene.hpp":
     cdef cppclass Scene[T, F]:
