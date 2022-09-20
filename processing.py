@@ -42,6 +42,7 @@
 
 
 import numpy as np
+from scipy.signal import convolve2d
 from .tools import log_factorial
 
 
@@ -224,6 +225,52 @@ def cfar_ca_1d(data, guard, trailing, pfa=1e-5, axis=0, offset=None):
     return cfar
 
 
+def cfar_ca_2d(data, guard, trailing, pfa=1e-5, offset=None):
+    """
+    Cell Averaging CFAR (CA-CFAR)
+
+    :param data:
+        Radar data
+    :type data: numpy.1darray or numpy.2darray
+    :param guard:
+        Number of guard cells on one side, total guard cells are ``2*guard``
+    :type guard: int or list[int]
+    :param trailing:
+        Number of trailing cells on one side, total trailing cells are
+        ``2*trailing``
+    :type trailing: int or list[int]
+    :param float pfa:
+        Probability of false alarm. ``default 1e-5``
+    :param float offset:
+        CFAR threshold offset. If offect is None, threshold offset is
+        ``2*trailing(pfa^(-1/2/trailing)-1)``. ``default None``
+
+    :return: CFAR threshold. The dimension is the same as ``data``
+    :rtype: numpy.1darray or numpy.2darray
+    """
+
+    data = np.abs(data)
+
+    if offset is None:
+        a = trailing*2*(pfa**(-1/trailing/2)-1)
+    else:
+        a = offset
+
+    guard = np.array(guard)
+    if guard.size == 1:
+        guard = np.tile(guard, 2)
+    trailing = np.array(trailing)
+    if trailing.size == 1:
+        trailing = np.tile(trailing, 2)
+
+    cfar_win = np.ones(((guard+trailing)*2+1))
+    cfar_win[trailing[0]:(trailing[0]+guard[0]*2+1),
+             trailing[1]:(trailing[1]+guard[1]*2+1)] = 0
+    cfar_win = cfar_win/np.sum(cfar_win)
+
+    return a*convolve2d(data, cfar_win, mode='same', boundary='wrap')
+
+
 def os_cfar_threshold(k, n, pfa):
     """
     Use Secant method to calculate OS-CFAR's threshold
@@ -353,5 +400,90 @@ def cfar_os_1d(
             samples = np.sort(data[:, win_idx.astype(int)], axis=1)
 
             cfar[:, idx] = a*samples[:, k]
+
+    return cfar
+
+
+def cfar_os_2d(
+        data,
+        guard,
+        trailing,
+        k,
+        pfa=1e-5,
+        offset=None):
+    """
+    Ordered Statistic CFAR (OS-CFAR)
+
+    For edge cells, use rollovered cells to fill the missing cells.
+
+    :param data:
+        Radar data
+    :type data: numpy.1darray or numpy.2darray
+    :param guard:
+        Number of guard cells on one side, total guard cells are ``2*guard``
+    :type guard: int or list[int]
+    :param trailing:
+        Number of trailing cells on one side, total trailing cells are
+        ``2*trailing``
+    :type trailing: int or list[int]
+    :param int k:
+        Rank in the order
+    :param float pfa:
+        Probability of false alarm. ``default 1e-5``
+    :param float offset:
+        CFAR threshold offset. If offect is None, threshold offset is
+        calculated from ``pfa``. ``default None``
+
+    :return: CFAR threshold. The dimension is the same as ``data``
+    :rtype: numpy.1darray or numpy.2darray
+
+    *Reference*
+
+    [1] H. Rohling, “Radar CFAR Thresholding in Clutter and Multiple Target
+    Situations,” IEEE Trans. Aerosp. Electron. Syst., vol. AES-19, no. 4,
+    pp. 608-621, 1983.
+    """
+
+    data = np.abs(data)
+    data_shape = np.shape(data)
+    cfar = np.zeros_like(data)
+
+    guard = np.array(guard)
+    if guard.size == 1:
+        guard = np.tile(guard, 2)
+    trailing = np.array(trailing)
+    if trailing.size == 1:
+        trailing = np.tile(trailing, 2)
+
+    if offset is None:
+        a = os_cfar_threshold(k, np.sum(trailing)*2, pfa)
+    else:
+        a = offset
+
+    for idx_0 in range(0, data_shape[0]):
+        for idx_1 in range(0, data_shape[1]):
+            win_idx_0 = np.mod(
+                np.concatenate(
+                    [np.arange(idx_0-trailing[0]-guard[0],
+                               idx_0-guard[0],
+                               1),
+                        np.arange(idx_0+1+guard[0],
+                                  idx_0+1+trailing[0]+guard[0],
+                                  1)]
+                ), data_shape[0])
+            win_idx_1 = np.mod(
+                np.concatenate(
+                    [np.arange(idx_1-trailing[1]-guard[1],
+                               idx_1-guard[1],
+                               1),
+                        np.arange(idx_1+1+guard[1],
+                                  idx_1+1+trailing[1]+guard[1],
+                                  1)]
+                ), data_shape[1])
+
+            x, y = np.meshgrid(win_idx_0, win_idx_1)
+            samples = np.sort(data[x.astype(int), y.astype(int)].flatten())
+
+            cfar[idx_0, idx_1] = a*samples[k]
 
     return cfar
