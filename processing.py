@@ -41,8 +41,9 @@
 #            .+:
 
 
+from warnings import warn
 import numpy as np
-from scipy.signal import convolve2d
+from scipy.signal import convolve
 from .tools import log_factorial
 
 
@@ -203,7 +204,7 @@ def cfar_ca_1d(data, guard, trailing, pfa=1e-5, axis=0, offset=None):
     cfar = np.zeros_like(data)
 
     if offset is None:
-        a = trailing*2*(pfa**(-1/trailing/2)-1)
+        a = trailing*2*(pfa**(-1/(trailing*2))-1)
     else:
         a = offset
 
@@ -255,11 +256,6 @@ def cfar_ca_2d(data, guard, trailing, pfa=1e-5, offset=None):
 
     data = np.abs(data)
 
-    if offset is None:
-        a = trailing*2*(pfa**(-1/trailing/2)-1)
-    else:
-        a = offset
-
     guard = np.array(guard)
     if guard.size == 1:
         guard = np.tile(guard, 2)
@@ -267,12 +263,24 @@ def cfar_ca_2d(data, guard, trailing, pfa=1e-5, offset=None):
     if trailing.size == 1:
         trailing = np.tile(trailing, 2)
 
+    if offset is None:
+        tg_sum = trailing+guard
+        t_num = (2*tg_sum[0]+1)*(2*tg_sum[1]+1)
+        g_num = (2*guard[0]+1)*(2*guard[1]+1)
+
+        if t_num == g_num:
+            raise('No trailing bins!')
+
+        a = (t_num-g_num)*(pfa**(-1/(t_num-g_num))-1)
+    else:
+        a = offset
+
     cfar_win = np.ones(((guard+trailing)*2+1))
     cfar_win[trailing[0]:(trailing[0]+guard[0]*2+1),
              trailing[1]:(trailing[1]+guard[1]*2+1)] = 0
     cfar_win = cfar_win/np.sum(cfar_win)
 
-    return a*convolve2d(data, cfar_win, mode='same', boundary='wrap')
+    return a*convolve(data, cfar_win, mode='same')
 
 
 def os_cfar_threshold(k, n, pfa):
@@ -350,7 +358,8 @@ def cfar_os_1d(
         Number of trailing cells on one side, total trailing cells are
         ``2*trailing``
     :param int k:
-        Rank in the order
+        Rank in the order. ``k`` is usuall chosen to satisfy ``N/2 < k < N``.
+        Typically, ``k`` is on the order of ``0.75N``
     :param float pfa:
         Probability of false alarm. ``default 1e-5``
     :param int axis:
@@ -379,6 +388,11 @@ def cfar_os_1d(
         a = os_cfar_threshold(k, trailing*2, pfa)
     else:
         a = offset
+
+    if k < trailing or k > trailing*2:
+        warn('``k`` is usuall chosen to satisfy ``N/2 < k < N '
+             '(N = '+str(trailing*2)+')``. '
+             'Typically, ``k`` is on the order of ``0.75N``')
 
     if axis == 0:
         for idx in range(0, data_shape[0]):
@@ -435,7 +449,8 @@ def cfar_os_2d(
         axis 0 and axis 1 are the same
     :type trailing: int or list[int]
     :param int k:
-        Rank in the order
+        Rank in the order. ``k`` is usuall chosen to satisfy ``N/2 < k < N``.
+        Typically, ``k`` is on the order of ``0.75N``
     :param float pfa:
         Probability of false alarm. ``default 1e-5``
     :param float offset:
@@ -463,34 +478,39 @@ def cfar_os_2d(
     if trailing.size == 1:
         trailing = np.tile(trailing, 2)
 
+    tg_sum = trailing+guard
     if offset is None:
-        a = os_cfar_threshold(k, np.sum(trailing)*2, pfa)
+        t_num = (2*tg_sum[0]+1)*(2*tg_sum[1]+1)
+        g_num = (2*guard[0]+1)*(2*guard[1]+1)
+
+        if t_num == g_num:
+            raise('No trailing bins!')
+
+        a = os_cfar_threshold(k, t_num-g_num, pfa)
     else:
         a = offset
 
+    if k < (t_num-g_num)/2 or k > t_num-g_num:
+        warn('``k`` is usuall chosen to satisfy ``N/2 < k < N '
+             '(N = '+str(t_num-g_num)+')``. '
+             'Typically, ``k`` is on the order of ``0.75N``')
+
+    cfar_win = np.ones((tg_sum*2+1), dtype=bool)
+    cfar_win[trailing[0]:(trailing[0]+guard[0]*2+1),
+             trailing[1]:(trailing[1]+guard[1]*2+1)] = False
+
     for idx_0 in range(0, data_shape[0]):
         for idx_1 in range(0, data_shape[1]):
-            win_idx_0 = np.mod(
-                np.concatenate(
-                    [np.arange(idx_0-trailing[0]-guard[0],
-                               idx_0-guard[0],
-                               1),
-                        np.arange(idx_0+1+guard[0],
-                                  idx_0+1+trailing[0]+guard[0],
-                                  1)]
-                ), data_shape[0])
-            win_idx_1 = np.mod(
-                np.concatenate(
-                    [np.arange(idx_1-trailing[1]-guard[1],
-                               idx_1-guard[1],
-                               1),
-                        np.arange(idx_1+1+guard[1],
-                                  idx_1+1+trailing[1]+guard[1],
-                                  1)]
-                ), data_shape[1])
+            win_idx_0 = np.mod(np.arange(idx_0-tg_sum[0],
+                               idx_0+1+tg_sum[0],
+                               1), data_shape[0])
+            win_idx_1 = np.mod(np.arange(idx_1-tg_sum[1],
+                               idx_1+1+tg_sum[1],
+                               1), data_shape[1])
 
-            x, y = np.meshgrid(win_idx_0, win_idx_1)
-            samples = np.sort(data[x.astype(int), y.astype(int)].flatten())
+            x, y = np.meshgrid(win_idx_0, win_idx_1, indexing='ij')
+            sample_cube = data[x, y]
+            samples = np.sort(sample_cube[cfar_win].flatten())
 
             cfar[idx_0, idx_1] = a*samples[k]
 
