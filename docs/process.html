@@ -113,9 +113,13 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<em>numpy.1darray</em><em> or </em><em>numpy.2darray</em>) – Radar data</p></li>
-<li><p><strong>guard</strong> (<em>int</em><em> or </em><em>list</em><em>[</em><em>int</em><em>]</em>) – Number of guard cells on one side, total guard cells are <code class="docutils literal notranslate"><span class="pre">2*guard</span></code></p></li>
+<li><p><strong>guard</strong> (<em>int</em><em> or </em><em>list</em><em>[</em><em>int</em><em>]</em>) – Number of guard cells on one side, total guard cells are <code class="docutils literal notranslate"><span class="pre">2*guard</span></code>.
+When <code class="docutils literal notranslate"><span class="pre">guard</span></code> is a list, <code class="docutils literal notranslate"><span class="pre">guard[0]</span></code> is for axis 0, and <code class="docutils literal notranslate"><span class="pre">guard[1]</span></code>
+is for axis 1. If <code class="docutils literal notranslate"><span class="pre">guard</span></code> is a number, axis 0 and axis 1 are the same</p></li>
 <li><p><strong>trailing</strong> (<em>int</em><em> or </em><em>list</em><em>[</em><em>int</em><em>]</em>) – Number of trailing cells on one side, total trailing cells are
-<code class="docutils literal notranslate"><span class="pre">2*trailing</span></code></p></li>
+<code class="docutils literal notranslate"><span class="pre">2*trailing</span></code>. When <code class="docutils literal notranslate"><span class="pre">trailing</span></code> is a list, <code class="docutils literal notranslate"><span class="pre">trailing[0]</span></code> is for
+axis 0, and <code class="docutils literal notranslate"><span class="pre">trailing[1]</span></code> is for axis 1. If <code class="docutils literal notranslate"><span class="pre">trailing</span></code> is a number,
+axis 0 and axis 1 are the same</p></li>
 <li><p><strong>pfa</strong> (<em>float</em>) – Probability of false alarm. <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">1e-5</span></code></p></li>
 <li><p><strong>offset</strong> (<em>float</em>) – CFAR threshold offset. If offect is None, threshold offset is
 <code class="docutils literal notranslate"><span class="pre">2*trailing(pfa^(-1/2/trailing)-1)</span></code>. <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">None</span></code></p></li>
@@ -142,7 +146,8 @@
 <li><p><strong>guard</strong> (<em>int</em>) – Number of guard cells on one side, total guard cells are <code class="docutils literal notranslate"><span class="pre">2*guard</span></code></p></li>
 <li><p><strong>trailing</strong> (<em>int</em>) – Number of trailing cells on one side, total trailing cells are
 <code class="docutils literal notranslate"><span class="pre">2*trailing</span></code></p></li>
-<li><p><strong>k</strong> (<em>int</em>) – Rank in the order</p></li>
+<li><p><strong>k</strong> (<em>int</em>) – Rank in the order. <code class="docutils literal notranslate"><span class="pre">k</span></code> is usuall chosen to satisfy <code class="docutils literal notranslate"><span class="pre">N/2</span> <span class="pre">&lt;</span> <span class="pre">k</span> <span class="pre">&lt;</span> <span class="pre">N</span></code>.
+Typically, <code class="docutils literal notranslate"><span class="pre">k</span></code> is on the order of <code class="docutils literal notranslate"><span class="pre">0.75N</span></code></p></li>
 <li><p><strong>pfa</strong> (<em>float</em>) – Probability of false alarm. <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">1e-5</span></code></p></li>
 <li><p><strong>axis</strong> (<em>int</em>) – The axis to calculat CFAR. <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">0</span></code></p></li>
 <li><p><strong>offset</strong> (<em>float</em>) – CFAR threshold offset. If offect is None, threshold offset is
@@ -171,10 +176,15 @@ pp. 608-621, 1983.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<em>numpy.1darray</em><em> or </em><em>numpy.2darray</em>) – Radar data</p></li>
-<li><p><strong>guard</strong> (<em>int</em><em> or </em><em>list</em><em>[</em><em>int</em><em>]</em>) – Number of guard cells on one side, total guard cells are <code class="docutils literal notranslate"><span class="pre">2*guard</span></code></p></li>
+<li><p><strong>guard</strong> (<em>int</em><em> or </em><em>list</em><em>[</em><em>int</em><em>]</em>) – Number of guard cells on one side, total guard cells are <code class="docutils literal notranslate"><span class="pre">2*guard</span></code>.
+When <code class="docutils literal notranslate"><span class="pre">guard</span></code> is a list, <code class="docutils literal notranslate"><span class="pre">guard[0]</span></code> is for axis 0, and <code class="docutils literal notranslate"><span class="pre">guard[1]</span></code>
+is for axis 1. If <code class="docutils literal notranslate"><span class="pre">guard</span></code> is a number, axis 0 and axis 1 are the same</p></li>
 <li><p><strong>trailing</strong> (<em>int</em><em> or </em><em>list</em><em>[</em><em>int</em><em>]</em>) – Number of trailing cells on one side, total trailing cells are
-<code class="docutils literal notranslate"><span class="pre">2*trailing</span></code></p></li>
-<li><p><strong>k</strong> (<em>int</em>) – Rank in the order</p></li>
+<code class="docutils literal notranslate"><span class="pre">2*trailing</span></code>. When <code class="docutils literal notranslate"><span class="pre">trailing</span></code> is a list, <code class="docutils literal notranslate"><span class="pre">trailing[0]</span></code> is for
+axis 0, and <code class="docutils literal notranslate"><span class="pre">trailing[1]</span></code> is for axis 1. If <code class="docutils literal notranslate"><span class="pre">trailing</span></code> is a number,
+axis 0 and axis 1 are the same</p></li>
+<li><p><strong>k</strong> (<em>int</em>) – Rank in the order. <code class="docutils literal notranslate"><span class="pre">k</span></code> is usuall chosen to satisfy <code class="docutils literal notranslate"><span class="pre">N/2</span> <span class="pre">&lt;</span> <span class="pre">k</span> <span class="pre">&lt;</span> <span class="pre">N</span></code>.
+Typically, <code class="docutils literal notranslate"><span class="pre">k</span></code> is on the order of <code class="docutils literal notranslate"><span class="pre">0.75N</span></code></p></li>
 <li><p><strong>pfa</strong> (<em>float</em>) – Probability of false alarm. <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">1e-5</span></code></p></li>
 <li><p><strong>offset</strong> (<em>float</em>) – CFAR threshold offset. If offect is None, threshold offset is
 calculated from <code class="docutils literal notranslate"><span class="pre">pfa</span></code>. <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">None</span></code></p></li>
