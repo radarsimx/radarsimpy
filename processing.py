@@ -44,6 +44,7 @@
 from warnings import warn
 import numpy as np
 from scipy.signal import convolve
+from scipy import fft
 from .tools import log_factorial
 
 
@@ -72,7 +73,7 @@ def range_fft(data, rwin=None, n=None):
         rwin = np.tile(rwin[np.newaxis, np.newaxis, ...],
                        (shape[0], shape[1], 1))
 
-    return np.fft.fft(data * rwin, n=n, axis=2)
+    return fft.fft(data * rwin, n=n, axis=2)
 
 
 def doppler_fft(data, dwin=None, n=None):
@@ -100,7 +101,7 @@ def doppler_fft(data, dwin=None, n=None):
         dwin = np.tile(dwin[np.newaxis, ..., np.newaxis],
                        (shape[0], 1, shape[2]))
 
-    return np.fft.fft(data * dwin, n=n, axis=1)
+    return fft.fft(data * dwin, n=n, axis=1)
 
 
 def range_doppler_fft(data, rwin=None, dwin=None, rn=None, dn=None):
@@ -214,14 +215,14 @@ def cfar_ca_1d(data, guard, trailing, pfa=1e-5, axis=0, offset=None):
 
     if axis == 0:
         if data.ndim == 1:
-            cfar = a*np.convolve(data, cfar_win, mode='same')
+            cfar = a*convolve(data, cfar_win, mode='same')
         elif data.ndim == 2:
             for idx in range(0, data_shape[1]):
                 cfar[:, idx] = a * \
-                    np.convolve(data[:, idx], cfar_win, mode='same')
+                    convolve(data[:, idx], cfar_win, mode='same')
     elif axis == 1:
         for idx in range(0, data_shape[0]):
-            cfar[idx, :] = a*np.convolve(data[idx, :], cfar_win, mode='same')
+            cfar[idx, :] = a*convolve(data[idx, :], cfar_win, mode='same')
 
     return cfar
 
