@@ -3,13 +3,13 @@
 <a href="https://rookiepeng.github.io/radarsimpy/" target="_blank" rel="nofollow"><img src="https://img.shields.io/badge/Documentation-latest-brightgree?style=flat&logo=read-the-docs" height="20" ></a>
 [![DOI](https://zenodo.org/badge/282958664.svg)](https://zenodo.org/badge/latestdoi/282958664)
 
+**`!!! This module needs to be built/used together with RadarSimC (the C++ engine for radar simulator)`**
+
 # RadarSimPy
 
 <img src="./assets/radarsimpy.svg" alt="logo" width="200"/>
 
 A **Radar** **Sim**ulator for **Py**thon
-
-***This module needs to be built/used together with RadarSimC (the C++ engine for radar simulator)***
 
 ## Key Features
 
