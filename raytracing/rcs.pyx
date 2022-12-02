@@ -106,7 +106,7 @@ cpdef rcs_sbr(model,
 
     cdef Rcs[double] rcs
 
-    rcs = Rcs[double](Target[float](&points[0, 0], &cells[0, 0], <int_t> cells.shape[0]),
+    rcs = Rcs[double](Target[float_t](&points[0, 0], &cells[0, 0], <int_t> cells.shape[0]),
                       inc_dir,
                       obs_dir,
                       Vec3[double](<double> pol[0], <double> pol[1], <double> pol[2]),
