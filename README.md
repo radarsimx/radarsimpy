@@ -97,30 +97,30 @@ To use the module, please put the radarsimpy folder within your project folder a
 ## Usage
 
 - Radar system simulation
-  - [Doppler radar](https://zpeng.me/index.php/2019/05/16/doppler-radar/)
-  - [FMCW radar](https://zpeng.me/index.php/2018/10/11/fmcw-radar/)
-  - [TDM MIMO FMCW radar](https://zpeng.me/index.php/2019/04/07/tdm-mimo-fmcw-radar/)
-  - [PMCW radar](https://zpeng.me/index.php/2019/05/24/pmcw-radar/)
-  - [Arbitrary waveform](https://zpeng.me/index.php/2021/05/10/arbitrary-waveform/)
-  - [Phase noise](https://zpeng.me/index.php/2021/01/13/phase-noise/)
-  - [CFAR](https://zpeng.me/index.php/2021/01/10/cfar/)
+  - [Doppler radar](https://zpeng.me/2019/05/16/doppler-radar/)
+  - [FMCW radar](https://zpeng.me/2018/10/11/fmcw-radar/)
+  - [TDM MIMO FMCW radar](https://zpeng.me/2019/04/07/tdm-mimo-fmcw-radar/)
+  - [PMCW radar](https://zpeng.me/2019/05/24/pmcw-radar/)
+  - [Arbitrary waveform](https://zpeng.me/2021/05/10/arbitrary-waveform/)
+  - [Phase noise](https://zpeng.me/2021/01/13/phase-noise/)
+  - [CFAR](https://zpeng.me/2021/01/10/cfar/)
 
 - RCS simulation
-  - [Corner reflector RCS](https://zpeng.me/index.php/2021/05/10/corner-reflector-rcs/)
-  - [Plate RCS](https://zpeng.me/index.php/2021/05/10/plate-rcs/)
-  - [Car RCS](https://zpeng.me/index.php/2021/05/10/car-rcs/)
+  - [Corner reflector RCS](https://zpeng.me/2021/05/10/corner-reflector-rcs/)
+  - [Plate RCS](https://zpeng.me/2021/05/10/plate-rcs/)
+  - [Car RCS](https://zpeng.me/2021/05/10/car-rcs/)
 
 - Radar system and scene simulation with ray tracing
   - [Imaging radar](https://zpeng.me/2022/12/02/imaging-radar/)
-  - [FMCW radar with a corner reflector](https://zpeng.me/index.php/2021/05/10/fmcw-radar-with-a-corner-reflector/)
-  - [FMCW radar with a plate](https://zpeng.me/index.php/2021/05/10/fmcw-radar-with-a-plate/)
-  - [FMCW radar with a car](https://zpeng.me/index.php/2021/05/10/fmcw-radar-with-a-car/)
-  - [Doppler of a turbine](https://zpeng.me/index.php/2021/05/10/doppler-of-a-turbine/)
-  - [Micro-Doppler](https://zpeng.me/index.php/2021/05/10/micro-doppler/)
-  - [Multi-path effect](https://zpeng.me/index.php/2021/05/10/multi-path-effect/)
+  - [FMCW radar with a corner reflector](https://zpeng.me/2021/05/10/fmcw-radar-with-a-corner-reflector/)
+  - [FMCW radar with a plate](https://zpeng.me/2021/05/10/fmcw-radar-with-a-plate/)
+  - [FMCW radar with a car](https://zpeng.me/2021/05/10/fmcw-radar-with-a-car/)
+  - [Doppler of a turbine](https://zpeng.me/2021/05/10/doppler-of-a-turbine/)
+  - [Micro-Doppler](https://zpeng.me/2021/05/10/micro-doppler/)
+  - [Multi-path effect](https://zpeng.me/2021/05/10/multi-path-effect/)
 
 - LIDAR (Experimental)
-  - [LIDAR point cloud](https://zpeng.me/index.php/2020/02/05/lidar-point-cloud/)
+  - [LIDAR point cloud](https://zpeng.me/2020/02/05/lidar-point-cloud/)
 
 - Characterization
-  - [Receiver operating characteristic (ROC)](https://zpeng.me/index.php/2019/10/06/receiver-operating-characteristic/)
+  - [Receiver operating characteristic (ROC)](https://zpeng.me/2019/10/06/receiver-operating-characteristic/)
