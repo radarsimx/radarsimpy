@@ -37,7 +37,7 @@ GPU parallelization (CUDA) has been added since v6.0.0.
 | Linux   | ✅  | ✅         |
 | macOS   | ❌   | ❌          |
 
-![performance](./assets/performance.png)
+![performance](https://github.com/rookiepeng/radarsimpy/raw/master/assets/performance.png)
 
 ## Dependence
 
