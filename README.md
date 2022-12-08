@@ -23,10 +23,10 @@ A **Radar** **Sim**ulator for **Py**thon
 
 - ### Simulation
 
-  - Simulation of radar baseband data based on point targets
-  - Simulation of radar baseband data based on 3D modeled objects/environment (**`#raytracing`**)
+  - Simulation of radar baseband data from point targets
+  - Simulation of radar baseband data from 3D modeled objects/environment (**`#raytracing`**)
   - Simulation of target's RCS (**`#raytracing`**)
-  - Simulation of LiDAR point cloud based on 3D modeled objects/environment (**`#raytracing`**)
+  - Simulation of LiDAR point cloud from 3D modeled objects/environment (**`#raytracing`**)
 
 - ### Signal Processing
 
