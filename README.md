@@ -111,6 +111,8 @@ GPU parallelization (CUDA) has been added since v6.0.0.
 
 ## Usage Examples
 
+The source files of these Jupyter notebooks are available [here](https://github.com/rookiepeng/radar-notebooks).
+
 - ### Radar modeling and point target simulation
   - [Doppler radar](https://zpeng.me/2019/05/16/doppler-radar/)
   - [FMCW radar](https://zpeng.me/2018/10/11/fmcw-radar/)
