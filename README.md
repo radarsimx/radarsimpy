@@ -5,6 +5,8 @@
 
 **`!!! This module needs to be built/used together with RadarSimC (the C++ engine for radar simulator)`**
 
+**Please fill out this [form](https://zpeng.me/#contact) to request the module if you are interested in using RadarSimPy**
+
 # RadarSimPy
 
 <img src="./assets/radarsimpy.svg" alt="logo" width="200"/>
@@ -46,8 +48,6 @@ A **Radar** **Sim**ulator for **Py**thon
 - [Visual C++ Runtime](https://aka.ms/vs/16/release/vc_redist.x64.exe/) (*Windows only*)
 
 ## Installation
-
-**Please fill out this [form](https://zpeng.me/#contact) to request the module if you are interested in using RadarSimPy**
 
 To use the module, please put the radarsimpy folder within your project folder as shown below.
 
