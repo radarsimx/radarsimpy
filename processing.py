@@ -550,9 +550,10 @@ def doa_music(covmat, nsig, spacing=0.5, scanangles=np.arange(-90, 91)):
 
     pseudo_spectrum = np.zeros(scanangles.size)
     for idx, angle in enumerate(scanangles):
-        av = np.exp(1j*2*np.pi*array*np.sin(np.radians(angle))) / \
+        steering_vect = np.exp(1j*2*np.pi*array*np.sin(np.radians(angle))) / \
             np.sqrt(N_array)
-        pseudo_spectrum[idx] = 1/linalg.norm((Qn.conj().transpose()@av))
+        pseudo_spectrum[idx] = 1 / \
+            linalg.norm((Qn.conj().transpose()@steering_vect))
 
     ps_db = 10*np.log10(pseudo_spectrum/pseudo_spectrum.min())
     doa_idx, _ = find_peaks(ps_db, height=1.35, distance=1.5)
