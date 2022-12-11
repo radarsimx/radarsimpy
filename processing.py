@@ -43,7 +43,8 @@
 
 from warnings import warn
 import numpy as np
-from scipy.signal import convolve
+from scipy.signal import convolve, find_peaks
+from scipy import linalg
 from scipy import fft
 from .tools import log_factorial
 
@@ -516,3 +517,73 @@ def cfar_os_2d(
             cfar[idx_0, idx_1] = a*samples[k]
 
     return cfar
+
+
+def doa_music(covmat, nsig, spacing=0.5, scanangles=np.arange(-90, 91)):
+    """
+    Estimate arrival directions of signals using MUSIC for a uniform linear
+    array (ULA)
+
+    :param numpy.2darray covmat:
+        Sensor covariance matrix, specified as a complex-valued, positive-
+        definite M-by-M matrix. The quantity M is the number of elements
+        in the ULA array
+    :param int nsig:
+        Number of arriving signals, specified as a positive integer. The
+        number of signals must be smaller than the number of elements in
+        the ULA array
+    :param float spacing:
+        Distance (wavelength) between array elements. ``default 0.5``
+    :param numpy.1darray scanangles:
+        Broadside search angles, specified as a real-valued vector in degrees.
+        Angles must lie in the range [-90°,90°] and must be in increasing
+        order. ``default [-90°,90°] ``
+
+    :return: doa angles in degrees, doa index, pseudo spectrum (dB)
+    :rtype: list, list, numpy.1darray
+    """
+    N_array = np.shape(covmat)[0]
+    array = np.linspace(0, (N_array-1)*spacing, N_array)
+
+    _, V = linalg.eig(covmat)
+    Qn = V[:, nsig:]
+
+    pseudo_spectrum = np.zeros(scanangles.size)
+    for idx, angle in enumerate(scanangles):
+        av = np.exp(1j*2*np.pi*array*np.sin(np.radians(angle))) / \
+            np.sqrt(N_array)
+        pseudo_spectrum[idx] = 1/linalg.norm((Qn.conj().transpose()@av))
+
+    ps_db = np.log10(10*pseudo_spectrum/pseudo_spectrum.min())
+    doa_idx, _ = find_peaks(ps_db, height=1.35, distance=1.5)
+    return scanangles[doa_idx], doa_idx, ps_db
+
+
+def doa_esprit(covmat, nsig, spacing=0.5):
+    """
+    Estimate arrival directions of signals using MUSIC for a uniform linear
+    array (ULA)
+
+    :param numpy.2darray covmat:
+        Sensor covariance matrix, specified as a complex-valued, positive-
+        definite M-by-M matrix. The quantity M is the number of elements
+        in the ULA array
+    :param int nsig:
+        Number of arriving signals, specified as a positive integer. The
+        number of signals must be smaller than the number of elements in
+        the ULA array
+    :param float spacing:
+        Distance (wavelength) between array elements. ``default 0.5``
+
+    :return: doa angles in degrees
+    :rtype: list
+    """
+
+    _, V = linalg.eig(covmat)
+    S = V[:, 0:nsig]
+
+    # the original array is divided into two subarrays
+    # [0,1,...,N-2] and [1,2,...,N-1]
+    Phi = linalg.pinv(S[0:-1]) @ S[1:]
+    eigs, _ = linalg.eig(Phi)
+    return np.degrees(np.arcsin(np.angle(eigs)/np.pi/(spacing/0.5)))
