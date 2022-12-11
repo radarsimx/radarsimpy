@@ -554,7 +554,7 @@ def doa_music(covmat, nsig, spacing=0.5, scanangles=np.arange(-90, 91)):
             np.sqrt(N_array)
         pseudo_spectrum[idx] = 1/linalg.norm((Qn.conj().transpose()@av))
 
-    ps_db = np.log10(10*pseudo_spectrum/pseudo_spectrum.min())
+    ps_db = 10*np.log10(pseudo_spectrum/pseudo_spectrum.min())
     doa_idx, _ = find_peaks(ps_db, height=1.35, distance=1.5)
     return scanangles[doa_idx], doa_idx, ps_db
 
