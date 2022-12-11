@@ -561,7 +561,7 @@ def doa_music(covmat, nsig, spacing=0.5, scanangles=np.arange(-90, 91)):
 
 def doa_esprit(covmat, nsig, spacing=0.5):
     """
-    Estimate arrival directions of signals using MUSIC for a uniform linear
+    Estimate arrival directions of signals using Esprit for a uniform linear
     array (ULA)
 
     :param numpy.2darray covmat:
