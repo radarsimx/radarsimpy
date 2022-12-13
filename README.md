@@ -33,6 +33,8 @@ A **Radar** **Sim**ulator for **Py**thon
 - ### Signal Processing
 
   - Range/Doppler processing
+  - MUltiple SIgnal Classication (MUSIC) DoA estimation for a uniform linear array
+  - Estimation of Signal Parameters via Rational Invariance Techniques (ESPRIT) DoA estimation for a uniform linear array
   - 1D/2D cell-averaging CFAR (CA-CFAR)
   - 1D/2D ordered-statistic CFAR (OS-CFAR)
 
@@ -121,6 +123,7 @@ The source files of these Jupyter notebooks are available [here](https://github.
   - [Arbitrary waveform](https://zpeng.me/2021/05/10/arbitrary-waveform/)
   - [Phase noise](https://zpeng.me/2021/01/13/phase-noise/)
   - [CFAR](https://zpeng.me/2021/01/10/cfar/)
+  - [DoA estimation](https://zpeng.me/2022/12/12/doa-estimation/)
 
 - ### Radar modeling and 3D scene simulation with raytracing
   - [Imaging radar](https://zpeng.me/2022/12/02/imaging-radar/)

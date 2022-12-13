@@ -556,13 +556,15 @@ def doa_music(covmat, nsig, spacing=0.5, scanangles=np.arange(-90, 91)):
             linalg.norm((Qn.conj().transpose()@steering_vect))
 
     ps_db = 10*np.log10(pseudo_spectrum/pseudo_spectrum.min())
-    doa_idx, _ = find_peaks(ps_db, height=1.35, distance=1.5)
+    doa_idx, _ = find_peaks(ps_db)
+    doa_idx = doa_idx[np.argsort(ps_db[doa_idx])[-nsig:]]
+
     return scanangles[doa_idx], doa_idx, ps_db
 
 
 def doa_esprit(covmat, nsig, spacing=0.5):
     """
-    Estimate arrival directions of signals using Esprit for a uniform linear
+    Estimate arrival directions of signals using ESPRIT for a uniform linear
     array (ULA)
 
     :param numpy.2darray covmat:
