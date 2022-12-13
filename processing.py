@@ -546,8 +546,13 @@ def doa_music(covmat, nsig, spacing=0.5, scanangles=range(-90, 91)):
     array = np.linspace(0, (N_array-1)*spacing, N_array)
     scanangles = np.array(scanangles)
 
-    _, V = linalg.eig(covmat)
-    Qn = V[:, nsig:]
+    eig_vals, eig_vects = linalg.eig(covmat)
+
+    # Sort the eigenvalues in decreasing order
+    idx = np.argsort(eig_vals)[::-1]
+    # eig_vals = eig_vals[idx]
+    eig_vects = eig_vects[:, idx]
+    Qn = eig_vects[:, nsig:]
 
     pseudo_spectrum = np.zeros(scanangles.size)
     for idx, angle in enumerate(scanangles):
