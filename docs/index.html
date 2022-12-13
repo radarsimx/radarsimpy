@@ -16,6 +16,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -65,8 +66,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
-      <li>Welcome to RadarSimPy’s documentation!</li>
+      <li><a href="#" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">Welcome to RadarSimPy’s documentation!</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -99,10 +100,35 @@
 <li class="toctree-l2"><a class="reference internal" href="radar.html#radarsimpy-radar">radarsimpy.Radar</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="sim.html">Simulator</a></li>
-<li class="toctree-l1"><a class="reference internal" href="rt.html">Raytracing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="process.html">Processing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sim.html">Simulator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sim.html#radarsimpy.simulator.simc"><code class="docutils literal notranslate"><span class="pre">simc()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="sim.html#radarsimpy.simulator.simpy"><code class="docutils literal notranslate"><span class="pre">simpy()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rt.html">Raytracing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rt.html#radarsimpy.rt.lidar_scene"><code class="docutils literal notranslate"><span class="pre">lidar_scene()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rt.html#radarsimpy.rt.rcs_sbr"><code class="docutils literal notranslate"><span class="pre">rcs_sbr()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rt.html#radarsimpy.rt.scene"><code class="docutils literal notranslate"><span class="pre">scene()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="process.html">Processing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="process.html#radarsimpy.processing.cfar_ca_1d"><code class="docutils literal notranslate"><span class="pre">cfar_ca_1d()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="process.html#radarsimpy.processing.cfar_ca_2d"><code class="docutils literal notranslate"><span class="pre">cfar_ca_2d()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="process.html#radarsimpy.processing.cfar_os_1d"><code class="docutils literal notranslate"><span class="pre">cfar_os_1d()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="process.html#radarsimpy.processing.cfar_os_2d"><code class="docutils literal notranslate"><span class="pre">cfar_os_2d()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="process.html#radarsimpy.processing.doa_esprit"><code class="docutils literal notranslate"><span class="pre">doa_esprit()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="process.html#radarsimpy.processing.doa_music"><code class="docutils literal notranslate"><span class="pre">doa_music()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="process.html#radarsimpy.processing.doppler_fft"><code class="docutils literal notranslate"><span class="pre">doppler_fft()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="process.html#radarsimpy.processing.get_polar_image"><code class="docutils literal notranslate"><span class="pre">get_polar_image()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="process.html#radarsimpy.processing.range_doppler_fft"><code class="docutils literal notranslate"><span class="pre">range_doppler_fft()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="process.html#radarsimpy.processing.range_fft"><code class="docutils literal notranslate"><span class="pre">range_fft()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Tools</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tools.html#radarsimpy.tools.roc_pd"><code class="docutils literal notranslate"><span class="pre">roc_pd()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tools.html#radarsimpy.tools.roc_snr"><code class="docutils literal notranslate"><span class="pre">roc_snr()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </div>
 </section>
