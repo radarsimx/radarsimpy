@@ -519,7 +519,7 @@ def cfar_os_2d(
     return cfar
 
 
-def doa_music(covmat, nsig, spacing=0.5, scanangles=np.arange(-90, 91)):
+def doa_music(covmat, nsig, spacing=0.5, scanangles=range(-90, 91)):
     """
     Estimate arrival directions of signals using MUSIC for a uniform linear
     array (ULA)
@@ -544,6 +544,7 @@ def doa_music(covmat, nsig, spacing=0.5, scanangles=np.arange(-90, 91)):
     """
     N_array = np.shape(covmat)[0]
     array = np.linspace(0, (N_array-1)*spacing, N_array)
+    scanangles = np.array(scanangles)
 
     _, V = linalg.eig(covmat)
     Qn = V[:, nsig:]
