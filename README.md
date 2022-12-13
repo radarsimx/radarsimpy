@@ -166,6 +166,8 @@ The source files of these Jupyter notebooks are available [here](https://github.
   - [`radarsimpy.processing.cfar_ca_2d`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.cfar_ca_2d): 2D Cell Averaging CFAR (CA-CFAR)
   - [`radarsimpy.processing.cfar_os_1d`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.cfar_os_1d): 1D Ordered Statistic CFAR (OS-CFAR)
   - [`radarsimpy.processing.cfar_os_2d`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.cfar_os_2d): 2D Ordered Statistic CFAR (OS-CFAR)
+  - [`radarsimpy.processing.doa_music`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.doa_music): Estimate arrival directions of signals using MUSIC for a uniform linear array (ULA)
+  - [`radarsimpy.processing.doa_esprit`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.doa_esprit): Estimate arrival directions of signals using ESPRIT for a uniform linear array (ULA)
 - **Tools**: Receiver operating characteristic analysis
   - [`radarsimpy.tools.roc_pd`](https://rookiepeng.github.io/radarsimpy/tools.html#radarsimpy.tools.roc_pd): Calculate probability of detection (Pd) in receiver operating characteristic (ROC)
   - [`radarsimpy.tools.roc_snr`](https://rookiepeng.github.io/radarsimpy/tools.html#radarsimpy.tools.roc_snr): Calculate the minimal SNR for certain probability of detection (Pd) and probability of false alarm (Pfa) in receiver operating characteristic (ROC)
