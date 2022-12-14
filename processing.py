@@ -595,11 +595,12 @@ def doa_root_music(covmat, nsig, spacing=0.5):
 
     noise_subspace = eig_vecs_sorted[:, nsig:]
 
+    # Compute the coefficients for the polynomial.
     C = noise_subspace @ noise_subspace.T.conj()
     coeff = np.zeros((N - 1,), dtype=np.complex_)
     for i in range(1, N):
-        coeff[i - 1] += np.sum(np.diag(C, i))
-    coeff = np.hstack((coeff[::-1], np.sum(np.diag(C)), coeff.conj()))
+        coeff[i - 1] = np.trace(C, i)
+    coeff = np.hstack((coeff[::-1], np.trace(C), coeff.conj()))
 
     z = np.roots(coeff)
 
