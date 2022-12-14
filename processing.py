@@ -546,7 +546,7 @@ def doa_music(covmat, nsig, spacing=0.5, scanangles=range(-90, 91)):
     array = np.linspace(0, (N_array-1)*spacing, N_array)
     scanangles = np.array(scanangles)
 
-    # eigh gaurantee the eig vals are sorted
+    # `eigh` guarantees the eigen values are sorted
     _, eig_vects = linalg.eigh(covmat)
     Qn = eig_vects[:, :-nsig]
 
