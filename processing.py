@@ -642,3 +642,20 @@ def doa_esprit(covmat, nsig, spacing=0.5):
     Phi = linalg.pinv(S[0:-1]) @ S[1:]
     eigs, _ = linalg.eig(Phi)
     return np.degrees(np.arcsin(np.angle(eigs)/np.pi/(spacing/0.5)))
+
+
+def doa_bartlett(covmat, spacing=0.5, scanangles=range(-90, 91)):
+    N_array = np.shape(covmat)[0]
+    array = np.linspace(0, (N_array-1)*spacing, N_array)
+    scanangles = np.array(scanangles)
+
+    array_grid, angle_grid = np.meshgrid(
+        array, np.radians(scanangles), indexing='ij')
+    steering_vect = np.exp(1j*2*np.pi*array_grid *
+                           np.sin(angle_grid)) / np.sqrt(N_array)
+
+    ps = np.sum(steering_vect.conj() * (covmat @ steering_vect), axis=0).real
+
+    doa_idx, _ = find_peaks(ps, height=np.mean(ps)*5)
+
+    return scanangles[doa_idx], doa_idx, ps
