@@ -605,32 +605,14 @@ def doa_root_music(covmat, nsig, spacing=0.5):
 
     # Find k points inside the unit circle that are also closest to the unit
     # circle.
-    nz = len(z)
-    mask = np.ones((nz,), dtype=np.bool_)
-    for i in range(nz):
-        absz = abs(z[i])
-        if absz > 1.0:
-            # Outside the unit circle.
-            mask[i] = False
-        elif absz == 1.0:
-            # On the unit circle. Need to find the closest point and remove
-            # it.
-            idx = -1
-            dist = np.inf
-            for j in range(nz):
-                if j != i and mask[j]:
-                    cur_dist = abs(z[i] - z[j])
-                    if cur_dist < dist:
-                        dist = cur_dist
-                        idx = j
-            if idx < 0:
-                raise RuntimeError(
-                    'Unpaired point found on the unit circle, ' +
-                    'which is impossible.')
-            mask[idx] = False
+    mask = np.abs(z) <= 1
+    # On the unit circle. Need to find the closest point and remove it.
+    for _, i in enumerate(np.where(np.abs(z) == 1)[0]):
+        idx = np.argsort(np.abs(z-z[i]))[1]
+        mask[idx] = False
+
     z = z[mask]
     sorted_indices = np.argsort(1.0 - np.abs(z))
-
     sin_vals = np.angle(z[sorted_indices[:nsig]]) / (2 * np.pi * spacing)
 
     return np.degrees(np.arcsin(sin_vals))
