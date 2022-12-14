@@ -546,13 +546,9 @@ def doa_music(covmat, nsig, spacing=0.5, scanangles=range(-90, 91)):
     array = np.linspace(0, (N_array-1)*spacing, N_array)
     scanangles = np.array(scanangles)
 
-    eig_vals, eig_vects = linalg.eig(covmat)
-
-    # Sort the eigenvalues in decreasing order
-    idx = np.argsort(eig_vals)[::-1]
-    # eig_vals = eig_vals[idx]
-    eig_vects = eig_vects[:, idx]
-    Qn = eig_vects[:, nsig:]
+    # eigh gaurantee the eig vals are sorted
+    _, eig_vects = linalg.eigh(covmat)
+    Qn = eig_vects[:, :-nsig]
 
     pseudo_spectrum = np.zeros(scanangles.size)
     for idx, angle in enumerate(scanangles):
@@ -590,10 +586,8 @@ def doa_root_music(covmat, nsig, spacing=0.5):
 
     N = np.shape(covmat)[0]
 
-    eigenvalues, eigenvectors = linalg.eig(covmat)
-    eig_vecs_sorted = eigenvectors[:, eigenvalues.argsort()[::-1]]
-
-    noise_subspace = eig_vecs_sorted[:, nsig:]
+    _, eigenvectors = linalg.eigh(covmat)
+    noise_subspace = eigenvectors[:, :-nsig]
 
     # Compute the coefficients for the polynomial.
     C = noise_subspace @ noise_subspace.T.conj()
@@ -639,8 +633,8 @@ def doa_esprit(covmat, nsig, spacing=0.5):
     :rtype: list
     """
 
-    _, V = linalg.eig(covmat)
-    S = V[:, 0:nsig]
+    _, V = linalg.eigh(covmat)
+    S = V[:, -nsig:]
 
     # the original array is divided into two subarrays
     # [0,1,...,N-2] and [1,2,...,N-1]
