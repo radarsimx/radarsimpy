@@ -568,6 +568,74 @@ def doa_music(covmat, nsig, spacing=0.5, scanangles=range(-90, 91)):
     return scanangles[doa_idx], doa_idx, ps_db
 
 
+def doa_root_music(covmat, nsig, spacing=0.5):
+    """
+    Estimate arrival directions of signals using root-MUSIC for a uniform
+    linear array (ULA)
+
+    :param numpy.2darray covmat:
+        Sensor covariance matrix, specified as a complex-valued, positive-
+        definite M-by-M matrix. The quantity M is the number of elements
+        in the ULA array
+    :param int nsig:
+        Number of arriving signals, specified as a positive integer. The
+        number of signals must be smaller than the number of elements in
+        the ULA array
+    :param float spacing:
+        Distance (wavelength) between array elements. ``default 0.5``
+
+    :return: doa angles in degrees
+    :rtype: list
+    """
+
+    N = np.shape(covmat)[0]
+
+    eigenvalues, eigenvectors = linalg.eig(covmat)
+    eig_vecs_sorted = eigenvectors[:, eigenvalues.argsort()[::-1]]
+
+    noise_subspace = eig_vecs_sorted[:, nsig:]
+
+    C = noise_subspace @ noise_subspace.T.conj()
+    coeff = np.zeros((N - 1,), dtype=np.complex_)
+    for i in range(1, N):
+        coeff[i - 1] += np.sum(np.diag(C, i))
+    coeff = np.hstack((coeff[::-1], np.sum(np.diag(C)), coeff.conj()))
+
+    z = np.roots(coeff)
+
+    # Find k points inside the unit circle that are also closest to the unit
+    # circle.
+    nz = len(z)
+    mask = np.ones((nz,), dtype=np.bool_)
+    for i in range(nz):
+        absz = abs(z[i])
+        if absz > 1.0:
+            # Outside the unit circle.
+            mask[i] = False
+        elif absz == 1.0:
+            # On the unit circle. Need to find the closest point and remove
+            # it.
+            idx = -1
+            dist = np.inf
+            for j in range(nz):
+                if j != i and mask[j]:
+                    cur_dist = abs(z[i] - z[j])
+                    if cur_dist < dist:
+                        dist = cur_dist
+                        idx = j
+            if idx < 0:
+                raise RuntimeError(
+                    'Unpaired point found on the unit circle, ' +
+                    'which is impossible.')
+            mask[idx] = False
+    z = z[mask]
+    sorted_indices = np.argsort(1.0 - np.abs(z))
+
+    sin_vals = np.angle(z[sorted_indices[:nsig]]) / (2 * np.pi * spacing)
+
+    return np.degrees(np.arcsin(sin_vals))
+
+
 def doa_esprit(covmat, nsig, spacing=0.5):
     """
     Estimate arrival directions of signals using ESPRIT for a uniform linear
