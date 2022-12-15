@@ -645,6 +645,24 @@ def doa_esprit(covmat, nsig, spacing=0.5):
 
 
 def doa_bartlett(covmat, spacing=0.5, scanangles=range(-90, 91)):
+    """
+    Bartlett beamforming for a uniform linear array (ULA)
+
+    :param numpy.2darray covmat:
+        Sensor covariance matrix, specified as a complex-valued, positive-
+        definite M-by-M matrix. The quantity M is the number of elements
+        in the ULA array
+    :param float spacing:
+        Distance (wavelength) between array elements. ``default 0.5``
+    :param numpy.1darray scanangles:
+        Broadside search angles, specified as a real-valued vector in degrees.
+        Angles must lie in the range [-90°,90°] and must be in increasing
+        order. ``default [-90°,90°] ``
+
+    :return: spectrum in dB
+    :rtype: numpy.1darray
+    """
+
     N_array = np.shape(covmat)[0]
     array = np.linspace(0, (N_array-1)*spacing, N_array)
     scanangles = np.array(scanangles)
@@ -656,12 +674,28 @@ def doa_bartlett(covmat, spacing=0.5, scanangles=range(-90, 91)):
 
     ps = np.sum(steering_vect.conj() * (covmat @ steering_vect), axis=0).real
 
-    doa_idx, _ = find_peaks(ps, height=np.mean(ps)*5)
-
-    return scanangles[doa_idx], doa_idx, 20*np.log10(ps)
+    return 10*np.log10(ps)
 
 
 def doa_capon(covmat, spacing=0.5, scanangles=range(-90, 91)):
+    """
+    Capon (MVDR) beamforming for a uniform linear array (ULA)
+
+    :param numpy.2darray covmat:
+        Sensor covariance matrix, specified as a complex-valued, positive-
+        definite M-by-M matrix. The quantity M is the number of elements
+        in the ULA array
+    :param float spacing:
+        Distance (wavelength) between array elements. ``default 0.5``
+    :param numpy.1darray scanangles:
+        Broadside search angles, specified as a real-valued vector in degrees.
+        Angles must lie in the range [-90°,90°] and must be in increasing
+        order. ``default [-90°,90°] ``
+
+    :return: spectrum in dB
+    :rtype: numpy.1darray
+    """
+
     N_array = np.shape(covmat)[0]
     array = np.linspace(0, (N_array-1)*spacing, N_array)
     scanangles = np.array(range(-90, 91))
@@ -669,17 +703,16 @@ def doa_capon(covmat, spacing=0.5, scanangles=range(-90, 91)):
     array_grid, angle_grid = np.meshgrid(
         array, np.radians(scanangles), indexing='ij')
     steering_vect = np.exp(1j*2*np.pi*array_grid *
-                            np.sin(angle_grid))
+                           np.sin(angle_grid)) / np.sqrt(N_array)
 
     inv_covmat = linalg.pinv(covmat)
 
     MVDR = np.zeros(scanangles.shape)
     for idx, _ in enumerate(scanangles):
         SS = steering_vect[:, idx]
-        SS = SS[..., np.newaxis]
 
         a = inv_covmat@SS/(SS.conj().transpose()@inv_covmat@SS)
         PP = a.conj().transpose()@covmat@a
         MVDR[idx] = np.abs(PP)
 
-    return MVDR
+    return 10*np.log10(MVDR)
