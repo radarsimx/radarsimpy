@@ -658,4 +658,28 @@ def doa_bartlett(covmat, spacing=0.5, scanangles=range(-90, 91)):
 
     doa_idx, _ = find_peaks(ps, height=np.mean(ps)*5)
 
-    return scanangles[doa_idx], doa_idx, ps
+    return scanangles[doa_idx], doa_idx, 20*np.log10(ps)
+
+
+def doa_capon(covmat, spacing=0.5, scanangles=range(-90, 91)):
+    N_array = np.shape(covmat)[0]
+    array = np.linspace(0, (N_array-1)*spacing, N_array)
+    scanangles = np.array(range(-90, 91))
+
+    array_grid, angle_grid = np.meshgrid(
+        array, np.radians(scanangles), indexing='ij')
+    steering_vect = np.exp(1j*2*np.pi*array_grid *
+                            np.sin(angle_grid))
+
+    inv_covmat = linalg.pinv(covmat)
+
+    MVDR = np.zeros(scanangles.shape)
+    for idx, _ in enumerate(scanangles):
+        SS = steering_vect[:, idx]
+        SS = SS[..., np.newaxis]
+
+        a = inv_covmat@SS/(SS.conj().transpose()@inv_covmat@SS)
+        PP = a.conj().transpose()@covmat@a
+        MVDR[idx] = np.abs(PP)
+
+    return MVDR
