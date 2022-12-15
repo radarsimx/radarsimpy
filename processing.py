@@ -705,6 +705,7 @@ def doa_capon(covmat, spacing=0.5, scanangles=range(-90, 91)):
     steering_vect = np.exp(1j*2*np.pi*array_grid *
                            np.sin(angle_grid)) / np.sqrt(N_array)
 
+    covmat = covmat + np.eye(N_array)*0.000000001
     inv_covmat = linalg.pinv(covmat)
 
     ps = np.zeros(scanangles.shape)
