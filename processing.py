@@ -548,7 +548,7 @@ def doa_music(covmat, nsig, spacing=0.5, scanangles=range(-90, 91)):
 
     # `eigh` guarantees the eigen values are sorted
     _, eig_vects = linalg.eigh(covmat)
-    Qn = eig_vects[:, :-nsig]
+    noise_subspace = eig_vects[:, :-nsig]
 
     array_grid, angle_grid = np.meshgrid(
         array, np.radians(scanangles), indexing='ij')
@@ -556,7 +556,7 @@ def doa_music(covmat, nsig, spacing=0.5, scanangles=range(-90, 91)):
                            np.sin(angle_grid)) / np.sqrt(N_array)
 
     pseudo_spectrum = 1 / \
-        linalg.norm((Qn.conj().transpose()@steering_vect), axis=0)
+        linalg.norm((noise_subspace.T.conj() @ steering_vect), axis=0)
 
     ps_db = 10*np.log10(pseudo_spectrum/pseudo_spectrum.min())
     doa_idx, _ = find_peaks(ps_db)
@@ -587,8 +587,8 @@ def doa_root_music(covmat, nsig, spacing=0.5):
 
     N = np.shape(covmat)[0]
 
-    _, eigenvectors = linalg.eigh(covmat)
-    noise_subspace = eigenvectors[:, :-nsig]
+    _, eig_vects = linalg.eigh(covmat)
+    noise_subspace = eig_vects[:, :-nsig]
 
     # Compute the coefficients for the polynomial.
     C = noise_subspace @ noise_subspace.T.conj()
@@ -597,19 +597,19 @@ def doa_root_music(covmat, nsig, spacing=0.5):
         coeff[i - 1] = np.trace(C, i)
     coeff = np.hstack((coeff[::-1], np.trace(C), coeff.conj()))
 
-    z = np.roots(coeff)
+    roots = np.roots(coeff)
 
     # Find k points inside the unit circle that are also closest to the unit
     # circle.
-    mask = np.abs(z) <= 1
+    mask = np.abs(roots) <= 1
     # On the unit circle. Need to find the closest point and remove it.
-    for _, i in enumerate(np.where(np.abs(z) == 1)[0]):
-        idx = np.argsort(np.abs(z-z[i]))[1]
-        mask[idx] = False
+    for _, i in enumerate(np.where(np.abs(roots) == 1)[0]):
+        mask_idx = np.argsort(np.abs(roots-roots[i]))[1]
+        mask[mask_idx] = False
 
-    z = z[mask]
-    sorted_indices = np.argsort(1.0 - np.abs(z))
-    sin_vals = np.angle(z[sorted_indices[:nsig]]) / (2 * np.pi * spacing)
+    roots = roots[mask]
+    sorted_indices = np.argsort(1.0 - np.abs(roots))
+    sin_vals = np.angle(roots[sorted_indices[:nsig]]) / (2 * np.pi * spacing)
 
     return np.degrees(np.arcsin(sin_vals))
 
@@ -634,13 +634,13 @@ def doa_esprit(covmat, nsig, spacing=0.5):
     :rtype: list
     """
 
-    _, V = linalg.eigh(covmat)
-    S = V[:, -nsig:]
+    _, eig_vects = linalg.eigh(covmat)
+    signal_subspace = eig_vects[:, -nsig:]
 
     # the original array is divided into two subarrays
     # [0,1,...,N-2] and [1,2,...,N-1]
-    Phi = linalg.pinv(S[0:-1]) @ S[1:]
-    eigs, _ = linalg.eig(Phi)
+    Phi = linalg.pinv(signal_subspace[0:-1]) @ signal_subspace[1:]
+    eigs = linalg.eigvals(Phi)
     return np.degrees(np.arcsin(np.angle(eigs)/np.pi/(spacing/0.5)))
 
 
@@ -698,7 +698,7 @@ def doa_capon(covmat, spacing=0.5, scanangles=range(-90, 91)):
 
     N_array = np.shape(covmat)[0]
     array = np.linspace(0, (N_array-1)*spacing, N_array)
-    scanangles = np.array(range(-90, 91))
+    scanangles = np.array(scanangles)
 
     array_grid, angle_grid = np.meshgrid(
         array, np.radians(scanangles), indexing='ij')
@@ -707,12 +707,12 @@ def doa_capon(covmat, spacing=0.5, scanangles=range(-90, 91)):
 
     inv_covmat = linalg.pinv(covmat)
 
-    MVDR = np.zeros(scanangles.shape)
+    ps = np.zeros(scanangles.shape)
     for idx, _ in enumerate(scanangles):
-        SS = steering_vect[:, idx]
+        s_vect = steering_vect[:, idx]
 
-        a = inv_covmat@SS/(SS.conj().transpose()@inv_covmat@SS)
-        PP = a.conj().transpose()@covmat@a
-        MVDR[idx] = np.abs(PP)
+        weight = inv_covmat @ s_vect / \
+            (s_vect.T.conj() @ inv_covmat @ s_vect)
+        ps[idx] = np.abs(weight.T.conj() @ covmat @ weight)
 
-    return 10*np.log10(MVDR)
+    return 10*np.log10(ps)
