@@ -5,7 +5,7 @@
 
 **`!!! This module needs to be built/used together with RadarSimC (the C++ engine for radar simulator)`**
 
-**Please fill out this [form](https://zpeng.me/#contact) to request the module**
+**Please fill out this [form](https://zpeng.me/#contact) to request the module if you are interested in using RadarSimPy**
 
 # RadarSimPy
 
@@ -33,9 +33,9 @@ A **Radar** **Sim**ulator for **Py**thon
 - ### Signal Processing
 
   - Range/Doppler processing
-  - MUltiple SIgnal Classication (MUSIC) DoA estimation for a uniform linear array
-  - Root-MUSIC DoA estimation for a uniform linear array
-  - Estimation of Signal Parameters via Rational Invariance Techniques (ESPRIT) DoA estimation for a uniform linear array
+  - MUltiple SIgnal Classication (MUSIC) DoA estimation for a uniform linear array (ULA)
+  - Root-MUSIC DoA estimation for a ULA
+  - Estimation of Signal Parameters via Rational Invariance Techniques (ESPRIT) DoA estimation for a ULA
   - Capon beamformer
   - Bartlett beamformer
   - 1D/2D cell-averaging CFAR (CA-CFAR)
@@ -50,7 +50,7 @@ A **Radar** **Sim**ulator for **Py**thon
 - numpy
 - scipy
 - meshio
-- [Visual C++ Runtime](https://aka.ms/vs/16/release/vc_redist.x64.exe/) (*Windows only*)
+- [Visual C++ Runtime](https://aka.ms/vs/16/release/vc_redist.x64.exe/) (`Windows`)
 
 ## Installation
 
@@ -99,17 +99,17 @@ GPU parallelization (CUDA) has been added since v6.0.0.
 - ### Scene Coordinate
 
   - axis (m): `[x, y, z]`
-  - phi (deg): angle on x-y plane. Positive x-axis is 0 deg, positive y-axis is 90 deg
-  - theta (deg): angle on z-x plane. Positive z-axis is 0 deg, x-y plane is 90 deg
+  - phi (deg): angle on the x-y plane. 0 deg is the positive x-axis, 90 deg is the positive y-axis
+  - theta (deg): angle on the z-x plane. 0 deg is the positive z-axis, 90 deg is the x-y plane
   - azimuth (deg): azimuth -90 ~ 90 deg equal to phi -90 ~ 90 deg
   - elevation (deg): elevation -90 ~ 90 deg equal to theta 180 ~ 0 deg
 
 - ### Object's Local Coordinate
 
   - axis (m): `[x, y, z]`
-  - yaw (deg): rotation along z-axis. Positive yaw rotates object from positive x-axis to positive y-axis
-  - pitch (deg): rotation along y-axis. Positive pitch rotates object from positive x-axis to positive z-axis
-  - roll (deg): rotation along x-axis. Positive roll rotates object from positive z-axis to negative y-axis
+  - yaw (deg): rotation along the z-axis. Positive yaw rotates the object from the positive x-axis to the positive y-axis
+  - pitch (deg): rotation along the y-axis. Positive pitch rotates the object from the positive x-axis to the positive z-axis
+  - roll (deg): rotation along the x-axis. Positive roll rotates the object from the positive z-axis to the negative y-axis
   - origin (m): `[x, y, z]`
   - rotation (deg): `[yaw, pitch, roll]`
   - rotation (deg/s): rate `[yaw rate, pitch rate, roll rate]`
@@ -119,6 +119,7 @@ GPU parallelization (CUDA) has been added since v6.0.0.
 The source files of these Jupyter notebooks are available [here](https://github.com/rookiepeng/radar-notebooks).
 
 - ### Radar modeling and point target simulation
+
   - [Doppler radar](https://zpeng.me/2019/05/16/doppler-radar/)
   - [FMCW radar](https://zpeng.me/2018/10/11/fmcw-radar/)
   - [TDM MIMO FMCW radar](https://zpeng.me/2019/04/07/tdm-mimo-fmcw-radar/)
@@ -129,6 +130,7 @@ The source files of these Jupyter notebooks are available [here](https://github.
   - [DoA estimation](https://zpeng.me/2022/12/12/doa-estimation/)
 
 - ### Radar modeling and 3D scene simulation with raytracing
+
   - [Imaging radar](https://zpeng.me/2022/12/02/imaging-radar/)
   - [FMCW radar with a corner reflector](https://zpeng.me/2021/05/10/fmcw-radar-with-a-corner-reflector/)
   - [FMCW radar with a plate](https://zpeng.me/2021/05/10/fmcw-radar-with-a-plate/)
@@ -138,30 +140,40 @@ The source files of these Jupyter notebooks are available [here](https://github.
   - [Multi-path effect](https://zpeng.me/2021/05/10/multi-path-effect/)
 
 - ### 3D modeled target's RCS simulation
+
   - [Corner reflector RCS](https://zpeng.me/2021/05/10/corner-reflector-rcs/)
   - [Plate RCS](https://zpeng.me/2021/05/10/plate-rcs/)
   - [Car RCS](https://zpeng.me/2021/05/10/car-rcs/)
 
 - ### LiDAR point cloud
+
   - [LIDAR point cloud](https://zpeng.me/2020/02/05/lidar-point-cloud/)
 
 - ### Characterization
+
   - [Receiver operating characteristic (ROC)](https://zpeng.me/2019/10/06/receiver-operating-characteristic/)
 
 ## API Reference
 
 - **Radar Model**: Classes to define a radar system
-   - [`radarsimpy.Transmitter`](https://rookiepeng.github.io/radarsimpy/radar.html#radarsimpy-transmitter): Radar transmitter
-   - [`radarsimpy.Receiver`](https://rookiepeng.github.io/radarsimpy/radar.html#radarsimpy-receiver): Radar receiver
-   - [`radarsimpy.Radar`](https://rookiepeng.github.io/radarsimpy/radar.html#radarsimpy-radar): Radar system
+
+  - [`radarsimpy.Transmitter`](https://rookiepeng.github.io/radarsimpy/radar.html#radarsimpy-transmitter): Radar transmitter
+  - [`radarsimpy.Receiver`](https://rookiepeng.github.io/radarsimpy/radar.html#radarsimpy-receiver): Radar receiver
+  - [`radarsimpy.Radar`](https://rookiepeng.github.io/radarsimpy/radar.html#radarsimpy-radar): Radar system
+
 - **Simulator**: Radar baseband signal simulator
-   - [`radarsimpy.simulator.simpy`](https://rookiepeng.github.io/radarsimpy/sim.html#radarsimpy.simulator.simpy): Simulates and generates raw time domain baseband data (Python engine)
-   - [`radarsimpy.simulator.simc`](https://rookiepeng.github.io/radarsimpy/sim.html#radarsimpy.simulator.simc): Simulates and generates raw time domain baseband data (C++ engine)
+
+  - [`radarsimpy.simulator.simpy`](https://rookiepeng.github.io/radarsimpy/sim.html#radarsimpy.simulator.simpy): Simulates and generates raw time domain baseband data (Python engine)
+  - [`radarsimpy.simulator.simc`](https://rookiepeng.github.io/radarsimpy/sim.html#radarsimpy.simulator.simc): Simulates and generates raw time domain baseband data (C++ engine)
+
 - **Raytracing**: Raytracing module for radar scene simulation
-   - [`radarsimpy.rt.lidar_scene`](https://rookiepeng.github.io/radarsimpy/rt.html#radarsimpy.rt.lidar_scene): Simulates LiDAR's point cloud based on a 3D environment model with ray tracing
-   - [`radarsimpy.rt.rcs_sbr`](https://rookiepeng.github.io/radarsimpy/rt.html#radarsimpy.rt.rcs_sbr): Simulates target's radar cross section (RCS) based on the 3D model with ray tracing
-   - [`radarsimpy.rt.scene`](https://rookiepeng.github.io/radarsimpy/rt.html#radarsimpy.rt.scene): Simulates radar's response signal in a 3D environment model with ray tracing
+
+  - [`radarsimpy.rt.lidar_scene`](https://rookiepeng.github.io/radarsimpy/rt.html#radarsimpy.rt.lidar_scene): Simulates LiDAR's point cloud based on a 3D environment model with ray tracing
+  - [`radarsimpy.rt.rcs_sbr`](https://rookiepeng.github.io/radarsimpy/rt.html#radarsimpy.rt.rcs_sbr): Simulates target's radar cross section (RCS) based on the 3D model with ray tracing
+  - [`radarsimpy.rt.scene`](https://rookiepeng.github.io/radarsimpy/rt.html#radarsimpy.rt.scene): Simulates radar's response signal in a 3D environment model with ray tracing
+
 - **Processing**: Basic radar signal processing module
+
   - [`radarsimpy.processing.range_fft`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.range_fft): Calculate range profile matrix
   - [`radarsimpy.processing.doppler_fft`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.doppler_fft): Calculate range-Doppler matrix
   - [`radarsimpy.processing.range_doppler_fft`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.range_doppler_fft): Range-Doppler processing
@@ -169,8 +181,13 @@ The source files of these Jupyter notebooks are available [here](https://github.
   - [`radarsimpy.processing.cfar_ca_2d`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.cfar_ca_2d): 2D Cell Averaging CFAR (CA-CFAR)
   - [`radarsimpy.processing.cfar_os_1d`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.cfar_os_1d): 1D Ordered Statistic CFAR (OS-CFAR)
   - [`radarsimpy.processing.cfar_os_2d`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.cfar_os_2d): 2D Ordered Statistic CFAR (OS-CFAR)
-  - [`radarsimpy.processing.doa_music`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.doa_music): Estimate arrival directions of signals using MUSIC for a uniform linear array (ULA)
-  - [`radarsimpy.processing.doa_esprit`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.doa_esprit): Estimate arrival directions of signals using ESPRIT for a uniform linear array (ULA)
+  - [`radarsimpy.processing.doa_music`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.doa_music): Estimate DoA using MUSIC for a ULA
+  - [`radarsimpy.processing.doa_root_music`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.doa_root_music): Estimate DoA using Root-MUSIC for a ULA
+  - [`radarsimpy.processing.doa_esprit`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.doa_esprit): Estimate DoA using ESPRIT for a ULA
+  - [`radarsimpy.processing.doa_capon`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.doa_capon): Capon (MVDR) beamforming for a ULA
+  - [`radarsimpy.processing.doa_bartlett`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.doa_bartlett): Bartlett beamforming for a ULA
+
 - **Tools**: Receiver operating characteristic analysis
+
   - [`radarsimpy.tools.roc_pd`](https://rookiepeng.github.io/radarsimpy/tools.html#radarsimpy.tools.roc_pd): Calculate probability of detection (Pd) in receiver operating characteristic (ROC)
-  - [`radarsimpy.tools.roc_snr`](https://rookiepeng.github.io/radarsimpy/tools.html#radarsimpy.tools.roc_snr): Calculate the minimal SNR for certain probability of detection (Pd) and probability of false alarm (Pfa) in receiver operating characteristic (ROC)
+  - [`radarsimpy.tools.roc_snr`](https://rookiepeng.github.io/radarsimpy/tools.html#radarsimpy.tools.roc_snr): Calculate the minimal SNR for a certain probability of detection (Pd) and probability of false alarm (Pfa) in receiver operating characteristic (ROC)
