@@ -5,7 +5,7 @@
 
 **`!!! This module needs to be built/used together with RadarSimC (the C++ engine for radar simulator)`**
 
-**Please fill out this [form](https://zpeng.me/#contact) to request the module if you are interested in using RadarSimPy**
+**Please fill out this [form](https://zpeng.me/#contact) to request the module**
 
 # RadarSimPy
 
