@@ -34,7 +34,10 @@ A **Radar** **Sim**ulator for **Py**thon
 
   - Range/Doppler processing
   - MUltiple SIgnal Classication (MUSIC) DoA estimation for a uniform linear array
+  - Root-MUSIC DoA estimation for a uniform linear array
   - Estimation of Signal Parameters via Rational Invariance Techniques (ESPRIT) DoA estimation for a uniform linear array
+  - Capon beamformer
+  - Bartlett beamformer
   - 1D/2D cell-averaging CFAR (CA-CFAR)
   - 1D/2D ordered-statistic CFAR (OS-CFAR)
 
