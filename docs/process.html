@@ -55,8 +55,11 @@
 <li class="toctree-l2"><a class="reference internal" href="#radarsimpy.processing.cfar_ca_2d"><code class="docutils literal notranslate"><span class="pre">cfar_ca_2d()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#radarsimpy.processing.cfar_os_1d"><code class="docutils literal notranslate"><span class="pre">cfar_os_1d()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#radarsimpy.processing.cfar_os_2d"><code class="docutils literal notranslate"><span class="pre">cfar_os_2d()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#radarsimpy.processing.doa_bartlett"><code class="docutils literal notranslate"><span class="pre">doa_bartlett()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#radarsimpy.processing.doa_capon"><code class="docutils literal notranslate"><span class="pre">doa_capon()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#radarsimpy.processing.doa_esprit"><code class="docutils literal notranslate"><span class="pre">doa_esprit()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#radarsimpy.processing.doa_music"><code class="docutils literal notranslate"><span class="pre">doa_music()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#radarsimpy.processing.doa_root_music"><code class="docutils literal notranslate"><span class="pre">doa_root_music()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#radarsimpy.processing.doppler_fft"><code class="docutils literal notranslate"><span class="pre">doppler_fft()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#radarsimpy.processing.get_polar_image"><code class="docutils literal notranslate"><span class="pre">get_polar_image()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#radarsimpy.processing.range_doppler_fft"><code class="docutils literal notranslate"><span class="pre">range_doppler_fft()</span></code></a></li>
@@ -217,6 +220,56 @@ pp. 608-621, 1983.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="radarsimpy.processing.doa_bartlett">
+<span class="sig-prename descclassname"><span class="pre">radarsimpy.processing.</span></span><span class="sig-name descname"><span class="pre">doa_bartlett</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">covmat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spacing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scanangles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">range(-90,</span> <span class="pre">91)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.processing.doa_bartlett" title="Permalink to this definition"></a></dt>
+<dd><p>Bartlett beamforming for a uniform linear array (ULA)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>covmat</strong> (<em>numpy.2darray</em>) – Sensor covariance matrix, specified as a complex-valued, positive-
+definite M-by-M matrix. The quantity M is the number of elements
+in the ULA array</p></li>
+<li><p><strong>spacing</strong> (<em>float</em>) – Distance (wavelength) between array elements. <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">0.5</span></code></p></li>
+<li><p><strong>scanangles</strong> (<em>numpy.1darray</em>) – Broadside search angles, specified as a real-valued vector in degrees.
+Angles must lie in the range [-90°,90°] and must be in increasing
+order. <a href="#id1"><span class="problematic" id="id2">``</span></a>default [-90°,90°] ``</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>spectrum in dB</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.1darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="radarsimpy.processing.doa_capon">
+<span class="sig-prename descclassname"><span class="pre">radarsimpy.processing.</span></span><span class="sig-name descname"><span class="pre">doa_capon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">covmat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spacing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scanangles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">range(-90,</span> <span class="pre">91)</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.processing.doa_capon" title="Permalink to this definition"></a></dt>
+<dd><p>Capon (MVDR) beamforming for a uniform linear array (ULA)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>covmat</strong> (<em>numpy.2darray</em>) – Sensor covariance matrix, specified as a complex-valued, positive-
+definite M-by-M matrix. The quantity M is the number of elements
+in the ULA array</p></li>
+<li><p><strong>spacing</strong> (<em>float</em>) – Distance (wavelength) between array elements. <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">0.5</span></code></p></li>
+<li><p><strong>scanangles</strong> (<em>numpy.1darray</em>) – Broadside search angles, specified as a real-valued vector in degrees.
+Angles must lie in the range [-90°,90°] and must be in increasing
+order. <a href="#id3"><span class="problematic" id="id4">``</span></a>default [-90°,90°] ``</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>spectrum in dB</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy.1darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="radarsimpy.processing.doa_esprit">
 <span class="sig-prename descclassname"><span class="pre">radarsimpy.processing.</span></span><span class="sig-name descname"><span class="pre">doa_esprit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">covmat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spacing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.processing.doa_esprit" title="Permalink to this definition"></a></dt>
 <dd><p>Estimate arrival directions of signals using ESPRIT for a uniform linear
@@ -259,7 +312,7 @@ the ULA array</p></li>
 <li><p><strong>spacing</strong> (<em>float</em>) – Distance (wavelength) between array elements. <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">0.5</span></code></p></li>
 <li><p><strong>scanangles</strong> (<em>numpy.1darray</em>) – Broadside search angles, specified as a real-valued vector in degrees.
 Angles must lie in the range [-90°,90°] and must be in increasing
-order. <a href="#id1"><span class="problematic" id="id2">``</span></a>default [-90°,90°] ``</p></li>
+order. <a href="#id5"><span class="problematic" id="id6">``</span></a>default [-90°,90°] ``</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -267,6 +320,32 @@ order. <a href="#id1"><span class="problematic" id="id2">``</span></a>default [-
 </dd>
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>list, list, numpy.1darray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="radarsimpy.processing.doa_root_music">
+<span class="sig-prename descclassname"><span class="pre">radarsimpy.processing.</span></span><span class="sig-name descname"><span class="pre">doa_root_music</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">covmat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spacing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#radarsimpy.processing.doa_root_music" title="Permalink to this definition"></a></dt>
+<dd><p>Estimate arrival directions of signals using root-MUSIC for a uniform
+linear array (ULA)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>covmat</strong> (<em>numpy.2darray</em>) – Sensor covariance matrix, specified as a complex-valued, positive-
+definite M-by-M matrix. The quantity M is the number of elements
+in the ULA array</p></li>
+<li><p><strong>nsig</strong> (<em>int</em>) – Number of arriving signals, specified as a positive integer. The
+number of signals must be smaller than the number of elements in
+the ULA array</p></li>
+<li><p><strong>spacing</strong> (<em>float</em>) – Distance (wavelength) between array elements. <code class="docutils literal notranslate"><span class="pre">default</span> <span class="pre">0.5</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>doa angles in degrees</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
 </dd>
 </dl>
 </dd></dl>
