@@ -3,9 +3,9 @@
    inkscape:export-ydpi="104.0495"
    inkscape:export-xdpi="104.0495"
    inkscape:export-filename="C:\Users\zjx8rj\OneDrive\radarsimpy\docs\radarsimpy.png"
-   width="170mm"
-   height="170mm"
-   viewBox="0 0 170 170"
+   width="155mm"
+   height="155mm"
+   viewBox="0 0 155 155"
    version="1.1"
    id="svg8"
    inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
@@ -27,8 +27,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
-     inkscape:cx="515.35714"
-     inkscape:cy="493.57143"
+     inkscape:cx="476.07143"
+     inkscape:cy="465.71429"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -67,16 +67,16 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-15.108341,-50.180368)">
+     transform="translate(-22.608341,-57.680367)">
     <rect
-       style="fill:#ffffff;stroke:none;stroke-width:0.988075;fill-opacity:1"
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.906159"
        id="rect304"
-       width="169.01192"
-       height="169.01192"
-       x="15.602383"
-       y="50.674408"
-       rx="10.424501"
-       ry="10.48986" />
+       width="155"
+       height="155"
+       x="22.608341"
+       y="57.680367"
+       rx="9.5602589"
+       ry="9.6201982" />
     <g
        id="g1693"
        transform="translate(-12.645832,-12.645834)">
