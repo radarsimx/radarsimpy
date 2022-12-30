@@ -4,4 +4,4 @@ Dependence
 - numpy
 - scipy
 - meshio
-- `Visual C++ Runtime <https://aka.ms/vs/16/release/vc_redist.x64.exe/>`_ (*Windows only*)
+- `Visual C++ Runtime <https://aka.ms/vs/16/release/vc_redist.x64.exe/>`_ (``Windows``)
