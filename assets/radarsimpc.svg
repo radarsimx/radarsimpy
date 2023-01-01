@@ -8,7 +8,7 @@
    viewBox="0 0 512 512"
    version="1.1"
    id="svg8"
-   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
    sodipodi:docname="radarsimpc.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -27,8 +27,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.35"
-     inkscape:cx="980"
-     inkscape:cy="1208.5714"
+     inkscape:cx="728.57143"
+     inkscape:cy="1210"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -223,25 +223,33 @@
     </g>
     <g
        id="g3659"
-       transform="matrix(3.3032258,0,0,3.3032258,-38.390768,-131.08518)">
+       transform="matrix(3.3032258,0,0,3.3032258,-173.93296,-246.33881)"
+       style="stroke:none;stroke-width:0.757744;stroke-dasharray:none;stroke-opacity:1">
       <g
          aria-label="C"
-         id="text1767"
-         style="font-size:19.7556px;fill:#303030;stroke:#303030">
-        <path
-           d="m 143.28424,187.55461 q -0.53055,0.23151 -0.96463,0.43408 -0.42444,0.20257 -1.11897,0.42444 -0.58842,0.18328 -1.28296,0.30868 -0.68488,0.13504 -1.51446,0.13504 -1.5627,0 -2.84566,-0.43408 -1.27331,-0.44373 -2.21864,-1.37942 -0.92605,-0.91639 -1.44695,-2.32475 -0.5209,-1.41801 -0.5209,-3.28939 0,-1.77491 0.50161,-3.17363 0.50161,-1.39871 1.44694,-2.36334 0.9164,-0.93569 2.209,-1.42765 1.30225,-0.49196 2.88424,-0.49196 1.15756,0 2.30547,0.27974 1.15755,0.27975 2.56591,0.98392 v 2.26688 h -0.14469 q -1.1865,-0.99357 -2.3537,-1.44694 -1.1672,-0.45338 -2.49839,-0.45338 -1.09003,0 -1.96784,0.35692 -0.86817,0.34726 -1.55305,1.09003 -0.6656,0.72347 -1.0418,1.83279 -0.36656,1.09968 -0.36656,2.54662 0,1.51447 0.40514,2.6045 0.41479,1.09003 1.06109,1.77492 0.67524,0.71382 1.57235,1.06109 0.90675,0.33762 1.90996,0.33762 1.37942,0 2.58521,-0.47267 1.20579,-0.47267 2.25723,-1.418 h 0.13505 z"
-           id="path307" />
-      </g>
+         id="text362"
+         style="font-weight:500;font-size:37.5153px;font-family:'IBM Plex Mono';-inkscape-font-specification:'IBM Plex Mono Medium';fill:#484848;stroke:none;stroke-width:0.757744;stroke-dasharray:none;stroke-opacity:1" />
       <g
-         aria-label="++"
-         id="text3653"
-         style="font-size:8.02918px;fill:#303030;stroke:#303030;stroke-width:0.406425">
+         id="g1253"
+         transform="translate(1.1442639,-3.2039388)"
+         style="stroke:none;stroke-width:0.757744;stroke-dasharray:none;stroke-opacity:1">
         <path
-           d="m 143.90359,181.72838 h -2.13667 v 2.13667 h -0.6508 v -2.13667 h -2.13667 v -0.62728 h 2.13667 v -2.13667 h 0.6508 v 2.13667 h 2.13667 z"
-           id="path310" />
-        <path
-           d="m 150.47435,181.72838 h -2.13667 v 2.13667 h -0.65081 v -2.13667 h -2.13667 v -0.62728 h 2.13667 v -2.13667 h 0.65081 v 2.13667 h 2.13667 z"
-           id="path312" />
+           d="m 165.75484,186.28402 q -4.98954,0 -7.42803,-3.52644 -2.40098,-3.52644 -2.40098,-10.01659 0,-6.49015 2.40098,-10.01658 2.43849,-3.52644 7.42803,-3.52644 1.91328,0 3.30134,0.52521 1.42558,0.4877 2.4385,1.38807 1.01291,0.86285 1.68818,2.06334 0.7128,1.16297 1.16298,2.51353 l -3.78905,1.27552 q -0.30012,-0.90037 -0.67527,-1.68819 -0.37515,-0.78782 -0.93788,-1.35055 -0.56273,-0.56273 -1.35056,-0.90037 -0.7503,-0.33764 -1.87576,-0.33764 -2.77613,0 -4.05165,2.13837 -1.27552,2.10086 -1.27552,5.70233 v 4.4268 q 0,3.60147 1.27552,5.73985 1.27552,2.10085 4.05165,2.10085 1.12546,0 1.87576,-0.33764 0.78783,-0.33763 1.35056,-0.90036 0.56273,-0.56273 0.93788,-1.35055 0.37515,-0.78782 0.67527,-1.68819 l 3.78905,1.27552 q -0.45018,1.35055 -1.16298,2.55104 -0.67527,1.16297 -1.68818,2.06334 -1.01292,0.86285 -2.4385,1.38807 -1.38806,0.4877 -3.30134,0.4877 z"
+           style="font-weight:500;font-size:37.5153px;font-family:'IBM Plex Mono';-inkscape-font-specification:'IBM Plex Mono Medium';fill:#484848;stroke:none;stroke-width:0.757744;stroke-dasharray:none;stroke-opacity:1"
+           id="path1199" />
+        <g
+           aria-label="++"
+           id="text1072"
+           style="font-size:20.2308px;font-family:'IBM Plex Mono';-inkscape-font-specification:'IBM Plex Mono';fill:#484848;stroke:none;stroke-width:0.757744;stroke-dasharray:none;stroke-opacity:1">
+          <path
+             d="m 167.51844,177.89811 v -4.22824 h -4.04616 v -1.37569 h 4.04616 v -4.22824 h 1.53754 v 4.22824 h 4.04616 v 1.37569 h -4.04616 v 4.22824 z"
+             style="stroke:none;stroke-width:0.757744;stroke-dasharray:none;stroke-opacity:1"
+             id="path1196" />
+          <path
+             d="m 179.65693,177.89811 v -4.22824 h -4.04616 v -1.37569 h 4.04616 v -4.22824 h 1.53754 v 4.22824 h 4.04616 v 1.37569 h -4.04616 v 4.22824 z"
+             style="stroke:none;stroke-width:0.757744;stroke-dasharray:none;stroke-opacity:1"
+             id="path1193" />
+        </g>
       </g>
     </g>
   </g>
