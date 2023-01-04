@@ -20,8 +20,8 @@ A **Radar** **Sim**ulator for **Py**thon
   - Radar transceiver modeling
   - Arbitrary waveform
   - Phase noise
-  - Phase/Amplitude modulation
-  - Fast-time/Slow-time modulation
+  - Phase/amplitude modulation
+  - Fast-time/slow-time modulation
 
 - ### Simulation
 
@@ -34,9 +34,9 @@ A **Radar** **Sim**ulator for **Py**thon
 
   - Range/Doppler processing
   - Direction of arrival (DoA) estimation
-    - MUltiple SIgnal Classication (MUSIC) DoA estimation for a uniform linear array (ULA)
+    - **MU**ltiple **SI**gnal **C**lassification (MUSIC) DoA estimations for a uniform linear array (ULA)
     - Root-MUSIC DoA estimation for a ULA
-    - Estimation of Signal Parameters via Rational Invariance Techniques (ESPRIT) DoA estimation for a ULA
+    - **E**stimation of **S**ignal **P**arameters via **R**ational **I**nvariance **T**echniques (ESPRIT) DoA estimation for a ULA
   - Beamformer
     - Capon beamformer
     - Bartlett beamformer
@@ -154,7 +154,7 @@ The source files of these Jupyter notebooks are available [here](https://github.
 
   - [LIDAR point cloud](https://zpeng.me/2020/02/05/lidar-point-cloud/)
 
-- ### Characterization
+- ### Receiver characterization
 
   - [Receiver operating characteristic (ROC)](https://zpeng.me/2019/10/06/receiver-operating-characteristic/)
 
