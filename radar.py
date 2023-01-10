@@ -751,7 +751,8 @@ class Radar:
 
         self.delta_f = np.ediff1d(self.f, to_begin=0)
         self.delta_t = np.ediff1d(self.t, to_begin=0)
-        self.k = self.delta_f[1:]/self.delta_t[1:]
+        self.k = np.zeros_like(self.delta_f)
+        self.k[1:] = self.delta_f[1:]/self.delta_t[1:]
 
         # if hasattr(self.transmitter.fc, '__len__'):
         self.fc_mat = np.tile(
