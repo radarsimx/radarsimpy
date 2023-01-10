@@ -704,7 +704,7 @@ class Radar:
                  rotation=(0, 0, 0),
                  rotation_rate=(0, 0, 0),
                  time=0,
-                 interference=None,
+                 inc=None,
                  seed=None,
                  **kwargs):
 
@@ -940,16 +940,7 @@ class Radar:
             self.rotation = np.array(np.radians(rotation))
             self.rotation_rate = np.array(np.radians(rotation_rate))
 
-        if interference is not None:
-            self.int_f = interference.f
-            self.int_t = interference.t
-            self.int_k = interference.k
-
-            self.int_phs = np.zeros_like(self.int_f)
-            self.int_phs = self.int_f*interference.delta_t + 0.5 * \
-                self.int_k*interference.delta_t*interference.delta_t
-            self.int_phs = np.cumsum(self.int_phs)
-            self.int_pulse_start = interference.transmitter.pulse_start_time
+        self.inc = inc
 
     def gen_timestamp(self):
         """
