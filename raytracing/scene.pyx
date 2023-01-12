@@ -34,6 +34,7 @@ from radarsimpy.includes.type_def cimport float_t, int_t, vector
 from radarsimpy.lib.cp_radarsimc cimport cp_RxChannel, cp_Target
 from radarsimpy.lib.cp_radarsimc cimport cp_TxChannel, cp_Transmitter
 from radarsimpy.includes.radarsimc cimport Radar
+from radarsimpy.includes.radarsimc cimport Simulator
 from radarsimpy.includes.radarsimc cimport TxChannel, Transmitter
 from radarsimpy.includes.radarsimc cimport RxChannel, Receiver
 from radarsimpy.includes.radarsimc cimport Snapshot, Target, Scene
@@ -136,6 +137,12 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     cdef Radar[float_t] c_radar
     cdef Scene[double, float_t] c_scene
 
+    cdef Simulator[float_t] c_sim
+
+    cdef Transmitter[float_t] inferf_tx
+    cdef Receiver[float_t] inferf_rx
+    cdef Radar[float_t] inferf_radar
+
     cdef float_t[:, :, :, :] radar_loc
     cdef float_t[:, :, :, :] radar_spd
     cdef float_t[:, :, :, :] radar_rot
@@ -145,6 +152,11 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     cdef vector[Vec3[float_t]] c_spd_vect
     cdef vector[Vec3[float_t]] c_rot_vect
     cdef vector[Vec3[float_t]] c_rrt_vect
+
+    cdef vector[Vec3[float_t]] inferf_loc_vect
+    cdef vector[Vec3[float_t]] inferf_spd_vect
+    cdef vector[Vec3[float_t]] inferf_rot_vect
+    cdef vector[Vec3[float_t]] inferf_rrt_vect
 
     cdef int_t frames = radar.frames
     cdef int_t channles = radar.channel_size
@@ -354,9 +366,84 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
                     samples,
                 )
             )
+    
+    if radar.inferf is not None:
+        """
+        Transmitter
+        """
+        inferf_tx = cp_Transmitter(radar.inferf)
+
+        """
+        Transmitter Channels
+        """
+        for tx_idx in range(0, radar.inferf.transmitter.channel_size):
+            inferf_tx.AddChannel(cp_TxChannel(radar.inferf.transmitter, tx_idx))
+
+        """
+        Receiver
+        """
+        inferf_rx = Receiver[float_t](
+            <float_t> radar.inferf.receiver.fs,
+            <float_t> radar.inferf.receiver.rf_gain,
+            <float_t> radar.inferf.receiver.load_resistor,
+            <float_t> radar.inferf.receiver.baseband_gain,
+            <int_t> radar.inferf.samples_per_pulse
+        )
+
+        for rx_idx in range(0, radar.inferf.receiver.channel_size):
+            inferf_rx.AddChannel(cp_RxChannel(radar.inferf.receiver, rx_idx))
+
+        inferf_radar = Radar[float_t](inferf_tx, inferf_rx)
+
+        inferf_loc_vect.push_back(
+            Vec3[float_t](
+                <float_t> radar.inferf.location[0],
+                <float_t> radar.inferf.location[1],
+                <float_t> radar.inferf.location[2]
+            )
+        )
+        inferf_spd_vect.push_back(
+            Vec3[float_t](
+                <float_t> radar.inferf.speed[0],
+                <float_t> radar.inferf.speed[1],
+                <float_t> radar.inferf.speed[2]
+            )
+        )
+        inferf_rot_vect.push_back(
+            Vec3[float_t](
+                <float_t> radar.inferf.rotation[0],
+                <float_t> radar.inferf.rotation[1],
+                <float_t> radar.inferf.rotation[2]
+            )
+        )
+        inferf_rrt_vect.push_back(
+            Vec3[float_t](
+                <float_t> radar.inferf.rotation_rate[0],
+                <float_t> radar.inferf.rotation_rate[1],
+                <float_t> radar.inferf.rotation_rate[2]
+            )
+        )
+
+        inferf_radar.SetMotion(inferf_loc_vect,
+                        inferf_spd_vect,
+                        inferf_rot_vect,
+                        inferf_rrt_vect)
+
+        c_sim.Interference(c_radar, inferf_radar, bb_real, bb_imag)
+
+        interference = np.zeros((frames*channles, pulses, samples), dtype=complex)
+
+        for ch_idx in range(0, frames*channles):
+            for p_idx in range(0, pulses):
+                for s_idx in range(0, samples):
+                    bb_idx = ch_idx * ch_stride + p_idx * pulse_stride + s_idx
+                    interference[ch_idx, p_idx, s_idx] = bb_real[bb_idx] +  1j*bb_imag[bb_idx]
+    else:
+        interference = None
 
     free(bb_real)
     free(bb_imag)
 
     return {'baseband': baseband,
-            'timestamp': radar.timestamp}
+            'timestamp': radar.timestamp,
+            'interference': interference}

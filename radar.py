@@ -660,7 +660,9 @@ class Radar:
         ``default [0, 0, 0]``
     :param time:
         Radar firing time instances / frames
-    :type time: float or numpy.1darray
+        :type time: float or numpy.1darray
+    :param Radar interf:
+        Interference radar.``default None``
     :param int seed:
         Seed for noise generator
 
@@ -704,7 +706,7 @@ class Radar:
                  rotation=(0, 0, 0),
                  rotation_rate=(0, 0, 0),
                  time=0,
-                 inc=None,
+                 inferf=None,
                  seed=None,
                  **kwargs):
 
@@ -940,7 +942,7 @@ class Radar:
             self.rotation = np.array(np.radians(rotation))
             self.rotation_rate = np.array(np.radians(rotation_rate))
 
-        self.inc = inc
+        self.inferf = inferf
 
     def gen_timestamp(self):
         """

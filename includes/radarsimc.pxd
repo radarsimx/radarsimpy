@@ -216,6 +216,10 @@ cdef extern from "simulator.hpp":
                  vector[Point[T]] points,
                  double * bb_real,
                  double * bb_imag)
+        void Interference(Radar[T] radar,
+                          Radar[T] interf_radar,
+                          double *interf_bb_real,
+                          double *interf_bb_imag)
 
 
 """
