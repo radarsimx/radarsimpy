@@ -395,34 +395,72 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
 
         interf_radar = Radar[float_t](interf_tx, interf_rx)
 
-        interf_loc_vect.push_back(
-            Vec3[float_t](
-                <float_t> radar.interf.location[0],
-                <float_t> radar.interf.location[1],
-                <float_t> radar.interf.location[2]
+        if len(np.shape(radar.interf.location)) == 4:
+            radar_loc = radar.interf.location.astype(np.float32)
+            radar_spd = radar.interf.speed.astype(np.float32)
+            radar_rot = radar.interf.rotation.astype(np.float32)
+            radar_rrt = radar.interf.rotation_rate.astype(np.float32)
+
+            for ch_idx in range(0, radar.channel_size*radar.frames):
+                for ps_idx in range(0, radar.transmitter.pulses):
+                    for sp_idx in range(0, radar.samples_per_pulse):
+                        interf_loc_vect.push_back(
+                            Vec3[float_t](
+                                radar_loc[ch_idx, ps_idx, sp_idx,0],
+                                radar_loc[ch_idx, ps_idx, sp_idx,1],
+                                radar_loc[ch_idx, ps_idx, sp_idx,2]
+                            )
+                        )
+                        interf_spd_vect.push_back(
+                            Vec3[float_t](
+                                radar_spd[ch_idx, ps_idx, sp_idx,0],
+                                radar_spd[ch_idx, ps_idx, sp_idx,1],
+                                radar_spd[ch_idx, ps_idx, sp_idx,2]
+                            )
+                        )
+                        interf_rot_vect.push_back(
+                            Vec3[float_t](
+                                radar_rot[ch_idx, ps_idx, sp_idx,0],
+                                radar_rot[ch_idx, ps_idx, sp_idx,1],
+                                radar_rot[ch_idx, ps_idx, sp_idx,2]
+                            )
+                        )
+                        interf_rrt_vect.push_back(
+                            Vec3[float_t](
+                                radar_rrt[ch_idx, ps_idx, sp_idx,0],
+                                radar_rrt[ch_idx, ps_idx, sp_idx,1],
+                                radar_rrt[ch_idx, ps_idx, sp_idx,2]
+                            )
+                        )                                                                               
+        else:
+            interf_loc_vect.push_back(
+                Vec3[float_t](
+                    <float_t> radar.interf.location[0],
+                    <float_t> radar.interf.location[1],
+                    <float_t> radar.interf.location[2]
+                )
             )
-        )
-        interf_spd_vect.push_back(
-            Vec3[float_t](
-                <float_t> radar.interf.speed[0],
-                <float_t> radar.interf.speed[1],
-                <float_t> radar.interf.speed[2]
+            interf_spd_vect.push_back(
+                Vec3[float_t](
+                    <float_t> radar.interf.speed[0],
+                    <float_t> radar.interf.speed[1],
+                    <float_t> radar.interf.speed[2]
+                )
             )
-        )
-        interf_rot_vect.push_back(
-            Vec3[float_t](
-                <float_t> radar.interf.rotation[0],
-                <float_t> radar.interf.rotation[1],
-                <float_t> radar.interf.rotation[2]
+            interf_rot_vect.push_back(
+                Vec3[float_t](
+                    <float_t> radar.interf.rotation[0],
+                    <float_t> radar.interf.rotation[1],
+                    <float_t> radar.interf.rotation[2]
+                )
             )
-        )
-        interf_rrt_vect.push_back(
-            Vec3[float_t](
-                <float_t> radar.interf.rotation_rate[0],
-                <float_t> radar.interf.rotation_rate[1],
-                <float_t> radar.interf.rotation_rate[2]
+            interf_rrt_vect.push_back(
+                Vec3[float_t](
+                    <float_t> radar.interf.rotation_rate[0],
+                    <float_t> radar.interf.rotation_rate[1],
+                    <float_t> radar.interf.rotation_rate[2]
+                )
             )
-        )
 
         interf_radar.SetMotion(interf_loc_vect,
                         interf_spd_vect,
