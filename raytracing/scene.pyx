@@ -139,9 +139,9 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
 
     cdef Simulator[float_t] c_sim
 
-    cdef Transmitter[float_t] inferf_tx
-    cdef Receiver[float_t] inferf_rx
-    cdef Radar[float_t] inferf_radar
+    cdef Transmitter[float_t] interf_tx
+    cdef Receiver[float_t] interf_rx
+    cdef Radar[float_t] interf_radar
 
     cdef float_t[:, :, :, :] radar_loc
     cdef float_t[:, :, :, :] radar_spd
@@ -153,10 +153,10 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     cdef vector[Vec3[float_t]] c_rot_vect
     cdef vector[Vec3[float_t]] c_rrt_vect
 
-    cdef vector[Vec3[float_t]] inferf_loc_vect
-    cdef vector[Vec3[float_t]] inferf_spd_vect
-    cdef vector[Vec3[float_t]] inferf_rot_vect
-    cdef vector[Vec3[float_t]] inferf_rrt_vect
+    cdef vector[Vec3[float_t]] interf_loc_vect
+    cdef vector[Vec3[float_t]] interf_spd_vect
+    cdef vector[Vec3[float_t]] interf_rot_vect
+    cdef vector[Vec3[float_t]] interf_rrt_vect
 
     cdef int_t frames = radar.frames
     cdef int_t channles = radar.channel_size
@@ -367,69 +367,69 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
                 )
             )
     
-    if radar.inferf is not None:
+    if radar.interf is not None:
         """
         Transmitter
         """
-        inferf_tx = cp_Transmitter(radar.inferf)
+        interf_tx = cp_Transmitter(radar.interf)
 
         """
         Transmitter Channels
         """
-        for tx_idx in range(0, radar.inferf.transmitter.channel_size):
-            inferf_tx.AddChannel(cp_TxChannel(radar.inferf.transmitter, tx_idx))
+        for tx_idx in range(0, radar.interf.transmitter.channel_size):
+            interf_tx.AddChannel(cp_TxChannel(radar.interf.transmitter, tx_idx))
 
         """
         Receiver
         """
-        inferf_rx = Receiver[float_t](
-            <float_t> radar.inferf.receiver.fs,
-            <float_t> radar.inferf.receiver.rf_gain,
-            <float_t> radar.inferf.receiver.load_resistor,
-            <float_t> radar.inferf.receiver.baseband_gain,
-            <int_t> radar.inferf.samples_per_pulse
+        interf_rx = Receiver[float_t](
+            <float_t> radar.interf.receiver.fs,
+            <float_t> radar.interf.receiver.rf_gain,
+            <float_t> radar.interf.receiver.load_resistor,
+            <float_t> radar.interf.receiver.baseband_gain,
+            <int_t> radar.interf.samples_per_pulse
         )
 
-        for rx_idx in range(0, radar.inferf.receiver.channel_size):
-            inferf_rx.AddChannel(cp_RxChannel(radar.inferf.receiver, rx_idx))
+        for rx_idx in range(0, radar.interf.receiver.channel_size):
+            interf_rx.AddChannel(cp_RxChannel(radar.interf.receiver, rx_idx))
 
-        inferf_radar = Radar[float_t](inferf_tx, inferf_rx)
+        interf_radar = Radar[float_t](interf_tx, interf_rx)
 
-        inferf_loc_vect.push_back(
+        interf_loc_vect.push_back(
             Vec3[float_t](
-                <float_t> radar.inferf.location[0],
-                <float_t> radar.inferf.location[1],
-                <float_t> radar.inferf.location[2]
+                <float_t> radar.interf.location[0],
+                <float_t> radar.interf.location[1],
+                <float_t> radar.interf.location[2]
             )
         )
-        inferf_spd_vect.push_back(
+        interf_spd_vect.push_back(
             Vec3[float_t](
-                <float_t> radar.inferf.speed[0],
-                <float_t> radar.inferf.speed[1],
-                <float_t> radar.inferf.speed[2]
+                <float_t> radar.interf.speed[0],
+                <float_t> radar.interf.speed[1],
+                <float_t> radar.interf.speed[2]
             )
         )
-        inferf_rot_vect.push_back(
+        interf_rot_vect.push_back(
             Vec3[float_t](
-                <float_t> radar.inferf.rotation[0],
-                <float_t> radar.inferf.rotation[1],
-                <float_t> radar.inferf.rotation[2]
+                <float_t> radar.interf.rotation[0],
+                <float_t> radar.interf.rotation[1],
+                <float_t> radar.interf.rotation[2]
             )
         )
-        inferf_rrt_vect.push_back(
+        interf_rrt_vect.push_back(
             Vec3[float_t](
-                <float_t> radar.inferf.rotation_rate[0],
-                <float_t> radar.inferf.rotation_rate[1],
-                <float_t> radar.inferf.rotation_rate[2]
+                <float_t> radar.interf.rotation_rate[0],
+                <float_t> radar.interf.rotation_rate[1],
+                <float_t> radar.interf.rotation_rate[2]
             )
         )
 
-        inferf_radar.SetMotion(inferf_loc_vect,
-                        inferf_spd_vect,
-                        inferf_rot_vect,
-                        inferf_rrt_vect)
+        interf_radar.SetMotion(interf_loc_vect,
+                        interf_spd_vect,
+                        interf_rot_vect,
+                        interf_rrt_vect)
 
-        c_sim.Interference(c_radar, inferf_radar, bb_real, bb_imag)
+        c_sim.Interference(c_radar, interf_radar, bb_real, bb_imag)
 
         interference = np.zeros((frames*channles, pulses, samples), dtype=complex)
 

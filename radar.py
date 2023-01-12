@@ -706,7 +706,7 @@ class Radar:
                  rotation=(0, 0, 0),
                  rotation_rate=(0, 0, 0),
                  time=0,
-                 inferf=None,
+                 interf=None,
                  seed=None,
                  **kwargs):
 
@@ -942,7 +942,7 @@ class Radar:
             self.rotation = np.array(np.radians(rotation))
             self.rotation_rate = np.array(np.radians(rotation_rate))
 
-        self.inferf = inferf
+        self.interf = interf
 
     def gen_timestamp(self):
         """
