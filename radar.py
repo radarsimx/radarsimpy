@@ -662,7 +662,7 @@ class Radar:
         Radar firing time instances / frames
         :type time: float or numpy.1darray
     :param Radar interf:
-        Interference radar.``default None``
+        Interference radar. ``default None``
     :param int seed:
         Seed for noise generator
 
