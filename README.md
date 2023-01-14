@@ -26,6 +26,7 @@ A **Radar** **Sim**ulator for **Py**thon
 - ### Simulation
 
   - Simulation of radar baseband data from point targets
+  - Simulation of interference
   - Simulation of radar baseband data from 3D modeled objects/environment (**`#raytracing`**)
   - Simulation of target's RCS (**`#raytracing`**)
   - Simulation of LiDAR point cloud from 3D modeled objects/environment (**`#raytracing`**)
@@ -133,6 +134,7 @@ The source files of these Jupyter notebooks are available [here](https://github.
   - [Phase noise](https://zpeng.me/2021/01/13/phase-noise/)
   - [CFAR](https://zpeng.me/2021/01/10/cfar/)
   - [DoA estimation](https://zpeng.me/2022/12/12/doa-estimation/)
+  - [Interference](https://zpeng.me/2023/01/13/interference/)
 
 - ### Radar modeling and 3D scene simulation with raytracing
 
