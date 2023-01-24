@@ -32,6 +32,9 @@ from radarsimpy.includes.radarsimc cimport TxChannel
 from radarsimpy.includes.radarsimc cimport Transmitter
 from radarsimpy.includes.radarsimc cimport Target
 from radarsimpy.includes.radarsimc cimport Point
+from radarsimpy.includes.radarsimc cimport Mem_Copy
+from radarsimpy.includes.radarsimc cimport Mem_Copy_Vec3
+from radarsimpy.includes.radarsimc cimport Mem_Copy_Complex
 from radarsimpy.includes.type_def cimport float_t
 
 

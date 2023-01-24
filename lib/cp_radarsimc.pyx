@@ -123,16 +123,10 @@ cdef Point[float_t] cp_Point(location,
         else:
             phs_mem = np.full(shape, np.radians(phase), dtype=np.float32)
 
-        for ch_idx in range(0, shape[0]):
-            for ps_idx in range(0, shape[1]):
-                for sp_idx in range(0, shape[2]):
-                    loc_vect.push_back(Vec3[float_t](
-                        <float_t> loc_x[ch_idx, ps_idx, sp_idx],
-                        <float_t> loc_y[ch_idx, ps_idx, sp_idx],
-                        <float_t> loc_z[ch_idx, ps_idx, sp_idx]
-                    ))
-                    rcs_vect.push_back(<float_t> rcs_mem[ch_idx, ps_idx, sp_idx])
-                    phs_vect.push_back(<float_t> phs_mem[ch_idx, ps_idx, sp_idx])
+        Mem_Copy(rcs_vect, &rcs_mem[0,0,0], <int_t>(shape[0]*shape[1]*shape[2]))
+        Mem_Copy(phs_vect, &phs_mem[0,0,0], <int_t>(shape[0]*shape[1]*shape[2]))
+        Mem_Copy_Vec3(loc_vect, &loc_x[0,0,0], &loc_y[0,0,0], &loc_z[0,0,0], <int_t>(shape[0]*shape[1]*shape[2]))
+                    
     else:
         loc_vect.push_back(Vec3[float_t](
             <float_t> location[0],
@@ -191,28 +185,20 @@ cdef Transmitter[float_t] cp_Transmitter(radar):
         t_frame_vect.push_back(<double> (radar.t_offset))
 
     # frequency
-    f_mem = radar.f.astype(np.float64)
-    f_vect.reserve(len(radar.f))
-    for idx in range(0, len(radar.f)):
-        f_vect.push_back(f_mem[idx])
+    cdef double[:] f_mem = radar.f.astype(np.float64)
+    Mem_Copy(f_vect, &f_mem[0], <int_t>(len(radar.f)))
 
     # time
-    t_mem = radar.t.astype(np.float64)
-    t_vect.reserve(len(radar.t))
-    for idx in range(0, len(radar.t)):
-        t_vect.push_back(t_mem[idx])
+    cdef double[:] t_mem = radar.t.astype(np.float64)
+    Mem_Copy(t_vect, &t_mem[0], <int_t>(len(radar.t)))
 
     # frequency offset per pulse
-    f_offset_mem = radar.transmitter.f_offset.astype(np.float64)
-    f_offset_vect.reserve(len(radar.transmitter.f_offset))
-    for idx in range(0, len(radar.transmitter.f_offset)):
-        f_offset_vect.push_back(f_offset_mem[idx])
+    cdef double[:] f_offset_mem = radar.transmitter.f_offset.astype(np.float64)
+    Mem_Copy(f_offset_vect, &f_offset_mem[0], <int_t>(len(radar.transmitter.f_offset)))
 
     # pulse start time
-    t_pstart_mem = radar.transmitter.pulse_start_time.astype(np.float64)
-    t_pstart_vect.reserve(len(radar.transmitter.pulse_start_time))
-    for idx in range(0, len(radar.transmitter.pulse_start_time)):
-        t_pstart_vect.push_back(t_pstart_mem[idx])
+    cdef double[:] t_pstart_mem = radar.transmitter.pulse_start_time.astype(np.float64)
+    Mem_Copy(t_pstart_vect, &t_pstart_mem[0], <int_t>(len(radar.transmitter.pulse_start_time)))
 
     # phase noise
     if radar.phase_noise is not None:

@@ -34,6 +34,20 @@ from libcpp cimport bool
 from libcpp.complex cimport complex as cpp_complex
 
 
+cdef extern from "libs/mem_lib.hpp":
+    cdef void Mem_Copy[T](vector[T] &vect,
+                          T * ptr,
+                          int size) except +
+    cdef void Mem_Copy_Complex[T](vector[cpp_complex[T]] &vect,
+                                  T * ptr_real,
+                                  T * ptr_imag,
+                                  int size) except +
+    cdef void Mem_Copy_Vec3[T](vector[Vec3[T]] &vect,
+                   T *ptr_x,
+                   T *ptr_y,
+                   T *ptr_z,
+                   int size) except +
+
 """
 Target
 """
