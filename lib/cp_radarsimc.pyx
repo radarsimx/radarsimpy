@@ -176,11 +176,10 @@ cdef Transmitter[float_t] cp_Transmitter(radar):
     cdef vector[cpp_complex[double]] pn_vect
     
     # frame time offset
+    cdef double[:] t_frame_mem
     if frames > 1:
         t_frame_mem = radar.t_offset.astype(np.float64)
-        t_frame_vect.reserve(frames)
-        for idx in range(0, frames):
-            t_frame_vect.push_back(t_frame_mem[idx])
+        Mem_Copy(t_frame_vect, &t_frame_mem[0], frames)
     else:
         t_frame_vect.push_back(<double> (radar.t_offset))
 
