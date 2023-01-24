@@ -27,9 +27,11 @@
 #           :##:
 #            .+:
 
+
 ctypedef int int_t
-ctypedef float float_t
 ctypedef unsigned int uint_t
+
+ctypedef float float_t
 
 
 """
