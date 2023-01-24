@@ -201,15 +201,12 @@ cdef Transmitter[float_t] cp_Transmitter(radar):
     Mem_Copy(t_pstart_vect, &t_pstart_mem[0], <int_t>(len(radar.transmitter.pulse_start_time)))
 
     # phase noise
+    cdef double[:, :, :] pn_real_mem
+    cdef double[:, :, :] pn_imag_mem
     if radar.phase_noise is not None:
-        pn_vect.reserve(frames*channles*pulses*samples)
-        for idx0 in range(0, frames*channles):
-            for idx1 in range(0, pulses):
-                for idx2 in range(0, samples):
-                    pn_vect.push_back(cpp_complex[double](
-                        np.real(radar.phase_noise[idx0, idx1, idx2]),
-                        np.imag(radar.phase_noise[idx0, idx1, idx2])
-                    ))
+        pn_real_mem = np.real(radar.phase_noise).astype(np.float64)
+        pn_imag_mem = np.imag(radar.phase_noise).astype(np.float64)
+        Mem_Copy_Complex(pn_vect, &pn_real_mem[0,0,0], &pn_imag_mem[0,0,0], <int_t>(frames*channles*pulses*samples))
 
     return Transmitter[float_t](
         f_vect,
