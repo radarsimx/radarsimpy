@@ -385,6 +385,8 @@ cdef Target[float_t] cp_Target(radar,
     cdef int_t[:, :] cells_mem
     cdef float_t[:] origin
 
+    cdef int_t bb_size = <int_t>(radar.channel_size*radar.frames*radar.transmitter.pulses*radar.samples_per_pulse)
+
     # vector of location, speed, rotation, rotation rate
     cdef vector[Vec3[float_t]] loc_vect
     cdef vector[Vec3[float_t]] spd_vect
@@ -495,37 +497,11 @@ cdef Target[float_t] cp_Target(radar,
         else:
             rrt_z = np.full(shape, np.radians(rotation_rate[2]), dtype=np_float)
 
-        for ch_idx in range(0, radar.channel_size*radar.frames):
-            for ps_idx in range(0, radar.transmitter.pulses):
-                for sp_idx in range(0, radar.samples_per_pulse):
-                    loc_vect.push_back(
-                        Vec3[float_t](
-                            loc_x[ch_idx, ps_idx, sp_idx],
-                            loc_y[ch_idx, ps_idx, sp_idx],
-                            loc_z[ch_idx, ps_idx, sp_idx]
-                        )
-                    )
-                    spd_vect.push_back(
-                        Vec3[float_t](
-                            spd_x[ch_idx, ps_idx, sp_idx],
-                            spd_y[ch_idx, ps_idx, sp_idx],
-                            spd_z[ch_idx, ps_idx, sp_idx]
-                        )
-                    )
-                    rot_vect.push_back(
-                        Vec3[float_t](
-                            rot_x[ch_idx, ps_idx, sp_idx],
-                            rot_y[ch_idx, ps_idx, sp_idx],
-                            rot_z[ch_idx, ps_idx, sp_idx]
-                        )
-                    )
-                    rrt_vect.push_back(
-                        Vec3[float_t](
-                            rrt_x[ch_idx, ps_idx, sp_idx],
-                            rrt_y[ch_idx, ps_idx, sp_idx],
-                            rrt_z[ch_idx, ps_idx, sp_idx]
-                        )
-                    )
+        Mem_Copy_Vec3(&loc_x[0,0,0], &loc_y[0,0,0], &loc_z[0,0,0], bb_size, loc_vect)
+        Mem_Copy_Vec3(&spd_x[0,0,0], &spd_y[0,0,0], &spd_z[0,0,0], bb_size, spd_vect)
+        Mem_Copy_Vec3(&rot_x[0,0,0], &rot_y[0,0,0], &rot_z[0,0,0], bb_size, rot_vect)
+        Mem_Copy_Vec3(&rrt_x[0,0,0], &rrt_y[0,0,0], &rrt_z[0,0,0], bb_size, rrt_vect)
+
     else:
         loc_vect.push_back(
             Vec3[float_t](

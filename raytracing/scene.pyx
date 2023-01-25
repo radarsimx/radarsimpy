@@ -38,10 +38,13 @@ from radarsimpy.includes.radarsimc cimport Simulator
 from radarsimpy.includes.radarsimc cimport TxChannel, Transmitter
 from radarsimpy.includes.radarsimc cimport RxChannel, Receiver
 from radarsimpy.includes.radarsimc cimport Snapshot, Target, Scene
+from radarsimpy.includes.radarsimc cimport Mem_Copy_Vec3
 from libc.stdlib cimport malloc, free
 
 cimport cython
 cimport numpy as np
+
+np_float = np.float32
 
 
 @cython.cdivision(True)
@@ -142,11 +145,11 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     cdef Transmitter[float_t] interf_tx
     cdef Receiver[float_t] interf_rx
     cdef Radar[float_t] interf_radar
-
-    cdef float_t[:, :, :, :] radar_loc
-    cdef float_t[:, :, :, :] radar_spd
-    cdef float_t[:, :, :, :] radar_rot
-    cdef float_t[:, :, :, :] radar_rrt
+    
+    cdef float_t[:, :, :] loc_x, loc_y, loc_z
+    cdef float_t[:, :, :] spd_x, spd_y, spd_z
+    cdef float_t[:, :, :] rot_x, rot_y, rot_z
+    cdef float_t[:, :, :] rrt_x, rrt_y, rrt_z
 
     cdef vector[Vec3[float_t]] c_loc_vect
     cdef vector[Vec3[float_t]] c_spd_vect
@@ -164,6 +167,8 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     cdef int_t tx_ch = radar.transmitter.channel_size
     cdef int_t pulses = radar.transmitter.pulses
     cdef int_t samples = radar.samples_per_pulse
+
+    cdef int_t bb_size = channles*frames*pulses*samples
 
     cdef int_t ch_stride = pulses * samples
     cdef int_t pulse_stride = samples
@@ -214,42 +219,24 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     c_radar = Radar[float_t](c_tx, c_rx)
 
     if len(np.shape(radar.location)) == 4:
-        radar_loc = radar.location.astype(np.float32)
-        radar_spd = radar.speed.astype(np.float32)
-        radar_rot = radar.rotation.astype(np.float32)
-        radar_rrt = radar.rotation_rate.astype(np.float32)
+        loc_x = radar.location[:,:,:,0].astype(np_float)
+        loc_y = radar.location[:,:,:,1].astype(np_float)
+        loc_z = radar.location[:,:,:,2].astype(np_float)
+        spd_x = radar.speed[:,:,:,0].astype(np_float)
+        spd_y = radar.speed[:,:,:,1].astype(np_float)
+        spd_z = radar.speed[:,:,:,2].astype(np_float)
+        rot_x = radar.rotation[:,:,:,0].astype(np_float)
+        rot_y = radar.rotation[:,:,:,1].astype(np_float)
+        rot_z = radar.rotation[:,:,:,2].astype(np_float)
+        rrt_x = radar.rotation_rate[:,:,:,0].astype(np_float)
+        rrt_y = radar.rotation_rate[:,:,:,1].astype(np_float)
+        rrt_z = radar.rotation_rate[:,:,:,2].astype(np_float)
 
-        for ch_idx in range(0, radar.channel_size*radar.frames):
-            for ps_idx in range(0, radar.transmitter.pulses):
-                for sp_idx in range(0, radar.samples_per_pulse):
-                    c_loc_vect.push_back(
-                        Vec3[float_t](
-                            radar_loc[ch_idx, ps_idx, sp_idx,0],
-                            radar_loc[ch_idx, ps_idx, sp_idx,1],
-                            radar_loc[ch_idx, ps_idx, sp_idx,2]
-                        )
-                    )
-                    c_spd_vect.push_back(
-                        Vec3[float_t](
-                            radar_spd[ch_idx, ps_idx, sp_idx,0],
-                            radar_spd[ch_idx, ps_idx, sp_idx,1],
-                            radar_spd[ch_idx, ps_idx, sp_idx,2]
-                        )
-                    )
-                    c_rot_vect.push_back(
-                        Vec3[float_t](
-                            radar_rot[ch_idx, ps_idx, sp_idx,0],
-                            radar_rot[ch_idx, ps_idx, sp_idx,1],
-                            radar_rot[ch_idx, ps_idx, sp_idx,2]
-                        )
-                    )
-                    c_rrt_vect.push_back(
-                        Vec3[float_t](
-                            radar_rrt[ch_idx, ps_idx, sp_idx,0],
-                            radar_rrt[ch_idx, ps_idx, sp_idx,1],
-                            radar_rrt[ch_idx, ps_idx, sp_idx,2]
-                        )
-                    )
+        Mem_Copy_Vec3(&loc_x[0,0,0], &loc_y[0,0,0], &loc_z[0,0,0], bb_size, c_loc_vect)
+        Mem_Copy_Vec3(&spd_x[0,0,0], &spd_y[0,0,0], &spd_z[0,0,0], bb_size, c_spd_vect)
+        Mem_Copy_Vec3(&rot_x[0,0,0], &rot_y[0,0,0], &rot_z[0,0,0], bb_size, c_rot_vect)
+        Mem_Copy_Vec3(&rrt_x[0,0,0], &rrt_y[0,0,0], &rrt_z[0,0,0], bb_size, c_rrt_vect)
+
     else:
         c_loc_vect.push_back(
             Vec3[float_t](
@@ -333,8 +320,8 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
                                 sp_idx)
                         )
 
-    cdef double * bb_real = <double *> malloc(frames*channles*pulses*samples*sizeof(double))
-    cdef double * bb_imag = <double *> malloc(frames*channles*pulses*samples*sizeof(double))
+    cdef double * bb_real = <double *> malloc(bb_size*sizeof(double))
+    cdef double * bb_imag = <double *> malloc(bb_size*sizeof(double))
 
     c_scene.RunSimulator(
         level_id,
@@ -396,42 +383,24 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
         interf_radar = Radar[float_t](interf_tx, interf_rx)
 
         if len(np.shape(radar.interf.location)) == 4:
-            radar_loc = radar.interf.location.astype(np.float32)
-            radar_spd = radar.interf.speed.astype(np.float32)
-            radar_rot = radar.interf.rotation.astype(np.float32)
-            radar_rrt = radar.interf.rotation_rate.astype(np.float32)
+            loc_x = radar.interf.location[:,:,:,0].astype(np_float)
+            loc_y = radar.interf.location[:,:,:,1].astype(np_float)
+            loc_z = radar.interf.location[:,:,:,2].astype(np_float)
+            spd_x = radar.interf.speed[:,:,:,0].astype(np_float)
+            spd_y = radar.interf.speed[:,:,:,1].astype(np_float)
+            spd_z = radar.interf.speed[:,:,:,2].astype(np_float)
+            rot_x = radar.interf.rotation[:,:,:,0].astype(np_float)
+            rot_y = radar.interf.rotation[:,:,:,1].astype(np_float)
+            rot_z = radar.interf.rotation[:,:,:,2].astype(np_float)
+            rrt_x = radar.interf.rotation_rate[:,:,:,0].astype(np_float)
+            rrt_y = radar.interf.rotation_rate[:,:,:,1].astype(np_float)
+            rrt_z = radar.interf.rotation_rate[:,:,:,2].astype(np_float)
 
-            for ch_idx in range(0, radar.channel_size*radar.frames):
-                for ps_idx in range(0, radar.transmitter.pulses):
-                    for sp_idx in range(0, radar.samples_per_pulse):
-                        interf_loc_vect.push_back(
-                            Vec3[float_t](
-                                radar_loc[ch_idx, ps_idx, sp_idx,0],
-                                radar_loc[ch_idx, ps_idx, sp_idx,1],
-                                radar_loc[ch_idx, ps_idx, sp_idx,2]
-                            )
-                        )
-                        interf_spd_vect.push_back(
-                            Vec3[float_t](
-                                radar_spd[ch_idx, ps_idx, sp_idx,0],
-                                radar_spd[ch_idx, ps_idx, sp_idx,1],
-                                radar_spd[ch_idx, ps_idx, sp_idx,2]
-                            )
-                        )
-                        interf_rot_vect.push_back(
-                            Vec3[float_t](
-                                radar_rot[ch_idx, ps_idx, sp_idx,0],
-                                radar_rot[ch_idx, ps_idx, sp_idx,1],
-                                radar_rot[ch_idx, ps_idx, sp_idx,2]
-                            )
-                        )
-                        interf_rrt_vect.push_back(
-                            Vec3[float_t](
-                                radar_rrt[ch_idx, ps_idx, sp_idx,0],
-                                radar_rrt[ch_idx, ps_idx, sp_idx,1],
-                                radar_rrt[ch_idx, ps_idx, sp_idx,2]
-                            )
-                        )                                                                               
+            Mem_Copy_Vec3(&loc_x[0,0,0], &loc_y[0,0,0], &loc_z[0,0,0], bb_size, interf_loc_vect)
+            Mem_Copy_Vec3(&spd_x[0,0,0], &spd_y[0,0,0], &spd_z[0,0,0], bb_size, interf_spd_vect)
+            Mem_Copy_Vec3(&rot_x[0,0,0], &rot_y[0,0,0], &rot_z[0,0,0], bb_size, interf_rot_vect)
+            Mem_Copy_Vec3(&rrt_x[0,0,0], &rrt_y[0,0,0], &rrt_z[0,0,0], bb_size, interf_rrt_vect)
+                                                                             
         else:
             interf_loc_vect.push_back(
                 Vec3[float_t](
