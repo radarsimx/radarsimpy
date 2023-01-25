@@ -374,9 +374,9 @@ cdef Target[float_t] cp_Target(radar,
     cdef vector[Vec3[float_t]] rrt_vt
 
     cdef float_t[:, :, :] locx_mv, locy_mv, locz_mv
-    cdef float_t[:, :, :] spd_x, spd_y, spd_z
-    cdef float_t[:, :, :] rot_x, rot_y, rot_z
-    cdef float_t[:, :, :] rrt_x, rrt_y, rrt_z
+    cdef float_t[:, :, :] spdx_mv, spdy_mv, spdz_mv
+    cdef float_t[:, :, :] rotx_mv, roty_mv, rotz_mv
+    cdef float_t[:, :, :] rrtx_mv, rrty_mv, rrtz_mv
 
     cdef cpp_complex[float_t] ep_c, mu_c
 
@@ -430,57 +430,57 @@ cdef Target[float_t] cp_Target(radar,
             locz_mv = (location[2] + speed[2]*timestamp).astype(np_float)
 
         if np.size(speed[0]) > 1:
-            spd_x = speed[0].astype(np_float)
+            spdx_mv = speed[0].astype(np_float)
         else:
-            spd_x = np.full(shape, speed[0], dtype=np_float)
+            spdx_mv = np.full(shape, speed[0], dtype=np_float)
 
         if np.size(speed[1]) > 1:
-            spd_y = speed[1].astype(np_float)
+            spdy_mv = speed[1].astype(np_float)
         else:
-            spd_y = np.full(shape, speed[1], dtype=np_float)
+            spdy_mv = np.full(shape, speed[1], dtype=np_float)
 
         if np.size(speed[2]) > 1:
-            spd_z = speed[2].astype(np_float)
+            spdz_mv = speed[2].astype(np_float)
         else:
-            spd_z = np.full(shape, speed[2], dtype=np_float)
+            spdz_mv = np.full(shape, speed[2], dtype=np_float)
 
         if np.size(rotation[0]) > 1:
-            rot_x = np.radians(rotation[0]).astype(np_float)
+            rotx_mv = np.radians(rotation[0]).astype(np_float)
         else:
-            rot_x = np.radians(
+            rotx_mv = np.radians(
                 rotation[0] + rotation_rate[0]*timestamp).astype(np_float)
 
         if np.size(rotation[1]) > 1:
-            rot_y = np.radians(rotation[1]).astype(np_float)
+            roty_mv = np.radians(rotation[1]).astype(np_float)
         else:
-            rot_y = np.radians(
+            roty_mv = np.radians(
                 rotation[1] + rotation_rate[1]*timestamp).astype(np_float)
 
         if np.size(rotation[2]) > 1:
-            rot_z = np.radians(rotation[2]).astype(np_float)
+            rotz_mv = np.radians(rotation[2]).astype(np_float)
         else:
-            rot_z = np.radians(
+            rotz_mv = np.radians(
                 rotation[2] + rotation_rate[2]*timestamp).astype(np_float)
 
         if np.size(rotation_rate[0]) > 1:
-            rrt_x = np.radians(rotation_rate[0]).astype(np_float)
+            rrtx_mv = np.radians(rotation_rate[0]).astype(np_float)
         else:
-            rrt_x = np.full(shape, np.radians(rotation_rate[0]), dtype=np_float)
+            rrtx_mv = np.full(shape, np.radians(rotation_rate[0]), dtype=np_float)
 
         if np.size(rotation_rate[1]) > 1:
-            rrt_y = np.radians(rotation_rate[1]).astype(np_float)
+            rrty_mv = np.radians(rotation_rate[1]).astype(np_float)
         else:
-            rrt_y = np.full(shape, np.radians(rotation_rate[1]), dtype=np_float)
+            rrty_mv = np.full(shape, np.radians(rotation_rate[1]), dtype=np_float)
 
         if np.size(rotation_rate[2]) > 1:
-            rrt_z = np.radians(rotation_rate[2]).astype(np_float)
+            rrtz_mv = np.radians(rotation_rate[2]).astype(np_float)
         else:
-            rrt_z = np.full(shape, np.radians(rotation_rate[2]), dtype=np_float)
+            rrtz_mv = np.full(shape, np.radians(rotation_rate[2]), dtype=np_float)
 
         Mem_Copy_Vec3(&locx_mv[0,0,0], &locy_mv[0,0,0], &locz_mv[0,0,0], bbsize_c, loc_vt)
-        Mem_Copy_Vec3(&spd_x[0,0,0], &spd_y[0,0,0], &spd_z[0,0,0], bbsize_c, spd_vt)
-        Mem_Copy_Vec3(&rot_x[0,0,0], &rot_y[0,0,0], &rot_z[0,0,0], bbsize_c, rot_vt)
-        Mem_Copy_Vec3(&rrt_x[0,0,0], &rrt_y[0,0,0], &rrt_z[0,0,0], bbsize_c, rrt_vt)
+        Mem_Copy_Vec3(&spdx_mv[0,0,0], &spdy_mv[0,0,0], &spdz_mv[0,0,0], bbsize_c, spd_vt)
+        Mem_Copy_Vec3(&rotx_mv[0,0,0], &roty_mv[0,0,0], &rotz_mv[0,0,0], bbsize_c, rot_vt)
+        Mem_Copy_Vec3(&rrtx_mv[0,0,0], &rrty_mv[0,0,0], &rrtz_mv[0,0,0], bbsize_c, rrt_vt)
 
     else:
         loc_vt.push_back(
