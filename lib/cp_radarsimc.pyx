@@ -388,7 +388,6 @@ cdef Target[float_t] cp_Target(radar,
     cdef int_t[:, :] cells_mv = t_mesh.cells[0].data.astype(np.int32)
     cdef float_t[:] origin_mv = np.array(target.get('origin', (0, 0, 0)), dtype=np_float)
 
-    
     location = np.array(target.get('location', (0, 0, 0)), dtype=object)
     speed = np.array(target.get('speed', (0, 0, 0)), dtype=object)
     rotation = np.array(target.get('rotation', (0, 0, 0)), dtype=object)
