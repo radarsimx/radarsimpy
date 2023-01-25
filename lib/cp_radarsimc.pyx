@@ -81,16 +81,16 @@ cdef Point[float_t] cp_Point(location,
     :return: C++ object of a point target
     :rtype: Point
     """
-    cdef vector[Vec3[float_t]] loc_vect
-    cdef vector[float_t] rcs_vect
-    cdef vector[float_t] phs_vect
+    cdef vector[Vec3[float_t]] loc_vt
+    cdef vector[float_t] rcs_vt, phs_vt
 
-    cdef float_t[:, :, :] loc_x
-    cdef float_t[:, :, :] loc_y
-    cdef float_t[:, :, :] loc_z
+    cdef float_t[:, :, :] locx_mv, locy_mv, locz_mv
+    cdef float_t[:, :, :] rcs_mv, phs_mv
 
-    cdef float_t[:, :, :] rcs_mem
-    cdef float_t[:, :, :] phs_mem
+    cdef int_t bbsize_c = <int_t>(shape[0]*shape[1]*shape[2])
+
+    cdef float_t[:] speed_mv = np.array(speed, dtype=np_float)
+    cdef float_t[:] location_mv
 
     # check if there are any time varying parameters
     if np.size(location[0]) > 1 or \
@@ -100,52 +100,46 @@ cdef Point[float_t] cp_Point(location,
             np.size(phase) > 1:
 
         if np.size(location[0]) > 1:
-            loc_x = location[0].astype(np_float)
+            locx_mv = location[0].astype(np_float)
         else:
-            loc_x = np.full(shape, location[0], dtype=np_float)
+            locx_mv = np.full(shape, location[0], dtype=np_float)
 
         if np.size(location[1]) > 1:
-            loc_y = location[1].astype(np_float)
+            locy_mv = location[1].astype(np_float)
         else:
-            loc_y = np.full(shape, location[1], dtype=np_float)
+            locy_mv = np.full(shape, location[1], dtype=np_float)
 
         if np.size(location[2]) > 1:
-            loc_z = location[2].astype(np_float)
+            locz_mv = location[2].astype(np_float)
         else:
-            loc_z = np.full(shape, location[2], dtype=np_float)
+            locz_mv = np.full(shape, location[2], dtype=np_float)
 
         if np.size(rcs) > 1:
-            rcs_mem = rcs.astype(np_float)
+            rcs_mv = rcs.astype(np_float)
         else:
-            rcs_mem = np.full(shape, rcs, dtype=np_float)
+            rcs_mv = np.full(shape, rcs, dtype=np_float)
 
         if np.size(phase) > 1:
-            phs_mem = np.radians(phase).astype(np_float)
+            phs_mv = np.radians(phase).astype(np_float)
         else:
-            phs_mem = np.full(shape, np.radians(phase), dtype=np_float)
+            phs_mv = np.full(shape, np.radians(phase), dtype=np_float)
 
-        Mem_Copy(&rcs_mem[0,0,0], <int_t>(shape[0]*shape[1]*shape[2]), rcs_vect)
-        Mem_Copy(&phs_mem[0,0,0], <int_t>(shape[0]*shape[1]*shape[2]), phs_vect)
-        Mem_Copy_Vec3(&loc_x[0,0,0], &loc_y[0,0,0], &loc_z[0,0,0], <int_t>(shape[0]*shape[1]*shape[2]), loc_vect)
+        Mem_Copy(&rcs_mv[0,0,0], bbsize_c, rcs_vt)
+        Mem_Copy(&phs_mv[0,0,0], bbsize_c, phs_vt)
+        Mem_Copy_Vec3(&locx_mv[0,0,0], &locy_mv[0,0,0], &locz_mv[0,0,0], bbsize_c, loc_vt)
                     
     else:
-        loc_vect.push_back(Vec3[float_t](
-            <float_t> location[0],
-            <float_t> location[1],
-            <float_t> location[2]
-        ))
-        rcs_vect.push_back(<float_t> rcs)
-        phs_vect.push_back(<float_t> np.radians(phase))
+        location_mv = np.array(location, dtype=np_float)
+
+        loc_vt.push_back(Vec3[float_t](&location_mv[0]))
+        rcs_vt.push_back(<float_t> rcs)
+        phs_vt.push_back(<float_t> np.radians(phase))
     
     return Point[float_t](
-        loc_vect,
-        Vec3[float_t](
-            <float_t> speed[0],
-            <float_t> speed[1],
-            <float_t> speed[2]
-        ),
-        rcs_vect,
-        phs_vect
+        loc_vt,
+        Vec3[float_t](&speed_mv[0]),
+        rcs_vt,
+        phs_vt
     )
 
 
@@ -164,10 +158,10 @@ cdef Transmitter[float_t] cp_Transmitter(radar):
     :return: C++ object of a radar transmitter
     :rtype: Transmitter
     """
-    cdef int_t frames = radar.frames
-    cdef int_t channles = radar.channel_size
-    cdef int_t pulses = radar.transmitter.pulses
-    cdef int_t samples = radar.samples_per_pulse
+    cdef int_t frames_c = radar.frames
+    cdef int_t channles_c = radar.channel_size
+    cdef int_t pulses_c = radar.transmitter.pulses
+    cdef int_t samples_c = radar.samples_per_pulse
 
     cdef vector[double] t_frame_vect
     cdef vector[double] f_vect
@@ -178,9 +172,9 @@ cdef Transmitter[float_t] cp_Transmitter(radar):
     
     # frame time offset
     cdef double[:] t_frame_mem
-    if frames > 1:
+    if frames_c > 1:
         t_frame_mem = radar.t_offset.astype(np.float64)
-        Mem_Copy(&t_frame_mem[0], frames, t_frame_vect)
+        Mem_Copy(&t_frame_mem[0], frames_c, t_frame_vect)
     else:
         t_frame_vect.push_back(<double> (radar.t_offset))
 
@@ -206,7 +200,7 @@ cdef Transmitter[float_t] cp_Transmitter(radar):
     if radar.phase_noise is not None:
         pn_real_mem = np.real(radar.phase_noise).astype(np.float64)
         pn_imag_mem = np.imag(radar.phase_noise).astype(np.float64)
-        Mem_Copy_Complex(&pn_real_mem[0,0,0], &pn_imag_mem[0,0,0], <int_t>(frames*channles*pulses*samples), pn_vect)
+        Mem_Copy_Complex(&pn_real_mem[0,0,0], &pn_imag_mem[0,0,0], <int_t>(frames_c*channles_c*pulses_c*samples_c), pn_vect)
 
     return Transmitter[float_t](
         f_vect,
@@ -237,7 +231,7 @@ cdef TxChannel[float_t] cp_TxChannel(tx,
     :return: C++ object of a transmitter channel
     :rtype: TxChannel
     """
-    cdef int_t pulses = tx.pulses
+    cdef int_t pulses_c = tx.pulses
 
     cdef vector[float_t] az_ang_vect, az_ptn_vect
     cdef vector[float_t] el_ang_vect, el_ptn_vect
@@ -268,7 +262,7 @@ cdef TxChannel[float_t] cp_TxChannel(tx,
     # pulse modulation
     cdef float_t[:] pulse_real_mem = np.real(tx.pulse_mod[tx_idx]).astype(np_float)
     cdef float_t[:] pulse_imag_mem = np.imag(tx.pulse_mod[tx_idx]).astype(np_float)
-    Mem_Copy_Complex(&pulse_real_mem[0], &pulse_imag_mem[0], <int_t>(pulses), pulse_mod_vect)
+    Mem_Copy_Complex(&pulse_real_mem[0], &pulse_imag_mem[0], <int_t>(pulses_c), pulse_mod_vect)
 
     # waveform modulation
     mod_enabled = tx.waveform_mod[tx_idx]['enabled']
@@ -388,12 +382,12 @@ cdef Target[float_t] cp_Target(radar,
     cdef int_t bb_size = <int_t>(radar.channel_size*radar.frames*radar.transmitter.pulses*radar.samples_per_pulse)
 
     # vector of location, speed, rotation, rotation rate
-    cdef vector[Vec3[float_t]] loc_vect
+    cdef vector[Vec3[float_t]] loc_vt
     cdef vector[Vec3[float_t]] spd_vect
     cdef vector[Vec3[float_t]] rot_vect
     cdef vector[Vec3[float_t]] rrt_vect
 
-    cdef float_t[:, :, :] loc_x, loc_y, loc_z
+    cdef float_t[:, :, :] locx_mv, locy_mv, locz_mv
     cdef float_t[:, :, :] spd_x, spd_y, spd_z
     cdef float_t[:, :, :] rot_x, rot_y, rot_z
     cdef float_t[:, :, :] rrt_x, rrt_y, rrt_z
@@ -435,19 +429,19 @@ cdef Target[float_t] cp_Target(radar,
         np.size(rotation_rate[2]) > 1:
 
         if np.size(location[0]) > 1:
-            loc_x = location[0].astype(np_float)
+            locx_mv = location[0].astype(np_float)
         else:
-            loc_x = <float_t > location[0] + <float_t > speed[0]*timestamp
+            locx_mv = <float_t > location[0] + <float_t > speed[0]*timestamp
 
         if np.size(location[1]) > 1:
-            loc_y = location[1].astype(np_float)
+            locy_mv = location[1].astype(np_float)
         else:
-            loc_y = <float_t > location[1] + <float_t > speed[1]*timestamp
+            locy_mv = <float_t > location[1] + <float_t > speed[1]*timestamp
 
         if np.size(location[2]) > 1:
-            loc_z = location[2].astype(np_float)
+            locz_mv = location[2].astype(np_float)
         else:
-            loc_z = <float_t > location[2] + <float_t > speed[2]*timestamp
+            locz_mv = <float_t > location[2] + <float_t > speed[2]*timestamp
 
         if np.size(speed[0]) > 1:
             spd_x = speed[0].astype(np_float)
@@ -497,13 +491,13 @@ cdef Target[float_t] cp_Target(radar,
         else:
             rrt_z = np.full(shape, np.radians(rotation_rate[2]), dtype=np_float)
 
-        Mem_Copy_Vec3(&loc_x[0,0,0], &loc_y[0,0,0], &loc_z[0,0,0], bb_size, loc_vect)
+        Mem_Copy_Vec3(&locx_mv[0,0,0], &locy_mv[0,0,0], &locz_mv[0,0,0], bb_size, loc_vt)
         Mem_Copy_Vec3(&spd_x[0,0,0], &spd_y[0,0,0], &spd_z[0,0,0], bb_size, spd_vect)
         Mem_Copy_Vec3(&rot_x[0,0,0], &rot_y[0,0,0], &rot_z[0,0,0], bb_size, rot_vect)
         Mem_Copy_Vec3(&rrt_x[0,0,0], &rrt_y[0,0,0], &rrt_z[0,0,0], bb_size, rrt_vect)
 
     else:
-        loc_vect.push_back(
+        loc_vt.push_back(
             Vec3[float_t](
                 <float_t> location[0],
                 <float_t> location[1],
@@ -536,7 +530,7 @@ cdef Target[float_t] cp_Target(radar,
                            &cells_mem[0, 0],
                            <int_t> cells_mem.shape[0],
                            Vec3[float_t](&origin[0]),
-                           loc_vect,
+                           loc_vt,
                            spd_vect,
                            rot_vect,
                            rrt_vect,
