@@ -266,20 +266,22 @@ cdef TxChannel[float_t] cp_TxChannel(tx,
     Mem_Copy(&el_ptn_mem[0], <int_t>(len(tx.el_patterns[tx_idx])), el_ptn_vect)
 
     # pulse modulation
-    for idx in range(0, pulses):
-        pulse_mod_vect.push_back(cpp_complex[float_t](
-            np.real(tx.pulse_mod[tx_idx, idx]), np.imag(tx.pulse_mod[tx_idx, idx])))
+    cdef float_t[:] pulse_real_mem = np.real(tx.pulse_mod[tx_idx]).astype(np_float)
+    cdef float_t[:] pulse_imag_mem = np.imag(tx.pulse_mod[tx_idx]).astype(np_float)
+    Mem_Copy_Complex(&pulse_real_mem[0], &pulse_imag_mem[0], <int_t>(pulses), pulse_mod_vect)
 
     # waveform modulation
     mod_enabled = tx.waveform_mod[tx_idx]['enabled']
-    if mod_enabled:
-        for idx in range(0, len(tx.waveform_mod[tx_idx]['var'])):
-            mod_var_vect.push_back(cpp_complex[float_t](
-                np.real(tx.waveform_mod[tx_idx]['var'][idx]), np.imag(tx.waveform_mod[tx_idx]['var'][idx])))
 
-        mod_t_vect.reserve(len(tx.waveform_mod[tx_idx]['t']))
-        for idx in range(0, len(tx.waveform_mod[tx_idx]['t'])):
-            mod_t_vect.push_back(<float_t> tx.waveform_mod[tx_idx]['t'][idx])
+    cdef float_t[:] mod_real_mem, mod_imag_mem
+    cdef float_t[:] mod_t_mem
+    if mod_enabled:
+        mod_real_mem = np.real(tx.waveform_mod[tx_idx]['var']).astype(np_float)
+        mod_imag_mem = np.imag(tx.waveform_mod[tx_idx]['var']).astype(np_float)
+        mod_t_mem = tx.waveform_mod[tx_idx]['t'].astype(np_float)
+
+        Mem_Copy_Complex(&mod_real_mem[0], &mod_imag_mem[0], <int_t>(len(tx.waveform_mod[tx_idx]['var'])), mod_var_vect)
+        Mem_Copy(&mod_t_mem[0], <int_t>(len(tx.waveform_mod[tx_idx]['t'])), mod_t_vect)
 
     return TxChannel[float_t](
         Vec3[float_t](
@@ -329,25 +331,18 @@ cdef RxChannel[float_t] cp_RxChannel(rx,
     cdef float_t[:] el_ang_mem, el_ptn_mem
 
     # azimuth pattern
-    az_ang_mem = np.radians(rx.az_angles[rx_idx].astype(np_float))
+    az_ang_mem = np.radians(rx.az_angles[rx_idx]).astype(np_float)
     az_ptn_mem = rx.az_patterns[rx_idx].astype(np_float)
-    az_ang_vect.reserve(len(rx.az_angles[rx_idx]))
-    for idx in range(0, len(rx.az_angles[rx_idx])):
-        az_ang_vect.push_back(az_ang_mem[idx])
-    az_ptn_vect.reserve(len(rx.az_patterns[rx_idx]))
-    for idx in range(0, len(rx.az_patterns[rx_idx])):
-        az_ptn_vect.push_back(az_ptn_mem[idx])
+
+    Mem_Copy(&az_ang_mem[0], <int_t>(len(rx.az_angles[rx_idx])), az_ang_vect)
+    Mem_Copy(&az_ptn_mem[0], <int_t>(len(rx.az_patterns[rx_idx])), az_ptn_vect)
 
     # elevation pattern
-    el_ang_mem = np.radians(
-        np.flip(90-rx.el_angles[rx_idx].astype(np_float)))
-    el_ptn_mem = np.flip(rx.el_patterns[rx_idx].astype(np_float))
-    el_ang_vect.reserve(len(rx.el_angles[rx_idx]))
-    for idx in range(0, len(rx.el_angles[rx_idx])):
-        el_ang_vect.push_back(el_ang_mem[idx])
-    el_ptn_vect.reserve(len(rx.el_patterns[rx_idx]))
-    for idx in range(0, len(rx.el_patterns[rx_idx])):
-        el_ptn_vect.push_back(el_ptn_mem[idx])
+    el_ang_mem = np.radians(np.flip(90-rx.el_angles[rx_idx])).astype(np_float)
+    el_ptn_mem = np.flip(rx.el_patterns[rx_idx]).astype(np_float)
+
+    Mem_Copy(&el_ang_mem[0], <int_t>(len(rx.el_angles[rx_idx])), el_ang_vect)
+    Mem_Copy(&el_ptn_mem[0], <int_t>(len(rx.el_patterns[rx_idx])), el_ptn_vect)
 
     return RxChannel[float_t](
         Vec3[float_t](
