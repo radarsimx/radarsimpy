@@ -346,8 +346,8 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
         """
         Transmitter Channels
         """
-        for tx_idx in range(0, radar.interf.transmitter.channel_size):
-            interf_tx_c.AddChannel(cp_TxChannel(radar.interf.transmitter, tx_idx))
+        for idx in range(0, radar.interf.transmitter.channel_size):
+            interf_tx_c.AddChannel(cp_TxChannel(radar.interf.transmitter, idx))
 
         """
         Receiver
@@ -360,8 +360,8 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
             <int_t> radar.interf.samples_per_pulse
         )
 
-        for rx_idx in range(0, radar.interf.receiver.channel_size):
-            interf_rx_c.AddChannel(cp_RxChannel(radar.interf.receiver, rx_idx))
+        for idx in range(0, radar.interf.receiver.channel_size):
+            interf_rx_c.AddChannel(cp_RxChannel(radar.interf.receiver, idx))
 
         interf_radar_c = Radar[float_t](interf_tx_c, interf_rx_c)
 
