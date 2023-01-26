@@ -29,6 +29,7 @@
 
 
 from radarsimpy.includes.radarsimc cimport Target, PointCloud
+from radarsimpy.includes.radarsimc cimport Mem_Copy
 from radarsimpy.includes.zpvector cimport Vec3
 from radarsimpy.includes.type_def cimport float_t, int_t, vector
 
@@ -130,36 +131,28 @@ cpdef lidar_scene(lidar, targets, t=0):
             )
 
         pointcloud_c.AddTarget(Target[float_t](&points_mv[0, 0],
-                                             &cells_mv[0, 0],
-                                             <int_t> cells_mv.shape[0],
-                                             Vec3[float_t](& origin_mv[0]),
-                                             Vec3[float_t](& location_mv[0]),
-                                             Vec3[float_t](& speed_mv[0]),
-                                             Vec3[float_t](& rotation_mv[0]),
-                                             Vec3[float_t](& rotation_rate_mv[0]),
-                                             <bool> targets[idx].get('is_ground', False)))
+                                               &cells_mv[0, 0],
+                                               <int_t> cells_mv.shape[0],
+                                               Vec3[float_t](&origin_mv[0]),
+                                               Vec3[float_t](&location_mv[0]),
+                                               Vec3[float_t](&speed_mv[0]),
+                                               Vec3[float_t](&rotation_mv[0]),
+                                               Vec3[float_t](&rotation_rate_mv[0]),
+                                               <bool> targets[idx].get('is_ground', False)))
 
-    cdef float_t[:] phi = np.radians(np.array(lidar['phi'], dtype=np_float))
-    cdef float_t[:] theta = np.radians(np.array(lidar['theta'], dtype=np_float))
+    cdef float_t[:] phi_mv = np.radians(np.array(lidar['phi'], dtype=np_float))
+    cdef float_t[:] theta_mv = np.radians(np.array(lidar['theta'], dtype=np_float))
+    cdef float_t[:] position_mv = np.array(lidar['position'], dtype=np_float)
 
-    cdef vector[float_t] phi_vector
-    phi_vector.reserve(phi.shape[0])
+    cdef vector[float_t] phi_vt
+    Mem_Copy(&phi_mv[0], <int_t>(phi_mv.shape[0]), phi_vt)
 
-    cdef vector[float_t] theta_vector
-    theta_vector.reserve(theta.shape[0])
+    cdef vector[float_t] theta_vt
+    Mem_Copy(&theta_mv[0], <int_t>(theta_mv.shape[0]), theta_vt)
 
-    for idx in range(0, phi.shape[0]):
-        phi_vector.push_back(phi[idx])
-
-    for idx in range(0, theta.shape[0]):
-        theta_vector.push_back(theta[idx])
-
-    pointcloud_c.Sbr(phi_vector,
-                   theta_vector,
-                   Vec3[float_t](<float_t> lidar['position'][0],
-                                 <float_t> lidar['position'][1],
-                                 <float_t> lidar['position'][2])
-    )
+    pointcloud_c.Sbr(phi_vt,
+                     theta_vt,
+                     Vec3[float_t](&position_mv[0]))
 
     ray_type = np.dtype([('positions', np_float, (3,)),
                          ('directions', np_float, (3,))])
