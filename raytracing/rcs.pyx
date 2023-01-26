@@ -79,9 +79,9 @@ cpdef rcs_sbr(model,
     :return: Target's RCS (m^2), use 10*log10(RCS) to convert to dBsm
     :rtype: float
     """
-    trig_mesh = meshio.read(model)
-    cdef float_t[:, :] points = trig_mesh.points.astype(np.float32)
-    cdef int_t[:, :] cells = trig_mesh.cells[0].data.astype(np.int32)
+    t_mesh = meshio.read(model)
+    cdef float_t[:, :] points_mv = t_mesh.points.astype(np.float32)
+    cdef int_t[:, :] cells_mv = t_mesh.cells[0].data.astype(np.int32)
 
     if inc_phi is None:
         inc_phi = obs_phi
@@ -106,7 +106,7 @@ cpdef rcs_sbr(model,
 
     cdef Rcs[double] rcs
 
-    rcs = Rcs[double](Target[float](&points[0, 0], &cells[0, 0], <int_t> cells.shape[0]),
+    rcs = Rcs[double](Target[float](&points_mv[0, 0], &cells_mv[0, 0], <int_t> cells_mv.shape[0]),
                       inc_dir,
                       obs_dir,
                       Vec3[double](<double> pol[0], <double> pol[1], <double> pol[2]),
