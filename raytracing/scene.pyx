@@ -170,22 +170,17 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
 
     cdef int_t bbsize_c = channles_c*frames_c*pulses_c*samples_c
 
-    cdef int_t ch_stride = pulses_c * samples_c
-    cdef int_t pulse_stride = samples_c
+    cdef int_t chstride_c = pulses_c * samples_c
+    cdef int_t psstride_c = samples_c
 
-    cdef int_t bb_idx
     cdef int_t idx
-    cdef int_t fm_idx, tx_idx, ps_idx, sp_idx
-    cdef int_t ch_idx, p_idx, s_idx
-
+    
     """
     Targets
     """
     cdef double[:, :, :] timestamp_mv = radar.timestamp.astype(np.float64)
 
-    cdef int_t target_count = len(targets)
-
-    for idx in range(0, target_count):
+    for idx in range(0, len(targets)):
         scene_c.AddTarget(
             cp_Target(radar, targets[idx], np.shape(timestamp_mv))
         )
@@ -217,6 +212,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     """
     Radar
     """
+    cdef float_t[:] location_mv, speed_mv, rotation_mv, rotation_rate_mv
     radar_c = Radar[float_t](tx_c, rx_c)
 
     if len(np.shape(radar.location)) == 4:
@@ -239,34 +235,17 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
         Mem_Copy_Vec3(&rrtx_mv[0,0,0], &rrty_mv[0,0,0], &rrtz_mv[0,0,0], bbsize_c, rrt_vt)
 
     else:
-        loc_vt.push_back(
-            Vec3[float_t](
-                <float_t> radar.location[0],
-                <float_t> radar.location[1],
-                <float_t> radar.location[2]
-            )
-        )
-        spd_vt.push_back(
-            Vec3[float_t](
-                <float_t> radar.speed[0],
-                <float_t> radar.speed[1],
-                <float_t> radar.speed[2]
-            )
-        )
-        rot_vt.push_back(
-            Vec3[float_t](
-                <float_t> radar.rotation[0],
-                <float_t> radar.rotation[1],
-                <float_t> radar.rotation[2]
-            )
-        )
-        rrt_vt.push_back(
-            Vec3[float_t](
-                <float_t> radar.rotation_rate[0],
-                <float_t> radar.rotation_rate[1],
-                <float_t> radar.rotation_rate[2]
-            )
-        )
+        location_mv = radar.location.astype(np_float)
+        loc_vt.push_back(Vec3[float_t](&location_mv[0]))
+
+        speed_mv = radar.speed.astype(np_float)
+        spd_vt.push_back(Vec3[float_t](&speed_mv[0]))
+
+        rotation_mv = radar.rotation.astype(np_float)
+        rot_vt.push_back(Vec3[float_t](&rotation_mv[0]))
+
+        rotation_rate_mv = radar.rotation_rate.astype(np_float)
+        rrt_vt.push_back(Vec3[float_t](&rotation_rate_mv[0]))
 
     radar_c.SetMotion(loc_vt,
                       spd_vt,
@@ -280,6 +259,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     """
     cdef vector[Snapshot[float_t]] snaps
     cdef int_t level_id = 0
+    cdef int_t fm_idx, tx_idx, ps_idx, sp_idx
 
     if level is None:
         level_id = 0
@@ -334,10 +314,12 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
 
     baseband = np.zeros((frames_c*channles_c, pulses_c, samples_c), dtype=complex)
 
+    cdef int_t ch_idx, p_idx, s_idx
+    cdef int_t bb_idx
     for ch_idx in range(0, frames_c*channles_c):
         for p_idx in range(0, pulses_c):
             for s_idx in range(0, samples_c):
-                bb_idx = ch_idx * ch_stride + p_idx * pulse_stride + s_idx
+                bb_idx = ch_idx * chstride_c + p_idx * psstride_c + s_idx
                 baseband[ch_idx, p_idx, s_idx] = bb_real[bb_idx] +  1j*bb_imag[bb_idx]
 
     if noise:
@@ -401,36 +383,19 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
             Mem_Copy_Vec3(&spdx_mv[0,0,0], &spdy_mv[0,0,0], &spdz_mv[0,0,0], bbsize_c, interf_spd_vt)
             Mem_Copy_Vec3(&rotx_mv[0,0,0], &roty_mv[0,0,0], &rotz_mv[0,0,0], bbsize_c, interf_rot_vt)
             Mem_Copy_Vec3(&rrtx_mv[0,0,0], &rrty_mv[0,0,0], &rrtz_mv[0,0,0], bbsize_c, interf_rrt_vt)
-                                                                             
+
         else:
-            interf_loc_vt.push_back(
-                Vec3[float_t](
-                    <float_t> radar.interf.location[0],
-                    <float_t> radar.interf.location[1],
-                    <float_t> radar.interf.location[2]
-                )
-            )
-            interf_spd_vt.push_back(
-                Vec3[float_t](
-                    <float_t> radar.interf.speed[0],
-                    <float_t> radar.interf.speed[1],
-                    <float_t> radar.interf.speed[2]
-                )
-            )
-            interf_rot_vt.push_back(
-                Vec3[float_t](
-                    <float_t> radar.interf.rotation[0],
-                    <float_t> radar.interf.rotation[1],
-                    <float_t> radar.interf.rotation[2]
-                )
-            )
-            interf_rrt_vt.push_back(
-                Vec3[float_t](
-                    <float_t> radar.interf.rotation_rate[0],
-                    <float_t> radar.interf.rotation_rate[1],
-                    <float_t> radar.interf.rotation_rate[2]
-                )
-            )
+            location_mv = radar.interf.location.astype(np_float)
+            interf_loc_vt.push_back(Vec3[float_t](&location_mv[0]))
+
+            speed_mv = radar.interf.speed.astype(np_float)
+            interf_spd_vt.push_back(Vec3[float_t](&speed_mv[0]))
+
+            rotation_mv = radar.interf.rotation.astype(np_float)
+            interf_rot_vt.push_back(Vec3[float_t](&rotation_mv[0]))
+
+            rotation_rate_mv = radar.interf.rotation_rate.astype(np_float)
+            interf_rrt_vt.push_back(Vec3[float_t](&rotation_rate_mv[0]))
 
         interf_radar_c.SetMotion(interf_loc_vt,
                         interf_spd_vt,
@@ -444,7 +409,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
         for ch_idx in range(0, frames_c*channles_c):
             for p_idx in range(0, pulses_c):
                 for s_idx in range(0, samples_c):
-                    bb_idx = ch_idx * ch_stride + p_idx * pulse_stride + s_idx
+                    bb_idx = ch_idx * chstride_c + p_idx * psstride_c + s_idx
                     interference[ch_idx, p_idx, s_idx] = bb_real[bb_idx] +  1j*bb_imag[bb_idx]
     else:
         interference = None
