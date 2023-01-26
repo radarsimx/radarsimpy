@@ -393,6 +393,8 @@ cdef Target[float_t] cp_Target(radar,
     rotation = np.array(target.get('rotation', (0, 0, 0)), dtype=object)
     rotation_rate = np.array(target.get( 'rotation_rate', (0, 0, 0)), dtype=object)
 
+    cdef float_t[:] location_mv, speed_mv, rotation_mv, rotation_rate_mv
+
     permittivity = target.get('permittivity', 'PEC')
     if permittivity == "PEC":
         ep_c = cpp_complex[float_t](-1, 0)
@@ -483,34 +485,17 @@ cdef Target[float_t] cp_Target(radar,
         Mem_Copy_Vec3(&rrtx_mv[0,0,0], &rrty_mv[0,0,0], &rrtz_mv[0,0,0], bbsize_c, rrt_vt)
 
     else:
-        loc_vt.push_back(
-            Vec3[float_t](
-                <float_t> location[0],
-                <float_t> location[1],
-                <float_t> location[2]
-            )
-        )
-        spd_vt.push_back(
-            Vec3[float_t](
-                <float_t> speed[0],
-                <float_t> speed[1],
-                <float_t> speed[2]
-            )
-        )
-        rot_vt.push_back(
-            Vec3[float_t](
-                <float_t> np.radians(rotation[0]),
-                <float_t> np.radians(rotation[1]),
-                <float_t> np.radians(rotation[2])
-            )
-        )
-        rrt_vt.push_back(
-            Vec3[float_t](
-                <float_t> np.radians(rotation_rate[0]),
-                <float_t> np.radians(rotation_rate[1]),
-                <float_t> np.radians(rotation_rate[2])
-            )
-        )
+        location_mv = location.astype(np_float)
+        loc_vt.push_back(Vec3[float_t](&location_mv[0]))
+
+        speed_mv = speed.astype(np_float)
+        spd_vt.push_back(Vec3[float_t](&speed_mv[0]))
+
+        rotation_mv = np.radians(rotation.astype(np_float)).astype(np_float)
+        rot_vt.push_back(Vec3[float_t](&rotation_mv[0]))
+
+        rotation_rate_mv = np.radians(rotation_rate.astype(np_float)).astype(np_float)
+        rrt_vt.push_back(Vec3[float_t](&rotation_rate_mv[0]))
 
     return Target[float_t](&points_mv[0, 0],
                            &cells_mv[0, 0],
