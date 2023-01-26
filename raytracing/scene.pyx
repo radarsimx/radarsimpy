@@ -173,25 +173,25 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     cdef int_t chstride_c = pulses_c * samples_c
     cdef int_t psstride_c = samples_c
 
-    cdef int_t idx
+    cdef int_t idx_c
     
     """
     Targets
     """
     cdef double[:, :, :] timestamp_mv = radar.timestamp.astype(np.float64)
 
-    for idx in range(0, len(targets)):
+    for idx_c in range(0, len(targets)):
         scene_c.AddTarget(
-            cp_Target(radar, targets[idx], np.shape(timestamp_mv))
+            cp_Target(radar, targets[idx_c], np.shape(timestamp_mv))
         )
 
     """
     Transmitter
     """
     tx_c = cp_Transmitter(radar)
-    for idx in range(0, txsize_c):
+    for idx_c in range(0, txsize_c):
         tx_c.AddChannel(
-            cp_TxChannel(radar.transmitter, idx)
+            cp_TxChannel(radar.transmitter, idx_c)
         )
 
     """
@@ -204,9 +204,9 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
         <float_t> radar.receiver.baseband_gain,
         samples_c
     )
-    for idx in range(0, rxsize_c):
+    for idx_c in range(0, rxsize_c):
         rx_c.AddChannel(
-            cp_RxChannel(radar.receiver, idx)
+            cp_RxChannel(radar.receiver, idx_c)
         )
 
     """
@@ -346,8 +346,8 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
         """
         Transmitter Channels
         """
-        for idx in range(0, radar.interf.transmitter.channel_size):
-            interf_tx_c.AddChannel(cp_TxChannel(radar.interf.transmitter, idx))
+        for idx_c in range(0, radar.interf.transmitter.channel_size):
+            interf_tx_c.AddChannel(cp_TxChannel(radar.interf.transmitter, idx_c))
 
         """
         Receiver
@@ -360,8 +360,8 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
             <int_t> radar.interf.samples_per_pulse
         )
 
-        for idx in range(0, radar.interf.receiver.channel_size):
-            interf_rx_c.AddChannel(cp_RxChannel(radar.interf.receiver, idx))
+        for idx_c in range(0, radar.interf.receiver.channel_size):
+            interf_rx_c.AddChannel(cp_RxChannel(radar.interf.receiver, idx_c))
 
         interf_radar_c = Radar[float_t](interf_tx_c, interf_rx_c)
 

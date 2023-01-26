@@ -300,7 +300,7 @@ cdef TxChannel[float_t] cp_TxChannel(tx,
 cdef RxChannel[float_t] cp_RxChannel(rx,
                                      rx_idx):
     """
-    cp_RxChannel(tx, tx_idx)
+    cp_RxChannel(rx, rx_idx)
 
     Creat RxChannel object in Cython
 
@@ -351,7 +351,7 @@ cdef Target[float_t] cp_Target(radar,
                                target,
                                shape):
     """
-    cp_Target(tx, tx_idx)
+    cp_Target((radar, target, shape)
 
     Creat Target object in Cython
 
