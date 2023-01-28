@@ -53,7 +53,7 @@ A **Radar** **Sim**ulator for **Py**thon
 
 - numpy
 - scipy
-- meshio
+- pymeshlab (preferred) or meshio
 - [Visual C++ Runtime](https://aka.ms/vs/16/release/vc_redist.x64.exe/) (`Windows`)
 
 ## Installation
