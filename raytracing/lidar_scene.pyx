@@ -33,7 +33,7 @@ from radarsimpy.includes.radarsimc cimport Mem_Copy
 from radarsimpy.includes.zpvector cimport Vec3
 from radarsimpy.includes.type_def cimport float_t, int_t, vector
 
-import meshio
+# import meshio
 import numpy as np
 from libcpp cimport bool
 
@@ -111,10 +111,27 @@ cpdef lidar_scene(lidar, targets, t=0):
     cdef int_t idx_c
 
     for idx_c in range(0, len(targets)):
-        t_mesh = meshio.read(targets[idx_c]['model'])
-
-        points_mv = t_mesh.points.astype(np_float)
-        cells_mv = t_mesh.cells[0].data.astype(np.int32)
+        try:
+            import pymeshlab
+        except:
+            try:
+                import meshio
+            except:
+                raise("PyMeshLab is requied to process the 3D model.")
+            else:
+                t_mesh = meshio.read(targets[idx_c]['model'])
+                points_mv = t_mesh.points.astype(np_float)
+                cells_mv = t_mesh.cells[0].data.astype(np.int32)
+        else:
+            ms = pymeshlab.MeshSet()
+            ms.load_new_mesh(targets[idx_c]['model'])
+            t_mesh = ms.current_mesh()
+            v_matrix = np.array(t_mesh.vertex_matrix())
+            f_matrix = np.array(t_mesh.face_matrix())
+            if np.isfortran(v_matrix):
+                points_mv = np.ascontiguousarray(v_matrix).astype(np_float)
+                cells_mv = np.ascontiguousarray(f_matrix).astype(np.int32)
+            ms.clear()
 
         origin_mv = np.array(targets[idx_c].get('origin', (0, 0, 0)), dtype=np_float)
 

@@ -32,11 +32,13 @@ from radarsimpy.includes.zpvector cimport Vec3
 from radarsimpy.includes.type_def cimport int_t
 from radarsimpy.includes.radarsimc cimport Target, Rcs
 
-import meshio
+# import meshio
 import numpy as np
 
 cimport cython
 cimport numpy as np
+
+np_float = np.float32
 
 
 @cython.cdivision(True)
@@ -79,9 +81,30 @@ cpdef rcs_sbr(model,
     :return: Target's RCS (m^2), use 10*log10(RCS) to convert to dBsm
     :rtype: float
     """
-    t_mesh = meshio.read(model)
-    cdef float_t[:, :] points_mv = t_mesh.points.astype(np.float32)
-    cdef int_t[:, :] cells_mv = t_mesh.cells[0].data.astype(np.int32)
+    cdef float_t[:, :] points_mv
+    cdef int_t[:, :] cells_mv
+
+    try:
+        import pymeshlab
+    except:
+        try:
+            import meshio
+        except:
+            raise("PyMeshLab is requied to process the 3D model.")
+        else:
+            t_mesh = meshio.read(model)
+            points_mv = t_mesh.points.astype(np_float)
+            cells_mv = t_mesh.cells[0].data.astype(np.int32)
+    else:
+        ms = pymeshlab.MeshSet()
+        ms.load_new_mesh(model)
+        t_mesh = ms.current_mesh()
+        v_matrix = np.array(t_mesh.vertex_matrix())
+        f_matrix = np.array(t_mesh.face_matrix())
+        if np.isfortran(v_matrix):
+            points_mv = np.ascontiguousarray(v_matrix).astype(np_float)
+            cells_mv = np.ascontiguousarray(f_matrix).astype(np.int32)
+        ms.clear()
 
     if inc_phi is None:
         inc_phi = obs_phi

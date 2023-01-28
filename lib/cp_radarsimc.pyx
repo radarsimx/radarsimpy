@@ -28,8 +28,6 @@
 #            .+:
 
 
-import meshio
-
 from radarsimpy.includes.zpvector cimport Vec3
 from radarsimpy.includes.type_def cimport int_t
 from radarsimpy.includes.type_def cimport vector
@@ -383,9 +381,30 @@ cdef Target[float_t] cp_Target(radar,
     cdef int_t ch_idx, ps_idx, sp_idx
     cdef int_t bbsize_c = <int_t>(radar.channel_size*radar.frames*radar.transmitter.pulses*radar.samples_per_pulse)
 
-    t_mesh = meshio.read(target['model'])
-    cdef float_t[:, :] points_mv = t_mesh.points.astype(np_float)
-    cdef int_t[:, :] cells_mv = t_mesh.cells[0].data.astype(np.int32)
+    cdef float_t[:, :] points_mv
+    cdef int_t[:, :] cells_mv
+    try:
+        import pymeshlab
+    except:
+        try:
+            import meshio
+        except:
+            raise("PyMeshLab is requied to process the 3D model.")
+        else:
+            t_mesh = meshio.read(target['model'])
+            points_mv = t_mesh.points.astype(np_float)
+            cells_mv = t_mesh.cells[0].data.astype(np.int32)
+    else:
+        ms = pymeshlab.MeshSet()
+        ms.load_new_mesh(target['model'])
+        t_mesh = ms.current_mesh()
+        v_matrix = np.array(t_mesh.vertex_matrix())
+        f_matrix = np.array(t_mesh.face_matrix())
+        if np.isfortran(v_matrix):
+            points_mv = np.ascontiguousarray(v_matrix).astype(np_float)
+            cells_mv = np.ascontiguousarray(f_matrix).astype(np.int32)
+        ms.clear()
+
     cdef float_t[:] origin_mv = np.array(target.get('origin', (0, 0, 0)), dtype=np_float)
 
     location = np.array(target.get('location', (0, 0, 0)), dtype=object)
