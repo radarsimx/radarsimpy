@@ -34,6 +34,10 @@ from libcpp cimport bool
 from libcpp.complex cimport complex as cpp_complex
 
 
+"""
+Memory Manipulation
+    Copy memory view into C++ vector
+"""
 cdef extern from "libs/mem_lib.hpp":
     cdef void Mem_Copy[T](T * ptr,
                           int_t size,
