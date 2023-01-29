@@ -331,9 +331,10 @@ cdef RxChannel[float_t] cp_RxChannel(rx,
     Mem_Copy(&el_ptn_mv[0], <int_t>(len(rx.el_patterns[rx_idx])), el_ptn_vt)
 
     cdef float_t[:] location_mv = rx.locations[rx_idx].astype(np_float)
+    cdef float_t[:] polarization_mv = rx.polarization[rx_idx].astype(np_float)
     return RxChannel[float_t](
         Vec3[float_t](&location_mv[0]),
-        Vec3[float_t](0, 0, 1),
+        Vec3[float_t](&polarization_mv[0]),
         az_ang_vt,
         az_ptn_vt,
         el_ang_vt,
