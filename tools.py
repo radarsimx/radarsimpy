@@ -178,11 +178,12 @@ def roc_pd(pfa, snr, N=1, stype='Coherent'):
             if (N <= 2):
                 pd[it_pfa.index, :] = ko
             else:
-                if log_factorial(N-2.) <= 500:
-                    temp4 = thred**(N-1)*np.exp(-thred) / \
-                        (temp_1*np.exp(log_factorial(N-2.)))
-                else:
+                temp4 = thred**(N-1)*np.exp(-thred) / \
+                    (temp_1*np.exp(log_factorial(N-2.)))
+
+                if np.isnan(temp4) or np.isinf(temp4):
                     temp4 = 0
+
                 pd[it_pfa.index, :] = temp4+1-gammainc(N-1, thred) + \
                     ko*gammainc(N-1, thred/(1+2/(N*snr)))
             if np.size(pd[it_pfa.index, :]) == 1:
@@ -220,7 +221,7 @@ def roc_pd(pfa, snr, N=1, stype='Coherent'):
                     a1 = ai
 
                     for ii in range(1, i+1, 1):
-                        temp_sw4 = temp_sw4*(N+1-ii)
+                        temp_sw4 = temp_sw4*int(N+1-ii)
 
                     term = (snr/2)**i*gammai*temp_sw4/np.exp(log_factorial(i))
                     sum_var = sum_var+term
@@ -316,7 +317,10 @@ def roc_snr(pfa, pd, N=1, stype='Coherent'):
 
     max_iter = 1000
     snra = 40
-    snrb = -30
+    snrb = -20
+
+    if stype == 'Coherent' or stype == 'Real':
+        snrb = -40
 
     size_pd = np.size(pd)
     size_pfa = np.size(pfa)
