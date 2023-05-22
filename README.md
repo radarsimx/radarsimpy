@@ -1,6 +1,6 @@
 [![Build Status](https://dev.azure.com/rookiepeng/radarsimc/_apis/build/status/rookiepeng.radarsimc?branchName=master)](https://dev.azure.com/rookiepeng/radarsimc/_build/latest?definitionId=3&branchName=master)
 <a href="#" target="_blank" rel="nofollow"><img src="https://img.shields.io/badge/Python-3.7%7C3.8%7C3.9%7C3.10%7C3.11-blue?style=flat&logo=python" height="20" ></a>
-<a href="https://rookiepeng.github.io/radarsimpy/" target="_blank" rel="nofollow"><img src="https://img.shields.io/badge/Documentation-latest-brightgree?style=flat&logo=read-the-docs" height="20" ></a>
+<a href="https://radarsimx.github.io/radarsimpy/" target="_blank" rel="nofollow"><img src="https://img.shields.io/badge/Documentation-latest-brightgree?style=flat&logo=read-the-docs" height="20" ></a>
 [![DOI](https://zenodo.org/badge/282958664.svg)](https://zenodo.org/badge/latestdoi/282958664)
 
 **`!!! This module needs to be built/used together with RadarSimC (the C++ engine for radar simulator)`**
@@ -96,7 +96,7 @@ GPU parallelization (CUDA) has been added since v6.0.0.
 | Linux   | ✅  | ✅         |
 | macOS   | ❌   | ❌          |
 
-![performance](https://github.com/rookiepeng/radarsimpy/raw/master/assets/performance.png)
+![performance](https://github.com/radarsimx/radarsimpy/raw/master/assets/performance.png)
 
 ## Coordinate Systems
 
@@ -120,7 +120,7 @@ GPU parallelization (CUDA) has been added since v6.0.0.
 
 ## Usage Examples
 
-The source files of these Jupyter notebooks are available [here](https://github.com/rookiepeng/radar-notebooks).
+The source files of these Jupyter notebooks are available [here](https://github.com/radarsimx/radar-notebooks).
 
 - ### Radar modeling and point target simulation
 
@@ -162,37 +162,37 @@ The source files of these Jupyter notebooks are available [here](https://github.
 
 - **Radar Model**: Classes to define a radar system
 
-  - [`radarsimpy.Transmitter`](https://rookiepeng.github.io/radarsimpy/radar.html#radarsimpy-transmitter): Radar transmitter
-  - [`radarsimpy.Receiver`](https://rookiepeng.github.io/radarsimpy/radar.html#radarsimpy-receiver): Radar receiver
-  - [`radarsimpy.Radar`](https://rookiepeng.github.io/radarsimpy/radar.html#radarsimpy-radar): Radar system
+  - [`radarsimpy.Transmitter`](https://radarsimx.github.io/radarsimpy/radar.html#radarsimpy-transmitter): Radar transmitter
+  - [`radarsimpy.Receiver`](https://radarsimx.github.io/radarsimpy/radar.html#radarsimpy-receiver): Radar receiver
+  - [`radarsimpy.Radar`](https://radarsimx.github.io/radarsimpy/radar.html#radarsimpy-radar): Radar system
 
 - **Simulator**: Radar baseband signal simulator
 
-  - [`radarsimpy.simulator.simpy`](https://rookiepeng.github.io/radarsimpy/sim.html#radarsimpy.simulator.simpy): Simulates and generates raw time domain baseband data (Python engine)
-  - [`radarsimpy.simulator.simc`](https://rookiepeng.github.io/radarsimpy/sim.html#radarsimpy.simulator.simc): Simulates and generates raw time domain baseband data (C++ engine)
+  - [`radarsimpy.simulator.simpy`](https://radarsimx.github.io/radarsimpy/sim.html#radarsimpy.simulator.simpy): Simulates and generates raw time domain baseband data (Python engine)
+  - [`radarsimpy.simulator.simc`](https://radarsimx.github.io/radarsimpy/sim.html#radarsimpy.simulator.simc): Simulates and generates raw time domain baseband data (C++ engine)
 
 - **Raytracing**: Raytracing module for radar scene simulation
 
-  - [`radarsimpy.rt.lidar_scene`](https://rookiepeng.github.io/radarsimpy/rt.html#radarsimpy.rt.lidar_scene): Simulates LiDAR's point cloud based on a 3D environment model with ray tracing
-  - [`radarsimpy.rt.rcs_sbr`](https://rookiepeng.github.io/radarsimpy/rt.html#radarsimpy.rt.rcs_sbr): Simulates target's radar cross section (RCS) based on the 3D model with ray tracing
-  - [`radarsimpy.rt.scene`](https://rookiepeng.github.io/radarsimpy/rt.html#radarsimpy.rt.scene): Simulates radar's response signal in a 3D environment model with ray tracing
+  - [`radarsimpy.rt.lidar_scene`](https://radarsimx.github.io/radarsimpy/rt.html#radarsimpy.rt.lidar_scene): Simulates LiDAR's point cloud based on a 3D environment model with ray tracing
+  - [`radarsimpy.rt.rcs_sbr`](https://radarsimx.github.io/radarsimpy/rt.html#radarsimpy.rt.rcs_sbr): Simulates target's radar cross section (RCS) based on the 3D model with ray tracing
+  - [`radarsimpy.rt.scene`](https://radarsimx.github.io/radarsimpy/rt.html#radarsimpy.rt.scene): Simulates radar's response signal in a 3D environment model with ray tracing
 
 - **Processing**: Basic radar signal processing module
 
-  - [`radarsimpy.processing.range_fft`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.range_fft): Calculate range profile matrix
-  - [`radarsimpy.processing.doppler_fft`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.doppler_fft): Calculate range-Doppler matrix
-  - [`radarsimpy.processing.range_doppler_fft`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.range_doppler_fft): Range-Doppler processing
-  - [`radarsimpy.processing.cfar_ca_1d`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.cfar_ca_1d): 1D Cell Averaging CFAR (CA-CFAR)
-  - [`radarsimpy.processing.cfar_ca_2d`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.cfar_ca_2d): 2D Cell Averaging CFAR (CA-CFAR)
-  - [`radarsimpy.processing.cfar_os_1d`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.cfar_os_1d): 1D Ordered Statistic CFAR (OS-CFAR)
-  - [`radarsimpy.processing.cfar_os_2d`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.cfar_os_2d): 2D Ordered Statistic CFAR (OS-CFAR)
-  - [`radarsimpy.processing.doa_music`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.doa_music): Estimate DoA using MUSIC for a ULA
-  - [`radarsimpy.processing.doa_root_music`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.doa_root_music): Estimate DoA using Root-MUSIC for a ULA
-  - [`radarsimpy.processing.doa_esprit`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.doa_esprit): Estimate DoA using ESPRIT for a ULA
-  - [`radarsimpy.processing.doa_capon`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.doa_capon): Capon (MVDR) beamforming for a ULA
-  - [`radarsimpy.processing.doa_bartlett`](https://rookiepeng.github.io/radarsimpy/process.html#radarsimpy.processing.doa_bartlett): Bartlett beamforming for a ULA
+  - [`radarsimpy.processing.range_fft`](https://radarsimx.github.io/radarsimpy/process.html#radarsimpy.processing.range_fft): Calculate range profile matrix
+  - [`radarsimpy.processing.doppler_fft`](https://radarsimx.github.io/radarsimpy/process.html#radarsimpy.processing.doppler_fft): Calculate range-Doppler matrix
+  - [`radarsimpy.processing.range_doppler_fft`](https://radarsimx.github.io/radarsimpy/process.html#radarsimpy.processing.range_doppler_fft): Range-Doppler processing
+  - [`radarsimpy.processing.cfar_ca_1d`](https://radarsimx.github.io/radarsimpy/process.html#radarsimpy.processing.cfar_ca_1d): 1D Cell Averaging CFAR (CA-CFAR)
+  - [`radarsimpy.processing.cfar_ca_2d`](https://radarsimx.github.io/radarsimpy/process.html#radarsimpy.processing.cfar_ca_2d): 2D Cell Averaging CFAR (CA-CFAR)
+  - [`radarsimpy.processing.cfar_os_1d`](https://radarsimx.github.io/radarsimpy/process.html#radarsimpy.processing.cfar_os_1d): 1D Ordered Statistic CFAR (OS-CFAR)
+  - [`radarsimpy.processing.cfar_os_2d`](https://radarsimx.github.io/radarsimpy/process.html#radarsimpy.processing.cfar_os_2d): 2D Ordered Statistic CFAR (OS-CFAR)
+  - [`radarsimpy.processing.doa_music`](https://radarsimx.github.io/radarsimpy/process.html#radarsimpy.processing.doa_music): Estimate DoA using MUSIC for a ULA
+  - [`radarsimpy.processing.doa_root_music`](https://radarsimx.github.io/radarsimpy/process.html#radarsimpy.processing.doa_root_music): Estimate DoA using Root-MUSIC for a ULA
+  - [`radarsimpy.processing.doa_esprit`](https://radarsimx.github.io/radarsimpy/process.html#radarsimpy.processing.doa_esprit): Estimate DoA using ESPRIT for a ULA
+  - [`radarsimpy.processing.doa_capon`](https://radarsimx.github.io/radarsimpy/process.html#radarsimpy.processing.doa_capon): Capon (MVDR) beamforming for a ULA
+  - [`radarsimpy.processing.doa_bartlett`](https://radarsimx.github.io/radarsimpy/process.html#radarsimpy.processing.doa_bartlett): Bartlett beamforming for a ULA
 
 - **Tools**: Receiver operating characteristic analysis
 
-  - [`radarsimpy.tools.roc_pd`](https://rookiepeng.github.io/radarsimpy/tools.html#radarsimpy.tools.roc_pd): Calculate probability of detection (Pd) in receiver operating characteristic (ROC)
-  - [`radarsimpy.tools.roc_snr`](https://rookiepeng.github.io/radarsimpy/tools.html#radarsimpy.tools.roc_snr): Calculate the minimal SNR for a certain probability of detection (Pd) and probability of false alarm (Pfa) in receiver operating characteristic (ROC)
+  - [`radarsimpy.tools.roc_pd`](https://radarsimx.github.io/radarsimpy/tools.html#radarsimpy.tools.roc_pd): Calculate probability of detection (Pd) in receiver operating characteristic (ROC)
+  - [`radarsimpy.tools.roc_snr`](https://radarsimx.github.io/radarsimpy/tools.html#radarsimpy.tools.roc_snr): Calculate the minimal SNR for a certain probability of detection (Pd) and probability of false alarm (Pfa) in receiver operating characteristic (ROC)
