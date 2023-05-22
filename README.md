@@ -5,8 +5,6 @@
 
 **`!!! This module needs to be built/used together with RadarSimC (the C++ engine for radar simulator)`**
 
-**Please fill out this [form](https://zpeng.me/#contact) to request the module**
-
 # RadarSimPy
 
 <img src="./assets/radarsimpy.svg" alt="logo" width="200"/>
@@ -126,39 +124,39 @@ The source files of these Jupyter notebooks are available [here](https://github.
 
 - ### Radar modeling and point target simulation
 
-  - [Doppler radar](https://zpeng.me/2019/05/16/doppler-radar/)
-  - [FMCW radar](https://zpeng.me/2018/10/11/fmcw-radar/)
-  - [TDM MIMO FMCW radar](https://zpeng.me/2019/04/07/tdm-mimo-fmcw-radar/)
-  - [PMCW radar](https://zpeng.me/2019/05/24/pmcw-radar/)
-  - [Arbitrary waveform](https://zpeng.me/2021/05/10/arbitrary-waveform/)
-  - [Phase noise](https://zpeng.me/2021/01/13/phase-noise/)
-  - [CFAR](https://zpeng.me/2021/01/10/cfar/)
-  - [DoA estimation](https://zpeng.me/2022/12/12/doa-estimation/)
-  - [Interference](https://zpeng.me/2023/01/13/interference/)
+  - [Doppler radar](https://radarsimx.com/2019/05/16/doppler-radar/)
+  - [FMCW radar](https://radarsimx.com/2018/10/11/fmcw-radar/)
+  - [TDM MIMO FMCW radar](https://radarsimx.com/2019/04/07/tdm-mimo-fmcw-radar/)
+  - [PMCW radar](https://radarsimx.com/2019/05/24/pmcw-radar/)
+  - [Arbitrary waveform](https://radarsimx.com/2021/05/10/arbitrary-waveform/)
+  - [Phase noise](https://radarsimx.com/2021/01/13/phase-noise/)
+  - [CFAR](https://radarsimx.com/2021/01/10/cfar/)
+  - [DoA estimation](https://radarsimx.com/2022/12/12/doa-estimation/)
+  - [Interference](https://radarsimx.com/2023/01/13/interference/)
 
 - ### Radar modeling and 3D scene simulation with raytracing
 
-  - [Imaging radar](https://zpeng.me/2022/12/02/imaging-radar/)
-  - [FMCW radar with a corner reflector](https://zpeng.me/2021/05/10/fmcw-radar-with-a-corner-reflector/)
-  - [FMCW radar with a plate](https://zpeng.me/2021/05/10/fmcw-radar-with-a-plate/)
-  - [FMCW radar with a car](https://zpeng.me/2021/05/10/fmcw-radar-with-a-car/)
-  - [Doppler of a turbine](https://zpeng.me/2021/05/10/doppler-of-a-turbine/)
-  - [Micro-Doppler](https://zpeng.me/2021/05/10/micro-doppler/)
-  - [Multi-path effect](https://zpeng.me/2021/05/10/multi-path-effect/)
+  - [Imaging radar](https://radarsimx.com/2022/12/02/imaging-radar/)
+  - [FMCW radar with a corner reflector](https://radarsimx.com/2021/05/10/fmcw-radar-with-a-corner-reflector/)
+  - [FMCW radar with a plate](https://radarsimx.com/2021/05/10/fmcw-radar-with-a-plate/)
+  - [FMCW radar with a car](https://radarsimx.com/2021/05/10/fmcw-radar-with-a-car/)
+  - [Doppler of a turbine](https://radarsimx.com/2021/05/10/doppler-of-a-turbine/)
+  - [Micro-Doppler](https://radarsimx.com/2021/05/10/micro-doppler/)
+  - [Multi-path effect](https://radarsimx.com/2021/05/10/multi-path-effect/)
 
 - ### 3D modeled target's RCS simulation
 
-  - [Corner reflector RCS](https://zpeng.me/2021/05/10/corner-reflector-rcs/)
-  - [Plate RCS](https://zpeng.me/2021/05/10/plate-rcs/)
-  - [Car RCS](https://zpeng.me/2021/05/10/car-rcs/)
+  - [Corner reflector RCS](https://radarsimx.com/2021/05/10/corner-reflector-rcs/)
+  - [Plate RCS](https://radarsimx.com/2021/05/10/plate-rcs/)
+  - [Car RCS](https://radarsimx.com/2021/05/10/car-rcs/)
 
 - ### LiDAR point cloud
 
-  - [LIDAR point cloud](https://zpeng.me/2020/02/05/lidar-point-cloud/)
+  - [LIDAR point cloud](https://radarsimx.com/2020/02/05/lidar-point-cloud/)
 
 - ### Receiver characterization
 
-  - [Receiver operating characteristic (ROC)](https://zpeng.me/2019/10/06/receiver-operating-characteristic/)
+  - [Receiver operating characteristic (ROC)](https://radarsimx.com/2019/10/06/receiver-operating-characteristic/)
 
 ## API Reference
 
