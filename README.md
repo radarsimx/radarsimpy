@@ -122,7 +122,7 @@ GPU parallelization (CUDA) has been added since v6.0.0.
 
 ## Usage Examples
 
-The source files of these Jupyter notebooks are available [here](https://github.com/radarsimx/radar-notebooks).
+The source files of these Jupyter notebooks are available [here](https://github.com/radarsimx/radarsimnb).
 
 - ### Radar modeling and point target simulation
 
