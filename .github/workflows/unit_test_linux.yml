@@ -1,0 +1,84 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Linux Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
+        c_compiler: [gcc-12]
+        cxx_compiler: [g++-12]
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ssh-key: ${{ secrets.RADARSIMC }}
+        submodules: recursive
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest numpy scipy pymeshlab cython Sphinx sphinx-rtd-theme
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Build
+      env:
+        CC: ${{ matrix.c_compiler }}
+        CXX: ${{ matrix.cxx_compiler }}
+      run: |
+        sudo chown -R $USER:$USER /home/runner/work/radarsimpy
+        chmod +x build_linux.sh
+        ./build_linux.sh
+    - name: Test with Google Test
+      run: |
+        ./src/radarsimc/build/radarsimc_test
+    - name: Test with pytest
+      run: |
+        pytest
+    - name: Archive built module
+      uses: actions/upload-artifact@v3
+      if: success()
+      with:
+        name: radarsimpy_linux_py${{ matrix.python-version }}
+        path: ./radarsimpy
+    - name: Generate documentation
+      run: |
+        cd gen_docs && make html && cd ..
+    - name: Archive documentation
+      if: success() && matrix.python-version == 3.11
+      uses: actions/upload-artifact@v3
+      with:
+        name: docs
+        path: ./gen_docs/_build/html
+    - name: Setup Pages
+      if: matrix.python-version == 3.11
+      uses: actions/configure-pages@v3
+    - name: Upload artifact
+      if: matrix.python-version == 3.11
+      uses: actions/upload-pages-artifact@v1
+      with:
+        # Upload entire repository
+        path: './gen_docs/_build/html'
+    - name: Deploy to GitHub Pages
+      id: deployment
+      if: matrix.python-version == 3.11
+      uses: actions/deploy-pages@v2
+
