@@ -62,9 +62,9 @@ jobs:
     - name: Generate documentation
       run: |
         cd gen_docs && make html && cd ..
+    if: success() && matrix.python-version == 3.11
     - name: Archive documentation
       uses: actions/upload-artifact@v3
-      if: success() && matrix.python-version == 3.10
       with:
         name: docs
         path: ./gen_docs/_build/html
