@@ -38,12 +38,12 @@ jobs:
         CC: ${{ matrix.c_compiler }}
         CXX: ${{ matrix.cxx_compiler }}
       run: |
-        sudo chown -R $USER:$USER /home/runner/work/radarsimc
+        sudo chown -R $USER:$USER /home/runner/work/radarsimpy
         chmod +x build_linux.sh
         ./build_linux.sh
     - name: Test with Google Test
       run: |
-        ./src/radarsimc/build/radarsimc_test
+        ./src/radarsimpy/build/radarsimc_test
     - name: Test with pytest
       run: |
         pytest
