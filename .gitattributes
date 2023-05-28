@@ -10,3 +10,5 @@
 *.eot binary
 *.ttf binary
 *.pdf binary
+*.fbx binary
+*.stl binary
