@@ -62,19 +62,22 @@ jobs:
     - name: Generate documentation
       run: |
         cd gen_docs && make html && cd ..
-    if: success() && matrix.python-version == 3.11
     - name: Archive documentation
       uses: actions/upload-artifact@v3
+      if: success() && matrix.python-version == 3.11
       with:
         name: docs
         path: ./gen_docs/_build/html
     - name: Setup Pages
       uses: actions/configure-pages@v3
+      if: matrix.python-version == 3.11
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v1
+      if: matrix.python-version == 3.11
       with:
         # Upload entire repository
         path: './gen_docs/_build/html'
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v2
+      if: matrix.python-version == 3.11
