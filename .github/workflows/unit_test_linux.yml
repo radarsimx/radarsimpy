@@ -24,4 +24,5 @@ jobs:
       with:
         ssh-key: ${{ secrets.RADARSIMC }}
         repository: rookiepeng/radarsimc
+        submodules: recursive
   
