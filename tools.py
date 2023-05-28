@@ -45,6 +45,7 @@
 
 
 import numpy as np
+import warnings
 from scipy.special import erfc, erfcinv, gammainc
 
 
@@ -178,8 +179,10 @@ def roc_pd(pfa, snr, N=1, stype='Coherent'):
             if (N <= 2):
                 pd[it_pfa.index, :] = ko
             else:
+                warnings.filterwarnings('ignore', category=RuntimeWarning)
                 temp4 = thred**(N-1)*np.exp(-thred) / \
                     (temp_1*np.exp(log_factorial(N-2.)))
+                warnings.filterwarnings('default', category=RuntimeWarning)
 
                 if np.isnan(temp4) or np.isinf(temp4):
                     temp4 = 0
