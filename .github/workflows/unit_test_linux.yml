@@ -22,6 +22,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-      ssh-key: ${{ secrets.RADARSIMC }}
-      repository: git@github.com:rookiepeng/radarsimc.git
+        ssh-key: ${{ secrets.RADARSIMC }}
+        repository: git@github.com:rookiepeng/radarsimc.git
   
