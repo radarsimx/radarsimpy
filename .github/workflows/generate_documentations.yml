@@ -3,11 +3,10 @@
 
 name: Generate Documentations
 
-on:
+on:  
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    tags:
+      - '*'
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
