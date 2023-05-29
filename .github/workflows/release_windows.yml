@@ -1,13 +1,12 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Windows Test
+name: Release on Windows
 
-on:
+on:  
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    tags:
+      - '*'
 
 jobs:
   build:
@@ -33,9 +32,9 @@ jobs:
     - name: Build
       run: |
         .\build_win.bat
-    - name: Test with Google Test
-      run: |
-        .\src\radarsimc\build\Release\radarsimc_test.exe
-    - name: Test with pytest
-      run: |
-        pytest
+    - name: Archive built module
+      uses: actions/upload-artifact@v3
+      if: success()
+      with:
+        name: radarsimpy_win_py${{ matrix.python-version }}
+        path: .\radarsimpy
