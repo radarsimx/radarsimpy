@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'RadarSimPy'
-copyright = '2018 - PRESENT, Zhengyu Peng'
+copyright = '2018 - PRESENT, radarsimx.com'
 author = 'Zhengyu Peng'
 
 
