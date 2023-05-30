@@ -2,9 +2,8 @@
 ![Windows Test](https://github.com/radarsimx/radarsimpy/workflows/Windows%20Test/badge.svg)
 ![Linux Test](https://github.com/radarsimx/radarsimpy/workflows/Linux%20Test/badge.svg)
 [![Documentations](https://img.shields.io/badge/-Documentation-blue?style=flat&logo=read-the-docs)](https://radarsimx.github.io/radarsimpy/)
-[![Download](https://img.shields.io/badge/-Download-green?style=flat)](https://radarsimx.com/product/radarsimpy/)
 
-**`!!! This module needs to be built/used together with RadarSimC (the C++ engine for radar simulator)`**
+<a href="https://radarsimx.com/product/radarsimpy/"><img src="./assets/download_radarsimpy.svg" alt="Download" width="200"/></a>
 
 # RadarSimPy
 
