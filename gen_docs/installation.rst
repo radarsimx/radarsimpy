@@ -1,7 +1,7 @@
 Installation
 =============
 
-.. image:: https://img.shields.io/badge/Download-latest-brightgree?style=flat&logo=python
+.. image:: https://img.shields.io/github/v/tag/radarsimx/radarsimpy?label=Download
   :height: 20
   :target: https://radarsimx.com/product/radarsimpy/
 
