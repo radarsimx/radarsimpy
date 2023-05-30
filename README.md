@@ -7,7 +7,7 @@
 
 # RadarSimPy
 
-<img src="./assets/radarsimpy.svg" alt="logo" width="200"/>
+<img src="./assets/radarsimpy.svg" alt="logo" width="250"/>
 
 A **Radar** **Sim**ulator for **Py**thon
 
