@@ -3,11 +3,11 @@
 ![Linux Test](https://github.com/radarsimx/radarsimpy/workflows/Linux%20Test/badge.svg)
 [![Documentations](https://img.shields.io/badge/-Documentation-blue?style=flat&logo=read-the-docs)](https://radarsimx.github.io/radarsimpy/)
 
-<a href="https://radarsimx.com/product/radarsimpy/"><img src="./assets/download_radarsimpy.svg" alt="Download" width="200"/></a>
+<a href="https://radarsimx.com/product/radarsimpy/"><img src="./assets/download_radarsimpy.svg" alt="Download" width="250"/></a>
 
 # RadarSimPy
 
-<img src="./assets/radarsimpy.svg" alt="logo" width="250"/>
+<img src="./assets/radarsimpy.svg" alt="logo" width="200"/>
 
 A **Radar** **Sim**ulator for **Py**thon
 
