@@ -2,7 +2,6 @@
 ![Linux Test](https://github.com/radarsimx/radarsimpy/workflows/Linux%20Test/badge.svg)
 ![Python support](https://img.shields.io/badge/Python-3.7%7C3.8%7C3.9%7C3.10%7C3.11-blue?style=flat&logo=python)
 [![Documentations](https://img.shields.io/badge/Documentation-latest-brightgree?style=flat&logo=read-the-docs)](https://radarsimx.github.io/radarsimpy/)
-[![DOI](https://zenodo.org/badge/282958664.svg)](https://zenodo.org/badge/latestdoi/282958664)
 [![Download](https://img.shields.io/badge/Download-latest-brightgree?style=flat&logo=python)](https://radarsimx.com/product/radarsimpy/)
 
 **`!!! This module needs to be built/used together with RadarSimC (the C++ engine for radar simulator)`**
