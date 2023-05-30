@@ -22,14 +22,14 @@
      inkscape:pagecheckerboard="0"
      showgrid="false"
      inkscape:zoom="4.0387097"
-     inkscape:cx="86.785144"
+     inkscape:cx="86.785143"
      inkscape:cy="40.483227"
      inkscape:window-width="1920"
      inkscape:window-height="1001"
      inkscape:window-x="-9"
      inkscape:window-y="-9"
      inkscape:window-maximized="1"
-     inkscape:current-layer="text2577" />
+     inkscape:current-layer="svg68" />
   <defs
      id="defs40">
     <linearGradient
@@ -176,7 +176,7 @@
   </metadata>
   <g
      id="g871"
-     transform="matrix(0.07408945,0,0,0.07408945,9.821587,6.7073123)">
+     transform="matrix(0.07408945,0,0,0.07408945,17.821587,6.7073123)">
     <g
        id="g1693"
        transform="matrix(3.3032258,0,0,3.3032258,-90.306034,-173.9173)">
@@ -348,7 +348,8 @@
   <g
      aria-label="Download"
      id="text2577"
-     style="font-size:19.6542px;line-height:1.25;stroke-width:0.491355">
+     style="font-size:19.6542px;line-height:1.25;stroke-width:0.491355"
+     transform="matrix(0.79235027,0,0,0.79235027,18.132629,6.2294923)">
     <path
        d="M 52.650912,37.159195 V 23.397417 h 3.800324 q 7.274357,0 7.274357,6.708147 0,3.18613 -2.02492,5.124679 -2.015323,1.928952 -5.402986,1.928952 z M 54.26317,24.856127 v 10.844358 h 2.053711 q 2.706291,0 4.212985,-1.449114 1.506694,-1.449113 1.506694,-4.10742 0,-5.287824 -5.623711,-5.287824 z"
        style="font-family:'Segoe UI';-inkscape-font-specification:'Segoe UI';fill:#ffffff"
@@ -362,7 +363,7 @@
        style="font-family:'Segoe UI';-inkscape-font-specification:'Segoe UI';fill:#ffffff"
        id="path8753" />
     <path
-       d="m 100.09738,37.159195 h -1.573872 v -5.604518 q 0,-3.128549 -2.284033,-3.128549 -1.180404,0 -1.957743,0.8925 -0.767742,0.882904 -0.767742,2.236049 v 5.604518 h -1.573871 v -9.8271 h 1.573871 v 1.631452 h 0.03839 q 1.113226,-1.861775 3.224517,-1.861775 1.612259,0 2.466372,1.046049 0.854114,1.036452 0.854114,3.003791 z"
+       d="m 100.09738,37.159195 h -1.573872 v -5.604518 q 0,-3.128549 -2.284033,-3.128549 -1.180404,0 -1.957743,0.8925 -0.767742,0.882904 -0.767742,2.236049 v 5.604518 h -1.573871 v -9.8271 h 1.573871 v 1.631452 h 0.03839 q 1.113226,-1.861775 3.224517,-1.861775 1.612259,0 2.466372,1.046049 0.854111,1.036452 0.854111,3.003791 z"
        style="font-family:'Segoe UI';-inkscape-font-specification:'Segoe UI';fill:#ffffff"
        id="path8755" />
     <path
