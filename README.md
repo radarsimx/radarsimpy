@@ -1,7 +1,7 @@
 ![Python support](https://img.shields.io/badge/Python-3.7%7C3.8%7C3.9%7C3.10%7C3.11-blue?style=flat&logo=python)
 ![Windows Test](https://github.com/radarsimx/radarsimpy/workflows/Windows%20Test/badge.svg)
 ![Linux Test](https://github.com/radarsimx/radarsimpy/workflows/Linux%20Test/badge.svg)
-[![Documentations](https://img.shields.io/badge/-Documentation-blue?style=flat&logo=read-the-docs)](https://radarsimx.github.io/radarsimpy/)
+[![Documentations](https://img.shields.io/github/v/tag/radarsimx/radarsimpy?label=Documentation&logo=read-the-docs)](https://radarsimx.github.io/radarsimpy/)
 
 <a href="https://radarsimx.com/product/radarsimpy/"><img src="./assets/download_radarsimpy.svg" alt="Download" width="250"/></a>
 
