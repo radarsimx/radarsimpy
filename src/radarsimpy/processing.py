@@ -271,7 +271,7 @@ def cfar_ca_2d(data, guard, trailing, pfa=1e-5, offset=None):
         g_num = (2*guard[0]+1)*(2*guard[1]+1)
 
         if t_num == g_num:
-            raise('No trailing bins!')
+            raise ('No trailing bins!')
 
         a = (t_num-g_num)*(pfa**(-1/(t_num-g_num))-1)
     else:
@@ -486,7 +486,7 @@ def cfar_os_2d(
         g_num = (2*guard[0]+1)*(2*guard[1]+1)
 
         if t_num == g_num:
-            raise('No trailing bins!')
+            raise ('No trailing bins!')
 
         a = os_cfar_threshold(k, t_num-g_num, pfa)
     else:
