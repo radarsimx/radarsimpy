@@ -177,12 +177,19 @@ def get_polar_image(image, range_bins, angle_bins, fov_deg):
     return polar
 
 
-def cfar_ca_1d(data, guard, trailing, pfa=1e-5, axis=0, offset=None):
+def cfar_ca_1d(data,
+               guard,
+               trailing,
+               pfa=1e-5,
+               axis=0,
+               detector='squarelaw',
+               offset=None):
     """
     1-D Cell Averaging CFAR (CA-CFAR)
 
     :param data:
-        Radar data
+        Amplitude/Power data. Amplitude data for ``linear`` detector,
+        Power data for ``squarelaw`` detector
     :type data: numpy.1darray or numpy.2darray
     :param int guard:
         Number of guard cells on one side, total guard cells are ``2*guard``
@@ -193,6 +200,8 @@ def cfar_ca_1d(data, guard, trailing, pfa=1e-5, axis=0, offset=None):
         Probability of false alarm. ``default 1e-5``
     :param int axis:
         The axis to calculat CFAR. ``default 0``
+    :param str detector:
+        Detector type, ``linear`` or ``squarelaw``. ``default squarelaw``
     :param float offset:
         CFAR threshold offset. If offect is None, threshold offset is
         ``2*trailing(pfa^(-1/2/trailing)-1)``. ``default None``
@@ -201,12 +210,19 @@ def cfar_ca_1d(data, guard, trailing, pfa=1e-5, axis=0, offset=None):
     :rtype: numpy.1darray or numpy.2darray
     """
 
-    data = np.abs(data)
+    if np.iscomplexobj(data):
+        raise ValueError('Input data should not be complex.')
+
     data_shape = np.shape(data)
     cfar = np.zeros_like(data)
 
     if offset is None:
-        a = trailing*2*(pfa**(-1/(trailing*2))-1)
+        if detector == 'squarelaw':
+            a = trailing*2*(pfa**(-1/(trailing*2))-1)
+        elif detector == 'linear':
+            a = np.sqrt(trailing*2*(pfa**(-1/(trailing*2))-1))
+        else:
+            raise ValueError('`detector` can only be `linear` or `squarelaw`.')
     else:
         a = offset
 
@@ -228,12 +244,18 @@ def cfar_ca_1d(data, guard, trailing, pfa=1e-5, axis=0, offset=None):
     return cfar
 
 
-def cfar_ca_2d(data, guard, trailing, pfa=1e-5, offset=None):
+def cfar_ca_2d(data,
+               guard,
+               trailing,
+               pfa=1e-5,
+               detector='squarelaw',
+               offset=None):
     """
     2-D Cell Averaging CFAR (CA-CFAR)
 
     :param data:
-        Radar data
+        Amplitude/Power data. Amplitude data for ``linear`` detector,
+        Power data for ``squarelaw`` detector
     :type data: numpy.1darray or numpy.2darray
     :param guard:
         Number of guard cells on one side, total guard cells are ``2*guard``.
@@ -248,6 +270,8 @@ def cfar_ca_2d(data, guard, trailing, pfa=1e-5, offset=None):
     :type trailing: int or list[int]
     :param float pfa:
         Probability of false alarm. ``default 1e-5``
+    :param str detector:
+        Detector type, ``linear`` or ``squarelaw``. ``default squarelaw``
     :param float offset:
         CFAR threshold offset. If offect is None, threshold offset is
         ``2*trailing(pfa^(-1/2/trailing)-1)``. ``default None``
@@ -256,7 +280,8 @@ def cfar_ca_2d(data, guard, trailing, pfa=1e-5, offset=None):
     :rtype: numpy.1darray or numpy.2darray
     """
 
-    data = np.abs(data)
+    if np.iscomplexobj(data):
+        raise ValueError('Input data should not be complex.')
 
     guard = np.array(guard)
     if guard.size == 1:
@@ -270,10 +295,15 @@ def cfar_ca_2d(data, guard, trailing, pfa=1e-5, offset=None):
         t_num = (2*tg_sum[0]+1)*(2*tg_sum[1]+1)
         g_num = (2*guard[0]+1)*(2*guard[1]+1)
 
-        if t_num == g_num:
+        if t_num <= g_num:
             raise ('No trailing bins!')
 
-        a = (t_num-g_num)*(pfa**(-1/(t_num-g_num))-1)
+        if detector == 'squarelaw':
+            a = (t_num-g_num)*(pfa**(-1/(t_num-g_num))-1)
+        elif detector == 'linear':
+            a = np.sqrt((t_num-g_num)*(pfa**(-1/(t_num-g_num))-1))
+        else:
+            raise ValueError('`detector` can only be `linear` or `squarelaw`.')
     else:
         a = offset
 
