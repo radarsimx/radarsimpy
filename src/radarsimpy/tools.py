@@ -184,8 +184,12 @@ def roc_pd(pfa, snr, N=1, stype='Coherent'):
                     (temp_1*np.exp(log_factorial(N-2.)))
                 warnings.filterwarnings('default', category=RuntimeWarning)
 
-                if np.isnan(temp4) or np.isinf(temp4):
-                    temp4 = 0
+                if np.isscalar(temp4):
+                    if np.isnan(temp4) or np.isinf(temp4):
+                        temp4 = 0
+                else:
+                    temp4[np.isnan(temp4)] = 0
+                    temp4[np.isinf(temp4)] = 0
 
                 pd[it_pfa.index, :] = temp4+1-gammainc(N-1, thred) + \
                     ko*gammainc(N-1, thred/(1+2/(N*snr)))
