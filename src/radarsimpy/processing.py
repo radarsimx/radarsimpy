@@ -295,7 +295,7 @@ def cfar_ca_2d(data,
         t_num = (2*tg_sum[0]+1)*(2*tg_sum[1]+1)
         g_num = (2*guard[0]+1)*(2*guard[1]+1)
 
-        if t_num <= g_num:
+        if t_num == g_num:
             raise ('No trailing bins!')
 
         if detector == 'squarelaw':
@@ -375,6 +375,7 @@ def cfar_os_1d(
         k,
         pfa=1e-5,
         axis=0,
+        detector='squarelaw',
         offset=None):
     """
     1-D Ordered Statistic CFAR (OS-CFAR)
@@ -382,7 +383,8 @@ def cfar_os_1d(
     For edge cells, use rollovered cells to fill the missing cells.
 
     :param data:
-        Radar data
+        Amplitude/Power data. Amplitude data for ``linear`` detector,
+        Power data for ``squarelaw`` detector
     :type data: numpy.1darray or numpy.2darray
     :param int guard:
         Number of guard cells on one side, total guard cells are ``2*guard``
@@ -396,6 +398,8 @@ def cfar_os_1d(
         Probability of false alarm. ``default 1e-5``
     :param int axis:
         The axis to calculat CFAR. ``default 0``
+    :param str detector:
+        Detector type, ``linear`` or ``squarelaw``. ``default squarelaw``
     :param float offset:
         CFAR threshold offset. If offect is None, threshold offset is
         calculated from ``pfa``. ``default None``
@@ -410,14 +414,21 @@ def cfar_os_1d(
     pp. 608-621, 1983.
     """
 
-    data = np.abs(data)
+    if np.iscomplexobj(data):
+        raise ValueError('Input data should not be complex.')
+
     data_shape = np.shape(data)
     cfar = np.zeros_like(data)
     leading = trailing
     # trailing = n-leading
 
     if offset is None:
-        a = os_cfar_threshold(k, trailing*2, pfa)
+        if detector == 'squarelaw':
+            a = os_cfar_threshold(k, trailing*2, pfa)
+        elif detector == 'linear':
+            a = np.sqrt(os_cfar_threshold(k, trailing*2, pfa))
+        else:
+            raise ValueError('`detector` can only be `linear` or `squarelaw`.')
     else:
         a = offset
 
@@ -460,6 +471,7 @@ def cfar_os_2d(
         trailing,
         k,
         pfa=1e-5,
+        detector='squarelaw',
         offset=None):
     """
     2-D Ordered Statistic CFAR (OS-CFAR)
@@ -467,7 +479,8 @@ def cfar_os_2d(
     For edge cells, use rollovered cells to fill the missing cells.
 
     :param data:
-        Radar data
+        Amplitude/Power data. Amplitude data for ``linear`` detector,
+        Power data for ``squarelaw`` detector
     :type data: numpy.1darray or numpy.2darray
     :param guard:
         Number of guard cells on one side, total guard cells are ``2*guard``.
@@ -485,6 +498,8 @@ def cfar_os_2d(
         Typically, ``k`` is on the order of ``0.75N``
     :param float pfa:
         Probability of false alarm. ``default 1e-5``
+    :param str detector:
+        Detector type, ``linear`` or ``squarelaw``. ``default squarelaw``
     :param float offset:
         CFAR threshold offset. If offect is None, threshold offset is
         calculated from ``pfa``. ``default None``
@@ -499,7 +514,9 @@ def cfar_os_2d(
     pp. 608-621, 1983.
     """
 
-    data = np.abs(data)
+    if np.iscomplexobj(data):
+        raise ValueError('Input data should not be complex.')
+
     data_shape = np.shape(data)
     cfar = np.zeros_like(data)
 
@@ -518,7 +535,12 @@ def cfar_os_2d(
         if t_num == g_num:
             raise ('No trailing bins!')
 
-        a = os_cfar_threshold(k, t_num-g_num, pfa)
+        if detector == 'squarelaw':
+            a = os_cfar_threshold(k, t_num-g_num, pfa)
+        elif detector == 'linear':
+            a = np.sqrt(os_cfar_threshold(k, t_num-g_num, pfa))
+        else:
+            raise ValueError('`detector` can only be `linear` or `squarelaw`.')
     else:
         a = offset
 
@@ -747,3 +769,20 @@ def doa_capon(covmat, spacing=0.5, scanangles=range(-90, 91)):
         ps[idx] = np.abs(weight.T.conj() @ covmat @ weight)
 
     return 10*np.log10(ps)
+
+
+if __name__ == "__main__":
+    # data = np.arange(1, 10000)
+    # cfar = cfar_ca_1d(data,
+    #                   1,
+    #                   100,
+    #                   pfa=1e-3,
+    #                   axis=0,
+    #                   detector='squarelaw',
+    #                   offset=None)
+
+    # print(cfar[2000])
+    # print(cfar[3000])
+
+    scale = os_cfar_threshold(18, 32, 1e-6)
+    print(scale)
