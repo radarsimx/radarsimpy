@@ -1,0 +1,53 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Linux Test CUDA
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
+        c_compiler: [gcc-12]
+        cxx_compiler: [g++-12]
+
+    steps:
+    - uses: Jimver/cuda-toolkit@v0.2.11
+      id: cuda-toolkit
+      with:
+        cuda: '12.1.0'
+    - uses: actions/checkout@v3
+      with:
+        ssh-key: ${{ secrets.RADARSIMC }}
+        submodules: recursive
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest numpy scipy pymeshlab cython Sphinx sphinx-rtd-theme
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Build
+      env:
+        CC: ${{ matrix.c_compiler }}
+        CXX: ${{ matrix.cxx_compiler }}
+      run: |
+        sudo chown -R $USER:$USER /home/runner/work/radarsimpy
+        chmod +x build_linux_cuda.sh
+        ./build_linux_cuda.sh
+    - name: Test with Google Test
+      run: |
+        ./src/radarsimc/build/radarsimc_test
+    - name: Test with pytest
+      run: |
+        pytest
