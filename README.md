@@ -158,6 +158,22 @@ The source files of these Jupyter notebooks are available [here](https://github.
 
   - [Receiver operating characteristic (ROC)](https://radarsimx.com/2019/10/06/receiver-operating-characteristic/)
 
+## Build
+
+**Building `radarsimpy` requires to access the source code of `radarsimc`. If you don't have access to `radarsimc`, please use the pre-built module instead**
+
+- Windows CPU
+  > build_win.bat
+
+- Windows CUDA
+  > build_win_cuda.bat
+
+- Linux CPU
+  > ./build_linux.sh
+
+- Linux CUDA
+  > ./build_linux_cuda.sh  
+
 ## API Reference
 
 - **Radar Model**: Classes to define a radar system
