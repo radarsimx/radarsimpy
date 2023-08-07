@@ -163,16 +163,28 @@ The source files of these Jupyter notebooks are available [here](https://github.
 **Building `radarsimpy` requires to access the source code of `radarsimc`. If you don't have access to `radarsimc`, please use the pre-built module instead**
 
 - Windows CPU
-  > build_win.bat
+
+```batch
+build_win.bat
+```
 
 - Windows CUDA
-  > build_win_cuda.bat
+
+```batch
+build_win_cuda.bat
+```
 
 - Linux CPU
-  > ./build_linux.sh
+
+```bash
+./build_linux.sh
+```
 
 - Linux CUDA
-  > ./build_linux_cuda.sh  
+
+```bash
+./build_linux_cuda.sh
+```
 
 ## API Reference
 
