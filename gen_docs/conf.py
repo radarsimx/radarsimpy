@@ -12,14 +12,22 @@
 #
 import os
 import sys
+import datetime
+
+import sys
+sys.path.append('../src')
+
+import radarsimpy
+
 sys.path.insert(0, os.path.abspath('..'))
 
 
 # -- Project information -----------------------------------------------------
 
 project = 'RadarSimPy'
-copyright = '2018 - PRESENT, radarsimx.com'
-author = 'Zhengyu Peng'
+copyright = '2018 - '+str(datetime.datetime.now().year)+', radarsimx.com'
+author = 'Dr. Zhengyu Peng'
+version = radarsimpy.__version__
 
 
 # -- General configuration ---------------------------------------------------
