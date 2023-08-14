@@ -14,13 +14,9 @@ import os
 import sys
 import datetime
 
-import sys
-sys.path.append('../src')
-
-import radarsimpy
-
 sys.path.insert(0, os.path.abspath('..'))
 
+import radarsimpy
 
 # -- Project information -----------------------------------------------------
 
