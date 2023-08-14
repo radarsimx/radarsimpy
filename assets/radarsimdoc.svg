@@ -3,9 +3,9 @@
    inkscape:export-ydpi="6.3499999"
    inkscape:export-xdpi="6.3499999"
    inkscape:export-filename="..\..\..\..\OneDrive - Aptiv\Desktop\radarsimdoc.png"
-   width="512mm"
-   height="512mm"
-   viewBox="0 0 512 512"
+   width="361.4458mm"
+   height="361.4458mm"
+   viewBox="0 0 361.4458 361.4458"
    version="1.1"
    id="svg8"
    inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
@@ -27,10 +27,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.24748737"
-     inkscape:cx="236.3757"
-     inkscape:cy="1056.6196"
+     inkscape:cx="-42.426407"
+     inkscape:cy="777.81747"
      inkscape:document-units="mm"
-     inkscape:current-layer="g2485"
+     inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
      showgrid="false"
      inkscape:window-width="1920"
@@ -67,15 +67,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-22.608341,-57.680367)">
-    <rect
-       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:2.99325"
-       id="rect304"
-       width="512"
-       height="512"
-       x="22.608341"
-       y="57.680367"
-       rx="32" />
+     transform="translate(-97.885445,-132.95747)">
     <g
        id="g1693"
        transform="matrix(3.3032258,0,0,3.3032258,-93.844154,-174.62296)">
