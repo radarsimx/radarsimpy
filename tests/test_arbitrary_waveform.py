@@ -101,7 +101,7 @@ def test_arbitrary_waveform_cpp():
     time_matrix_nonlinear = data_nonlinear['timestamp']
     data_matrix_nonlinear = data_nonlinear['baseband']
 
-    range_window = signal.chebwin(radar_nonlinear.samples_per_pulse, at=60)
+    range_window = signal.windows.chebwin(radar_nonlinear.samples_per_pulse, at=60)
 
     range_profile_nonlinear = proc.range_fft(
         data_matrix_nonlinear[:, :, :], range_window)
@@ -216,7 +216,7 @@ def test_arbitrary_waveform_py():
     time_matrix_nonlinear = data_nonlinear['timestamp']
     data_matrix_nonlinear = data_nonlinear['baseband']
 
-    range_window = signal.chebwin(radar_nonlinear.samples_per_pulse, at=60)
+    range_window = signal.windows.chebwin(radar_nonlinear.samples_per_pulse, at=60)
 
     range_profile_nonlinear = proc.range_fft(
         data_matrix_nonlinear[:, :, :], range_window)

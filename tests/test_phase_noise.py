@@ -106,7 +106,7 @@ def test_fmcw_phase_noise_cpp():
     data_cpp = simc(radar, targets, noise=False)
     data_matrix_cpp = data_cpp['baseband']
 
-    range_window = signal.chebwin(radar.samples_per_pulse, at=60)
+    range_window = signal.windows.chebwin(radar.samples_per_pulse, at=60)
     range_profile_pn = proc.range_fft(data_matrix_cpp_pn, range_window)
     range_profile = proc.range_fft(data_matrix_cpp, range_window)
 
@@ -202,7 +202,7 @@ def test_fmcw_phase_noise_py():
     data = simpy(radar, targets, noise=False)
     data_matrix = data['baseband']
 
-    range_window = signal.chebwin(radar.samples_per_pulse, at=60)
+    range_window = signal.windows.chebwin(radar.samples_per_pulse, at=60)
     range_profile = proc.range_fft(data_matrix, range_window)
 
     range_profile = 20 * \

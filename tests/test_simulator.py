@@ -124,9 +124,9 @@ def test_sim_fmcw():
     npt.assert_almost_equal(timestamp[0, :, 0], (np.arange(
         0, radar.transmitter.pulses)*radar.transmitter.prp[0]))
 
-    range_window = signal.chebwin(radar.samples_per_pulse, at=60)
+    range_window = signal.windows.chebwin(radar.samples_per_pulse, at=60)
     range_profile = proc.range_fft(baseband, range_window)
-    doppler_window = signal.chebwin(radar.transmitter.pulses, at=60)
+    doppler_window = signal.windows.chebwin(radar.transmitter.pulses, at=60)
     range_doppler = proc.doppler_fft(range_profile, doppler_window)
     rng_dop = 20*np.log10(np.abs(range_doppler))
     rng_dop = rng_dop-np.max(rng_dop[0, :, :])
@@ -196,9 +196,9 @@ def test_sim_fmcw():
     npt.assert_almost_equal(timestamp[0, :, 0], (np.arange(
         0, radar.transmitter.pulses)*radar.transmitter.prp[0]))
 
-    range_window = signal.chebwin(radar.samples_per_pulse, at=60)
+    range_window = signal.windows.chebwin(radar.samples_per_pulse, at=60)
     range_profile = proc.range_fft(baseband, range_window)
-    doppler_window = signal.chebwin(radar.transmitter.pulses, at=60)
+    doppler_window = signal.windows.chebwin(radar.transmitter.pulses, at=60)
     range_doppler = proc.doppler_fft(range_profile, doppler_window)
     rng_dop = 20*np.log10(np.abs(range_doppler))
     rng_dop = rng_dop-np.max(rng_dop[0, :, :])
@@ -288,7 +288,7 @@ def test_sim_tdm_fmcw():
 
     ]))
 
-    range_window = signal.chebwin(radar.samples_per_pulse, at=60)
+    range_window = signal.windows.chebwin(radar.samples_per_pulse, at=60)
     range_profile = proc.range_fft(baseband, range_window)
 
     rng_nci = 20*np.log10(np.mean(np.abs(range_profile[:, 0, :]), axis=0))
@@ -334,7 +334,7 @@ def test_sim_tdm_fmcw():
 
     ]))
 
-    range_window = signal.chebwin(radar.samples_per_pulse, at=60)
+    range_window = signal.windows.chebwin(radar.samples_per_pulse, at=60)
     range_profile = proc.range_fft(baseband, range_window)
 
     rng_nci = 20*np.log10(np.mean(np.abs(range_profile[:, 0, :]), axis=0))
@@ -444,7 +444,7 @@ def test_sim_pmcw():
     bin_size = const.c/2*4e-9
     range_bin = np.arange(0, code_length, 1)*bin_size
 
-    doppler_window = signal.chebwin(radar.transmitter.pulses, at=50)
+    doppler_window = signal.windows.chebwin(radar.transmitter.pulses, at=50)
 
     range_doppler = np.zeros(np.shape(range_profile), dtype=complex)
     for ii in range(0, radar.channel_size):
@@ -502,7 +502,7 @@ def test_sim_pmcw():
     bin_size = const.c/2*4e-9
     range_bin = np.arange(0, code_length, 1)*bin_size
 
-    doppler_window = signal.chebwin(radar.transmitter.pulses, at=50)
+    doppler_window = signal.windows.chebwin(radar.transmitter.pulses, at=50)
 
     range_doppler = np.zeros(np.shape(range_profile), dtype=complex)
     for ii in range(0, radar.channel_size):

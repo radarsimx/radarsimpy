@@ -88,7 +88,7 @@ def test_fmcw_raytracing():
 
     baseband = data['baseband']
 
-    range_window = signal.chebwin(radar.samples_per_pulse, at=60)
+    range_window = signal.windows.chebwin(radar.samples_per_pulse, at=60)
     range_profile = proc.range_fft(baseband, range_window)
 
     assert np.array_equal(np.shape(range_profile), np.array([2, 2, 160]))
@@ -169,7 +169,7 @@ def test_fmcw_raytracing_tx_azimuth():
 
     baseband = data['baseband']
 
-    range_window = signal.chebwin(radar.samples_per_pulse, at=60)
+    range_window = signal.windows.chebwin(radar.samples_per_pulse, at=60)
     range_profile = proc.range_fft(baseband, range_window)
 
     assert np.argmax(np.abs(range_profile[0, 0, :])) == 47
@@ -229,7 +229,7 @@ def test_fmcw_raytracing_tx_elevation():
 
     baseband = data['baseband']
 
-    range_window = signal.chebwin(radar.samples_per_pulse, at=60)
+    range_window = signal.windows.chebwin(radar.samples_per_pulse, at=60)
     range_profile = proc.range_fft(baseband, range_window)
 
     assert np.argmax(np.abs(range_profile[0, 0, :])) == 47
@@ -289,7 +289,7 @@ def test_fmcw_raytracing_rx_azimuth():
 
     baseband = data['baseband']
 
-    range_window = signal.chebwin(radar.samples_per_pulse, at=60)
+    range_window = signal.windows.chebwin(radar.samples_per_pulse, at=60)
     range_profile = proc.range_fft(baseband, range_window)
 
     assert np.argmax(np.abs(range_profile[0, 0, :])) == 47
@@ -349,7 +349,7 @@ def test_fmcw_raytracing_rx_elevation():
 
     baseband = data['baseband']
 
-    range_window = signal.chebwin(radar.samples_per_pulse, at=60)
+    range_window = signal.windows.chebwin(radar.samples_per_pulse, at=60)
     range_profile = proc.range_fft(baseband, range_window)
 
     assert np.argmax(np.abs(range_profile[0, 0, :])) == 47
@@ -409,7 +409,7 @@ def test_fmcw_raytracing_radar_rotation():
 
     baseband = data['baseband']
 
-    range_window = signal.chebwin(radar.samples_per_pulse, at=60)
+    range_window = signal.windows.chebwin(radar.samples_per_pulse, at=60)
     range_profile = proc.range_fft(baseband, range_window)
 
     assert np.argmax(np.abs(range_profile[0, 0, :])) == 33
@@ -470,7 +470,7 @@ def test_fmcw_raytracing_radar_speed():
 
     baseband = data['baseband']
 
-    range_window = signal.chebwin(radar.samples_per_pulse, at=60)
+    range_window = signal.windows.chebwin(radar.samples_per_pulse, at=60)
     range_profile = proc.range_fft(baseband, range_window)
 
     assert np.argmax(np.abs(range_profile[0, 0, :])) == 47
