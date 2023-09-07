@@ -14,15 +14,15 @@ import os
 import sys
 import datetime
 
-sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath(".."))
 
 import radarsimpy
 
 # -- Project information -----------------------------------------------------
 
-project = 'RadarSimPy'
-copyright = '2018 - '+str(datetime.datetime.now().year)+', radarsimx.com'
-author = 'Dr. Zhengyu Peng'
+project = "RadarSimPy"
+copyright = "2018 - " + str(datetime.datetime.now().year) + ", radarsimx.com"
+author = "Dr. Zhengyu Peng"
 version = radarsimpy.__version__
 
 
@@ -39,9 +39,9 @@ extensions = [
 ]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
-html_favicon = 'radarsimdoc.png'
+html_favicon = "radarsimdoc.png"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -54,9 +54,9 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = "sphinx_rtd_theme"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]

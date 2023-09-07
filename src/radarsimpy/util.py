@@ -135,7 +135,7 @@ def cal_phase_noise(signal, fs, freq, power, seed=None, validation=False):
     freq = freq[sort_idx]
     power = power[sort_idx]
 
-    cut_idx = np.where(freq < fs/2)
+    cut_idx = np.where(freq < fs / 2)
     freq = freq[cut_idx]
     power = power[cut_idx]
 
@@ -163,13 +163,13 @@ def cal_phase_noise(signal, fs, freq, power, seed=None, validation=False):
     # M = (N+1)/2 + 1
     #
     if np.remainder(N, 2):
-        M = int((N+1)/2 + 1)
+        M = int((N + 1) / 2 + 1)
     else:
-        M = int(N/2 + 1)
+        M = int(N / 2 + 1)
 
     # Equally spaced partitioning of the half spectrum
-    F = np.linspace(0, fs/2, int(M))    # Freq. Grid
-    dF = np.concatenate((np.diff(F), [F[-1]-F[-2]]))  # Delta F
+    F = np.linspace(0, fs / 2, int(M))  # Freq. Grid
+    dF = np.concatenate((np.diff(F), [F[-1] - F[-2]]))  # Delta F
 
     realmin = np.finfo(np.float64).tiny
     # realmin = 1e-30
@@ -181,24 +181,23 @@ def cal_phase_noise(signal, fs, freq, power, seed=None, validation=False):
     for intrvlIndex in range(0, intrvlNum):
         leftBound = freq[intrvlIndex]
         t1 = power[intrvlIndex]
-        if intrvlIndex == intrvlNum-1:
-            rightBound = fs/2
+        if intrvlIndex == intrvlNum - 1:
+            rightBound = fs / 2
             t2 = power[-1]
-            inside = np.where(np.logical_and(
-                F >= leftBound, F <= rightBound))
+            inside = np.where(np.logical_and(F >= leftBound, F <= rightBound))
         else:
-            rightBound = freq[intrvlIndex+1]
-            t2 = power[intrvlIndex+1]
-            inside = np.where(np.logical_and(
-                F >= leftBound, F < rightBound))
+            rightBound = freq[intrvlIndex + 1]
+            t2 = power[intrvlIndex + 1]
+            inside = np.where(np.logical_and(F >= leftBound, F < rightBound))
 
-        logP[inside] = t1 + (np.log10(F[inside] + realmin) -
-                             np.log10(leftBound + realmin)) / \
-            (np.log10(rightBound + 2*realmin) -
-                np.log10(leftBound + realmin)) * (t2-t1)
+        logP[inside] = t1 + (
+            np.log10(F[inside] + realmin) - np.log10(leftBound + realmin)
+        ) / (np.log10(rightBound + 2 * realmin) - np.log10(leftBound + realmin)) * (
+            t2 - t1
+        )
 
     # Interpolated P ( half spectrum [0 fs/2] ) [ dBc/Hz ]
-    P = 10**(np.real(logP)/10)
+    P = 10 ** (np.real(logP) / 10)
 
     # Now we will generate AWGN of power 1 in frequency domain and shape
     # it by the desired shape as follows:
@@ -223,11 +222,11 @@ def cal_phase_noise(signal, fs, freq, power, seed=None, validation=False):
 
     # Generate AWGN of power 1
     if validation:
-        awgn_P1 = (np.sqrt(0.5)*(np.ones((row, M)) +
-                                 1j*np.ones((row, M))))
+        awgn_P1 = np.sqrt(0.5) * (np.ones((row, M)) + 1j * np.ones((row, M)))
     else:
-        awgn_P1 = (np.sqrt(0.5)*(rng.standard_normal((row, M)) +
-                                 1j*rng.standard_normal((row, M))))
+        awgn_P1 = np.sqrt(0.5) * (
+            rng.standard_normal((row, M)) + 1j * rng.standard_normal((row, M))
+        )
 
     # Shape the noise on the positive spectrum [0, fs/2] including bounds
     # ( M points )
@@ -238,9 +237,9 @@ def cal_phase_noise(signal, fs, freq, power, seed=None, validation=False):
     # X = np.transpose(X)
     # Complete symmetrical negative spectrum  (fs/2, fs) not including
     # bounds (M-2 points)
-    tmp_X = np.zeros((row, int(M*2-2)), dtype=complex)
+    tmp_X = np.zeros((row, int(M * 2 - 2)), dtype=complex)
     tmp_X[:, 0:M] = X
-    tmp_X[:, M:(2*M-2)] = np.fliplr(np.conjugate(X[:, 1:-1]))
+    tmp_X[:, M : (2 * M - 2)] = np.fliplr(np.conjugate(X[:, 1:-1]))
 
     X = tmp_X
 

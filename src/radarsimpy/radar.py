@@ -202,17 +202,18 @@ class Transmitter:
 
     """
 
-    def __init__(self,
-                 f,
-                 t,
-                 tx_power=0,
-                 pulses=1,
-                 prp=None,
-                 f_offset=None,
-                 pn_f=None,
-                 pn_power=None,
-                 channels=[dict(location=(0, 0, 0))]):
-
+    def __init__(
+        self,
+        f,
+        t,
+        tx_power=0,
+        pulses=1,
+        prp=None,
+        f_offset=None,
+        pn_f=None,
+        pn_power=None,
+        channels=[dict(location=(0, 0, 0))],
+    ):
         self.tx_power = tx_power
         self.pulses = pulses
         self.channels = channels
@@ -231,8 +232,7 @@ class Transmitter:
             self.t = np.array([0, t])
 
         if len(self.f) != len(self.t):
-            raise ValueError(
-                'Lengths of `f` and `t` should be the same')
+            raise ValueError("Lengths of `f` and `t` should be the same")
 
         # frequency offset for each pulse
         # the length of `f_offset` should be the same as `pulses`
@@ -240,35 +240,33 @@ class Transmitter:
             if isinstance(f_offset, (list, tuple, np.ndarray)):
                 if len(f_offset) != pulses:
                     raise ValueError(
-                        'Lengths of `f_offset` and `pulses` \
-                            should be the same')
+                        "Lengths of `f_offset` and `pulses` \
+                            should be the same"
+                    )
                 self.f_offset = np.array(f_offset)
             else:
-                self.f_offset = f_offset+np.zeros(pulses)
+                self.f_offset = f_offset + np.zeros(pulses)
         else:
             self.f_offset = np.zeros(pulses)
 
         self.bandwidth = np.max(self.f) - np.min(self.f)
-        self.pulse_length = self.t[-1]-self.t[0]
+        self.pulse_length = self.t[-1] - self.t[0]
 
         # self.fc_0 = (np.min(self.f)+np.max(self.f))/2
-        self.fc_vect = (np.min(self.f)+np.max(self.f))/2+self.f_offset
-        self.fc_frame = (np.min(self.fc_vect)+np.max(self.fc_vect))/2
+        self.fc_vect = (np.min(self.f) + np.max(self.f)) / 2 + self.f_offset
+        self.fc_frame = (np.min(self.fc_vect) + np.max(self.fc_vect)) / 2
 
         # phase noise
         self.pn_f = pn_f
         self.pn_power = pn_power
 
         if self.pn_f is not None and self.pn_power is None:
-            raise ValueError(
-                'Lengths of `pn_f` and `pn_power` should be the same')
+            raise ValueError("Lengths of `pn_f` and `pn_power` should be the same")
         if self.pn_f is None and self.pn_power is not None:
-            raise ValueError(
-                'Lengths of `pn_f` and `pn_power` should be the same')
+            raise ValueError("Lengths of `pn_f` and `pn_power` should be the same")
         if self.pn_f is not None and self.pn_power is not None:
             if len(self.pn_f) != len(self.pn_power):
-                raise ValueError(
-                    'Lengths of `pn_f` and `pn_power` should be the same')
+                raise ValueError("Lengths of `pn_f` and `pn_power` should be the same")
 
         # Extend `prp` to a numpy.1darray.
         # Length equels to `pulses`
@@ -278,20 +276,19 @@ class Transmitter:
             if isinstance(prp, (list, tuple, np.ndarray)):
                 if len(prp) != pulses:
                     raise ValueError(
-                        'Length of `prp` should equal to the \
-                            length of `pulses`.')
+                        "Length of `prp` should equal to the \
+                            length of `pulses`."
+                    )
                 else:
                     self.prp = prp
             else:
                 self.prp = prp + np.zeros(pulses)
 
         if np.min(self.prp) < self.pulse_length:
-            raise ValueError(
-                '`prp` should be larger than `pulse_length`')
+            raise ValueError("`prp` should be larger than `pulse_length`")
 
         # start time of each pulse, without considering the delay
-        self.pulse_start_time = np.cumsum(
-            self.prp)-self.prp[0]
+        self.pulse_start_time = np.cumsum(self.prp) - self.prp[0]
 
         # number of transmitter channels
         self.channel_size = len(self.channels)
@@ -306,8 +303,7 @@ class Transmitter:
         self.waveform_mod = []
 
         # pulse modulation parameters
-        self.pulse_mod = np.ones(
-            (self.channel_size, self.pulses), dtype=complex)
+        self.pulse_mod = np.ones((self.channel_size, self.pulses), dtype=complex)
 
         # azimuth patterns
         self.az_patterns = []
@@ -326,17 +322,16 @@ class Transmitter:
         self.grid = []
 
         for tx_idx, tx_element in enumerate(self.channels):
+            self.delay[tx_idx] = self.channels[tx_idx].get("delay", 0)
 
-            self.delay[tx_idx] = self.channels[tx_idx].get('delay', 0)
-
-            self.locations[tx_idx, :] = np.array(
-                tx_element.get('location'))
+            self.locations[tx_idx, :] = np.array(tx_element.get("location"))
             self.polarization[tx_idx, :] = np.array(
-                tx_element.get('polarization', [0, 0, 1]))
+                tx_element.get("polarization", [0, 0, 1])
+            )
 
             # waveform modulation
             mod_enabled = True
-            amp = self.channels[tx_idx].get('amp', None)
+            amp = self.channels[tx_idx].get("amp", None)
             if amp is not None:
                 if isinstance(amp, (list, tuple, np.ndarray)):
                     amp = np.array(amp)
@@ -345,7 +340,7 @@ class Transmitter:
             else:
                 mod_enabled = False
 
-            phs = self.channels[tx_idx].get('phs', None)
+            phs = self.channels[tx_idx].get("phs", None)
             if phs is not None:
                 if isinstance(phs, (list, tuple, np.ndarray)):
                     phs = np.array(phs)
@@ -361,7 +356,7 @@ class Transmitter:
                 phs = np.zeros_like(amp)
                 mod_enabled = True
 
-            mod_t = self.channels[tx_idx].get('mod_t', None)
+            mod_t = self.channels[tx_idx].get("mod_t", None)
             if mod_t is not None:
                 if isinstance(mod_t, (list, tuple, np.ndarray)):
                     mod_t = np.array(mod_t)
@@ -372,81 +367,95 @@ class Transmitter:
 
             if mod_enabled:
                 if len(amp) != len(phs):
-                    raise ValueError(
-                        'Lengths of `amp` and `phs` should be the same')
-                mod_var = amp*np.exp(1j*phs/180*np.pi)
+                    raise ValueError("Lengths of `amp` and `phs` should be the same")
+                mod_var = amp * np.exp(1j * phs / 180 * np.pi)
                 if len(mod_t) != len(mod_var):
                     raise ValueError(
-                        'Lengths of `mod_t`, `amp`, and `phs` \
-                            should be the same')
+                        "Lengths of `mod_t`, `amp`, and `phs` \
+                            should be the same"
+                    )
             else:
                 mod_var = None
 
-            self.waveform_mod.append({
-                'enabled': mod_enabled,
-                'var': mod_var,
-                't': mod_t
-            })
+            self.waveform_mod.append(
+                {"enabled": mod_enabled, "var": mod_var, "t": mod_t}
+            )
 
             # pulse modulation
-            pulse_amp = self.channels[tx_idx].get(
-                'pulse_amp', np.ones((pulses)))
-            pulse_phs = self.channels[tx_idx].get(
-                'pulse_phs', np.zeros((pulses)))/180*np.pi
+            pulse_amp = self.channels[tx_idx].get("pulse_amp", np.ones((pulses)))
+            pulse_phs = (
+                self.channels[tx_idx].get("pulse_phs", np.zeros((pulses))) / 180 * np.pi
+            )
             if len(pulse_amp) != pulses:
                 raise ValueError(
-                    'Lengths of `pulse_amp` and `pulses` should be the same')
+                    "Lengths of `pulse_amp` and `pulses` should be the same"
+                )
             if len(pulse_phs) != pulses:
                 raise ValueError(
-                    'Length of `pulse_phs` and `pulses` should be the same')
+                    "Length of `pulse_phs` and `pulses` should be the same"
+                )
 
             self.pulse_mod[tx_idx, :] = pulse_amp * np.exp(1j * pulse_phs)
 
             # azimuth pattern
             self.az_angles.append(
-                np.array(self.channels[tx_idx].get('azimuth_angle',
-                                                   np.arange(-90, 91, 180))))
+                np.array(
+                    self.channels[tx_idx].get("azimuth_angle", np.arange(-90, 91, 180))
+                )
+            )
             self.az_patterns.append(
-                np.array(self.channels[tx_idx].get('azimuth_pattern',
-                                                   np.zeros(2))))
+                np.array(self.channels[tx_idx].get("azimuth_pattern", np.zeros(2)))
+            )
 
             if len(self.az_angles[-1]) != len(self.az_patterns[-1]):
                 raise ValueError(
-                    'Lengths of `azimuth_angle` and `azimuth_pattern` \
-                        should be the same')
+                    "Lengths of `azimuth_angle` and `azimuth_pattern` \
+                        should be the same"
+                )
 
             self.antenna_gains[tx_idx] = np.max(self.az_patterns[-1])
 
-            self.az_patterns[-1] = self.az_patterns[-1] - \
-                np.max(self.az_patterns[-1])
+            self.az_patterns[-1] = self.az_patterns[-1] - np.max(self.az_patterns[-1])
             self.az_func.append(
-                interp1d(self.az_angles[-1], self.az_patterns[-1],
-                         kind='linear', bounds_error=False, fill_value=-10000)
+                interp1d(
+                    self.az_angles[-1],
+                    self.az_patterns[-1],
+                    kind="linear",
+                    bounds_error=False,
+                    fill_value=-10000,
+                )
             )
 
             # elevation pattern
             self.el_angles.append(
-                np.array(self.channels[tx_idx].get('elevation_angle',
-                                                   np.arange(-90, 91, 180))))
+                np.array(
+                    self.channels[tx_idx].get(
+                        "elevation_angle", np.arange(-90, 91, 180)
+                    )
+                )
+            )
             self.el_patterns.append(
-                np.array(self.channels[tx_idx].get('elevation_pattern',
-                                                   np.zeros(2))))
+                np.array(self.channels[tx_idx].get("elevation_pattern", np.zeros(2)))
+            )
 
             if len(self.el_angles[-1]) != len(self.el_patterns[-1]):
                 raise ValueError(
-                    'Lengths of `elevation_angle` and `elevation_pattern` \
-                        should be the same')
+                    "Lengths of `elevation_angle` and `elevation_pattern` \
+                        should be the same"
+                )
 
-            self.el_patterns[-1] = self.el_patterns[-1] - \
-                np.max(self.el_patterns[-1])
+            self.el_patterns[-1] = self.el_patterns[-1] - np.max(self.el_patterns[-1])
             self.el_func.append(
                 interp1d(
                     self.el_angles[-1],
-                    self.el_patterns[-1]-np.max(self.el_patterns[-1]),
-                    kind='linear', bounds_error=False, fill_value=-10000)
+                    self.el_patterns[-1] - np.max(self.el_patterns[-1]),
+                    kind="linear",
+                    bounds_error=False,
+                    fill_value=-10000,
+                )
             )
 
-            self.grid.append(self.channels[tx_idx].get('grid', 1))
+            self.grid.append(self.channels[tx_idx].get("grid", 1))
 
         self.box_min = np.min(self.locations, axis=0)
         self.box_max = np.max(self.locations, axis=0)
@@ -548,25 +557,28 @@ class Receiver:
 
     """
 
-    def __init__(self, fs,
-                 noise_figure=10,
-                 rf_gain=0,
-                 load_resistor=500,
-                 baseband_gain=0,
-                 bb_type='complex',
-                 channels=[dict(location=(0, 0, 0))]):
+    def __init__(
+        self,
+        fs,
+        noise_figure=10,
+        rf_gain=0,
+        load_resistor=500,
+        baseband_gain=0,
+        bb_type="complex",
+        channels=[dict(location=(0, 0, 0))],
+    ):
         self.fs = fs
         self.noise_figure = noise_figure
         self.rf_gain = rf_gain
         self.load_resistor = load_resistor
         self.baseband_gain = baseband_gain
         self.bb_type = bb_type
-        if bb_type == 'complex':
+        if bb_type == "complex":
             self.noise_bandwidth = self.fs
-        elif bb_type == 'real':
+        elif bb_type == "real":
             self.noise_bandwidth = self.fs / 2
         else:
-            raise ValueError('Invalid baseband type')
+            raise ValueError("Invalid baseband type")
 
         # additional receiver parameters
 
@@ -587,50 +599,64 @@ class Receiver:
         self.antenna_gains = np.zeros((self.channel_size))
 
         for rx_idx, rx_element in enumerate(self.channels):
-            self.locations[rx_idx, :] = np.array(
-                rx_element.get('location'))
+            self.locations[rx_idx, :] = np.array(rx_element.get("location"))
             self.polarization[rx_idx, :] = np.array(
-                rx_element.get('polarization', [0, 0, 1]))
+                rx_element.get("polarization", [0, 0, 1])
+            )
 
             # azimuth pattern
             self.az_angles.append(
-                np.array(self.channels[rx_idx].get('azimuth_angle',
-                                                   np.arange(-90, 91, 180))))
+                np.array(
+                    self.channels[rx_idx].get("azimuth_angle", np.arange(-90, 91, 180))
+                )
+            )
             self.az_patterns.append(
-                np.array(self.channels[rx_idx].get('azimuth_pattern',
-                                                   np.zeros(2))))
+                np.array(self.channels[rx_idx].get("azimuth_pattern", np.zeros(2)))
+            )
             if len(self.az_angles[-1]) != len(self.az_patterns[-1]):
                 raise ValueError(
-                    'Lengths of `azimuth_angle` and `azimuth_pattern` \
-                        should be the same')
+                    "Lengths of `azimuth_angle` and `azimuth_pattern` \
+                        should be the same"
+                )
 
             self.antenna_gains[rx_idx] = np.max(self.az_patterns[-1])
-            self.az_patterns[-1] = self.az_patterns[-1] - \
-                np.max(self.az_patterns[-1])
+            self.az_patterns[-1] = self.az_patterns[-1] - np.max(self.az_patterns[-1])
             self.az_func.append(
-                interp1d(self.az_angles[-1], self.az_patterns[-1],
-                         kind='linear', bounds_error=False, fill_value=-10000)
+                interp1d(
+                    self.az_angles[-1],
+                    self.az_patterns[-1],
+                    kind="linear",
+                    bounds_error=False,
+                    fill_value=-10000,
+                )
             )
 
             # elevation pattern
             self.el_angles.append(
-                np.array(self.channels[rx_idx].get('elevation_angle',
-                                                   np.arange(-90, 91, 180))))
+                np.array(
+                    self.channels[rx_idx].get(
+                        "elevation_angle", np.arange(-90, 91, 180)
+                    )
+                )
+            )
             self.el_patterns.append(
-                np.array(self.channels[rx_idx].get('elevation_pattern',
-                                                   np.zeros(2))))
+                np.array(self.channels[rx_idx].get("elevation_pattern", np.zeros(2)))
+            )
             if len(self.el_angles[-1]) != len(self.el_patterns[-1]):
                 raise ValueError(
-                    'Lengths of `elevation_angle` and `elevation_pattern` \
-                        should be the same')
+                    "Lengths of `elevation_angle` and `elevation_pattern` \
+                        should be the same"
+                )
 
-            self.el_patterns[-1] = self.el_patterns[-1] - \
-                np.max(self.el_patterns[-1])
+            self.el_patterns[-1] = self.el_patterns[-1] - np.max(self.el_patterns[-1])
             self.el_func.append(
                 interp1d(
                     self.el_angles[-1],
-                    self.el_patterns[-1]-np.max(self.el_patterns[-1]),
-                    kind='linear', bounds_error=False, fill_value=-10000)
+                    self.el_patterns[-1] - np.max(self.el_patterns[-1]),
+                    kind="linear",
+                    bounds_error=False,
+                    fill_value=-10000,
+                )
             )
 
         self.box_min = np.min(self.locations, axis=0)
@@ -698,41 +724,37 @@ class Radar:
 
     """
 
-    def __init__(self,
-                 transmitter,
-                 receiver,
-                 location=(0, 0, 0),
-                 speed=(0, 0, 0),
-                 rotation=(0, 0, 0),
-                 rotation_rate=(0, 0, 0),
-                 time=0,
-                 interf=None,
-                 seed=None,
-                 **kwargs):
-
+    def __init__(
+        self,
+        transmitter,
+        receiver,
+        location=(0, 0, 0),
+        speed=(0, 0, 0),
+        rotation=(0, 0, 0),
+        rotation_rate=(0, 0, 0),
+        time=0,
+        interf=None,
+        seed=None,
+        **kwargs
+    ):
         self.transmitter = transmitter
         self.receiver = receiver
 
-        self.validation = kwargs.get('validation', False)
+        self.validation = kwargs.get("validation", False)
 
-        self.samples_per_pulse = int(self.transmitter.pulse_length *
-                                     self.receiver.fs)
+        self.samples_per_pulse = int(self.transmitter.pulse_length * self.receiver.fs)
 
         self.t_offset = np.array(time)
         self.frames = np.size(time)
 
         # virtual array
-        self.channel_size = self.transmitter.channel_size * \
-            self.receiver.channel_size
+        self.channel_size = self.transmitter.channel_size * self.receiver.channel_size
         self.virtual_array = np.repeat(
-            self.transmitter.locations, self.receiver.channel_size,
-            axis=0) + np.tile(self.receiver.locations,
-                              (self.transmitter.channel_size, 1))
+            self.transmitter.locations, self.receiver.channel_size, axis=0
+        ) + np.tile(self.receiver.locations, (self.transmitter.channel_size, 1))
 
-        self.box_min = np.min(
-            [self.transmitter.box_min, self.receiver.box_min], axis=0)
-        self.box_max = np.max(
-            [self.transmitter.box_min, self.receiver.box_max], axis=0)
+        self.box_min = np.min([self.transmitter.box_min, self.receiver.box_min], axis=0)
+        self.box_max = np.max([self.transmitter.box_min, self.receiver.box_max], axis=0)
 
         self.timestamp = self.gen_timestamp()
         self.pulse_phs = self.cal_frame_phases()
@@ -740,12 +762,12 @@ class Radar:
         self.noise = self.cal_noise()
 
         if len(self.transmitter.f) > 2:
-            fun_f_t = interp1d(self.transmitter.t,
-                               self.transmitter.f, kind='linear')
+            fun_f_t = interp1d(self.transmitter.t, self.transmitter.f, kind="linear")
             self.t = np.linspace(
                 self.transmitter.t[0],
                 self.transmitter.t[-1],
-                self.samples_per_pulse*100)
+                self.samples_per_pulse * 100,
+            )
             self.f = fun_f_t(self.t)
 
         else:
@@ -755,44 +777,48 @@ class Radar:
         self.delta_f = np.ediff1d(self.f, to_begin=0)
         self.delta_t = np.ediff1d(self.t, to_begin=0)
         self.k = np.zeros_like(self.delta_f)
-        self.k[1:] = self.delta_f[1:]/self.delta_t[1:]
+        self.k[1:] = self.delta_f[1:] / self.delta_t[1:]
 
         # if hasattr(self.transmitter.fc, '__len__'):
         self.fc_mat = np.tile(
             self.transmitter.fc_vect[np.newaxis, :, np.newaxis],
-            (self.channel_size, 1, self.samples_per_pulse)
+            (self.channel_size, 1, self.samples_per_pulse),
         )
 
         self.f_offset_mat = np.tile(
             self.transmitter.f_offset[np.newaxis, :, np.newaxis],
-            (self.channel_size, 1, self.samples_per_pulse)
+            (self.channel_size, 1, self.samples_per_pulse),
         )
 
-        beat_time_samples = np.arange(0,
-                                      self.samples_per_pulse,
-                                      1) / self.receiver.fs
+        beat_time_samples = np.arange(0, self.samples_per_pulse, 1) / self.receiver.fs
         self.beat_time = np.tile(
             beat_time_samples[np.newaxis, np.newaxis, ...],
-            (self.channel_size, self.transmitter.pulses, 1)
+            (self.channel_size, self.transmitter.pulses, 1),
         )
 
-        if self.transmitter.pn_f is not None and \
-                self.transmitter.pn_power is not None:
+        if self.transmitter.pn_f is not None and self.transmitter.pn_power is not None:
             dummy_sig = np.ones(
-                (self.channel_size*self.frames*self.transmitter.pulses,
-                 self.samples_per_pulse))
+                (
+                    self.channel_size * self.frames * self.transmitter.pulses,
+                    self.samples_per_pulse,
+                )
+            )
             self.phase_noise = cal_phase_noise(
                 dummy_sig,
                 self.receiver.fs,
                 self.transmitter.pn_f,
                 self.transmitter.pn_power,
                 seed=seed,
-                validation=self.validation)
-            self.phase_noise = np.reshape(self.phase_noise, (
-                self.channel_size*self.frames,
-                self.transmitter.pulses,
-                self.samples_per_pulse
-            ))
+                validation=self.validation,
+            )
+            self.phase_noise = np.reshape(
+                self.phase_noise,
+                (
+                    self.channel_size * self.frames,
+                    self.transmitter.pulses,
+                    self.samples_per_pulse,
+                ),
+            )
         else:
             self.phase_noise = None
 
@@ -802,29 +828,31 @@ class Radar:
         self.rotation_rate = np.array(rotation_rate)
         shape = np.shape(self.timestamp)
 
-        if np.size(location[0]) > 1 or \
-                np.size(location[1]) > 1 or \
-                np.size(location[2]) > 1 or \
-                np.size(speed[0]) > 1 or \
-                np.size(speed[1]) > 1 or \
-                np.size(speed[2]) > 1 or \
-                np.size(rotation[0]) > 1 or \
-                np.size(rotation[1]) > 1 or \
-                np.size(rotation[2]) > 1 or \
-                np.size(rotation_rate[0]) > 1 or \
-                np.size(rotation_rate[1]) > 1 or \
-                np.size(rotation_rate[2]) > 1:
-
-            self.location = np.zeros(shape+(3,))
-            self.speed = np.zeros(shape+(3,))
-            self.rotation = np.zeros(shape+(3,))
-            self.rotation_rate = np.zeros(shape+(3,))
+        if (
+            np.size(location[0]) > 1
+            or np.size(location[1]) > 1
+            or np.size(location[2]) > 1
+            or np.size(speed[0]) > 1
+            or np.size(speed[1]) > 1
+            or np.size(speed[2]) > 1
+            or np.size(rotation[0]) > 1
+            or np.size(rotation[1]) > 1
+            or np.size(rotation[2]) > 1
+            or np.size(rotation_rate[0]) > 1
+            or np.size(rotation_rate[1]) > 1
+            or np.size(rotation_rate[2]) > 1
+        ):
+            self.location = np.zeros(shape + (3,))
+            self.speed = np.zeros(shape + (3,))
+            self.rotation = np.zeros(shape + (3,))
+            self.rotation_rate = np.zeros(shape + (3,))
 
             if np.size(speed[0]) > 1:
                 if np.shape(speed[0]) != shape:
                     raise ValueError(
-                        'speed[0] must be a scalar or have the same shape as '
-                        'timestamp')
+                        "speed[0] must be a scalar or have the same shape as "
+                        "timestamp"
+                    )
                 self.speed[:, :, :, 0] = speed[0]
             else:
                 self.speed[:, :, :, 0] = np.full(shape, speed[0])
@@ -832,8 +860,9 @@ class Radar:
             if np.size(speed[1]) > 1:
                 if np.shape(speed[1]) != shape:
                     raise ValueError(
-                        'speed[1] must be a scalar or have the same shape as '
-                        'timestamp')
+                        "speed[1] must be a scalar or have the same shape as "
+                        "timestamp"
+                    )
                 self.speed[:, :, :, 1] = speed[1]
             else:
                 self.speed[:, :, :, 1] = np.full(shape, speed[1])
@@ -841,8 +870,9 @@ class Radar:
             if np.size(speed[2]) > 1:
                 if np.shape(speed[2]) != shape:
                     raise ValueError(
-                        'speed[2] must be a scalar or have the same shape as '
-                        'timestamp')
+                        "speed[2] must be a scalar or have the same shape as "
+                        "timestamp"
+                    )
                 self.speed[:, :, :, 2] = speed[2]
             else:
                 self.speed[:, :, :, 2] = np.full(shape, speed[2])
@@ -850,92 +880,104 @@ class Radar:
             if np.size(location[0]) > 1:
                 if np.shape(location[0]) != shape:
                     raise ValueError(
-                        'location[0] must be a scalar or have the same shape '
-                        'as timestamp')
+                        "location[0] must be a scalar or have the same shape "
+                        "as timestamp"
+                    )
                 self.location[:, :, :, 0] = location[0]
             else:
-                self.location[:, :, :, 0] = location[0] + \
-                    speed[0]*self.timestamp
+                self.location[:, :, :, 0] = location[0] + speed[0] * self.timestamp
 
             if np.size(location[1]) > 1:
                 if np.shape(location[1]) != shape:
                     raise ValueError(
-                        'location[1] must be a scalar or have the same shape '
-                        'as timestamp')
+                        "location[1] must be a scalar or have the same shape "
+                        "as timestamp"
+                    )
                 self.location[:, :, :, 1] = location[1]
             else:
-                self.location[:, :, :, 1] = location[1] + \
-                    speed[1]*self.timestamp
+                self.location[:, :, :, 1] = location[1] + speed[1] * self.timestamp
 
             if np.size(location[2]) > 1:
                 if np.shape(location[2]) != shape:
                     raise ValueError(
-                        'location[2] must be a scalar or have the same shape '
-                        'as timestamp')
+                        "location[2] must be a scalar or have the same shape "
+                        "as timestamp"
+                    )
                 self.location[:, :, :, 2] = location[2]
             else:
-                self.location[:, :, :, 2] = location[2] + \
-                    speed[2]*self.timestamp
+                self.location[:, :, :, 2] = location[2] + speed[2] * self.timestamp
 
             if np.size(rotation_rate[0]) > 1:
                 if np.shape(rotation_rate[0]) != shape:
                     raise ValueError(
-                        'rotation_rate[0] must be a scalar or have the same '
-                        'shape as timestamp')
+                        "rotation_rate[0] must be a scalar or have the same "
+                        "shape as timestamp"
+                    )
                 self.rotation_rate[:, :, :, 0] = np.radians(rotation_rate[0])
             else:
                 self.rotation_rate[:, :, :, 0] = np.full(
-                    shape, np.radians(rotation_rate[0]))
+                    shape, np.radians(rotation_rate[0])
+                )
 
             if np.size(rotation_rate[1]) > 1:
                 if np.shape(rotation_rate[1]) != shape:
                     raise ValueError(
-                        'rotation_rate[1] must be a scalar or have the same '
-                        'shape as timestamp')
+                        "rotation_rate[1] must be a scalar or have the same "
+                        "shape as timestamp"
+                    )
                 self.rotation_rate[:, :, :, 1] = np.radians(rotation_rate[1])
             else:
                 self.rotation_rate[:, :, :, 1] = np.full(
-                    shape, np.radians(rotation_rate[1]))
+                    shape, np.radians(rotation_rate[1])
+                )
 
             if np.size(rotation_rate[2]) > 1:
                 if np.shape(rotation_rate[2]) != shape:
                     raise ValueError(
-                        'rotation_rate[2] must be a scalar or have the same '
-                        'shape as timestamp')
+                        "rotation_rate[2] must be a scalar or have the same "
+                        "shape as timestamp"
+                    )
                 self.rotation_rate[:, :, :, 2] = np.radians(rotation_rate[2])
             else:
                 self.rotation_rate[:, :, :, 2] = np.full(
-                    shape, np.radians(rotation_rate[2]))
+                    shape, np.radians(rotation_rate[2])
+                )
 
             if np.size(rotation[0]) > 1:
                 if np.shape(rotation[0]) != shape:
                     raise ValueError(
-                        'rotation[0] must be a scalar or have the same shape '
-                        'as timestamp')
+                        "rotation[0] must be a scalar or have the same shape "
+                        "as timestamp"
+                    )
                 self.rotation[:, :, :, 0] = np.radians(rotation[0])
             else:
                 self.rotation[:, :, :, 0] = np.radians(
-                    rotation[0] + rotation_rate[0]*self.timestamp)
+                    rotation[0] + rotation_rate[0] * self.timestamp
+                )
 
             if np.size(rotation[1]) > 1:
                 if np.shape(rotation[1]) != shape:
                     raise ValueError(
-                        'rotation[1] must be a scalar or have the same shape '
-                        'as timestamp')
+                        "rotation[1] must be a scalar or have the same shape "
+                        "as timestamp"
+                    )
                 self.rotation[:, :, :, 1] = np.radians(rotation[1])
             else:
                 self.rotation[:, :, :, 1] = np.radians(
-                    rotation[1] + rotation_rate[1]*self.timestamp)
+                    rotation[1] + rotation_rate[1] * self.timestamp
+                )
 
             if np.size(rotation[2]) > 1:
                 if np.shape(rotation[2]) != shape:
                     raise ValueError(
-                        'rotation[2] must be a scalar or have the same shape '
-                        'as timestamp')
+                        "rotation[2] must be a scalar or have the same shape "
+                        "as timestamp"
+                    )
                 self.rotation[:, :, :, 2] = np.radians(rotation[2])
             else:
                 self.rotation[:, :, :, 2] = np.radians(
-                    rotation[2] + rotation_rate[2]*self.timestamp)
+                    rotation[2] + rotation_rate[2] * self.timestamp
+                )
         else:
             self.speed = np.array(speed)
             self.loccation = np.array(location)
@@ -964,31 +1006,35 @@ class Radar:
         fs = self.receiver.fs
 
         chirp_delay = np.tile(
-            np.expand_dims(
-                np.expand_dims(np.cumsum(crp)-crp[0], axis=1),
-                axis=0),
-            (channel_size, 1, samples))
+            np.expand_dims(np.expand_dims(np.cumsum(crp) - crp[0], axis=1), axis=0),
+            (channel_size, 1, samples),
+        )
 
-        tx_idx = np.arange(0, channel_size)/rx_channel_size
+        tx_idx = np.arange(0, channel_size) / rx_channel_size
         tx_delay = np.tile(
-            np.expand_dims(
-                np.expand_dims(delay[tx_idx.astype(int)], axis=1),
-                axis=2),
-            (1, pulses, samples))
+            np.expand_dims(np.expand_dims(delay[tx_idx.astype(int)], axis=1), axis=2),
+            (1, pulses, samples),
+        )
 
-        timestamp = tx_delay+chirp_delay+np.tile(
-            np.expand_dims(
-                np.expand_dims(np.arange(0, samples), axis=0),
-                axis=0),
-            (channel_size, pulses, 1))/fs
+        timestamp = (
+            tx_delay
+            + chirp_delay
+            + np.tile(
+                np.expand_dims(np.expand_dims(np.arange(0, samples), axis=0), axis=0),
+                (channel_size, pulses, 1),
+            )
+            / fs
+        )
 
         if self.frames > 1:
             toffset = np.repeat(
                 np.tile(
-                    np.expand_dims(
-                        np.expand_dims(self.t_offset, axis=1), axis=2), (
-                        1, self.transmitter.pulses, self.samples_per_pulse
-                    )), self.channel_size, axis=0)
+                    np.expand_dims(np.expand_dims(self.t_offset, axis=1), axis=2),
+                    (1, self.transmitter.pulses, self.samples_per_pulse),
+                ),
+                self.channel_size,
+                axis=0,
+            )
 
             timestamp = np.tile(timestamp, (self.frames, 1, 1)) + toffset
         elif self.frames == 1:
@@ -1020,20 +1066,15 @@ class Radar:
         :rtype: numpy.2darray
         """
 
-        chip_length = np.expand_dims(
-            np.array(self.transmitter.chip_length),
-            axis=1)
-        code_sequence = chip_length*np.tile(
-            np.expand_dims(
-                np.arange(0, self.transmitter.max_code_length),
-                axis=0),
-            (self.transmitter.channel_size, 1))
+        chip_length = np.expand_dims(np.array(self.transmitter.chip_length), axis=1)
+        code_sequence = chip_length * np.tile(
+            np.expand_dims(np.arange(0, self.transmitter.max_code_length), axis=0),
+            (self.transmitter.channel_size, 1),
+        )
 
-        code_timestamp = np.repeat(
-            code_sequence, self.receiver.channel_size, axis=0)
+        code_timestamp = np.repeat(code_sequence, self.receiver.channel_size, axis=0)
 
-        code_timestamp = np.repeat(
-            code_timestamp, self.frames, axis=0)
+        code_timestamp = np.repeat(code_timestamp, self.frames, axis=0)
 
         return code_timestamp
 
@@ -1047,22 +1088,27 @@ class Radar:
         :rtype: numpy.3darray
         """
 
-        noise_amp = np.zeros([
-            self.channel_size,
-            self.transmitter.pulses,
-            self.samples_per_pulse,
-        ])
+        noise_amp = np.zeros(
+            [
+                self.channel_size,
+                self.transmitter.pulses,
+                self.samples_per_pulse,
+            ]
+        )
 
         Boltzmann_const = 1.38064852e-23
         Ts = 290
         input_noise_dbm = 10 * np.log10(Boltzmann_const * Ts * 1000)  # dBm/Hz
-        receiver_noise_dbm = (input_noise_dbm + self.receiver.rf_gain +
-                              self.receiver.noise_figure +
-                              10 * np.log10(self.receiver.noise_bandwidth) +
-                              self.receiver.baseband_gain)  # dBm/Hz
-        receiver_noise_watts = 1e-3 * 10**(receiver_noise_dbm / 10
-                                           )  # Watts/sqrt(hz)
-        noise_amplitude_mixer = np.sqrt(receiver_noise_watts *
-                                        self.receiver.load_resistor)
+        receiver_noise_dbm = (
+            input_noise_dbm
+            + self.receiver.rf_gain
+            + self.receiver.noise_figure
+            + 10 * np.log10(self.receiver.noise_bandwidth)
+            + self.receiver.baseband_gain
+        )  # dBm/Hz
+        receiver_noise_watts = 1e-3 * 10 ** (receiver_noise_dbm / 10)  # Watts/sqrt(hz)
+        noise_amplitude_mixer = np.sqrt(
+            receiver_noise_watts * self.receiver.load_resistor
+        )
         noise_amplitude_peak = np.sqrt(2) * noise_amplitude_mixer + noise_amp
         return noise_amplitude_peak
