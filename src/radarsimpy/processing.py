@@ -1,45 +1,46 @@
 #!python
 # distutils: language = c++
 
-# Script for radar signal processing
+"""
+Script for radar signal processing
 
-# This script requires that `numpy` and be installed within the Python
-# environment you are running this script in.
+This script requires that `numpy` and be installed within the Python
+environment you are running this script in.
 
-# This file can be imported as a module and contains the following
-# functions:
+This file can be imported as a module and contains the following
+functions:
 
-# * cal_range_profile - calculate range profile matrix
-# * cal_range_doppler - range-Doppler processing
-# * get_polar_image - convert cartesian coordinate to polar
+* cal_range_profile - calculate range profile matrix
+* cal_range_doppler - range-Doppler processing
+* get_polar_image - convert cartesian coordinate to polar
 
-# ----------
-# RadarSimPy - A Radar Simulator Built with Python
-# Copyright (C) 2018 - PRESENT  Zhengyu Peng
-# E-mail: zpeng.me@gmail.com
-# Website: https://zpeng.me
+----------
+RadarSimPy - A Radar Simulator Built with Python
+Copyright (C) 2018 - PRESENT  Zhengyu Peng
+E-mail: zpeng.me@gmail.com
+Website: https://zpeng.me
 
-# `                      `
-# -:.                  -#:
-# -//:.              -###:
-# -////:.          -#####:
-# -/:.://:.      -###++##:
-# ..   `://:-  -###+. :##:
-#        `:/+####+.   :##:
-# .::::::::/+###.     :##:
-# .////-----+##:    `:###:
-#  `-//:.   :##:  `:###/.
-#    `-//:. :##:`:###/.
-#      `-//:+######/.
-#        `-/+####/.
-#          `+##+.
-#           :##:
-#           :##:
-#           :##:
-#           :##:
-#           :##:
-#            .+:
-
+`                      `
+-:.                  -#:
+-//:.              -###:
+-////:.          -#####:
+-/:.://:.      -###++##:
+..   `://:-  -###+. :##:
+       `:/+####+.   :##:
+.::::::::/+###.     :##:
+.////-----+##:    `:###:
+ `-//:.   :##:  `:###/.
+   `-//:. :##:`:###/.
+     `-//:+######/.
+       `-/+####/.
+         `+##+.
+          :##:
+          :##:
+          :##:
+          :##:
+          :##:
+           .+:
+"""
 
 from warnings import warn
 import numpy as np
@@ -129,53 +130,53 @@ def range_doppler_fft(data, rwin=None, dwin=None, rn=None, dn=None):
     return doppler_fft(range_fft(data, rwin=rwin, n=rn), dwin=dwin, n=dn)
 
 
-def get_polar_image(image, range_bins, angle_bins, fov_deg):
-    """
-    Convert cartesian coordinate to polar
+# def get_polar_image(image, range_bins, angle_bins, fov_deg):
+#     """
+#     Convert cartesian coordinate to polar
 
-    :param numpy.2darray image:
-        Data with cartesian coordinate, [range, angle]
-    :param int range_bins:
-        Number of range bins
-    :param int angle_bins:
-        Number of angle bins
-    :param float fov_deg:
-        Field of view (deg)
+#     :param numpy.2darray image:
+#         Data with cartesian coordinate, [range, angle]
+#     :param int range_bins:
+#         Number of range bins
+#     :param int angle_bins:
+#         Number of angle bins
+#     :param float fov_deg:
+#         Field of view (deg)
 
-    :return: A 2D image with polar coordinate
-    :rtype: numpy.2darray
-    """
+#     :return: A 2D image with polar coordinate
+#     :rtype: numpy.2darray
+#     """
 
-    angle_bin_res = fov_deg / angle_bins
+#     angle_bin_res = fov_deg / angle_bins
 
-    latitude_bins = int(range_bins * np.sin(fov_deg / 360 * np.pi) + 1)
-    polar = np.zeros((range_bins, latitude_bins * 2), dtype=complex)
+#     latitude_bins = int(range_bins * np.sin(fov_deg / 360 * np.pi) + 1)
+#     polar = np.zeros((range_bins, latitude_bins * 2), dtype=complex)
 
-    x = np.arange(1, range_bins, 1, dtype=int)
-    y = np.arange(0, latitude_bins * 2, 1, dtype=int)
-    X_data, Y_data = np.meshgrid(x, y)
+#     x = np.arange(1, range_bins, 1, dtype=int)
+#     y = np.arange(0, latitude_bins * 2, 1, dtype=int)
+#     X_data, Y_data = np.meshgrid(x, y)
 
-    b = (
-        180 * np.arctan((Y_data - latitude_bins) / X_data) / angle_bin_res / np.pi
-        + fov_deg / angle_bin_res / 2
-    )
-    a = X_data / (np.cos((angle_bin_res * b - fov_deg / 2) / 180 * np.pi))
-    b = b.astype(int)
-    a = a.astype(int)
+#     b = (
+#         180 * np.arctan((Y_data - latitude_bins) / X_data) / angle_bin_res / np.pi
+#         + fov_deg / angle_bin_res / 2
+#     )
+#     a = X_data / (np.cos((angle_bin_res * b - fov_deg / 2) / 180 * np.pi))
+#     b = b.astype(int)
+#     a = a.astype(int)
 
-    idx = np.where(
-        np.logical_and(
-            np.logical_and(np.less(b, angle_bins), np.greater_equal(b, 0)),
-            np.logical_and(np.less(a, range_bins), np.greater_equal(a, 0)),
-        )
-    )
-    b = b[idx]
-    a = a[idx]
-    xx = X_data[idx]
-    yy = Y_data[idx]
+#     idx = np.where(
+#         np.logical_and(
+#             np.logical_and(np.less(b, angle_bins), np.greater_equal(b, 0)),
+#             np.logical_and(np.less(a, range_bins), np.greater_equal(a, 0)),
+#         )
+#     )
+#     b = b[idx]
+#     a = a[idx]
+#     xx = X_data[idx]
+#     yy = Y_data[idx]
 
-    polar[xx, yy] = image[a, b]
-    return polar
+#     polar[xx, yy] = image[a, b]
+#     return polar
 
 
 def cfar_ca_1d(
@@ -287,7 +288,7 @@ def cfar_ca_2d(data, guard, trailing, pfa=1e-5, detector="squarelaw", offset=Non
         g_num = (2 * guard[0] + 1) * (2 * guard[1] + 1)
 
         if t_num == g_num:
-            raise ("No trailing bins!")
+            raise ValueError("No trailing bins!")
 
         if detector == "squarelaw":
             a = (t_num - g_num) * (pfa ** (-1 / (t_num - g_num)) - 1)
@@ -342,21 +343,22 @@ def os_cfar_threshold(k, n, pfa):
     t_max = 1e32
     t_min = 1
 
-    for idx in range(0, max_iter):
+    for _ in range(0, max_iter):
         m_n = t_max - fun(k, n, t_max, pfa) * (t_min - t_max) / (
             fun(k, n, t_min, pfa) - fun(k, n, t_max, pfa)
         )
         f_m_n = fun(k, n, m_n, pfa)
         if f_m_n == 0:
             return m_n
-        elif np.abs(f_m_n) < 0.0001:
+        if np.abs(f_m_n) < 0.0001:
             return m_n
-        elif fun(k, n, t_max, pfa) * f_m_n < 0:
-            t_max = t_max
+
+        if fun(k, n, t_max, pfa) * f_m_n < 0:
+            # t_max = t_max
             t_min = m_n
         elif fun(k, n, t_min, pfa) * f_m_n < 0:
             t_max = m_n
-            t_min = t_min
+            # t_min = t_min
         else:
             # print("Secant method fails.")
             break
@@ -526,7 +528,7 @@ def cfar_os_2d(data, guard, trailing, k, pfa=1e-5, detector="squarelaw", offset=
         g_num = (2 * guard[0] + 1) * (2 * guard[1] + 1)
 
         if t_num == g_num:
-            raise ("No trailing bins!")
+            raise ValueError("No trailing bins!")
 
         if detector == "squarelaw":
             a = os_cfar_threshold(k, t_num - g_num, pfa)
@@ -687,8 +689,8 @@ def doa_esprit(covmat, nsig, spacing=0.5):
 
     # the original array is divided into two subarrays
     # [0,1,...,N-2] and [1,2,...,N-1]
-    Phi = linalg.pinv(signal_subspace[0:-1]) @ signal_subspace[1:]
-    eigs = linalg.eigvals(Phi)
+    phi = linalg.pinv(signal_subspace[0:-1]) @ signal_subspace[1:]
+    eigs = linalg.eigvals(phi)
     return np.degrees(np.arcsin(np.angle(eigs) / np.pi / (spacing / 0.5)))
 
 
