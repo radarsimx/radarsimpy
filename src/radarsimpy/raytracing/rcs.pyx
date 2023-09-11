@@ -30,9 +30,9 @@
 
 from radarsimpy.includes.zpvector cimport Vec3
 from radarsimpy.includes.type_def cimport int_t
+from radarsimpy.lib.cp_radarsimc cimport cp_RCS_Target
 from radarsimpy.includes.radarsimc cimport Target, Rcs
 
-# import meshio
 import numpy as np
 
 cimport cython
@@ -44,7 +44,7 @@ np_float = np.float32
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef rcs_sbr(model,
+cpdef rcs_sbr(targets,
               f,
               obs_phi,
               obs_theta,
@@ -84,27 +84,10 @@ cpdef rcs_sbr(model,
     cdef float_t[:, :] points_mv
     cdef int_t[:, :] cells_mv
 
-    try:
-        import pymeshlab
-    except:
-        try:
-            import meshio
-        except:
-            raise("PyMeshLab is requied to process the 3D model.")
-        else:
-            t_mesh = meshio.read(model)
-            points_mv = t_mesh.points.astype(np_float)
-            cells_mv = t_mesh.cells[0].data.astype(np.int32)
-    else:
-        ms = pymeshlab.MeshSet()
-        ms.load_new_mesh(model)
-        t_mesh = ms.current_mesh()
-        v_matrix = np.array(t_mesh.vertex_matrix())
-        f_matrix = np.array(t_mesh.face_matrix())
-        if np.isfortran(v_matrix):
-            points_mv = np.ascontiguousarray(v_matrix).astype(np_float)
-            cells_mv = np.ascontiguousarray(f_matrix).astype(np.int32)
-        ms.clear()
+    cdef vector[Target[float]] targets_vt
+
+    for idx_c in range(0, len(targets)):
+        targets_vt.push_back(cp_RCS_Target(targets[idx_c]))
 
     if inc_phi is None:
         inc_phi = obs_phi
@@ -129,7 +112,7 @@ cpdef rcs_sbr(model,
 
     cdef Rcs[double] rcs
 
-    rcs = Rcs[double](Target[float](&points_mv[0, 0], &cells_mv[0, 0], <int_t> cells_mv.shape[0]),
+    rcs = Rcs[double](targets_vt,
                       inc_dir,
                       obs_dir,
                       Vec3[double](<double> pol[0], <double> pol[1], <double> pol[2]),

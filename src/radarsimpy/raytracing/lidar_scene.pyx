@@ -119,12 +119,12 @@ cpdef lidar_scene(lidar, targets, t=0):
             except:
                 raise("PyMeshLab is requied to process the 3D model.")
             else:
-                t_mesh = meshio.read(targets[idx_c]['model'])
+                t_mesh = meshio.read(targets[idx_c]["model"])
                 points_mv = t_mesh.points.astype(np_float)
                 cells_mv = t_mesh.cells[0].data.astype(np.int32)
         else:
             ms = pymeshlab.MeshSet()
-            ms.load_new_mesh(targets[idx_c]['model'])
+            ms.load_new_mesh(targets[idx_c]["model"])
             t_mesh = ms.current_mesh()
             v_matrix = np.array(t_mesh.vertex_matrix())
             f_matrix = np.array(t_mesh.face_matrix())
@@ -133,18 +133,18 @@ cpdef lidar_scene(lidar, targets, t=0):
                 cells_mv = np.ascontiguousarray(f_matrix).astype(np.int32)
             ms.clear()
 
-        origin_mv = np.array(targets[idx_c].get('origin', (0, 0, 0)), dtype=np_float)
+        origin_mv = np.array(targets[idx_c].get("origin", (0, 0, 0)), dtype=np_float)
 
-        location_mv = np.array(targets[idx_c].get('location', (0, 0, 0)), dtype=np_float) + \
-            t*np.array(targets[idx_c].get('speed', (0, 0, 0)), dtype=np_float)
-        speed_mv = np.array(targets[idx_c].get('speed', (0, 0, 0)), dtype=np_float)
+        location_mv = np.array(targets[idx_c].get("location", (0, 0, 0)), dtype=np_float) + \
+            t*np.array(targets[idx_c].get("speed", (0, 0, 0)), dtype=np_float)
+        speed_mv = np.array(targets[idx_c].get("speed", (0, 0, 0)), dtype=np_float)
 
         rotation_mv = np.radians(
-            np.array(targets[idx_c].get('rotation', (0, 0, 0)), dtype=np_float) + \
-            t*np.array(targets[idx_c].get('rotation_rate', (0, 0, 0)), dtype=np_float)
+            np.array(targets[idx_c].get("rotation", (0, 0, 0)), dtype=np_float) + \
+            t*np.array(targets[idx_c].get("rotation_rate", (0, 0, 0)), dtype=np_float)
             )
         rotation_rate_mv = np.radians(
-            np.array(targets[idx_c].get('rotation_rate', (0, 0, 0)), dtype=np_float)
+            np.array(targets[idx_c].get("rotation_rate", (0, 0, 0)), dtype=np_float)
             )
 
         pointcloud_c.AddTarget(Target[float_t](&points_mv[0, 0],
@@ -155,11 +155,11 @@ cpdef lidar_scene(lidar, targets, t=0):
                                                Vec3[float_t](&speed_mv[0]),
                                                Vec3[float_t](&rotation_mv[0]),
                                                Vec3[float_t](&rotation_rate_mv[0]),
-                                               <bool> targets[idx_c].get('is_ground', False)))
+                                               <bool> targets[idx_c].get("is_ground", False)))
 
-    cdef float_t[:] phi_mv = np.radians(np.array(lidar['phi'], dtype=np_float))
-    cdef float_t[:] theta_mv = np.radians(np.array(lidar['theta'], dtype=np_float))
-    cdef float_t[:] position_mv = np.array(lidar['position'], dtype=np_float)
+    cdef float_t[:] phi_mv = np.radians(np.array(lidar["phi"], dtype=np_float))
+    cdef float_t[:] theta_mv = np.radians(np.array(lidar["theta"], dtype=np_float))
+    cdef float_t[:] position_mv = np.array(lidar["position"], dtype=np_float)
 
     cdef vector[float_t] phi_vt
     Mem_Copy(&phi_mv[0], <int_t>(phi_mv.shape[0]), phi_vt)
@@ -171,17 +171,17 @@ cpdef lidar_scene(lidar, targets, t=0):
                      theta_vt,
                      Vec3[float_t](&position_mv[0]))
 
-    ray_type = np.dtype([('positions', np_float, (3,)),
-                         ('directions', np_float, (3,))])
+    ray_type = np.dtype([("positions", np_float, (3,)),
+                         ("directions", np_float, (3,))])
 
     rays = np.zeros(pointcloud_c.cloud_.size(), dtype=ray_type)
 
     for idx_c in range(0, <int_t> pointcloud_c.cloud_.size()):
-        rays[idx_c]['positions'][0] = pointcloud_c.cloud_[idx_c].location_[1][0]
-        rays[idx_c]['positions'][1] = pointcloud_c.cloud_[idx_c].location_[1][1]
-        rays[idx_c]['positions'][2] = pointcloud_c.cloud_[idx_c].location_[1][2]
-        rays[idx_c]['directions'][0] = pointcloud_c.cloud_[idx_c].direction_[1][0]
-        rays[idx_c]['directions'][1] = pointcloud_c.cloud_[idx_c].direction_[1][1]
-        rays[idx_c]['directions'][2] = pointcloud_c.cloud_[idx_c].direction_[1][2]
+        rays[idx_c]["positions"][0] = pointcloud_c.cloud_[idx_c].location_[1][0]
+        rays[idx_c]["positions"][1] = pointcloud_c.cloud_[idx_c].location_[1][1]
+        rays[idx_c]["positions"][2] = pointcloud_c.cloud_[idx_c].location_[1][2]
+        rays[idx_c]["directions"][0] = pointcloud_c.cloud_[idx_c].direction_[1][0]
+        rays[idx_c]["directions"][1] = pointcloud_c.cloud_[idx_c].direction_[1][1]
+        rays[idx_c]["directions"][2] = pointcloud_c.cloud_[idx_c].direction_[1][2]
 
     return rays

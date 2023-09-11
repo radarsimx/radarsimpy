@@ -43,9 +43,13 @@ def test_rcs_momostatic():
     pol = np.array([0, 0, 1])
     density = 1
     rcs = np.zeros_like(freq)
+    target = {
+        "model": "./models/plate5x5.stl",
+        "location": (0, 0, 0),
+    }
     for f_idx, f in enumerate(freq):
         rcs[f_idx] = 10 * np.log10(
-            rcs_sbr("./models/plate5x5.stl", f, phi, theta, pol=pol, density=density)
+            rcs_sbr([target], f, phi, theta, pol=pol, density=density)
         )
 
     npt.assert_almost_equal(rcs, np.array([48.3, 59.2]), decimal=1)
@@ -62,10 +66,15 @@ def test_rcs_bistatic():
     pol = np.array([0, 0, 1])
     density = 1
     rcs = np.zeros_like(phi)
+
+    target = {
+        "model": "./models/plate5x5.stl",
+        "location": (0, 0, 0),
+    }
     for phi_idx, phi_ang in enumerate(phi):
         rcs[phi_idx] = 10 * np.log10(
             rcs_sbr(
-                "./models/plate5x5.stl",
+                [target],
                 freq,
                 phi_ang,
                 theta,

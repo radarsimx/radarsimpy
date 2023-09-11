@@ -262,17 +262,17 @@ cdef TxChannel[float_t] cp_TxChannel(tx,
     Mem_Copy_Complex(&pulse_real_mv[0], &pulse_imag_mv[0], <int_t>(pulses_c), pulse_mod_vt)
 
     # waveform modulation
-    mod_enabled = tx.waveform_mod[tx_idx]['enabled']
+    mod_enabled = tx.waveform_mod[tx_idx]["enabled"]
 
     cdef float_t[:] mod_real_mv, mod_imag_mv
     cdef float_t[:] mod_t_mv
     if mod_enabled:
-        mod_real_mv = np.real(tx.waveform_mod[tx_idx]['var']).astype(np_float)
-        mod_imag_mv = np.imag(tx.waveform_mod[tx_idx]['var']).astype(np_float)
-        mod_t_mv = tx.waveform_mod[tx_idx]['t'].astype(np_float)
+        mod_real_mv = np.real(tx.waveform_mod[tx_idx]["var"]).astype(np_float)
+        mod_imag_mv = np.imag(tx.waveform_mod[tx_idx]["var"]).astype(np_float)
+        mod_t_mv = tx.waveform_mod[tx_idx]["t"].astype(np_float)
 
-        Mem_Copy_Complex(&mod_real_mv[0], &mod_imag_mv[0], <int_t>(len(tx.waveform_mod[tx_idx]['var'])), mod_var_vt)
-        Mem_Copy(&mod_t_mv[0], <int_t>(len(tx.waveform_mod[tx_idx]['t'])), mod_t_vt)
+        Mem_Copy_Complex(&mod_real_mv[0], &mod_imag_mv[0], <int_t>(len(tx.waveform_mod[tx_idx]["var"])), mod_var_vt)
+        Mem_Copy(&mod_t_mv[0], <int_t>(len(tx.waveform_mod[tx_idx]["t"])), mod_t_vt)
 
     cdef float_t[:] location_mv = tx.locations[tx_idx].astype(np_float)
     cdef float_t[:] polarization_mv = tx.polarization[tx_idx].astype(np_float)
@@ -392,12 +392,12 @@ cdef Target[float_t] cp_Target(radar,
         except:
             raise("PyMeshLab is requied to process the 3D model.")
         else:
-            t_mesh = meshio.read(target['model'])
+            t_mesh = meshio.read(target["model"])
             points_mv = t_mesh.points.astype(np_float)
             cells_mv = t_mesh.cells[0].data.astype(np.int32)
     else:
         ms = pymeshlab.MeshSet()
-        ms.load_new_mesh(target['model'])
+        ms.load_new_mesh(target["model"])
         t_mesh = ms.current_mesh()
         v_matrix = np.array(t_mesh.vertex_matrix())
         f_matrix = np.array(t_mesh.face_matrix())
@@ -406,16 +406,16 @@ cdef Target[float_t] cp_Target(radar,
             cells_mv = np.ascontiguousarray(f_matrix).astype(np.int32)
         ms.clear()
 
-    cdef float_t[:] origin_mv = np.array(target.get('origin', (0, 0, 0)), dtype=np_float)
+    cdef float_t[:] origin_mv = np.array(target.get("origin", (0, 0, 0)), dtype=np_float)
 
-    location = np.array(target.get('location', (0, 0, 0)), dtype=object)
-    speed = np.array(target.get('speed', (0, 0, 0)), dtype=object)
-    rotation = np.array(target.get('rotation', (0, 0, 0)), dtype=object)
-    rotation_rate = np.array(target.get( 'rotation_rate', (0, 0, 0)), dtype=object)
+    location = np.array(target.get("location", (0, 0, 0)), dtype=object)
+    speed = np.array(target.get("speed", (0, 0, 0)), dtype=object)
+    rotation = np.array(target.get("rotation", (0, 0, 0)), dtype=object)
+    rotation_rate = np.array(target.get( "rotation_rate", (0, 0, 0)), dtype=object)
 
     cdef float_t[:] location_mv, speed_mv, rotation_mv, rotation_rate_mv
 
-    permittivity = target.get('permittivity', 'PEC')
+    permittivity = target.get("permittivity", "PEC")
     if permittivity == "PEC":
         ep_c = cpp_complex[float_t](-1, 0)
         mu_c = cpp_complex[float_t](1, 0)
@@ -527,5 +527,93 @@ cdef Target[float_t] cp_Target(radar,
                            rrt_vt,
                            ep_c,
                            mu_c,
-                           <bool> target.get('is_ground', False))
+                           <bool> target.get("is_ground", False))
 
+@cython.cdivision(True)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef Target[float_t] cp_RCS_Target(target):
+    """
+    cp_RCS_Target((radar, target, shape)
+
+    Creat Target object in Cython for RCS calculation
+
+    :param dict target:
+        Target properties
+
+    :return: C++ object of a target
+    :rtype: Target
+    """
+
+    # vector of location, speed, rotation, rotation rate
+    cdef vector[Vec3[float_t]] loc_vt
+    cdef vector[Vec3[float_t]] spd_vt
+    cdef vector[Vec3[float_t]] rot_vt
+    cdef vector[Vec3[float_t]] rrt_vt
+
+    cdef cpp_complex[float_t] ep_c, mu_c
+
+    cdef float_t[:, :] points_mv
+    cdef int_t[:, :] cells_mv
+    try:
+        import pymeshlab
+    except:
+        try:
+            import meshio
+        except:
+            raise("PyMeshLab is requied to process the 3D model.")
+        else:
+            t_mesh = meshio.read(target["model"])
+            points_mv = t_mesh.points.astype(np_float)
+            cells_mv = t_mesh.cells[0].data.astype(np.int32)
+    else:
+        ms = pymeshlab.MeshSet()
+        ms.load_new_mesh(target["model"])
+        t_mesh = ms.current_mesh()
+        v_matrix = np.array(t_mesh.vertex_matrix())
+        f_matrix = np.array(t_mesh.face_matrix())
+        if np.isfortran(v_matrix):
+            points_mv = np.ascontiguousarray(v_matrix).astype(np_float)
+            cells_mv = np.ascontiguousarray(f_matrix).astype(np.int32)
+        ms.clear()
+
+    cdef float_t[:] origin_mv = np.array(target.get("origin", (0, 0, 0)), dtype=np_float)
+
+    location = np.array(target.get("location", (0, 0, 0)), dtype=object)
+    speed = np.array(target.get("speed", (0, 0, 0)), dtype=object)
+    rotation = np.array(target.get("rotation", (0, 0, 0)), dtype=object)
+    rotation_rate = np.array(target.get( "rotation_rate", (0, 0, 0)), dtype=object)
+
+    cdef float_t[:] location_mv, speed_mv, rotation_mv, rotation_rate_mv
+
+    permittivity = target.get("permittivity", "PEC")
+    if permittivity == "PEC":
+        ep_c = cpp_complex[float_t](-1, 0)
+        mu_c = cpp_complex[float_t](1, 0)
+    else:
+        ep_c = cpp_complex[float_t](np.real(permittivity), np.imag(permittivity))
+        mu_c = cpp_complex[float_t](1, 0)
+
+    location_mv = location.astype(np_float)
+    loc_vt.push_back(Vec3[float_t](&location_mv[0]))
+
+    speed_mv = speed.astype(np_float)
+    spd_vt.push_back(Vec3[float_t](&speed_mv[0]))
+
+    rotation_mv = np.radians(rotation.astype(np_float)).astype(np_float)
+    rot_vt.push_back(Vec3[float_t](&rotation_mv[0]))
+
+    rotation_rate_mv = np.radians(rotation_rate.astype(np_float)).astype(np_float)
+    rrt_vt.push_back(Vec3[float_t](&rotation_rate_mv[0]))
+
+    return Target[float_t](&points_mv[0, 0],
+                           &cells_mv[0, 0],
+                           <int_t> cells_mv.shape[0],
+                           Vec3[float_t](&origin_mv[0]),
+                           loc_vt,
+                           spd_vt,
+                           rot_vt,
+                           rrt_vt,
+                           ep_c,
+                           mu_c,
+                           <bool> target.get("is_ground", False))

@@ -100,7 +100,7 @@ Rcs
 cdef extern from "rcs.hpp":
     cdef cppclass Rcs[T]:
         Rcs() except +
-        Rcs(const Target[float] & mesh,
+        Rcs(const vector[Target[float]] & targets,
             const Vec3[T] & inc_dir,
             const Vec3[T] & obs_dir,
             const Vec3[T] & polarization,

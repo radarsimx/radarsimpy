@@ -273,7 +273,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
                         0,
                         0)
                 )
-    elif level == 'pulse':
+    elif level == "pulse":
         level_id = 1
         for fm_idx in range(0, frames_c):
             for tx_idx in range(0, txsize_c):
@@ -286,7 +286,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
                             ps_idx,
                             0)
                     )
-    elif level == 'sample':
+    elif level == "sample":
         level_id = 2
         for fm_idx in range(0, frames_c):
             for tx_idx in range(0, txsize_c):
@@ -417,6 +417,6 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     free(bb_real)
     free(bb_imag)
 
-    return {'baseband': baseband,
-            'timestamp': radar.timestamp,
-            'interference': interference}
+    return {"baseband": baseband,
+            "timestamp": radar.timestamp,
+            "interference": interference}
