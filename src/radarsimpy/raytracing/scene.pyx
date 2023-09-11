@@ -81,6 +81,8 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
             Target's rotation rate (deg/s),
             [yaw rate, pitch rate, roll rate]
             ``default [0, 0, 0]``
+        - **permittivity** (*complex*) --
+            Target's permittivity. Perfect electric conductor (PEC) if not specified.
 
         }]
 

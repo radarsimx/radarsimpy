@@ -29,7 +29,7 @@
 
 
 from radarsimpy.includes.zpvector cimport Vec3
-from radarsimpy.includes.type_def cimport int_t
+from radarsimpy.includes.type_def cimport vector
 from radarsimpy.lib.cp_radarsimc cimport cp_RCS_Target
 from radarsimpy.includes.radarsimc cimport Target, Rcs
 
@@ -53,12 +53,30 @@ cpdef rcs_sbr(targets,
               pol=[0, 0, 1],
               density=1):
     """
-    rcs_sbr(model, f, obs_phi, obs_theta, inc_phi=None, inc_theta=None, pol=[0, 0, 1], density=1)
+    rcs_sbr(targets, f, obs_phi, obs_theta, inc_phi=None, inc_theta=None, pol=[0, 0, 1], density=1)
 
     Calculate target's RCS by using shooting and bouncing rays (SBR)
 
-    :param str model:
-        Path of the model file
+    :param list[dict] targets:
+        Target list
+
+        [{
+
+        - **model** (*str*) --
+            Path to the target model
+        - **origin** (*numpy.1darray*) --
+            Origin position of the target model (m), [x, y, z].
+            ``default [0, 0, 0]``
+        - **location** (*numpy.1darray*) --
+            Location of the target (m), [x, y, z].
+            ``default [0, 0, 0]``
+        - **rotation** (*numpy.1darray*) --
+            Target's angle (deg), [yaw, pitch, roll].
+            ``default [0, 0, 0]``
+        - **permittivity** (*complex*) --
+            Target's permittivity. Perfect electric conductor (PEC) if not specified.
+
+        }]
     :param float f:
         Center frequency (Hz)
     :param float obs_phi:
@@ -81,9 +99,6 @@ cpdef rcs_sbr(targets,
     :return: Target's RCS (m^2), use 10*log10(RCS) to convert to dBsm
     :rtype: float
     """
-    cdef float_t[:, :] points_mv
-    cdef int_t[:, :] cells_mv
-
     cdef vector[Target[float]] targets_vt
 
     for idx_c in range(0, len(targets)):
