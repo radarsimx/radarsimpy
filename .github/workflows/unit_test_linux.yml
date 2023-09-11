@@ -16,8 +16,8 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
-        c_compiler: [gcc-8]
-        cxx_compiler: [g++-8]
+        c_compiler: [gcc-12]
+        cxx_compiler: [g++-12]
 
     steps:
     - uses: actions/checkout@v3
