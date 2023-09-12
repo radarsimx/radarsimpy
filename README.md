@@ -197,8 +197,7 @@ build_win_cuda.bat
 
 - **Simulator**: Radar baseband signal simulator
 
-  - [`radarsimpy.simulator.simpy`](https://radarsimx.github.io/radarsimpy/sim.html#radarsimpy.simulator.simpy): Simulates and generates raw time domain baseband data (Python engine)
-  - [`radarsimpy.simulator.simc`](https://radarsimx.github.io/radarsimpy/sim.html#radarsimpy.simulator.simc): Simulates and generates raw time domain baseband data (C++ engine)
+  - [`radarsimpy.simulator.simc`](https://radarsimx.github.io/radarsimpy/sim.html#radarsimpy.simulator.simc): Simulates and generates raw time domain baseband data (C++/CUDA engine)
 
 - **Raytracing**: Raytracing module for radar scene simulation
 
