@@ -32,8 +32,8 @@ def find_in_path(name, path):
     """Find a file in a search path"""
 
     # Adapted fom http://code.activestate.com/recipes/52224
-    for dir in path.split(os.pathsep):
-        binpath = pjoin(dir, name)
+    for path_name in path.split(os.pathsep):
+        binpath = pjoin(path_name, name)
         if os.path.exists(binpath):
             return os.path.abspath(binpath)
     return None
@@ -68,10 +68,10 @@ def locate_cuda():
         "include": pjoin(home, "include"),
         "lib64": pjoin(home, CUDALIB),
     }
-    for k, v in cudaconfig.items():
-        if not os.path.exists(v):
+    for key, val in cudaconfig.items():
+        if not os.path.exists(val):
             raise EnvironmentError(
-                "The CUDA %s path could not be located in %s" % (k, v)
+                "The CUDA " + key + " path could not be located in " + val
             )
 
     return cudaconfig
@@ -106,7 +106,7 @@ ext_modules = [
     ),
     Extension(
         "radarsimpy.simulator",
-        ["src/simulator.pyx"],
+        ["src/radarsimpy/simulator.pyx"],
         define_macros=MACROS,
         include_dirs=INCLUDE_DIRS + [CUDA["include"]],
         libraries=["radarsimc"],

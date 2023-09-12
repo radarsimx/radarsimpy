@@ -48,7 +48,7 @@ ext_modules = [
     ),
     Extension(
         "radarsimpy.simulator",
-        ["src/simulator.pyx"],
+        ["src/radarsimpy/simulator.pyx"],
         define_macros=MACROS,
         include_dirs=INCLUDE_DIRS,
         libraries=["radarsimc"],
