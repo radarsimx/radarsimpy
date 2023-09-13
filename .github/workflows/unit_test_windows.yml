@@ -35,7 +35,7 @@ jobs:
         .\build_win.bat
     - name: Test with Google Test
       run: |
-        .\src\radarsimc\build\Release\radarsimc_test.exe
+        .\src\radarsimc\build\Release\radarsimcpp_test.exe
     - name: Test with pytest
       run: |
         pytest
