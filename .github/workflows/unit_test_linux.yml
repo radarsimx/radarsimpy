@@ -43,7 +43,7 @@ jobs:
         ./build_linux.sh
     - name: Test with Google Test
       run: |
-        ./src/radarsimc/build/radarsimcpp_test
+        ./src/radarsimcpp/build/radarsimcpp_test
     - name: Test with pytest
       run: |
         pytest
