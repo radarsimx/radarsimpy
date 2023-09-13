@@ -35,7 +35,7 @@ echo "## Clean old build files ##"
 rm -rf ./src/radarsimc/build
 rm -rf ./radarsimpy
 
-echo "## Building libradarsimc.so with CPU ##"
+echo "## Building libradarsimcpp.so with CPU ##"
 mkdir ./src/radarsimc/build 
 cd ./src/radarsimc/build
 

@@ -41,7 +41,7 @@ RMDIR /Q/S .\radarsimpy
 MD ".\src\radarsimc\build"
 CD ".\src\radarsimc\build"
 
-ECHO ## Building radarsimc.dll with MSVC ##
+ECHO ## Building radarsimcpp.dll with MSVC ##
 @REM MSVC needs to set the build type using '--config Relesae' 
 cmake -DGPU_BUILD=ON -DGTEST=ON ..
 cmake --build . --config Release
@@ -51,7 +51,7 @@ CD %pwd%
 python setup_cuda.py build_ext -b ./
 
 ECHO ## Copying dll files to ./radarsimpy ##
-XCOPY ".\src\radarsimc\build\Release\radarsimc.dll" ".\radarsimpy\"
+XCOPY ".\src\radarsimc\build\Release\radarsimcpp.dll" ".\radarsimpy\"
 XCOPY ".\src\radarsimpy\__init__.py" ".\radarsimpy\"
 XCOPY ".\src\radarsimpy\lib\__init__.py" ".\radarsimpy\lib\"
 
