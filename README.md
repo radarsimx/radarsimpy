@@ -67,7 +67,7 @@ To use the module, please put the radarsimpy folder within your project folder a
   - your_project.ipynb
   - radarsimpy
     - \_\_init__.py
-    - radarsimc.dll
+    - radarsimcpp.dll
     - scene.xxx.pyd
     - ...
 
@@ -79,7 +79,7 @@ To use the module, please put the radarsimpy folder within your project folder a
   - your_project.ipynb
   - radarsimpy
     - \_\_init__.py
-    - libradarsimc.so
+    - libradarsimcpp.so
     - scene.xxx.so
     - ...
 
@@ -161,7 +161,7 @@ The source files of these Jupyter notebooks are available [here](https://github.
 
 ## Build
 
-**Building `radarsimpy` requires to access the source code of `radarsimc`. If you don't have access to `radarsimc`, please use the pre-built module instead**
+**Building `radarsimpy` requires to access the source code of `radarsimcpp`. If you don't have access to `radarsimcpp`, please use the pre-built module instead**
 
 - Windows CPU
 

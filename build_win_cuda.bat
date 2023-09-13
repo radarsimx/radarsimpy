@@ -1,6 +1,6 @@
 @ECHO OFF
 
-ECHO Automatic build script of radarsimc/radarsimpy for Windows
+ECHO Automatic build script of radarsimcpp/radarsimpy for Windows
 ECHO:
 ECHO ----------
 ECHO RadarSimPy - A Radar Simulator Built with Python
@@ -32,14 +32,14 @@ ECHO            .+:
 SET pwd=%cd%
 
 ECHO clean old build files
-RMDIR /Q/S .\src\radarsimc\build
+RMDIR /Q/S .\src\radarsimcpp\build
 
 ECHO clean old radarsimpy module
 RMDIR /Q/S .\radarsimpy
 
 @REM go to the build folder
-MD ".\src\radarsimc\build"
-CD ".\src\radarsimc\build"
+MD ".\src\radarsimcpp\build"
+CD ".\src\radarsimcpp\build"
 
 ECHO ## Building radarsimcpp.dll with MSVC ##
 @REM MSVC needs to set the build type using '--config Relesae' 
@@ -51,7 +51,7 @@ CD %pwd%
 python setup_cuda.py build_ext -b ./
 
 ECHO ## Copying dll files to ./radarsimpy ##
-XCOPY ".\src\radarsimc\build\Release\radarsimcpp.dll" ".\radarsimpy\"
+XCOPY ".\src\radarsimcpp\build\Release\radarsimcpp.dll" ".\radarsimpy\"
 XCOPY ".\src\radarsimpy\__init__.py" ".\radarsimpy\"
 XCOPY ".\src\radarsimpy\lib\__init__.py" ".\radarsimpy\lib\"
 
@@ -77,7 +77,7 @@ XCOPY /E /I .\radarsimpy .\tests\radarsimpy
 ECHO ## Build completed ##
 
 ECHO ## Run Google test ##
-.\src\radarsimc\build\Release\radarsimc_test.exe
+.\src\radarsimcpp\build\Release\radarsimcpp_test.exe
 
 ECHO ## Pytest ##
 pytest

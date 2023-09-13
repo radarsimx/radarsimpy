@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo "Automatic build script of radarsimc/radarsimpy for Linux"
+echo "Automatic build script of radarsimcpp/radarsimpy for Linux"
 echo ""
 echo "----------"
 echo "RadarSimPy - A Radar Simulator Built with Python"
@@ -32,12 +32,12 @@ echo "           .+:"
 workpath=$(pwd)
 
 echo "## Clean old build files ##"
-rm -rf ./src/radarsimc/build
+rm -rf ./src/radarsimcpp/build
 rm -rf ./radarsimpy
 
 echo "## Building libradarsimcpp.so with CPU ##"
-mkdir ./src/radarsimc/build 
-cd ./src/radarsimc/build
+mkdir ./src/radarsimcpp/build 
+cd ./src/radarsimcpp/build
 
 cmake -DCMAKE_BUILD_TYPE=Release -DGTEST=ON ..
 cmake --build .
@@ -50,7 +50,7 @@ echo "## Copying lib files to ./radarsimpy ##"
 # mkdir ./radarsimpy/lib
 cp ./src/radarsimpy/__init__.py ./radarsimpy
 cp ./src/radarsimpy/lib/__init__.py ./radarsimpy/lib
-cp ./src/radarsimc/build/*.so ./radarsimpy
+cp ./src/radarsimcpp/build/*.so ./radarsimpy
 
 echo "## Cleaning radarsimpy builds ##"
 rm -rf build

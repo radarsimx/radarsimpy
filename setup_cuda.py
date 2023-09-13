@@ -17,15 +17,15 @@ if os_type == "Linux":
     LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
     NVCC = "nvcc"
     CUDALIB = "lib64"
-    LIBRARY_DIRS = ["src/radarsimc/build"]
+    LIBRARY_DIRS = ["src/radarsimcpp/build"]
 elif os_type == "Windows":
     LINK_ARGS = []
     NVCC = "nvcc.exe"
     CUDALIB = "lib\\x64"
-    LIBRARY_DIRS = ["src/radarsimc/build/Release"]
+    LIBRARY_DIRS = ["src/radarsimcpp/build/Release"]
 
 MACROS = [("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION"), ("_CUDA_", None)]
-INCLUDE_DIRS = ["src/radarsimc/includes", "src/radarsimc/includes/zpvector"]
+INCLUDE_DIRS = ["src/radarsimcpp/includes", "src/radarsimcpp/includes/zpvector"]
 
 
 def find_in_path(name, path):
