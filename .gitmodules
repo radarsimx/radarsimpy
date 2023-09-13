@@ -1,3 +1,6 @@
 [submodule "src/radarsimc"]
 	path = src/radarsimc
 	url = git@github.com:rookiepeng/radarsimc.git
+[submodule "src/radarsimcpp"]
+	path = src/radarsimcpp
+	url = git@github.com:rookiepeng/radarsimcpp.git
