@@ -158,10 +158,10 @@ cpdef simc(radar, targets, noise=True):
     Targets
     """
     for idx_c in range(0, len(targets)):
-        location = targets[idx_c]['location']
-        speed = targets[idx_c].get('speed', (0, 0, 0))
-        rcs = targets[idx_c]['rcs']
-        phase = targets[idx_c].get('phase', 0)
+        location = targets[idx_c]["location"]
+        speed = targets[idx_c].get("speed", (0, 0, 0))
+        rcs = targets[idx_c]["rcs"]
+        phase = targets[idx_c].get("phase", 0)
 
         point_vt.push_back(
             cp_Point(location, speed, rcs, phase, np.shape(radar.timestamp))
@@ -347,6 +347,6 @@ cpdef simc(radar, targets, noise=True):
     free(bb_real)
     free(bb_imag)
 
-    return {'baseband': baseband,
-            'timestamp': radar.timestamp,
-            'interference': interference}
+    return {"baseband": baseband,
+            "timestamp": radar.timestamp,
+            "interference": interference}
