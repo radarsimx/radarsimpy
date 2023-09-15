@@ -200,10 +200,10 @@ cdef Transmitter[float_t] cp_Transmitter(radar):
         Mem_Copy_Complex(&pn_real_mv[0,0,0], &pn_imag_mv[0,0,0], <int_t>(frames_c*channles_c*pulses_c*samples_c), pn_vt)
 
     return Transmitter[float_t](
-        f_vt,
-        f_offset_vt,
-        t_vt,
         <float_t> radar.transmitter.tx_power,
+        f_vt,
+        t_vt,
+        f_offset_vt,
         t_pstart_vt,
         t_frame_vt,
         pn_vt
