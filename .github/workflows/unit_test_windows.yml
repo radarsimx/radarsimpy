@@ -22,7 +22,6 @@ jobs:
       with:
         ssh-key: ${{ secrets.RADARSIMC }}
         submodules: recursive
-        fetch-depth: 2
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
