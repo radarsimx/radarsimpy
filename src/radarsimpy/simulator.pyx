@@ -185,8 +185,7 @@ cpdef simc(radar, targets, noise=True):
         <float_t> radar.receiver.fs,
         <float_t> radar.receiver.rf_gain,
         <float_t> radar.receiver.load_resistor,
-        <float_t> radar.receiver.baseband_gain,
-        samples_c
+        <float_t> radar.receiver.baseband_gain
     )
 
     for idx_c in range(0, radar.receiver.channel_size):
@@ -284,8 +283,7 @@ cpdef simc(radar, targets, noise=True):
             <float_t> radar.interf.receiver.fs,
             <float_t> radar.interf.receiver.rf_gain,
             <float_t> radar.interf.receiver.load_resistor,
-            <float_t> radar.interf.receiver.baseband_gain,
-            <int_t> radar.interf.samples_per_pulse
+            <float_t> radar.interf.receiver.baseband_gain
         )
 
         for idx_c in range(0, radar.interf.receiver.channel_size):
