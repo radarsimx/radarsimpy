@@ -108,7 +108,7 @@ class Transmitter:
             Elevation pattern (dB). ``default [0, 0]``
         - **pulse_amp** (*numpy.1darray*) --
             Relative amplitude sequence for pulse's amplitude modulation.
-            The array length should be the same as `pulses`. ``default 0``
+            The array length should be the same as `pulses`. ``default 1``
         - **pulse_phs** (*numpy.1darray*) --
             Phase code sequence for pulse's phase modulation (deg).
             The array length should be the same as `pulses`. ``default 0``
