@@ -1,47 +1,29 @@
 #!python
 # distutils: language = c++
 
-# Useful tools for radar system analysis
+"""
+Useful tools for radar system analysis
 
-# This script requires that 'numpy' and 'scipy' be installed within the
-# Python environment you are running this script in.
+This script requires that 'numpy' and 'scipy' be installed within the
+Python environment you are running this script in.
 
-# This file can be imported as a module and contains the following
-# functions:
+This file can be imported as a module and contains the following
+functions:
 
-# * threshold - Threshold ratio
-# * roc_pd - Calculate probability of detection (Pd) in receiver operating
-#            characteristic (ROC)
-# * roc_snr - Calculate the minimal SNR for certain probability of
-#             detection (Pd) and probability of false alarm (Pfa) in
-#             receiver operating characteristic (ROC)
+* threshold - Threshold ratio
+* roc_pd - Calculate probability of detection (Pd) in receiver operating
+           characteristic (ROC)
+* roc_snr - Calculate the minimal SNR for certain probability of
+            detection (Pd) and probability of false alarm (Pfa) in
+            receiver operating characteristic (ROC)
 
-# ----------
-# RadarSimPy - A Radar Simulator Built with Python
-# Copyright (C) 2018 - PRESENT  Zhengyu Peng
-# E-mail: zpeng.me@gmail.com
-# Website: https://zpeng.me
+----------
+RadarSimPy - A Radar Simulator Built with Python
+Copyright (C) 2018 - PRESENT  radarsimx.com
+E-mail: info@radarsimx.com
+Website: https://radarsimx.com
 
-# `                      `
-# -:.                  -#:
-# -//:.              -###:
-# -////:.          -#####:
-# -/:.://:.      -###++##:
-# ..   `://:-  -###+. :##:
-#        `:/+####+.   :##:
-# .::::::::/+###.     :##:
-# .////-----+##:    `:###:
-#  `-//:.   :##:  `:###/.
-#    `-//:. :##:`:###/.
-#      `-//:+######/.
-#        `-/+####/.
-#          `+##+.
-#           :##:
-#           :##:
-#           :##:
-#           :##:
-#           :##:
-#            .+:
+"""
 
 
 import numpy as np

@@ -4,30 +4,16 @@ ECHO Automatic build script of radarsimcpp/radarsimpy for Windows
 ECHO:
 ECHO ----------
 ECHO RadarSimPy - A Radar Simulator Built with Python
-ECHO Copyright (C) 2018 - PRESENT  Zhengyu Peng
-ECHO E-mail: zpeng.me@gmail.com
-ECHO Website: https://zpeng.me
+ECHO Copyright (C) 2023 - PRESENT  radarsimx.com
+ECHO E-mail: info@radarsimx.com
+ECHO Website: https://radarsimx.com
 ECHO:
-ECHO `                      `
-ECHO -:.                  -#:
-ECHO -//:.              -###:
-ECHO -////:.          -#####:
-ECHO -/:.://:.      -###++##:
-ECHO ..   `://:-  -###+. :##:
-ECHO        `:/+####+.   :##:
-ECHO .::::::::/+###.     :##:
-ECHO .////-----+##:    `:###:
-ECHO  `-//:.   :##:  `:###/.
-ECHO    `-//:. :##:`:###/.
-ECHO      `-//:+######/.
-ECHO        `-/+####/.
-ECHO          `+##+.
-ECHO           :##:
-ECHO           :##:
-ECHO           :##:
-ECHO           :##:
-ECHO           :##:
-ECHO            .+:
+ECHO " ____           _            ____  _          __  __"
+ECHO "|  _ \ __ _  __| | __ _ _ __/ ___|(_)_ __ ___ \ \/ /"
+ECHO "| |_) / _` |/ _` |/ _` | '__\___ \| | '_ ` _ \ \  /"
+ECHO "|  _ < (_| | (_| | (_| | |   ___) | | | | | | |/  \"
+ECHO "|_| \_\__,_|\__,_|\__,_|_|  |____/|_|_| |_| |_/_/\_\"
+ECHO:
 
 SET pwd=%cd%
 

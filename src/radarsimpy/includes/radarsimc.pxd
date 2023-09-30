@@ -1,31 +1,15 @@
 # distutils: language = c++
 
-# ----------
-# RadarSimPy - A Radar Simulator Built with Python
-# Copyright (C) 2018 - PRESENT  Zhengyu Peng
-# E-mail: zpeng.me@gmail.com
-# Website: https://zpeng.me
+"""
+A Python module for radar simulation
 
-# `                      `
-# -:.                  -#:
-# -//:.              -###:
-# -////:.          -#####:
-# -/:.://:.      -###++##:
-# ..   `://:-  -###+. :##:
-#        `:/+####+.   :##:
-# .::::::::/+###.     :##:
-# .////-----+##:    `:###:
-#  `-//:.   :##:  `:###/.
-#    `-//:. :##:`:###/.
-#      `-//:+######/.
-#        `-/+####/.
-#          `+##+.
-#           :##:
-#           :##:
-#           :##:
-#           :##:
-#           :##:
-#            .+:
+----------
+RadarSimPy - A Radar Simulator Built with Python
+Copyright (C) 2018 - PRESENT  radarsimx.com
+E-mail: info@radarsimx.com
+Website: https://radarsimx.com
+
+"""
 
 from radarsimpy.includes.zpvector cimport Vec3
 from radarsimpy.includes.type_def cimport int_t

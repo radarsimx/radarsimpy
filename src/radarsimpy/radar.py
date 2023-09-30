@@ -17,31 +17,12 @@ class:
 
 ----------
 RadarSimPy - A Radar Simulator Built with Python
-Copyright (C) 2018 - PRESENT  Zhengyu Peng
-E-mail: zpeng.me@gmail.com
-Website: https://zpeng.me
+Copyright (C) 2018 - PRESENT  radarsimx.com
+E-mail: info@radarsimx.com
+Website: https://radarsimx.com
 
-`                      `
--:.                  -#:
--//:.              -###:
--////:.          -#####:
--/:.://:.      -###++##:
-..   `://:-  -###+. :##:
-       `:/+####+.   :##:
-.::::::::/+###.     :##:
-.////-----+##:    `:###:
- `-//:.   :##:  `:###/.
-   `-//:. :##:`:###/.
-     `-//:+######/.
-       `-/+####/.
-         `+##+.
-          :##:
-          :##:
-          :##:
-          :##:
-          :##:
-           .+:
 """
+
 
 import numpy as np
 from scipy.interpolate import interp1d
