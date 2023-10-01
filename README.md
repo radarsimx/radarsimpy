@@ -1,4 +1,4 @@
-![Windows Test](https://github.com/radarsimx/radarsimpy/workflows/Windows%20Test/badge.svg)
+[![Windows Test](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_windows.yml/badge.svg)](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_windows.yml)
 ![Linux Test](https://github.com/radarsimx/radarsimpy/workflows/Linux%20Test/badge.svg)
 
 [![Documentations](https://img.shields.io/github/v/tag/radarsimx/radarsimpy?label=Documentation&logo=read-the-docs)](https://radarsimx.github.io/radarsimpy/)
