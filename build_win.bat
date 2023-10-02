@@ -4,7 +4,7 @@ ECHO Automatic build script of radarsimcpp/radarsimpy for Windows
 ECHO:
 ECHO ----------
 ECHO RadarSimPy - A Radar Simulator Built with Python
-ECHO Copyright (C) 2023 - PRESENT  radarsimx.com
+ECHO Copyright (C) 2018 - PRESENT  radarsimx.com
 ECHO E-mail: info@radarsimx.com
 ECHO Website: https://radarsimx.com
 ECHO:
