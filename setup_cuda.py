@@ -119,7 +119,6 @@ setup(
     ext_modules=cythonize(
         ext_modules,
         annotate=False,
-        language="c++",
         compiler_directives={"language_level": "3"},
     ),
     include_dirs=[numpy.get_include()],
