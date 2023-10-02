@@ -1,5 +1,3 @@
-# distutils: language = c++
-
 r"""
 A Python module for radar simulation
 

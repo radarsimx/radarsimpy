@@ -1,6 +1,3 @@
-#!python
-# distutils: language = c++
-
 r"""
 Script for radar signal processing
 

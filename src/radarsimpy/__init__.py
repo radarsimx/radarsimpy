@@ -1,6 +1,3 @@
-# distutils: language = c++
-# cython: language_level=3
-
 r"""
 A Python module for radar simulation
 

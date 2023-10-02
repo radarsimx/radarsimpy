@@ -1,5 +1,3 @@
-#!python
-
 import platform
 
 from setuptools import setup
@@ -61,7 +59,10 @@ setup(
     name="radarsimpy",
     cmdclass={"build_ext": build_ext},
     ext_modules=cythonize(
-        ext_modules, annotate=False, compiler_directives={"language_level": "3"}
+        ext_modules,
+        annotate=False,
+        language="c++",
+        compiler_directives={"language_level": "3"},
     ),
     include_dirs=[numpy.get_include()],
 )

@@ -1,6 +1,3 @@
-#!python
-# distutils: language = c++
-
 r"""
 Useful tools for radar system analysis
 

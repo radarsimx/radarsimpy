@@ -1,6 +1,3 @@
-#!python
-# distutils: language = c++
-
 r"""
 This script contains classes that define all the parameters for
 a radar system
