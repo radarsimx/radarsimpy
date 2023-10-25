@@ -1080,9 +1080,9 @@ class Radar:
             ]
         )
 
-        Boltzmann_const = 1.38064852e-23
+        boltzmann_const = 1.38064852e-23
         Ts = 290
-        input_noise_dbm = 10 * np.log10(Boltzmann_const * Ts * 1000)  # dBm/Hz
+        input_noise_dbm = 10 * np.log10(boltzmann_const * Ts * 1000)  # dBm/Hz
         receiver_noise_dbm = (
             input_noise_dbm
             + self.receiver.rf_gain
