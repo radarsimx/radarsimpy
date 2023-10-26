@@ -165,12 +165,12 @@ cdef Transmitter[float_t] cp_Transmitter(radar):
         t_frame_vt.push_back(<double> (radar.t_offset))
 
     # frequency
-    cdef double[:] f_mv = radar.f.astype(np.float64)
-    Mem_Copy(&f_mv[0], <int_t>(len(radar.f)), f_vt)
+    cdef double[:] f_mv = radar.transmitter.f.astype(np.float64)
+    Mem_Copy(&f_mv[0], <int_t>(len(radar.transmitter.f)), f_vt)
 
     # time
-    cdef double[:] t_mv = radar.t.astype(np.float64)
-    Mem_Copy(&t_mv[0], <int_t>(len(radar.t)), t_vt)
+    cdef double[:] t_mv = radar.transmitter.t.astype(np.float64)
+    Mem_Copy(&t_mv[0], <int_t>(len(radar.transmitter.t)), t_vt)
 
     # frequency offset per pulse
     cdef double[:] f_offset_mv = radar.transmitter.f_offset.astype(np.float64)

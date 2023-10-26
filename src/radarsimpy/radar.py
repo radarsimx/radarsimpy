@@ -745,23 +745,23 @@ class Radar:
 
         self.noise = self.cal_noise()
 
-        if len(self.transmitter.f) > 2:
-            fun_f_t = interp1d(self.transmitter.t, self.transmitter.f, kind="linear")
-            self.t = np.linspace(
-                self.transmitter.t[0],
-                self.transmitter.t[-1],
-                self.samples_per_pulse * 100,
-            )
-            self.f = fun_f_t(self.t)
+        # if len(self.transmitter.f) > 2:
+        #     fun_f_t = interp1d(self.transmitter.t, self.transmitter.f, kind="linear")
+        #     self.t = np.linspace(
+        #         self.transmitter.t[0],
+        #         self.transmitter.t[-1],
+        #         self.samples_per_pulse * 100,
+        #     )
+        #     self.f = fun_f_t(self.t)
 
-        else:
-            self.f = self.transmitter.f
-            self.t = self.transmitter.t
+        # else:
+        # self.f = self.transmitter.f
+        # self.t = self.transmitter.t
 
-        self.delta_f = np.ediff1d(self.f, to_begin=0)
-        self.delta_t = np.ediff1d(self.t, to_begin=0)
-        self.k = np.zeros_like(self.delta_f)
-        self.k[1:] = self.delta_f[1:] / self.delta_t[1:]
+        # self.delta_f = np.ediff1d(self.f, to_begin=0)
+        # self.delta_t = np.ediff1d(self.t, to_begin=0)
+        # self.k = np.zeros_like(self.delta_f)
+        # self.k[1:] = self.delta_f[1:] / self.delta_t[1:]
 
         # if hasattr(self.transmitter.fc, '__len__'):
         self.fc_mat = np.tile(
