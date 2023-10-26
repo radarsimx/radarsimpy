@@ -1022,29 +1022,29 @@ class Radar:
         pulse_phs = np.repeat(pulse_phs, self.frames, axis=0)
         return pulse_phs
 
-    def cal_code_timestamp(self):
-        """
-        Calculate phase code timing for pulse level modulation
+    # def cal_code_timestamp(self):
+    #     """
+    #     Calculate phase code timing for pulse level modulation
 
-        :return:
-            Timing at the start position of each phase code.
-            ``[channes/frames, max_code_length]``
-        :rtype: numpy.2darray
-        """
+    #     :return:
+    #         Timing at the start position of each phase code.
+    #         ``[channes/frames, max_code_length]``
+    #     :rtype: numpy.2darray
+    #     """
 
-        chip_length = np.expand_dims(np.array(self.transmitter.chip_length), axis=1)
-        code_sequence = chip_length * np.tile(
-            np.expand_dims(np.arange(0, self.transmitter.max_code_length), axis=0),
-            (self.transmitter.channel_size, 1),
-        )
+    #     chip_length = np.expand_dims(np.array(self.transmitter.chip_length), axis=1)
+    #     code_sequence = chip_length * np.tile(
+    #         np.expand_dims(np.arange(0, self.transmitter.max_code_length), axis=0),
+    #         (self.transmitter.channel_size, 1),
+    #     )
 
-        code_timestamp = np.repeat(code_sequence, self.receiver.channel_size, axis=0)
+    #     code_timestamp = np.repeat(code_sequence, self.receiver.channel_size, axis=0)
 
-        code_timestamp = np.repeat(code_timestamp, self.frames, axis=0)
+    #     code_timestamp = np.repeat(code_timestamp, self.frames, axis=0)
 
-        return code_timestamp
+    #     return code_timestamp
 
-    def cal_noise(self):
+    def cal_noise(self, noise_temp = 290):
         """
         Calculate noise amplitudes
 
@@ -1063,8 +1063,8 @@ class Radar:
         )
 
         boltzmann_const = 1.38064852e-23
-        noise_temperature = 290
-        input_noise_dbm = 10 * np.log10(boltzmann_const * noise_temperature * 1000)  # dBm/Hz
+
+        input_noise_dbm = 10 * np.log10(boltzmann_const * noise_temp * 1000)  # dBm/Hz
         receiver_noise_dbm = (
             input_noise_dbm
             + self.receiver.rf_gain
