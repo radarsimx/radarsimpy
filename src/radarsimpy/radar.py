@@ -28,7 +28,6 @@ Website: https://radarsimx.com
 
 
 import numpy as np
-from scipy.interpolate import interp1d
 
 from .util import cal_phase_noise
 
@@ -133,10 +132,6 @@ class Transmitter:
         Angles for each channel's elevation pattern (deg)
     :ivar list[numpy.1darray] el_patterns:
         Elevation pattern for each channel (dB)
-    :ivar list az_func:
-        Azimuth patterns' interpolation functions
-    :ivar list el_func:
-        Elevation patterns' interpolation functions
     :ivar numpy.1darray antenna_gains:
         Antenna gain for each channel (dB).
         Antenna gain is ``max(az_pattern)``
@@ -288,12 +283,10 @@ class Transmitter:
         # azimuth patterns
         self.az_patterns = []
         self.az_angles = []
-        self.az_func = []
 
         # elevation patterns
         self.el_patterns = []
         self.el_angles = []
-        self.el_func = []
 
         # antenna peak gain
         # antenna gain is calculated based on azimuth pattern
@@ -396,15 +389,6 @@ class Transmitter:
             self.antenna_gains[tx_idx] = np.max(self.az_patterns[-1])
 
             self.az_patterns[-1] = self.az_patterns[-1] - np.max(self.az_patterns[-1])
-            self.az_func.append(
-                interp1d(
-                    self.az_angles[-1],
-                    self.az_patterns[-1],
-                    kind="linear",
-                    bounds_error=False,
-                    fill_value=-10000,
-                )
-            )
 
             # elevation pattern
             self.el_angles.append(
@@ -425,15 +409,6 @@ class Transmitter:
                 )
 
             self.el_patterns[-1] = self.el_patterns[-1] - np.max(self.el_patterns[-1])
-            self.el_func.append(
-                interp1d(
-                    self.el_angles[-1],
-                    self.el_patterns[-1] - np.max(self.el_patterns[-1]),
-                    kind="linear",
-                    bounds_error=False,
-                    fill_value=-10000,
-                )
-            )
 
             self.grid.append(self.channels[tx_idx].get("grid", 1))
 
@@ -497,10 +472,6 @@ class Receiver:
         Angles for each channel's elevation pattern (deg)
     :ivar list[numpy.1darray] el_patterns:
         Elevation pattern for each channel (dB)
-    :ivar list az_func:
-        Azimuth patterns' interpolation functions
-    :ivar list el_func:
-        Elevation patterns' interpolation functions
     :ivar numpy.1darray antenna_gains:
         Antenna gain for each channel (dB).
         Antenna gain is ``max(az_pattern)``
@@ -563,11 +534,9 @@ class Receiver:
 
         self.az_patterns = []
         self.az_angles = []
-        self.az_func = []
 
         self.el_patterns = []
         self.el_angles = []
-        self.el_func = []
 
         self.antenna_gains = np.zeros((self.channel_size))
 
@@ -594,15 +563,6 @@ class Receiver:
 
             self.antenna_gains[rx_idx] = np.max(self.az_patterns[-1])
             self.az_patterns[-1] = self.az_patterns[-1] - np.max(self.az_patterns[-1])
-            self.az_func.append(
-                interp1d(
-                    self.az_angles[-1],
-                    self.az_patterns[-1],
-                    kind="linear",
-                    bounds_error=False,
-                    fill_value=-10000,
-                )
-            )
 
             # elevation pattern
             self.el_angles.append(
@@ -622,15 +582,6 @@ class Receiver:
                 )
 
             self.el_patterns[-1] = self.el_patterns[-1] - np.max(self.el_patterns[-1])
-            self.el_func.append(
-                interp1d(
-                    self.el_angles[-1],
-                    self.el_patterns[-1] - np.max(self.el_patterns[-1]),
-                    kind="linear",
-                    bounds_error=False,
-                    fill_value=-10000,
-                )
-            )
 
 
 class Radar:
