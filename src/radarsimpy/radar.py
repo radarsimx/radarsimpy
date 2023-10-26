@@ -150,10 +150,6 @@ class Transmitter:
             ``var`` (*numpy.1darray*) -- Variance of the modulation
             ``t`` (*numpy.1darray*) -- Time stamps for waveform modulation
         }
-    :ivar numpy.1darray box_min:
-        Minimum location of the transmitter box (m)
-    :ivar numpy.1darray box_max:
-        Maximum location of the transmitter box (m)
 
     **Waveform**
 
@@ -441,9 +437,6 @@ class Transmitter:
 
             self.grid.append(self.channels[tx_idx].get("grid", 1))
 
-        self.box_min = np.min(self.locations, axis=0)
-        self.box_max = np.max(self.locations, axis=0)
-
 
 class Receiver:
     """
@@ -511,10 +504,6 @@ class Receiver:
     :ivar numpy.1darray antenna_gains:
         Antenna gain for each channel (dB).
         Antenna gain is ``max(az_pattern)``
-    :ivar numpy.1darray box_min:
-        Minimum location of the transmitter box (m)
-    :ivar numpy.1darray box_max:
-        Maximum location of the transmitter box (m)
 
     **Receiver noise**
 
@@ -643,9 +632,6 @@ class Receiver:
                 )
             )
 
-        self.box_min = np.min(self.locations, axis=0)
-        self.box_max = np.max(self.locations, axis=0)
-
 
 class Radar:
     """
@@ -736,9 +722,6 @@ class Radar:
         self.virtual_array = np.repeat(
             self.transmitter.locations, self.receiver.channel_size, axis=0
         ) + np.tile(self.receiver.locations, (self.transmitter.channel_size, 1))
-
-        self.box_min = np.min([self.transmitter.box_min, self.receiver.box_min], axis=0)
-        self.box_max = np.max([self.transmitter.box_min, self.receiver.box_max], axis=0)
 
         self.timestamp = self.gen_timestamp()
         self.pulse_phs = self.cal_frame_phases()
@@ -1022,29 +1005,7 @@ class Radar:
         pulse_phs = np.repeat(pulse_phs, self.frames, axis=0)
         return pulse_phs
 
-    # def cal_code_timestamp(self):
-    #     """
-    #     Calculate phase code timing for pulse level modulation
-
-    #     :return:
-    #         Timing at the start position of each phase code.
-    #         ``[channes/frames, max_code_length]``
-    #     :rtype: numpy.2darray
-    #     """
-
-    #     chip_length = np.expand_dims(np.array(self.transmitter.chip_length), axis=1)
-    #     code_sequence = chip_length * np.tile(
-    #         np.expand_dims(np.arange(0, self.transmitter.max_code_length), axis=0),
-    #         (self.transmitter.channel_size, 1),
-    #     )
-
-    #     code_timestamp = np.repeat(code_sequence, self.receiver.channel_size, axis=0)
-
-    #     code_timestamp = np.repeat(code_timestamp, self.frames, axis=0)
-
-    #     return code_timestamp
-
-    def cal_noise(self, noise_temp = 290):
+    def cal_noise(self, noise_temp=290):
         """
         Calculate noise amplitudes
 
