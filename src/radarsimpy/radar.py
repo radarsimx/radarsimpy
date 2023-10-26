@@ -520,7 +520,7 @@ class Receiver:
 
     ::
 
-        |           + n1 = 10*log10(Boltzmann_constant * Ts * 1000)
+        |           + n1 = 10*log10(Boltzmann_constant * noise_temperature * 1000)
         |           |      + 10*log10(noise_bandwidth)  (dBm)
         |           v
         |    +------+------+
@@ -744,24 +744,6 @@ class Radar:
         self.pulse_phs = self.cal_frame_phases()
 
         self.noise = self.cal_noise()
-
-        # if len(self.transmitter.f) > 2:
-        #     fun_f_t = interp1d(self.transmitter.t, self.transmitter.f, kind="linear")
-        #     self.t = np.linspace(
-        #         self.transmitter.t[0],
-        #         self.transmitter.t[-1],
-        #         self.samples_per_pulse * 100,
-        #     )
-        #     self.f = fun_f_t(self.t)
-
-        # else:
-        # self.f = self.transmitter.f
-        # self.t = self.transmitter.t
-
-        # self.delta_f = np.ediff1d(self.f, to_begin=0)
-        # self.delta_t = np.ediff1d(self.t, to_begin=0)
-        # self.k = np.zeros_like(self.delta_f)
-        # self.k[1:] = self.delta_f[1:] / self.delta_t[1:]
 
         # if hasattr(self.transmitter.fc, '__len__'):
         self.fc_mat = np.tile(
@@ -1081,8 +1063,8 @@ class Radar:
         )
 
         boltzmann_const = 1.38064852e-23
-        Ts = 290
-        input_noise_dbm = 10 * np.log10(boltzmann_const * Ts * 1000)  # dBm/Hz
+        noise_temperature = 290
+        input_noise_dbm = 10 * np.log10(boltzmann_const * noise_temperature * 1000)  # dBm/Hz
         receiver_noise_dbm = (
             input_noise_dbm
             + self.receiver.rf_gain
