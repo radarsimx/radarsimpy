@@ -24,9 +24,9 @@ from radarsimpy.lib.cp_radarsimc cimport cp_RxChannel, cp_Target
 from radarsimpy.lib.cp_radarsimc cimport cp_TxChannel, cp_Transmitter
 from radarsimpy.includes.radarsimc cimport Radar
 from radarsimpy.includes.radarsimc cimport Simulator
-from radarsimpy.includes.radarsimc cimport TxChannel, Transmitter
-from radarsimpy.includes.radarsimc cimport RxChannel, Receiver
-from radarsimpy.includes.radarsimc cimport Snapshot, Target, Scene
+from radarsimpy.includes.radarsimc cimport Transmitter
+from radarsimpy.includes.radarsimc cimport Receiver
+from radarsimpy.includes.radarsimc cimport Snapshot, Scene
 from radarsimpy.includes.radarsimc cimport Mem_Copy_Vec3
 from libc.stdlib cimport malloc, free
 
