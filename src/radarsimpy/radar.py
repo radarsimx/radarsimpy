@@ -177,7 +177,7 @@ class Transmitter:
 
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments, too-many-locals, too-many-branches, too-many-statements
         self,
         f,
         t,
@@ -187,11 +187,15 @@ class Transmitter:
         f_offset=None,
         pn_f=None,
         pn_power=None,
-        channels=[dict(location=(0, 0, 0))],
+        channels=None,
     ):
         self.tx_power = tx_power
         self.pulses = pulses
-        self.channels = channels
+
+        if channels is None:
+            self.channels = [{"location": (0, 0, 0)}]
+        else:
+            self.channels = channels
 
         # get `f(t)`
         # the lenght of `f` should be the same as `t`
@@ -509,7 +513,7 @@ class Receiver:
         load_resistor=500,
         baseband_gain=0,
         bb_type="complex",
-        channels=[dict(location=(0, 0, 0))],
+        channels=None,
     ):
         self.fs = fs
         self.noise_figure = noise_figure
@@ -525,8 +529,11 @@ class Receiver:
             raise ValueError("Invalid baseband type")
 
         # additional receiver parameters
+        if channels is None:
+            self.channels = [{"location": (0, 0, 0)}]
+        else:
+            self.channels = channels
 
-        self.channels = channels
         self.channel_size = len(self.channels)
 
         self.locations = np.zeros((self.channel_size, 3))
