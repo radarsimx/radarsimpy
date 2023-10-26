@@ -728,19 +728,12 @@ class Radar:
         self.rotation_rate = np.array(rotation_rate)
         shape = np.shape(self.timestamp)
 
-        if (
-            np.size(location[0]) > 1
-            or np.size(location[1]) > 1
-            or np.size(location[2]) > 1
-            or np.size(speed[0]) > 1
-            or np.size(speed[1]) > 1
-            or np.size(speed[2]) > 1
-            or np.size(rotation[0]) > 1
-            or np.size(rotation[1]) > 1
-            or np.size(rotation[2]) > 1
-            or np.size(rotation_rate[0]) > 1
-            or np.size(rotation_rate[1]) > 1
-            or np.size(rotation_rate[2]) > 1
+        if any(
+            np.size(var) > 1
+            for var in list(location)
+            + list(speed)
+            + list(rotation)
+            + list(rotation_rate)
         ):
             self.location = np.zeros(shape + (3,))
             self.speed = np.zeros(shape + (3,))

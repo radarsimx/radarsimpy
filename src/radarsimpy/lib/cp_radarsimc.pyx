@@ -17,9 +17,19 @@ Website: https://radarsimx.com
 """
 
 
+from radarsimpy.includes.radarsimc cimport Transmitter
+from radarsimpy.includes.radarsimc cimport TxChannel
+from radarsimpy.includes.radarsimc cimport RxChannel
+from radarsimpy.includes.radarsimc cimport Target
+from radarsimpy.includes.radarsimc cimport Point
+
 from radarsimpy.includes.zpvector cimport Vec3
-from radarsimpy.includes.type_def cimport int_t
+from radarsimpy.includes.type_def cimport int_t, float_t
 from radarsimpy.includes.type_def cimport vector
+
+from radarsimpy.includes.radarsimc cimport Mem_Copy
+from radarsimpy.includes.radarsimc cimport Mem_Copy_Vec3
+from radarsimpy.includes.radarsimc cimport Mem_Copy_Complex
 
 from libcpp.complex cimport complex as cpp_complex
 from libcpp cimport bool
@@ -80,11 +90,7 @@ cdef Point[float_t] cp_Point(location,
     cdef float_t[:] location_mv
 
     # check if there are any time varying parameters
-    if np.size(location[0]) > 1 or \
-            np.size(location[1]) > 1 or \
-            np.size(location[2]) > 1 or \
-            np.size(rcs) > 1 or \
-            np.size(phase) > 1:
+    if any(np.size(var) > 1 for var in list(location) + [rcs, phase]):
 
         if np.size(location[0]) > 1:
             locx_mv = location[0].astype(np_float)
@@ -397,10 +403,10 @@ cdef Target[float_t] cp_Target(radar,
 
     cdef float_t[:] origin_mv = np.array(target.get("origin", (0, 0, 0)), dtype=np_float)
 
-    location = np.array(target.get("location", (0, 0, 0)), dtype=object)
-    speed = np.array(target.get("speed", (0, 0, 0)), dtype=object)
-    rotation = np.array(target.get("rotation", (0, 0, 0)), dtype=object)
-    rotation_rate = np.array(target.get( "rotation_rate", (0, 0, 0)), dtype=object)
+    location = list(target.get("location", [0, 0, 0]))
+    speed = list(target.get("speed", [0, 0, 0]))
+    rotation = list(target.get("rotation", [0, 0, 0]))
+    rotation_rate = list(target.get( "rotation_rate", [0, 0, 0]))
 
     cdef float_t[:] location_mv, speed_mv, rotation_mv, rotation_rate_mv
 
@@ -412,19 +418,7 @@ cdef Target[float_t] cp_Target(radar,
         ep_c = cpp_complex[float_t](np.real(permittivity), np.imag(permittivity))
         mu_c = cpp_complex[float_t](1, 0)
 
-    if np.size(location[0]) > 1 or \
-        np.size(location[1]) > 1 or \
-        np.size(location[2]) > 1 or \
-        np.size(speed[0]) > 1 or \
-        np.size(speed[1]) > 1 or \
-        np.size(speed[2]) > 1 or \
-        np.size(rotation[0]) > 1 or \
-        np.size(rotation[1]) > 1 or \
-        np.size(rotation[2]) > 1 or \
-        np.size(rotation_rate[0]) > 1 or \
-        np.size(rotation_rate[1]) > 1 or \
-        np.size(rotation_rate[2]) > 1:
-
+    if any(np.size(var) > 1 for var in location + speed + rotation + rotation_rate):
         if np.size(location[0]) > 1:
             locx_mv = location[0].astype(np_float)
         else:
@@ -494,16 +488,16 @@ cdef Target[float_t] cp_Target(radar,
         Mem_Copy_Vec3(&rrtx_mv[0,0,0], &rrty_mv[0,0,0], &rrtz_mv[0,0,0], bbsize_c, rrt_vt)
 
     else:
-        location_mv = location.astype(np_float)
+        location_mv = np.array(location, dtype=np_float)
         loc_vt.push_back(Vec3[float_t](&location_mv[0]))
 
-        speed_mv = speed.astype(np_float)
+        speed_mv = np.array(speed, dtype=np_float)
         spd_vt.push_back(Vec3[float_t](&speed_mv[0]))
 
-        rotation_mv = np.radians(rotation.astype(np_float)).astype(np_float)
+        rotation_mv = np.radians(np.array(rotation, dtype=np_float)).astype(np_float)
         rot_vt.push_back(Vec3[float_t](&rotation_mv[0]))
 
-        rotation_rate_mv = np.radians(rotation_rate.astype(np_float)).astype(np_float)
+        rotation_rate_mv = np.radians(np.array(rotation_rate, dtype=np_float)).astype(np_float)
         rrt_vt.push_back(Vec3[float_t](&rotation_rate_mv[0]))
 
     return Target[float_t](&points_mv[0, 0],
