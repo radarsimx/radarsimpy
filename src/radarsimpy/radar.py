@@ -177,7 +177,7 @@ class Transmitter:
 
     """
 
-    def __init__(  # pylint: disable=too-many-arguments, too-many-locals, too-many-branches, too-many-statements
+    def __init__(  # pylint: disable=too-many-arguments, too-many-branches, too-many-statements
         self,
         f,
         t,
@@ -189,232 +189,269 @@ class Transmitter:
         pn_power=None,
         channels=None,
     ):
-        self.tx_power = tx_power
-        self.pulses = pulses
+        self.rf_prop = {}
+        self.waveform_prop = {}
+        self.txchannel_prop = {}
 
-        if channels is None:
-            self.channels = [{"location": (0, 0, 0)}]
-        else:
-            self.channels = channels
+        self.rf_prop["tx_power"] = tx_power
+        self.rf_prop["pn_f"] = pn_f
+        self.rf_prop["pn_power"] = pn_power
+        self.validate_rf_prop(self.rf_prop)
 
         # get `f(t)`
         # the lenght of `f` should be the same as `t`
         if isinstance(f, (list, tuple, np.ndarray)):
-            self.f = np.array(f)
+            f = np.array(f)
         else:
-            self.f = np.array([f, f])
+            f = np.array([f, f])
 
         if isinstance(t, (list, tuple, np.ndarray)):
-            self.t = np.array(t)
-            self.t = self.t - self.t[0]
+            t = np.array(t) - t[0]
         else:
-            self.t = np.array([0, t])
+            t = np.array([0, t])
 
-        if len(self.f) != len(self.t):
-            raise ValueError("Lengths of `f` and `t` should be the same")
+        self.waveform_prop["f"] = f
+        self.waveform_prop["t"] = t
+        self.waveform_prop["bandwidth"] = np.max(f) - np.min(f)
+        self.waveform_prop["pulse_length"] = t[-1]
+        self.waveform_prop["pulses"] = pulses
 
         # frequency offset for each pulse
         # the length of `f_offset` should be the same as `pulses`
-        if f_offset is not None:
-            if isinstance(f_offset, (list, tuple, np.ndarray)):
-                if len(f_offset) != pulses:
-                    raise ValueError(
-                        "Lengths of `f_offset` and `pulses` \
-                            should be the same"
-                    )
-                self.f_offset = np.array(f_offset)
-            else:
-                self.f_offset = f_offset + np.zeros(pulses)
+        if f_offset is None:
+            f_offset = np.zeros(pulses)
         else:
-            self.f_offset = np.zeros(pulses)
-
-        self.bandwidth = np.max(self.f) - np.min(self.f)
-        self.pulse_length = self.t[-1] - self.t[0]
-
-        # self.fc_0 = (np.min(self.f)+np.max(self.f))/2
-        self.fc_vect = (np.min(self.f) + np.max(self.f)) / 2 + self.f_offset
-        self.fc_frame = (np.min(self.fc_vect) + np.max(self.fc_vect)) / 2
-
-        # phase noise
-        self.pn_f = pn_f
-        self.pn_power = pn_power
-
-        if self.pn_f is not None and self.pn_power is None:
-            raise ValueError("Lengths of `pn_f` and `pn_power` should be the same")
-        if self.pn_f is None and self.pn_power is not None:
-            raise ValueError("Lengths of `pn_f` and `pn_power` should be the same")
-        if self.pn_f is not None and self.pn_power is not None:
-            if len(self.pn_f) != len(self.pn_power):
-                raise ValueError("Lengths of `pn_f` and `pn_power` should be the same")
+            if isinstance(f_offset, (list, tuple, np.ndarray)):
+                f_offset = np.array(f_offset)
+            else:
+                f_offset = f_offset + np.zeros(pulses)
+        self.waveform_prop["f_offset"] = f_offset
 
         # Extend `prp` to a numpy.1darray.
         # Length equels to `pulses`
         if prp is None:
-            self.prp = self.pulse_length + np.zeros(pulses)
+            prp = self.waveform_prop["pulse_length"] + np.zeros(pulses)
         else:
             if isinstance(prp, (list, tuple, np.ndarray)):
-                if len(prp) != pulses:
-                    raise ValueError(
-                        "Length of `prp` should equal to the \
-                            length of `pulses`."
-                    )
-                else:
-                    self.prp = prp
+                prp = np.array(prp)
             else:
-                self.prp = prp + np.zeros(pulses)
-
-        if np.min(self.prp) < self.pulse_length:
-            raise ValueError("`prp` should be larger than `pulse_length`")
+                prp = prp + np.zeros(pulses)
+        self.waveform_prop["prp"] = prp
 
         # start time of each pulse, without considering the delay
-        self.pulse_start_time = np.cumsum(self.prp) - self.prp[0]
+        self.waveform_prop["pulse_start_time"] = np.cumsum(prp) - prp[0]
+
+        self.validate_waveform_prop(self.waveform_prop)
+
+        if channels is None:
+            channels = [{"location": (0, 0, 0)}]
 
         # number of transmitter channels
-        self.channel_size = len(self.channels)
+        self.txchannel_prop["size"] = len(channels)
 
         # firing delay for each channel
-        self.delay = np.zeros(self.channel_size)
-
-        self.locations = np.zeros((self.channel_size, 3))
-        self.polarization = np.zeros((self.channel_size, 3))
+        self.txchannel_prop["delay"] = np.zeros(self.txchannel_prop["size"])
+        self.txchannel_prop["grid"] = np.zeros(self.txchannel_prop["size"])
+        self.txchannel_prop["locations"] = np.zeros((self.txchannel_prop["size"], 3))
+        self.txchannel_prop["polarization"] = np.zeros((self.txchannel_prop["size"], 3))
 
         # waveform modulation parameters
-        self.waveform_mod = []
+        self.txchannel_prop["waveform_mod"] = []
 
         # pulse modulation parameters
-        self.pulse_mod = np.ones((self.channel_size, self.pulses), dtype=complex)
+        self.txchannel_prop["pulse_mod"] = np.ones(
+            (self.txchannel_prop["size"], pulses), dtype=complex
+        )
 
         # azimuth patterns
-        self.az_patterns = []
-        self.az_angles = []
+        self.txchannel_prop["az_patterns"] = []
+        self.txchannel_prop["az_angles"] = []
 
         # elevation patterns
-        self.el_patterns = []
-        self.el_angles = []
+        self.txchannel_prop["el_patterns"] = []
+        self.txchannel_prop["el_angles"] = []
 
         # antenna peak gain
         # antenna gain is calculated based on azimuth pattern
-        self.antenna_gains = np.zeros((self.channel_size))
+        self.txchannel_prop["antenna_gains"] = np.zeros((self.txchannel_prop["size"]))
 
-        self.grid = []
+        for tx_idx, tx_element in enumerate(channels):
+            self.txchannel_prop["delay"][tx_idx] = tx_element.get("delay", 0)
+            self.txchannel_prop["grid"][tx_idx] = tx_element.get("grid", 1)
 
-        for tx_idx, tx_element in enumerate(self.channels):
-            self.delay[tx_idx] = self.channels[tx_idx].get("delay", 0)
-
-            self.locations[tx_idx, :] = np.array(tx_element.get("location"))
-            self.polarization[tx_idx, :] = np.array(
+            self.txchannel_prop["locations"][tx_idx, :] = np.array(
+                tx_element.get("location")
+            )
+            self.txchannel_prop["polarization"][tx_idx, :] = np.array(
                 tx_element.get("polarization", [0, 0, 1])
             )
 
-            # waveform modulation
-            mod_enabled = True
-            amp = self.channels[tx_idx].get("amp", None)
-            if amp is not None:
-                if isinstance(amp, (list, tuple, np.ndarray)):
-                    amp = np.array(amp)
-                else:
-                    amp = np.array([amp, amp])
-            else:
-                mod_enabled = False
-
-            phs = self.channels[tx_idx].get("phs", None)
-            if phs is not None:
-                if isinstance(phs, (list, tuple, np.ndarray)):
-                    phs = np.array(phs)
-                else:
-                    phs = np.array([phs, phs])
-            else:
-                mod_enabled = False
-
-            if phs is not None and amp is None:
-                amp = np.ones_like(phs)
-                mod_enabled = True
-            elif phs is None and amp is not None:
-                phs = np.zeros_like(amp)
-                mod_enabled = True
-
-            mod_t = self.channels[tx_idx].get("mod_t", None)
-            if mod_t is not None:
-                if isinstance(mod_t, (list, tuple, np.ndarray)):
-                    mod_t = np.array(mod_t)
-                else:
-                    mod_t = np.array([0, mod_t])
-            else:
-                mod_enabled = False
-
-            if mod_enabled:
-                if len(amp) != len(phs):
-                    raise ValueError("Lengths of `amp` and `phs` should be the same")
-                mod_var = amp * np.exp(1j * phs / 180 * np.pi)
-                if len(mod_t) != len(mod_var):
-                    raise ValueError(
-                        "Lengths of `mod_t`, `amp`, and `phs` \
-                            should be the same"
-                    )
-            else:
-                mod_var = None
-
-            self.waveform_mod.append(
-                {"enabled": mod_enabled, "var": mod_var, "t": mod_t}
-            )
-
-            # pulse modulation
-            pulse_amp = self.channels[tx_idx].get("pulse_amp", np.ones((pulses)))
-            pulse_phs = (
-                self.channels[tx_idx].get("pulse_phs", np.zeros((pulses))) / 180 * np.pi
-            )
-            if len(pulse_amp) != pulses:
-                raise ValueError(
-                    "Lengths of `pulse_amp` and `pulses` should be the same"
-                )
-            if len(pulse_phs) != pulses:
-                raise ValueError(
-                    "Length of `pulse_phs` and `pulses` should be the same"
-                )
-
-            self.pulse_mod[tx_idx, :] = pulse_amp * np.exp(1j * pulse_phs)
-
-            # azimuth pattern
-            self.az_angles.append(
-                np.array(
-                    self.channels[tx_idx].get("azimuth_angle", np.arange(-90, 91, 180))
+            self.txchannel_prop["waveform_mod"].append(
+                self.process_waveform_modulation(
+                    tx_element.get("mod_t", None),
+                    tx_element.get("amp", None),
+                    tx_element.get("phs", None),
                 )
             )
-            self.az_patterns.append(
-                np.array(self.channels[tx_idx].get("azimuth_pattern", np.zeros(2)))
+
+            self.txchannel_prop["pulse_mod"][tx_idx, :] = self.process_pulse_modulation(
+                tx_element.get("pulse_amp", np.ones((pulses))),
+                tx_element.get("pulse_phs", np.zeros((pulses))),
             )
 
-            if len(self.az_angles[-1]) != len(self.az_patterns[-1]):
-                raise ValueError(
-                    "Lengths of `azimuth_angle` and `azimuth_pattern` \
-                        should be the same"
-                )
+            self.process_patterns(tx_element, tx_idx)
 
-            self.antenna_gains[tx_idx] = np.max(self.az_patterns[-1])
+    def validate_rf_prop(self, rf_prop):
+        """_summary_
 
-            self.az_patterns[-1] = self.az_patterns[-1] - np.max(self.az_patterns[-1])
+        Args:
+            rf_prop (_type_): _description_
 
-            # elevation pattern
-            self.el_angles.append(
-                np.array(
-                    self.channels[tx_idx].get(
-                        "elevation_angle", np.arange(-90, 91, 180)
-                    )
-                )
+        Raises:
+            ValueError: _description_
+            ValueError: _description_
+            ValueError: _description_
+        """
+        if rf_prop["pn_f"] is not None and rf_prop["pn_power"] is None:
+            raise ValueError("Lengths of `pn_f` and `pn_power` should be the same")
+        if rf_prop["pn_f"] is None and rf_prop["pn_power"] is not None:
+            raise ValueError("Lengths of `pn_f` and `pn_power` should be the same")
+        if rf_prop["pn_f"] is not None and rf_prop["pn_power"] is not None:
+            if len(rf_prop["pn_f"]) != len(rf_prop["pn_power"]):
+                raise ValueError("Lengths of `pn_f` and `pn_power` should be the same")
+
+    def validate_waveform_prop(self, waveform_prop):
+        """_summary_
+
+        Args:
+            waveform_prop (_type_): _description_
+
+        Raises:
+            ValueError: _description_
+            ValueError: _description_
+            ValueError: _description_
+            ValueError: _description_
+        """
+        if len(waveform_prop["f"]) != len(waveform_prop["t"]):
+            raise ValueError("Lengths of `f` and `t` should be the same")
+
+        if len(waveform_prop["f_offset"]) != waveform_prop["pulses"]:
+            raise ValueError("Lengths of `f_offset` and `pulses` should be the same")
+
+        if len(waveform_prop["prp"]) != waveform_prop["pulses"]:
+            raise ValueError("Length of `prp` should equal to the length of `pulses`.")
+
+        if np.min(waveform_prop["prp"]) < waveform_prop["pulse_length"]:
+            raise ValueError("`prp` should be larger than `pulse_length`")
+
+    def process_waveform_modulation(self, mod_t, amp, phs):
+        """_summary_
+
+        Args:
+            mod_t (_type_): _description_
+            amp (_type_): _description_
+            phs (_type_): _description_
+
+        Raises:
+            ValueError: _description_
+            ValueError: _description_
+
+        Returns:
+            _type_: _description_
+        """
+
+        if phs is not None and amp is None:
+            amp = np.ones_like(phs)
+        elif phs is None and amp is not None:
+            phs = np.zeros_like(amp)
+
+        if not all([mod_t, amp, phs]):
+            return {"enabled": False, "var": None, "t": None}
+
+        if isinstance(amp, (list, tuple, np.ndarray)):
+            amp = np.array(amp)
+        else:
+            amp = np.array([amp, amp])
+
+        if isinstance(phs, (list, tuple, np.ndarray)):
+            phs = np.array(phs)
+        else:
+            phs = np.array([phs, phs])
+
+        if isinstance(mod_t, (list, tuple, np.ndarray)):
+            mod_t = np.array(mod_t)
+        else:
+            mod_t = np.array([0, mod_t])
+
+        if len(amp) != len(phs):
+            raise ValueError("Lengths of `amp` and `phs` should be the same")
+
+        mod_var = amp * np.exp(1j * phs / 180 * np.pi)
+
+        if len(mod_t) != len(mod_var):
+            raise ValueError("Lengths of `mod_t`, `amp`, and `phs` should be the same")
+
+        return {"enabled": True, "var": mod_var, "t": mod_t}
+
+    def process_pulse_modulation(self, pulse_amp, pulse_phs):
+        """_summary_
+
+        Args:
+            pulse_amp (_type_): _description_
+            pulse_phs (_type_): _description_
+
+        Raises:
+            ValueError: _description_
+            ValueError: _description_
+
+        Returns:
+            _type_: _description_
+        """
+        if len(pulse_amp) != self.waveform_prop["pulses"]:
+            raise ValueError("Lengths of `pulse_amp` and `pulses` should be the same")
+        if len(pulse_phs) != self.waveform_prop["pulses"]:
+            raise ValueError("Length of `pulse_phs` and `pulses` should be the same")
+
+        return pulse_amp * np.exp(1j * (pulse_phs / 180 * np.pi))
+
+    def process_patterns(self, tx_channel, tx_idx):
+        """_summary_
+
+        Args:
+            tx_channel (_type_): _description_
+            tx_idx (_type_): _description_
+
+        Raises:
+            ValueError: _description_
+            ValueError: _description_
+        """
+        # azimuth pattern
+        az_angle = np.array(tx_channel.get("azimuth_angle", [-90, 90]))
+        az_pattern = np.array(tx_channel.get("azimuth_pattern", [0, 0]))
+        if len(az_angle) != len(az_pattern):
+            raise ValueError(
+                "Lengths of `azimuth_angle` and `azimuth_pattern` \
+                    should be the same"
             )
-            self.el_patterns.append(
-                np.array(self.channels[tx_idx].get("elevation_pattern", np.zeros(2)))
+
+        self.txchannel_prop["antenna_gains"][tx_idx] = np.max(az_pattern)
+        az_pattern = az_pattern - self.txchannel_prop["antenna_gains"][tx_idx]
+
+        self.txchannel_prop["az_angles"].append(az_angle)
+        self.txchannel_prop["az_patterns"].append(az_pattern)
+
+        # elevation pattern
+        el_angle = np.array(tx_channel.get("elevation_angle", [-90, 90]))
+        el_pattern = np.array(tx_channel.get("elevation_pattern", [0, 0]))
+        if len(el_angle) != len(el_pattern):
+            raise ValueError(
+                "Lengths of `elevation_angle` and `elevation_pattern` \
+                    should be the same"
             )
+        el_pattern = el_pattern - np.max(el_pattern)
 
-            if len(self.el_angles[-1]) != len(self.el_patterns[-1]):
-                raise ValueError(
-                    "Lengths of `elevation_angle` and `elevation_pattern` \
-                        should be the same"
-                )
-
-            self.el_patterns[-1] = self.el_patterns[-1] - np.max(self.el_patterns[-1])
-
-            self.grid.append(self.channels[tx_idx].get("grid", 1))
+        self.txchannel_prop["el_angles"].append(el_angle)
+        self.txchannel_prop["el_patterns"].append(el_pattern)
 
 
 class Receiver:
@@ -670,16 +707,16 @@ class Radar:
 
         self.validation = kwargs.get("validation", False)
 
-        self.samples_per_pulse = int(self.transmitter.pulse_length * self.receiver.fs)
+        self.samples_per_pulse = int(self.transmitter.waveform_prop["pulse_length"] * self.receiver.fs)
 
         self.t_offset = np.array(time)
         self.frames = np.size(time)
 
         # virtual array
-        self.channel_size = self.transmitter.channel_size * self.receiver.channel_size
+        self.channel_size = self.transmitter.txchannel_prop["size"] * self.receiver.channel_size
         self.virtual_array = np.repeat(
-            self.transmitter.locations, self.receiver.channel_size, axis=0
-        ) + np.tile(self.receiver.locations, (self.transmitter.channel_size, 1))
+            self.transmitter.txchannel_prop["locations"], self.receiver.channel_size, axis=0
+        ) + np.tile(self.receiver.locations, (self.transmitter.txchannel_prop["size"], 1))
 
         self.timestamp = self.gen_timestamp()
         self.pulse_phs = self.cal_frame_phases()
@@ -687,34 +724,34 @@ class Radar:
         self.noise = self.cal_noise()
 
         # if hasattr(self.transmitter.fc, '__len__'):
-        self.fc_mat = np.tile(
-            self.transmitter.fc_vect[np.newaxis, :, np.newaxis],
-            (self.channel_size, 1, self.samples_per_pulse),
-        )
+        # self.fc_mat = np.tile(
+        #     self.transmitter.fc_vect[np.newaxis, :, np.newaxis],
+        #     (self.channel_size, 1, self.samples_per_pulse),
+        # )
 
-        self.f_offset_mat = np.tile(
-            self.transmitter.f_offset[np.newaxis, :, np.newaxis],
-            (self.channel_size, 1, self.samples_per_pulse),
-        )
+        # self.f_offset_mat = np.tile(
+        #     self.transmitter.f_offset[np.newaxis, :, np.newaxis],
+        #     (self.channel_size, 1, self.samples_per_pulse),
+        # )
 
         beat_time_samples = np.arange(0, self.samples_per_pulse, 1) / self.receiver.fs
         self.beat_time = np.tile(
             beat_time_samples[np.newaxis, np.newaxis, ...],
-            (self.channel_size, self.transmitter.pulses, 1),
+            (self.channel_size, self.transmitter.waveform_prop["pulses"], 1),
         )
 
-        if self.transmitter.pn_f is not None and self.transmitter.pn_power is not None:
+        if self.transmitter.rf_prop["pn_f"] is not None and self.transmitter.rf_prop["pn_power"] is not None:
             dummy_sig = np.ones(
                 (
-                    self.channel_size * self.frames * self.transmitter.pulses,
+                    self.channel_size * self.frames * self.transmitter.waveform_prop["pulses"],
                     self.samples_per_pulse,
                 )
             )
             self.phase_noise = cal_phase_noise(
                 dummy_sig,
                 self.receiver.fs,
-                self.transmitter.pn_f,
-                self.transmitter.pn_power,
+                self.transmitter.rf_prop["pn_f"],
+                self.transmitter.rf_prop["pn_power"],
                 seed=seed,
                 validation=self.validation,
             )
@@ -722,7 +759,7 @@ class Radar:
                 self.phase_noise,
                 (
                     self.channel_size * self.frames,
-                    self.transmitter.pulses,
+                    self.transmitter.waveform_prop["pulses"],
                     self.samples_per_pulse,
                 ),
             )
@@ -899,10 +936,10 @@ class Radar:
 
         channel_size = self.channel_size
         rx_channel_size = self.receiver.channel_size
-        pulses = self.transmitter.pulses
+        pulses = self.transmitter.waveform_prop["pulses"]
         samples = self.samples_per_pulse
-        crp = self.transmitter.prp
-        delay = self.transmitter.delay
+        crp = self.transmitter.waveform_prop["prp"]
+        delay = self.transmitter.txchannel_prop["delay"]
         fs = self.receiver.fs
 
         chirp_delay = np.tile(
@@ -951,7 +988,7 @@ class Radar:
         :rtype: numpy.2darray
         """
 
-        pulse_phs = self.transmitter.pulse_mod
+        pulse_phs = self.transmitter.txchannel_prop["pulse_mod"]
         pulse_phs = np.repeat(pulse_phs, self.receiver.channel_size, axis=0)
         pulse_phs = np.repeat(pulse_phs, self.frames, axis=0)
         return pulse_phs
@@ -969,7 +1006,7 @@ class Radar:
         noise_amp = np.zeros(
             [
                 self.channel_size,
-                self.transmitter.pulses,
+                self.transmitter.waveform_prop["pulses"],
                 self.samples_per_pulse,
             ]
         )
