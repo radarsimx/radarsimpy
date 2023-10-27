@@ -118,7 +118,7 @@ cpdef simc(radar, targets, noise=True):
 
     cdef int_t frames_c = radar.frames
     cdef int_t channles_c = radar.channel_size
-    cdef int_t pulses_c = radar.transmitter.pulses
+    cdef int_t pulses_c = radar.transmitter.waveform_prop["pulses"]
     cdef int_t samples_c = radar.samples_per_pulse
 
     cdef int_t bbsize_c = channles_c*frames_c*pulses_c*samples_c
@@ -164,20 +164,20 @@ cpdef simc(radar, targets, noise=True):
     """
     Transmitter Channels
     """
-    for idx_c in range(0, radar.transmitter.channel_size):
+    for idx_c in range(0, radar.transmitter.txchannel_prop["size"]):
         tx_c.AddChannel(cp_TxChannel(radar.transmitter, idx_c))
 
     """
     Receiver
     """
     rx_c = Receiver[float_t](
-        <float_t> radar.receiver.fs,
-        <float_t> radar.receiver.rf_gain,
-        <float_t> radar.receiver.load_resistor,
-        <float_t> radar.receiver.baseband_gain
+        <float_t> radar.receiver.bb_prop["fs"],
+        <float_t> radar.receiver.rf_prop["rf_gain"],
+        <float_t> radar.receiver.bb_prop["load_resistor"],
+        <float_t> radar.receiver.bb_prop["baseband_gain"]
     )
 
-    for idx_c in range(0, radar.receiver.channel_size):
+    for idx_c in range(0, radar.receiver.rxchannel_prop["size"]):
         rx_c.AddChannel(cp_RxChannel(radar.receiver, idx_c))
 
     """
@@ -262,20 +262,20 @@ cpdef simc(radar, targets, noise=True):
         """
         Transmitter Channels
         """
-        for idx_c in range(0, radar.interf.transmitter.channel_size):
+        for idx_c in range(0, radar.interf.transmitter.txchannel_prop["size"]):
             interf_tx_c.AddChannel(cp_TxChannel(radar.interf.transmitter, idx_c))
 
         """
         Receiver
         """
         interf_rx_c = Receiver[float_t](
-            <float_t> radar.interf.receiver.fs,
-            <float_t> radar.interf.receiver.rf_gain,
-            <float_t> radar.interf.receiver.load_resistor,
-            <float_t> radar.interf.receiver.baseband_gain
+            <float_t> radar.interf.receiver.bb_prop["fs"],
+            <float_t> radar.interf.receiver.rf_prop["rf_gain"],
+            <float_t> radar.interf.receiver.bb_prop["load_resistor"],
+            <float_t> radar.interf.receiver.bb_prop["baseband_gain"]
         )
 
-        for idx_c in range(0, radar.interf.receiver.channel_size):
+        for idx_c in range(0, radar.interf.receiver.rxchannel_prop["size"]):
             interf_rx_c.AddChannel(cp_RxChannel(radar.interf.receiver, idx_c))
 
         interf_radar_c = Radar[float_t](interf_tx_c, interf_rx_c)

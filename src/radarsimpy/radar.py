@@ -365,7 +365,7 @@ class Transmitter:
         elif phs is None and amp is not None:
             phs = np.zeros_like(amp)
 
-        if not all([mod_t, amp, phs]):
+        if mod_t is None or amp is None or phs is None:
             return {"enabled": False, "var": None, "t": None}
 
         if isinstance(amp, (list, tuple, np.ndarray)):
@@ -754,17 +754,6 @@ class Radar:
 
         self.noise = self.cal_noise()
 
-        # if hasattr(self.transmitter.fc, '__len__'):
-        # self.fc_mat = np.tile(
-        #     self.transmitter.fc_vect[np.newaxis, :, np.newaxis],
-        #     (self.channel_size, 1, self.samples_per_pulse),
-        # )
-
-        # self.f_offset_mat = np.tile(
-        #     self.transmitter.f_offset[np.newaxis, :, np.newaxis],
-        #     (self.channel_size, 1, self.samples_per_pulse),
-        # )
-
         beat_time_samples = (
             np.arange(0, self.samples_per_pulse, 1) / self.receiver.bb_prop["fs"]
         )
@@ -1005,7 +994,11 @@ class Radar:
             toffset = np.repeat(
                 np.tile(
                     np.expand_dims(np.expand_dims(self.t_offset, axis=1), axis=2),
-                    (1, self.transmitter.pulses, self.samples_per_pulse),
+                    (
+                        1,
+                        self.transmitter.waveform_prop["pulses"],
+                        self.samples_per_pulse,
+                    ),
                 ),
                 self.channel_size,
                 axis=0,

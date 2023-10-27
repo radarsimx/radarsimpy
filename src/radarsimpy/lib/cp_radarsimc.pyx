@@ -153,7 +153,7 @@ cdef Transmitter[float_t] cp_Transmitter(radar):
     """
     cdef int_t frames_c = radar.frames
     cdef int_t channles_c = radar.channel_size
-    cdef int_t pulses_c = radar.transmitter.pulses
+    cdef int_t pulses_c = radar.transmitter.waveform_prop["pulses"]
     cdef int_t samples_c = radar.samples_per_pulse
 
     cdef vector[double] t_frame_vt
@@ -171,20 +171,20 @@ cdef Transmitter[float_t] cp_Transmitter(radar):
         t_frame_vt.push_back(<double> (radar.t_offset))
 
     # frequency
-    cdef double[:] f_mv = radar.transmitter.f.astype(np.float64)
-    Mem_Copy(&f_mv[0], <int_t>(len(radar.transmitter.f)), f_vt)
+    cdef double[:] f_mv = radar.transmitter.waveform_prop["f"].astype(np.float64)
+    Mem_Copy(&f_mv[0], <int_t>(len(radar.transmitter.waveform_prop["f"])), f_vt)
 
     # time
-    cdef double[:] t_mv = radar.transmitter.t.astype(np.float64)
-    Mem_Copy(&t_mv[0], <int_t>(len(radar.transmitter.t)), t_vt)
+    cdef double[:] t_mv = radar.transmitter.waveform_prop["t"].astype(np.float64)
+    Mem_Copy(&t_mv[0], <int_t>(len(radar.transmitter.waveform_prop["t"])), t_vt)
 
     # frequency offset per pulse
-    cdef double[:] f_offset_mv = radar.transmitter.f_offset.astype(np.float64)
-    Mem_Copy(&f_offset_mv[0], <int_t>(len(radar.transmitter.f_offset)), f_offset_vt)
+    cdef double[:] f_offset_mv = radar.transmitter.waveform_prop["f_offset"].astype(np.float64)
+    Mem_Copy(&f_offset_mv[0], <int_t>(len(radar.transmitter.waveform_prop["f_offset"])), f_offset_vt)
 
     # pulse start time
-    cdef double[:] t_pstart_mv = radar.transmitter.pulse_start_time.astype(np.float64)
-    Mem_Copy(&t_pstart_mv[0], <int_t>(len(radar.transmitter.pulse_start_time)), t_pstart_vt)
+    cdef double[:] t_pstart_mv = radar.transmitter.waveform_prop["pulse_start_time"].astype(np.float64)
+    Mem_Copy(&t_pstart_mv[0], <int_t>(len(radar.transmitter.waveform_prop["pulse_start_time"])), t_pstart_vt)
 
     # phase noise
     cdef double[:, :, :] pn_real_mv
@@ -195,7 +195,7 @@ cdef Transmitter[float_t] cp_Transmitter(radar):
         Mem_Copy_Complex(&pn_real_mv[0,0,0], &pn_imag_mv[0,0,0], <int_t>(frames_c*channles_c*pulses_c*samples_c), pn_vt)
 
     return Transmitter[float_t](
-        <float_t> radar.transmitter.tx_power,
+        <float_t> radar.transmitter.rf_prop["tx_power"],
         f_vt,
         t_vt,
         f_offset_vt,
@@ -223,7 +223,7 @@ cdef TxChannel[float_t] cp_TxChannel(tx,
     :return: C++ object of a transmitter channel
     :rtype: TxChannel
     """
-    cdef int_t pulses_c = tx.pulses
+    cdef int_t pulses_c = tx.waveform_prop["pulses"]
 
     cdef vector[float_t] az_ang_vt, az_ptn_vt
     cdef vector[float_t] el_ang_vt, el_ptn_vt
@@ -238,39 +238,39 @@ cdef TxChannel[float_t] cp_TxChannel(tx,
     cdef vector[float_t] mod_t_vt
 
     # azimuth pattern
-    az_ang_mv = np.radians(np.array(tx.az_angles[tx_idx])).astype(np_float)
-    az_ptn_mv = np.array(tx.az_patterns[tx_idx]).astype(np_float)
+    az_ang_mv = np.radians(np.array(tx.txchannel_prop["az_angles"][tx_idx])).astype(np_float)
+    az_ptn_mv = np.array(tx.txchannel_prop["az_patterns"][tx_idx]).astype(np_float)
 
-    Mem_Copy(&az_ang_mv[0], <int_t>(len(tx.az_angles[tx_idx])), az_ang_vt)
-    Mem_Copy(&az_ptn_mv[0], <int_t>(len(tx.az_patterns[tx_idx])), az_ptn_vt)
+    Mem_Copy(&az_ang_mv[0], <int_t>(len(tx.txchannel_prop["az_angles"][tx_idx])), az_ang_vt)
+    Mem_Copy(&az_ptn_mv[0], <int_t>(len(tx.txchannel_prop["az_patterns"][tx_idx])), az_ptn_vt)
 
     # elevation pattern
-    el_ang_mv = np.radians(np.flip(90-tx.el_angles[tx_idx])).astype(np_float)
-    el_ptn_mv = np.flip(tx.el_patterns[tx_idx]).astype(np_float)
+    el_ang_mv = np.radians(np.flip(90-tx.txchannel_prop["el_angles"][tx_idx])).astype(np_float)
+    el_ptn_mv = np.flip(tx.txchannel_prop["el_patterns"][tx_idx]).astype(np_float)
 
-    Mem_Copy(&el_ang_mv[0], <int_t>(len(tx.el_angles[tx_idx])), el_ang_vt)
-    Mem_Copy(&el_ptn_mv[0], <int_t>(len(tx.el_patterns[tx_idx])), el_ptn_vt)
+    Mem_Copy(&el_ang_mv[0], <int_t>(len(tx.txchannel_prop["el_angles"][tx_idx])), el_ang_vt)
+    Mem_Copy(&el_ptn_mv[0], <int_t>(len(tx.txchannel_prop["el_patterns"][tx_idx])), el_ptn_vt)
 
     # pulse modulation
-    cdef float_t[:] pulse_real_mv = np.real(tx.pulse_mod[tx_idx]).astype(np_float)
-    cdef float_t[:] pulse_imag_mv = np.imag(tx.pulse_mod[tx_idx]).astype(np_float)
+    cdef float_t[:] pulse_real_mv = np.real(tx.txchannel_prop["pulse_mod"][tx_idx]).astype(np_float)
+    cdef float_t[:] pulse_imag_mv = np.imag(tx.txchannel_prop["pulse_mod"][tx_idx]).astype(np_float)
     Mem_Copy_Complex(&pulse_real_mv[0], &pulse_imag_mv[0], <int_t>(pulses_c), pulse_mod_vt)
 
     # waveform modulation
-    mod_enabled = tx.waveform_mod[tx_idx]["enabled"]
+    mod_enabled = tx.txchannel_prop["waveform_mod"][tx_idx]["enabled"]
 
     cdef float_t[:] mod_real_mv, mod_imag_mv
     cdef float_t[:] mod_t_mv
     if mod_enabled:
-        mod_real_mv = np.real(tx.waveform_mod[tx_idx]["var"]).astype(np_float)
-        mod_imag_mv = np.imag(tx.waveform_mod[tx_idx]["var"]).astype(np_float)
-        mod_t_mv = tx.waveform_mod[tx_idx]["t"].astype(np_float)
+        mod_real_mv = np.real(tx.txchannel_prop["waveform_mod"][tx_idx]["var"]).astype(np_float)
+        mod_imag_mv = np.imag(tx.txchannel_prop["waveform_mod"][tx_idx]["var"]).astype(np_float)
+        mod_t_mv = tx.txchannel_prop["waveform_mod"][tx_idx]["t"].astype(np_float)
 
-        Mem_Copy_Complex(&mod_real_mv[0], &mod_imag_mv[0], <int_t>(len(tx.waveform_mod[tx_idx]["var"])), mod_var_vt)
-        Mem_Copy(&mod_t_mv[0], <int_t>(len(tx.waveform_mod[tx_idx]["t"])), mod_t_vt)
+        Mem_Copy_Complex(&mod_real_mv[0], &mod_imag_mv[0], <int_t>(len(tx.txchannel_prop["waveform_mod"][tx_idx]["var"])), mod_var_vt)
+        Mem_Copy(&mod_t_mv[0], <int_t>(len(tx.txchannel_prop["waveform_mod"][tx_idx]["t"])), mod_t_vt)
 
-    cdef float_t[:] location_mv = tx.locations[tx_idx].astype(np_float)
-    cdef float_t[:] polarization_mv = tx.polarization[tx_idx].astype(np_float)
+    cdef float_t[:] location_mv = tx.txchannel_prop["locations"][tx_idx].astype(np_float)
+    cdef float_t[:] polarization_mv = tx.txchannel_prop["polarization"][tx_idx].astype(np_float)
     return TxChannel[float_t](
         Vec3[float_t](&location_mv[0]),
         Vec3[float_t](&polarization_mv[0]),
@@ -278,12 +278,12 @@ cdef TxChannel[float_t] cp_TxChannel(tx,
         az_ptn_vt,
         el_ang_vt,
         el_ptn_vt,
-        <float_t> tx.antenna_gains[tx_idx],
+        <float_t> tx.txchannel_prop["antenna_gains"][tx_idx],
         mod_t_vt,
         mod_var_vt,
         pulse_mod_vt,
-        <float_t> tx.delay[tx_idx],
-        <float_t> np.radians(tx.grid[tx_idx])
+        <float_t> tx.txchannel_prop["delay"][tx_idx],
+        <float_t> np.radians(tx.txchannel_prop["grid"][tx_idx])
     )
 
 
@@ -312,21 +312,21 @@ cdef RxChannel[float_t] cp_RxChannel(rx,
     cdef float_t[:] el_ang_mv, el_ptn_mv
 
     # azimuth pattern
-    az_ang_mv = np.radians(rx.az_angles[rx_idx]).astype(np_float)
-    az_ptn_mv = rx.az_patterns[rx_idx].astype(np_float)
+    az_ang_mv = np.radians(rx.rxchannel_prop["az_angles"][rx_idx]).astype(np_float)
+    az_ptn_mv = rx.rxchannel_prop["az_patterns"][rx_idx].astype(np_float)
 
-    Mem_Copy(&az_ang_mv[0], <int_t>(len(rx.az_angles[rx_idx])), az_ang_vt)
-    Mem_Copy(&az_ptn_mv[0], <int_t>(len(rx.az_patterns[rx_idx])), az_ptn_vt)
+    Mem_Copy(&az_ang_mv[0], <int_t>(len(rx.rxchannel_prop["az_angles"][rx_idx])), az_ang_vt)
+    Mem_Copy(&az_ptn_mv[0], <int_t>(len(rx.rxchannel_prop["az_patterns"][rx_idx])), az_ptn_vt)
 
     # elevation pattern
-    el_ang_mv = np.radians(np.flip(90-rx.el_angles[rx_idx])).astype(np_float)
-    el_ptn_mv = np.flip(rx.el_patterns[rx_idx]).astype(np_float)
+    el_ang_mv = np.radians(np.flip(90-rx.rxchannel_prop["el_angles"][rx_idx])).astype(np_float)
+    el_ptn_mv = np.flip(rx.rxchannel_prop["el_patterns"][rx_idx]).astype(np_float)
 
-    Mem_Copy(&el_ang_mv[0], <int_t>(len(rx.el_angles[rx_idx])), el_ang_vt)
-    Mem_Copy(&el_ptn_mv[0], <int_t>(len(rx.el_patterns[rx_idx])), el_ptn_vt)
+    Mem_Copy(&el_ang_mv[0], <int_t>(len(rx.rxchannel_prop["el_angles"][rx_idx])), el_ang_vt)
+    Mem_Copy(&el_ptn_mv[0], <int_t>(len(rx.rxchannel_prop["el_patterns"][rx_idx])), el_ptn_vt)
 
-    cdef float_t[:] location_mv = rx.locations[rx_idx].astype(np_float)
-    cdef float_t[:] polarization_mv = rx.polarization[rx_idx].astype(np_float)
+    cdef float_t[:] location_mv = rx.rxchannel_prop["locations"][rx_idx].astype(np_float)
+    cdef float_t[:] polarization_mv = rx.rxchannel_prop["polarization"][rx_idx].astype(np_float)
     return RxChannel[float_t](
         Vec3[float_t](&location_mv[0]),
         Vec3[float_t](&polarization_mv[0]),
@@ -334,7 +334,7 @@ cdef RxChannel[float_t] cp_RxChannel(rx,
         az_ptn_vt,
         el_ang_vt,
         el_ptn_vt,
-        <float_t> rx.antenna_gains[rx_idx]
+        <float_t> rx.rxchannel_prop["antenna_gains"][rx_idx]
     )
 
 
@@ -375,7 +375,7 @@ cdef Target[float_t] cp_Target(radar,
     cdef cpp_complex[float_t] ep_c, mu_c
 
     cdef int_t ch_idx, ps_idx, sp_idx
-    cdef int_t bbsize_c = <int_t>(radar.channel_size*radar.frames*radar.transmitter.pulses*radar.samples_per_pulse)
+    cdef int_t bbsize_c = <int_t>(radar.channel_size*radar.frames*radar.transmitter.waveform_prop["pulses"]*radar.samples_per_pulse)
 
     cdef float_t[:, :] points_mv
     cdef int_t[:, :] cells_mv

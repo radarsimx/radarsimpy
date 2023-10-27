@@ -33,20 +33,22 @@ def test_cw_tx():
     # assert np.array_equal(cw.fc_vect, np.ones(2)*24e9)
     # assert cw.pulse_length == 10
     # assert cw.bandwidth == 0
-    assert cw.tx_power == 10
-    assert cw.prp[0] == 10
-    assert cw.pulses == 2
+    assert cw.rf_prop["tx_power"] == 10
+    assert cw.waveform_prop["prp"][0] == 10
+    assert cw.waveform_prop["pulses"] == 2
 
     print("# CW transmitter channel #")
-    assert cw.channel_size == 1
-    assert np.array_equal(cw.locations, np.array([[0, 0, 0]]))
-    assert np.array_equal(cw.az_angles, [np.arange(-90, 91, 180)])
-    assert np.array_equal(cw.az_patterns, [np.zeros(2)])
-    assert np.array_equal(cw.el_angles, [np.arange(-90, 91, 180)])
-    assert np.array_equal(cw.el_patterns, [np.zeros(2)])
+    assert cw.txchannel_prop["size"] == 1
+    assert np.array_equal(cw.txchannel_prop["locations"], np.array([[0, 0, 0]]))
+    assert np.array_equal(cw.txchannel_prop["az_angles"], [np.arange(-90, 91, 180)])
+    assert np.array_equal(cw.txchannel_prop["az_patterns"], [np.zeros(2)])
+    assert np.array_equal(cw.txchannel_prop["el_angles"], [np.arange(-90, 91, 180)])
+    assert np.array_equal(cw.txchannel_prop["el_patterns"], [np.zeros(2)])
 
     print("# CW transmitter modulation #")
-    assert np.array_equal(cw.pulse_mod, [np.ones(cw.pulses)])
+    assert np.array_equal(
+        cw.txchannel_prop["pulse_mod"], [np.ones(cw.waveform_prop["pulses"])]
+    )
 
 
 def fmcw_tx():
@@ -80,23 +82,25 @@ def test_fmcw_tx():
     pattern = pattern - np.max(pattern)
 
     print("# FMCW transmitter parameters #")
-    assert np.array_equal(fmcw.fc_vect, np.ones(256) * 24.125e9)
-    assert fmcw.pulse_length == 80e-6
-    assert fmcw.bandwidth == 100e6
-    assert fmcw.tx_power == 10
-    assert fmcw.prp[0] == 100e-6
-    assert fmcw.pulses == 256
+    # assert np.array_equal(fmcw.fc_vect, np.ones(256) * 24.125e9)
+    assert fmcw.waveform_prop["pulse_length"] == 80e-6
+    assert fmcw.waveform_prop["bandwidth"] == 100e6
+    assert fmcw.rf_prop["tx_power"] == 10
+    assert fmcw.waveform_prop["prp"][0] == 100e-6
+    assert fmcw.waveform_prop["pulses"] == 256
 
     print("# FMCW transmitter channel #")
-    assert fmcw.channel_size == 1
-    assert np.array_equal(fmcw.locations, np.array([[0, 0, 0]]))
-    assert np.array_equal(fmcw.az_angles, [np.arange(-90, 91, 1)])
-    assert np.array_equal(fmcw.az_patterns, [pattern])
-    assert np.array_equal(fmcw.el_angles, [np.arange(-90, 91, 1)])
-    assert np.array_equal(fmcw.el_patterns, [pattern])
+    assert fmcw.txchannel_prop["size"] == 1
+    assert np.array_equal(fmcw.txchannel_prop["locations"], np.array([[0, 0, 0]]))
+    assert np.array_equal(fmcw.txchannel_prop["az_angles"], [np.arange(-90, 91, 1)])
+    assert np.array_equal(fmcw.txchannel_prop["az_patterns"], [pattern])
+    assert np.array_equal(fmcw.txchannel_prop["el_angles"], [np.arange(-90, 91, 1)])
+    assert np.array_equal(fmcw.txchannel_prop["el_patterns"], [pattern])
 
     print("# FMCW transmitter modulation #")
-    assert np.array_equal(fmcw.pulse_mod, [np.ones(fmcw.pulses)])
+    assert np.array_equal(
+        fmcw.txchannel_prop["pulse_mod"], [np.ones(fmcw.waveform_prop["pulses"])]
+    )
 
 
 def tdm_fmcw_tx():
@@ -120,29 +124,35 @@ def test_tdm_fmcw_tx():
     tdm = tdm_fmcw_tx()
 
     print("# TDM FMCW transmitter parameters #")
-    assert np.array_equal(tdm.fc_vect, np.ones(2) * 24.125e9)
-    assert tdm.pulse_length == 80e-6
-    assert tdm.bandwidth == 100e6
-    assert tdm.tx_power == 20
-    assert tdm.prp[0] == 200e-6
-    assert tdm.pulses == 2
+    # assert np.array_equal(tdm.fc_vect, np.ones(2) * 24.125e9)
+    assert tdm.waveform_prop["pulse_length"] == 80e-6
+    assert tdm.waveform_prop["bandwidth"] == 100e6
+    assert tdm.rf_prop["tx_power"] == 20
+    assert tdm.waveform_prop["prp"][0] == 200e-6
+    assert tdm.waveform_prop["pulses"] == 2
 
     print("# TDM FMCW transmitter channel #")
-    assert tdm.channel_size == 2
+    assert tdm.txchannel_prop["size"] == 2
     assert np.array_equal(
-        tdm.locations, np.array([[0, -4 * const.c / 24.125e9, 0], [0, 0, 0]])
+        tdm.txchannel_prop["locations"],
+        np.array([[0, -4 * const.c / 24.125e9, 0], [0, 0, 0]]),
     )
     assert np.array_equal(
-        tdm.az_angles, [np.arange(-90, 91, 180), np.arange(-90, 91, 180)]
+        tdm.txchannel_prop["az_angles"],
+        [np.arange(-90, 91, 180), np.arange(-90, 91, 180)],
     )
-    assert np.array_equal(tdm.az_patterns, [np.zeros(2), np.zeros(2)])
+    assert np.array_equal(tdm.txchannel_prop["az_patterns"], [np.zeros(2), np.zeros(2)])
     assert np.array_equal(
-        tdm.el_angles, [np.arange(-90, 91, 180), np.arange(-90, 91, 180)]
+        tdm.txchannel_prop["el_angles"],
+        [np.arange(-90, 91, 180), np.arange(-90, 91, 180)],
     )
-    assert np.array_equal(tdm.el_patterns, [np.zeros(2), np.zeros(2)])
+    assert np.array_equal(tdm.txchannel_prop["el_patterns"], [np.zeros(2), np.zeros(2)])
 
     print("# TDM FMCW transmitter modulation #")
-    assert np.array_equal(tdm.pulse_mod, [np.ones(tdm.pulses), np.ones(tdm.pulses)])
+    assert np.array_equal(
+        tdm.txchannel_prop["pulse_mod"],
+        [np.ones(tdm.waveform_prop["pulses"]), np.ones(tdm.waveform_prop["pulses"])],
+    )
 
 
 def pmcw_tx(code1, code2):
@@ -712,31 +722,41 @@ def test_pmcw_tx():
     pmcw = pmcw_tx(code1, code2)
 
     print("# PMCW transmitter parameters #")
-    assert np.array_equal(pmcw.fc_vect, np.ones(256) * 24.125e9)
-    assert pmcw.pulse_length == 2.1e-6
-    assert pmcw.bandwidth == 0
-    assert pmcw.tx_power == 20
-    assert pmcw.prp[0] == 2.1e-6
-    assert pmcw.pulses == 256
+    # assert np.array_equal(pmcw.fc_vect, np.ones(256) * 24.125e9)
+    assert pmcw.waveform_prop["pulse_length"] == 2.1e-6
+    assert pmcw.waveform_prop["bandwidth"] == 0
+    assert pmcw.rf_prop["tx_power"] == 20
+    assert pmcw.waveform_prop["prp"][0] == 2.1e-6
+    assert pmcw.waveform_prop["pulses"] == 256
 
     print("# PMCW transmitter channel #")
-    assert pmcw.channel_size == 2
-    assert np.array_equal(pmcw.locations, np.array([[0, 0, 0], [0, 0, 0]]))
+    assert pmcw.txchannel_prop["size"] == 2
     assert np.array_equal(
-        pmcw.az_angles, [np.arange(-90, 91, 1), np.arange(-90, 91, 1)]
+        pmcw.txchannel_prop["locations"], np.array([[0, 0, 0], [0, 0, 0]])
     )
-    assert np.array_equal(pmcw.az_patterns, [np.zeros(181), np.zeros(181)])
     assert np.array_equal(
-        pmcw.el_angles, [np.arange(-90, 91, 1), np.arange(-90, 91, 1)]
+        pmcw.txchannel_prop["az_angles"], [np.arange(-90, 91, 1), np.arange(-90, 91, 1)]
     )
-    assert np.array_equal(pmcw.el_patterns, [np.zeros(181), np.zeros(181)])
+    assert np.array_equal(
+        pmcw.txchannel_prop["az_patterns"], [np.zeros(181), np.zeros(181)]
+    )
+    assert np.array_equal(
+        pmcw.txchannel_prop["el_angles"], [np.arange(-90, 91, 1), np.arange(-90, 91, 1)]
+    )
+    assert np.array_equal(
+        pmcw.txchannel_prop["el_patterns"], [np.zeros(181), np.zeros(181)]
+    )
 
     print("# PMCW transmitter modulation #")
-    npt.assert_almost_equal(pmcw.waveform_mod[0]["var"], code1)
-    npt.assert_almost_equal(pmcw.waveform_mod[1]["var"], code2)
+    npt.assert_almost_equal(pmcw.txchannel_prop["waveform_mod"][0]["var"], code1)
+    npt.assert_almost_equal(pmcw.txchannel_prop["waveform_mod"][1]["var"], code2)
 
-    npt.assert_almost_equal(pmcw.waveform_mod[0]["t"], np.arange(0, len(code1)) * 4e-9)
-    npt.assert_almost_equal(pmcw.waveform_mod[1]["t"], np.arange(0, len(code2)) * 4e-9)
+    npt.assert_almost_equal(
+        pmcw.txchannel_prop["waveform_mod"][0]["t"], np.arange(0, len(code1)) * 4e-9
+    )
+    npt.assert_almost_equal(
+        pmcw.txchannel_prop["waveform_mod"][1]["t"], np.arange(0, len(code2)) * 4e-9
+    )
 
     # assert np.array_equal(pmcw.chip_length, [4e-9, 4e-9])
 

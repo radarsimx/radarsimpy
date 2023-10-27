@@ -38,20 +38,20 @@ def test_cw_rx():
     cw = cw_rx()
 
     print("# CW receiver parameters #")
-    assert cw.fs == 20
-    assert cw.noise_figure == 12
-    assert cw.rf_gain == 20
-    assert cw.load_resistor == 1000
-    assert cw.baseband_gain == 50
-    assert cw.noise_bandwidth == cw.fs
+    assert cw.bb_prop["fs"] == 20
+    assert cw.rf_prop["noise_figure"] == 12
+    assert cw.rf_prop["rf_gain"] == 20
+    assert cw.bb_prop["load_resistor"] == 1000
+    assert cw.bb_prop["baseband_gain"] == 50
+    assert cw.bb_prop["noise_bandwidth"] == cw.bb_prop["fs"]
 
     print("# CW receiver channel #")
-    assert cw.channel_size == 1
-    assert np.array_equal(cw.locations, np.array([[0, 0, 0]]))
-    assert np.array_equal(cw.az_angles, [np.arange(-90, 91, 180)])
-    assert np.array_equal(cw.az_patterns, [np.zeros(2)])
-    assert np.array_equal(cw.el_angles, [np.arange(-90, 91, 180)])
-    assert np.array_equal(cw.el_patterns, [np.zeros(2)])
+    assert cw.rxchannel_prop["size"] == 1
+    assert np.array_equal(cw.rxchannel_prop["locations"], np.array([[0, 0, 0]]))
+    assert np.array_equal(cw.rxchannel_prop["az_angles"], [np.arange(-90, 91, 180)])
+    assert np.array_equal(cw.rxchannel_prop["az_patterns"], [np.zeros(2)])
+    assert np.array_equal(cw.rxchannel_prop["el_angles"], [np.arange(-90, 91, 180)])
+    assert np.array_equal(cw.rxchannel_prop["el_patterns"], [np.zeros(2)])
 
 
 def fmcw_rx():
@@ -85,20 +85,20 @@ def test_fmcw_rx():
     pattern = pattern - np.max(pattern)
 
     print("# FMCW receiver parameters #")
-    assert fmcw.fs == 2e6
-    assert fmcw.noise_figure == 12
-    assert fmcw.rf_gain == 20
-    assert fmcw.load_resistor == 500
-    assert fmcw.baseband_gain == 30
-    assert fmcw.noise_bandwidth == fmcw.fs
+    assert fmcw.bb_prop["fs"] == 2e6
+    assert fmcw.rf_prop["noise_figure"] == 12
+    assert fmcw.rf_prop["rf_gain"] == 20
+    assert fmcw.bb_prop["load_resistor"] == 500
+    assert fmcw.bb_prop["baseband_gain"] == 30
+    assert fmcw.bb_prop["noise_bandwidth"] == fmcw.bb_prop["fs"]
 
     print("# FMCW receiver channel #")
-    assert fmcw.channel_size == 1
-    assert np.array_equal(fmcw.locations, np.array([[0, 0, 0]]))
-    assert np.array_equal(fmcw.az_angles, [np.arange(-90, 91, 1)])
-    assert np.array_equal(fmcw.az_patterns, [pattern])
-    assert np.array_equal(fmcw.el_angles, [np.arange(-90, 91, 1)])
-    assert np.array_equal(fmcw.el_patterns, [pattern])
+    assert fmcw.rxchannel_prop["size"] == 1
+    assert np.array_equal(fmcw.rxchannel_prop["locations"], np.array([[0, 0, 0]]))
+    assert np.array_equal(fmcw.rxchannel_prop["az_angles"], [np.arange(-90, 91, 1)])
+    assert np.array_equal(fmcw.rxchannel_prop["az_patterns"], [pattern])
+    assert np.array_equal(fmcw.rxchannel_prop["el_angles"], [np.arange(-90, 91, 1)])
+    assert np.array_equal(fmcw.rxchannel_prop["el_patterns"], [pattern])
 
 
 def tdm_fmcw_rx():
@@ -122,18 +122,18 @@ def test_tdm_fmcw_rx():
     tdm = tdm_fmcw_rx()
 
     print("# TDM FMCW receiver parameters #")
-    assert tdm.fs == 2e6
-    assert tdm.noise_figure == 4
-    assert tdm.rf_gain == 20
-    assert tdm.load_resistor == 500
-    assert tdm.baseband_gain == 50
-    assert tdm.noise_bandwidth == tdm.fs
+    assert tdm.bb_prop["fs"] == 2e6
+    assert tdm.rf_prop["noise_figure"] == 4
+    assert tdm.rf_prop["rf_gain"] == 20
+    assert tdm.bb_prop["load_resistor"] == 500
+    assert tdm.bb_prop["baseband_gain"] == 50
+    assert tdm.bb_prop["noise_bandwidth"] == tdm.bb_prop["fs"]
 
     print("# TDM FMCW receiver channel #")
     half_wavelength = const.c / 24.125e9 / 2
-    assert tdm.channel_size == 8
+    assert tdm.rxchannel_prop["size"] == 8
     assert np.array_equal(
-        tdm.locations,
+        tdm.rxchannel_prop["locations"],
         np.array(
             [
                 [0, 0, 0],
@@ -148,7 +148,7 @@ def test_tdm_fmcw_rx():
         ),
     )
     assert np.array_equal(
-        tdm.az_angles,
+        tdm.rxchannel_prop["az_angles"],
         [
             np.arange(-90, 91, 180),
             np.arange(-90, 91, 180),
@@ -161,7 +161,7 @@ def test_tdm_fmcw_rx():
         ],
     )
     assert np.array_equal(
-        tdm.az_patterns,
+        tdm.rxchannel_prop["az_patterns"],
         [
             np.zeros(2),
             np.zeros(2),
@@ -174,7 +174,7 @@ def test_tdm_fmcw_rx():
         ],
     )
     assert np.array_equal(
-        tdm.el_angles,
+        tdm.rxchannel_prop["el_angles"],
         [
             np.arange(-90, 91, 180),
             np.arange(-90, 91, 180),
@@ -187,7 +187,7 @@ def test_tdm_fmcw_rx():
         ],
     )
     assert np.array_equal(
-        tdm.el_patterns,
+        tdm.rxchannel_prop["el_patterns"],
         [
             np.zeros(2),
             np.zeros(2),
@@ -228,17 +228,17 @@ def test_pmcw_rx():
     pmcw = pmcw_rx()
 
     print("# PMCW receiver parameters #")
-    assert pmcw.fs == 250e6
-    assert pmcw.noise_figure == 10
-    assert pmcw.rf_gain == 20
-    assert pmcw.load_resistor == 1000
-    assert pmcw.baseband_gain == 30
-    assert pmcw.noise_bandwidth == pmcw.fs
+    assert pmcw.bb_prop["fs"] == 250e6
+    assert pmcw.rf_prop["noise_figure"] == 10
+    assert pmcw.rf_prop["rf_gain"] == 20
+    assert pmcw.bb_prop["load_resistor"] == 1000
+    assert pmcw.bb_prop["baseband_gain"] == 30
+    assert pmcw.bb_prop["noise_bandwidth"] == pmcw.bb_prop["fs"]
 
     print("# PMCW receiver channel #")
-    assert pmcw.channel_size == 1
-    assert np.array_equal(pmcw.locations, np.array([[0, 0, 0]]))
-    assert np.array_equal(pmcw.az_angles, [np.arange(-90, 91, 1)])
-    assert np.array_equal(pmcw.az_patterns, [np.zeros(181)])
-    assert np.array_equal(pmcw.el_angles, [np.arange(-90, 91, 1)])
-    assert np.array_equal(pmcw.el_patterns, [np.zeros(181)])
+    assert pmcw.rxchannel_prop["size"] == 1
+    assert np.array_equal(pmcw.rxchannel_prop["locations"], np.array([[0, 0, 0]]))
+    assert np.array_equal(pmcw.rxchannel_prop["az_angles"], [np.arange(-90, 91, 1)])
+    assert np.array_equal(pmcw.rxchannel_prop["az_patterns"], [np.zeros(181)])
+    assert np.array_equal(pmcw.rxchannel_prop["el_angles"], [np.arange(-90, 91, 1)])
+    assert np.array_equal(pmcw.rxchannel_prop["el_patterns"], [np.zeros(181)])
