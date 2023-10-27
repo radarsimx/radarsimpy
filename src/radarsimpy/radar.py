@@ -177,7 +177,7 @@ class Transmitter:
 
     """
 
-    def __init__(  # pylint: disable=too-many-arguments, too-many-branches, too-many-statements
+    def __init__(  # pylint: disable=too-many-arguments, too-many-statements
         self,
         f,
         t,
@@ -542,7 +542,7 @@ class Receiver:
 
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         fs,
         noise_figure=10,
@@ -552,80 +552,101 @@ class Receiver:
         bb_type="complex",
         channels=None,
     ):
-        self.fs = fs
-        self.noise_figure = noise_figure
-        self.rf_gain = rf_gain
-        self.load_resistor = load_resistor
-        self.baseband_gain = baseband_gain
-        self.bb_type = bb_type
+        self.rf_prop = {}
+        self.bb_prop = {}
+        self.rxchannel_prop = {}
+
+        self.rf_prop["rf_gain"] = rf_gain
+        self.rf_prop["noise_figure"] = noise_figure
+
+        self.bb_prop["fs"] = fs
+        self.bb_prop["load_resistor"] = load_resistor
+        self.bb_prop["baseband_gain"] = baseband_gain
+        self.bb_prop["bb_type"] = bb_type
         if bb_type == "complex":
-            self.noise_bandwidth = self.fs
+            self.bb_prop["noise_bandwidth"] = fs
         elif bb_type == "real":
-            self.noise_bandwidth = self.fs / 2
-        else:
-            raise ValueError("Invalid baseband type")
+            self.bb_prop["noise_bandwidth"] = fs / 2
+
+        self.validate_bb_prop(self.bb_prop)
 
         # additional receiver parameters
         if channels is None:
-            self.channels = [{"location": (0, 0, 0)}]
-        else:
-            self.channels = channels
+            channels = [{"location": (0, 0, 0)}]
 
-        self.channel_size = len(self.channels)
+        self.rxchannel_prop["size"] = len(channels)
 
-        self.locations = np.zeros((self.channel_size, 3))
-        self.polarization = np.zeros((self.channel_size, 3))
+        self.rxchannel_prop["locations"] = np.zeros((self.rxchannel_prop["size"], 3))
+        self.rxchannel_prop["polarization"] = np.zeros((self.rxchannel_prop["size"], 3))
 
-        self.az_patterns = []
-        self.az_angles = []
+        self.rxchannel_prop["az_patterns"] = []
+        self.rxchannel_prop["az_angles"] = []
 
-        self.el_patterns = []
-        self.el_angles = []
+        self.rxchannel_prop["el_patterns"] = []
+        self.rxchannel_prop["el_angles"] = []
 
-        self.antenna_gains = np.zeros((self.channel_size))
+        self.rxchannel_prop["antenna_gains"] = np.zeros((self.rxchannel_prop["size"]))
 
-        for rx_idx, rx_element in enumerate(self.channels):
-            self.locations[rx_idx, :] = np.array(rx_element.get("location"))
-            self.polarization[rx_idx, :] = np.array(
+        for rx_idx, rx_element in enumerate(channels):
+            self.rxchannel_prop["locations"][rx_idx, :] = np.array(
+                rx_element.get("location")
+            )
+            self.rxchannel_prop["polarization"][rx_idx, :] = np.array(
                 rx_element.get("polarization", [0, 0, 1])
             )
 
-            # azimuth pattern
-            self.az_angles.append(
-                np.array(
-                    self.channels[rx_idx].get("azimuth_angle", np.arange(-90, 91, 180))
-                )
-            )
-            self.az_patterns.append(
-                np.array(self.channels[rx_idx].get("azimuth_pattern", np.zeros(2)))
-            )
-            if len(self.az_angles[-1]) != len(self.az_patterns[-1]):
-                raise ValueError(
-                    "Lengths of `azimuth_angle` and `azimuth_pattern` \
-                        should be the same"
-                )
+            self.process_patterns(rx_element, rx_idx)
 
-            self.antenna_gains[rx_idx] = np.max(self.az_patterns[-1])
-            self.az_patterns[-1] = self.az_patterns[-1] - np.max(self.az_patterns[-1])
+    def validate_bb_prop(self, bb_prop):
+        """_summary_
 
-            # elevation pattern
-            self.el_angles.append(
-                np.array(
-                    self.channels[rx_idx].get(
-                        "elevation_angle", np.arange(-90, 91, 180)
-                    )
-                )
-            )
-            self.el_patterns.append(
-                np.array(self.channels[rx_idx].get("elevation_pattern", np.zeros(2)))
-            )
-            if len(self.el_angles[-1]) != len(self.el_patterns[-1]):
-                raise ValueError(
-                    "Lengths of `elevation_angle` and `elevation_pattern` \
-                        should be the same"
-                )
+        Args:
+            bb_prop (_type_): _description_
 
-            self.el_patterns[-1] = self.el_patterns[-1] - np.max(self.el_patterns[-1])
+        Raises:
+            ValueError: _description_
+        """
+        if bb_prop["bb_type"] != "complex" and bb_prop["bb_type"] != "real":
+            raise ValueError("Invalid baseband type")
+
+    def process_patterns(self, rx_channel, rx_idx):
+        """_summary_
+
+        Args:
+            rx_channel (_type_): _description_
+            rx_idx (_type_): _description_
+
+        Raises:
+            ValueError: _description_
+            ValueError: _description_
+        """
+        # azimuth pattern
+        az_angle = np.array(rx_channel.get("azimuth_angle", [-90, 90]))
+        az_pattern = np.array(rx_channel.get("azimuth_pattern", [0, 0]))
+        if len(az_angle) != len(az_pattern):
+            raise ValueError(
+                "Lengths of `azimuth_angle` and `azimuth_pattern` \
+                    should be the same"
+            )
+
+        self.rxchannel_prop["antenna_gains"][rx_idx] = np.max(az_pattern)
+        az_pattern = az_pattern - self.rxchannel_prop["antenna_gains"][rx_idx]
+
+        self.rxchannel_prop["az_angles"].append(az_angle)
+        self.rxchannel_prop["az_patterns"].append(az_pattern)
+
+        # elevation pattern
+        el_angle = np.array(rx_channel.get("elevation_angle", [-90, 90]))
+        el_pattern = np.array(rx_channel.get("elevation_pattern", [0, 0]))
+        if len(el_angle) != len(el_pattern):
+            raise ValueError(
+                "Lengths of `elevation_angle` and `elevation_pattern` \
+                    should be the same"
+            )
+        el_pattern = el_pattern - np.max(el_pattern)
+
+        self.rxchannel_prop["el_angles"].append(el_angle)
+        self.rxchannel_prop["el_patterns"].append(el_pattern)
 
 
 class Radar:
@@ -707,16 +728,26 @@ class Radar:
 
         self.validation = kwargs.get("validation", False)
 
-        self.samples_per_pulse = int(self.transmitter.waveform_prop["pulse_length"] * self.receiver.fs)
+        self.samples_per_pulse = int(
+            self.transmitter.waveform_prop["pulse_length"] * self.receiver.bb_prop["fs"]
+        )
 
         self.t_offset = np.array(time)
         self.frames = np.size(time)
 
         # virtual array
-        self.channel_size = self.transmitter.txchannel_prop["size"] * self.receiver.channel_size
+        self.channel_size = (
+            self.transmitter.txchannel_prop["size"]
+            * self.receiver.rxchannel_prop["size"]
+        )
         self.virtual_array = np.repeat(
-            self.transmitter.txchannel_prop["locations"], self.receiver.channel_size, axis=0
-        ) + np.tile(self.receiver.locations, (self.transmitter.txchannel_prop["size"], 1))
+            self.transmitter.txchannel_prop["locations"],
+            self.receiver.rxchannel_prop["size"],
+            axis=0,
+        ) + np.tile(
+            self.receiver.rxchannel_prop["locations"],
+            (self.transmitter.txchannel_prop["size"], 1),
+        )
 
         self.timestamp = self.gen_timestamp()
         self.pulse_phs = self.cal_frame_phases()
@@ -734,22 +765,29 @@ class Radar:
         #     (self.channel_size, 1, self.samples_per_pulse),
         # )
 
-        beat_time_samples = np.arange(0, self.samples_per_pulse, 1) / self.receiver.fs
+        beat_time_samples = (
+            np.arange(0, self.samples_per_pulse, 1) / self.receiver.bb_prop["fs"]
+        )
         self.beat_time = np.tile(
             beat_time_samples[np.newaxis, np.newaxis, ...],
             (self.channel_size, self.transmitter.waveform_prop["pulses"], 1),
         )
 
-        if self.transmitter.rf_prop["pn_f"] is not None and self.transmitter.rf_prop["pn_power"] is not None:
+        if (
+            self.transmitter.rf_prop["pn_f"] is not None
+            and self.transmitter.rf_prop["pn_power"] is not None
+        ):
             dummy_sig = np.ones(
                 (
-                    self.channel_size * self.frames * self.transmitter.waveform_prop["pulses"],
+                    self.channel_size
+                    * self.frames
+                    * self.transmitter.waveform_prop["pulses"],
                     self.samples_per_pulse,
                 )
             )
             self.phase_noise = cal_phase_noise(
                 dummy_sig,
-                self.receiver.fs,
+                self.receiver.bb_prop["fs"],
                 self.transmitter.rf_prop["pn_f"],
                 self.transmitter.rf_prop["pn_power"],
                 seed=seed,
@@ -935,12 +973,12 @@ class Radar:
         """
 
         channel_size = self.channel_size
-        rx_channel_size = self.receiver.channel_size
+        rx_channel_size = self.receiver.rxchannel_prop["size"]
         pulses = self.transmitter.waveform_prop["pulses"]
         samples = self.samples_per_pulse
         crp = self.transmitter.waveform_prop["prp"]
         delay = self.transmitter.txchannel_prop["delay"]
-        fs = self.receiver.fs
+        fs = self.receiver.bb_prop["fs"]
 
         chirp_delay = np.tile(
             np.expand_dims(np.expand_dims(np.cumsum(crp) - crp[0], axis=1), axis=0),
@@ -989,7 +1027,7 @@ class Radar:
         """
 
         pulse_phs = self.transmitter.txchannel_prop["pulse_mod"]
-        pulse_phs = np.repeat(pulse_phs, self.receiver.channel_size, axis=0)
+        pulse_phs = np.repeat(pulse_phs, self.receiver.rxchannel_prop["size"], axis=0)
         pulse_phs = np.repeat(pulse_phs, self.frames, axis=0)
         return pulse_phs
 
@@ -1016,14 +1054,14 @@ class Radar:
         input_noise_dbm = 10 * np.log10(boltzmann_const * noise_temp * 1000)  # dBm/Hz
         receiver_noise_dbm = (
             input_noise_dbm
-            + self.receiver.rf_gain
-            + self.receiver.noise_figure
-            + 10 * np.log10(self.receiver.noise_bandwidth)
-            + self.receiver.baseband_gain
+            + self.receiver.rf_prop["rf_gain"]
+            + self.receiver.rf_prop["noise_figure"]
+            + 10 * np.log10(self.receiver.bb_prop["noise_bandwidth"])
+            + self.receiver.bb_prop["baseband_gain"]
         )  # dBm/Hz
         receiver_noise_watts = 1e-3 * 10 ** (receiver_noise_dbm / 10)  # Watts/sqrt(hz)
         noise_amplitude_mixer = np.sqrt(
-            receiver_noise_watts * self.receiver.load_resistor
+            receiver_noise_watts * self.receiver.bb_prop["load_resistor"]
         )
         noise_amplitude_peak = np.sqrt(2) * noise_amplitude_mixer + noise_amp
         return noise_amplitude_peak
