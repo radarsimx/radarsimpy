@@ -104,47 +104,12 @@ class Transmitter:
 
         }]
 
-    :ivar numpy.1darray fc_vect:
-        Center frequency array for the pulses (Hz)
-    :ivar float fc_frame:
-        Center frequency of the whole frame (Hz)
-    :ivar float bandwidth:
-        Bandwith of each pulse (Hz), calculated from ``max(f) - min(f)``
-    :ivar float pulse_length:
-        Dwell time of each pulse (s), calculated from ``t[-1] - t[0]``
-    :ivar int channel_size:
-        Number of transmitter channels
-    :ivar numpy.2darray locations:
-        3D location of the channels. Size of the aray is
-        ``[channel_size, 3 <x, y, z>]`` (m)
-    :ivar numpy.1darray delay:
-        Delay for each channel (s)
-    :ivar numpy.1darray polarization:
-        Antenna polarization ``[x, y, z]``.
-
-        - Horizontal polarization: ``[1, 0, 0]``
-        - Vertical polarization: ``[0, 0, 1]``
-    :ivar list[numpy.1darray] az_angles:
-        Angles for each channel's azimuth pattern (deg)
-    :ivar list[numpy.1darray] az_patterns:
-        Azimuth pattern for each channel (dB)
-    :ivar list[numpy.1darray] el_angles:
-        Angles for each channel's elevation pattern (deg)
-    :ivar list[numpy.1darray] el_patterns:
-        Elevation pattern for each channel (dB)
-    :ivar numpy.1darray antenna_gains:
-        Antenna gain for each channel (dB).
-        Antenna gain is ``max(az_pattern)``
-    :ivar list[numpy.1darray] pulse_mod:
-        Complex modulation code sequence for phase modulation.
-        Lentgh of ``pulse_mod`` is the same as ``pulses``
-    :ivar list[dict] waveform_mod:
-        Waveform modulation properties for each channel.
-        {
-            ``enabled`` (*bool*) -- Enable waveform modulation
-            ``var`` (*numpy.1darray*) -- Variance of the modulation
-            ``t`` (*numpy.1darray*) -- Time stamps for waveform modulation
-        }
+    :ivar dict rf_prop:
+        RF properties
+    :ivar dict waveform_prop:
+        Waveform properties
+    :ivar dict txchannel_prop
+        Transmitter channels
 
     **Waveform**
 
@@ -492,30 +457,12 @@ class Receiver:
 
         }]
 
-    :ivar float noise_bandwidth:
-        Bandwidth in calculating the noise (Hz).
-        ``noise_bandwidth = fs / 2``
-    :ivar int channel_size:
-        Total number of receiver channels
-    :ivar numpy.2darray locations:
-        3D location of the channels. Size of the aray is
-        ``[channel_size, 3 <x, y, z>]`` (m)
-    :ivar numpy.1darray polarization:
-        Antenna polarization ``[x, y, z]``.
-
-        - Horizontal polarization: ``[1, 0, 0]``
-        - Vertical polarization: ``[0, 0, 1]``
-    :ivar list[numpy.1darray] az_angles:
-        Angles for each channel's azimuth pattern (deg)
-    :ivar list[numpy.1darray] az_patterns:
-        Azimuth pattern for each channel (dB)
-    :ivar list[numpy.1darray] el_angles:
-        Angles for each channel's elevation pattern (deg)
-    :ivar list[numpy.1darray] el_patterns:
-        Elevation pattern for each channel (dB)
-    :ivar numpy.1darray antenna_gains:
-        Antenna gain for each channel (dB).
-        Antenna gain is ``max(az_pattern)``
+    :ivar dict rf_prop:
+        RF properties
+    :ivar dict bb_prop:
+        Baseband properties
+    :ivar dict rxchannel_prop:
+        Receiver channels
 
     **Receiver noise**
 
@@ -657,22 +604,22 @@ class Radar:
         Radar transmiter
     :param Receiver receiver:
         Radar Receiver
-    :param numpy.1darray location:
+    :param list location:
         3D location of the radar [x, y, z] (m). ``default
         [0, 0, 0]``
-    :param numpy.1darray speed:
+    :param list speed:
         Speed of the radar (m/s), [vx, vy, vz]. ``default
         [0, 0, 0]``
-    :param numpy.1darray rotation:
+    :param list rotation:
         Radar's angle (deg), [yaw, pitch, roll].
         ``default [0, 0, 0]``
-    :param numpy.1darray rotation_rate:
+    :param list rotation_rate:
         Radar's rotation rate (deg/s),
         [yaw rate, pitch rate, roll rate]
         ``default [0, 0, 0]``
     :param time:
         Radar firing time instances / frames
-        :type time: float or numpy.1darray
+        :type time: float or list
     :param Radar interf:
         Interference radar. ``default None``
     :param int seed:
