@@ -20,4 +20,4 @@ from .radar import Radar
 from .radar import Transmitter
 from .radar import Receiver
 
-__version__ = "11.3.0"
+__version__ = "12.0.0"
