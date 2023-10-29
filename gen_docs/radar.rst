@@ -9,6 +9,7 @@ radarsimpy.Transmitter
     :undoc-members:
     :inherited-members:
     :show-inheritance:
+    :exclude-members: validate_rf_prop, validate_waveform_prop, process_waveform_modulation, process_pulse_modulation, process_txchannel_prop
 
 radarsimpy.Receiver
 --------------------

@@ -214,15 +214,14 @@ class Transmitter:
         self.txchannel_prop = self.process_txchannel_prop(channels)
 
     def validate_rf_prop(self, rf_prop):
-        """_summary_
+        """
+        Validate RF properties
 
-        Args:
-            rf_prop (_type_): _description_
+        :param rf_prop (dict): RF properties
 
-        Raises:
-            ValueError: _description_
-            ValueError: _description_
-            ValueError: _description_
+        :raises ValueError: Lengths of `pn_f` and `pn_power` should be the same
+        :raises ValueError: Lengths of `pn_f` and `pn_power` should be the same
+        :raises ValueError: Lengths of `pn_f` and `pn_power` should be the same
         """
         if rf_prop["pn_f"] is not None and rf_prop["pn_power"] is None:
             raise ValueError("Lengths of `pn_f` and `pn_power` should be the same")
@@ -233,16 +232,15 @@ class Transmitter:
                 raise ValueError("Lengths of `pn_f` and `pn_power` should be the same")
 
     def validate_waveform_prop(self, waveform_prop):
-        """_summary_
+        """
+        Validate waveform properties
 
-        Args:
-            waveform_prop (_type_): _description_
+        :param waveform_prop (dict): Wavefrom properties
 
-        Raises:
-            ValueError: _description_
-            ValueError: _description_
-            ValueError: _description_
-            ValueError: _description_
+        :raises ValueError: Lengths of `f` and `t` should be the same
+        :raises ValueError: Lengths of `f_offset` and `pulses` should be the same
+        :raises ValueError: Length of `prp` should equal to the length of `pulses`
+        :raises ValueError: `prp` should be larger than `pulse_length`
         """
         if len(waveform_prop["f"]) != len(waveform_prop["t"]):
             raise ValueError("Lengths of `f` and `t` should be the same")
@@ -251,7 +249,7 @@ class Transmitter:
             raise ValueError("Lengths of `f_offset` and `pulses` should be the same")
 
         if len(waveform_prop["prp"]) != waveform_prop["pulses"]:
-            raise ValueError("Length of `prp` should equal to the length of `pulses`.")
+            raise ValueError("Length of `prp` should equal to the length of `pulses`")
 
         if np.min(waveform_prop["prp"]) < waveform_prop["pulse_length"]:
             raise ValueError("`prp` should be larger than `pulse_length`")
