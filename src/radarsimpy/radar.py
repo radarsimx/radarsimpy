@@ -108,7 +108,7 @@ class Transmitter:
         RF properties
     :ivar dict waveform_prop:
         Waveform properties
-    :ivar dict txchannel_prop
+    :ivar dict txchannel_prop:
         Transmitter channels
 
     **Waveform**
