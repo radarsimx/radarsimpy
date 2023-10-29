@@ -142,7 +142,7 @@ class Transmitter:
 
     """
 
-    def __init__(  # pylint: disable=too-many-arguments, too-many-statements
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         f,
         t,
@@ -211,60 +211,7 @@ class Transmitter:
         if channels is None:
             channels = [{"location": (0, 0, 0)}]
 
-        # number of transmitter channels
-        self.txchannel_prop["size"] = len(channels)
-
-        # firing delay for each channel
-        self.txchannel_prop["delay"] = np.zeros(self.txchannel_prop["size"])
-        self.txchannel_prop["grid"] = np.zeros(self.txchannel_prop["size"])
-        self.txchannel_prop["locations"] = np.zeros((self.txchannel_prop["size"], 3))
-        self.txchannel_prop["polarization"] = np.zeros((self.txchannel_prop["size"], 3))
-
-        # waveform modulation parameters
-        self.txchannel_prop["waveform_mod"] = []
-
-        # pulse modulation parameters
-        self.txchannel_prop["pulse_mod"] = np.ones(
-            (self.txchannel_prop["size"], pulses), dtype=complex
-        )
-
-        # azimuth patterns
-        self.txchannel_prop["az_patterns"] = []
-        self.txchannel_prop["az_angles"] = []
-
-        # elevation patterns
-        self.txchannel_prop["el_patterns"] = []
-        self.txchannel_prop["el_angles"] = []
-
-        # antenna peak gain
-        # antenna gain is calculated based on azimuth pattern
-        self.txchannel_prop["antenna_gains"] = np.zeros((self.txchannel_prop["size"]))
-
-        for tx_idx, tx_element in enumerate(channels):
-            self.txchannel_prop["delay"][tx_idx] = tx_element.get("delay", 0)
-            self.txchannel_prop["grid"][tx_idx] = tx_element.get("grid", 1)
-
-            self.txchannel_prop["locations"][tx_idx, :] = np.array(
-                tx_element.get("location")
-            )
-            self.txchannel_prop["polarization"][tx_idx, :] = np.array(
-                tx_element.get("polarization", [0, 0, 1])
-            )
-
-            self.txchannel_prop["waveform_mod"].append(
-                self.process_waveform_modulation(
-                    tx_element.get("mod_t", None),
-                    tx_element.get("amp", None),
-                    tx_element.get("phs", None),
-                )
-            )
-
-            self.txchannel_prop["pulse_mod"][tx_idx, :] = self.process_pulse_modulation(
-                tx_element.get("pulse_amp", np.ones((pulses))),
-                tx_element.get("pulse_phs", np.zeros((pulses))),
-            )
-
-            self.process_patterns(tx_element, tx_idx)
+        self.txchannel_prop = self.process_txchannel_prop(channels)
 
     def validate_rf_prop(self, rf_prop):
         """_summary_
@@ -379,7 +326,7 @@ class Transmitter:
 
         return pulse_amp * np.exp(1j * (pulse_phs / 180 * np.pi))
 
-    def process_patterns(self, tx_channel, tx_idx):
+    def process_txchannel_prop(self, channels):
         """_summary_
 
         Args:
@@ -390,33 +337,88 @@ class Transmitter:
             ValueError: _description_
             ValueError: _description_
         """
-        # azimuth pattern
-        az_angle = np.array(tx_channel.get("azimuth_angle", [-90, 90]))
-        az_pattern = np.array(tx_channel.get("azimuth_pattern", [0, 0]))
-        if len(az_angle) != len(az_pattern):
-            raise ValueError(
-                "Lengths of `azimuth_angle` and `azimuth_pattern` \
-                    should be the same"
+        # number of transmitter channels
+        txch_prop = {}
+
+        txch_prop["size"] = len(channels)
+
+        # firing delay for each channel
+        txch_prop["delay"] = np.zeros(txch_prop["size"])
+        txch_prop["grid"] = np.zeros(txch_prop["size"])
+        txch_prop["locations"] = np.zeros((txch_prop["size"], 3))
+        txch_prop["polarization"] = np.zeros((txch_prop["size"], 3))
+
+        # waveform modulation parameters
+        txch_prop["waveform_mod"] = []
+
+        # pulse modulation parameters
+        txch_prop["pulse_mod"] = np.ones(
+            (txch_prop["size"], self.waveform_prop["pulses"]), dtype=complex
+        )
+
+        # azimuth patterns
+        txch_prop["az_patterns"] = []
+        txch_prop["az_angles"] = []
+
+        # elevation patterns
+        txch_prop["el_patterns"] = []
+        txch_prop["el_angles"] = []
+
+        # antenna peak gain
+        # antenna gain is calculated based on azimuth pattern
+        txch_prop["antenna_gains"] = np.zeros((txch_prop["size"]))
+
+        for tx_idx, tx_element in enumerate(channels):
+            txch_prop["delay"][tx_idx] = tx_element.get("delay", 0)
+            txch_prop["grid"][tx_idx] = tx_element.get("grid", 1)
+
+            txch_prop["locations"][tx_idx, :] = np.array(tx_element.get("location"))
+            txch_prop["polarization"][tx_idx, :] = np.array(
+                tx_element.get("polarization", [0, 0, 1])
             )
 
-        self.txchannel_prop["antenna_gains"][tx_idx] = np.max(az_pattern)
-        az_pattern = az_pattern - self.txchannel_prop["antenna_gains"][tx_idx]
-
-        self.txchannel_prop["az_angles"].append(az_angle)
-        self.txchannel_prop["az_patterns"].append(az_pattern)
-
-        # elevation pattern
-        el_angle = np.array(tx_channel.get("elevation_angle", [-90, 90]))
-        el_pattern = np.array(tx_channel.get("elevation_pattern", [0, 0]))
-        if len(el_angle) != len(el_pattern):
-            raise ValueError(
-                "Lengths of `elevation_angle` and `elevation_pattern` \
-                    should be the same"
+            txch_prop["waveform_mod"].append(
+                self.process_waveform_modulation(
+                    tx_element.get("mod_t", None),
+                    tx_element.get("amp", None),
+                    tx_element.get("phs", None),
+                )
             )
-        el_pattern = el_pattern - np.max(el_pattern)
 
-        self.txchannel_prop["el_angles"].append(el_angle)
-        self.txchannel_prop["el_patterns"].append(el_pattern)
+            txch_prop["pulse_mod"][tx_idx, :] = self.process_pulse_modulation(
+                tx_element.get("pulse_amp", np.ones((self.waveform_prop["pulses"]))),
+                tx_element.get("pulse_phs", np.zeros((self.waveform_prop["pulses"]))),
+            )
+
+            # azimuth pattern
+            az_angle = np.array(tx_element.get("azimuth_angle", [-90, 90]))
+            az_pattern = np.array(tx_element.get("azimuth_pattern", [0, 0]))
+            if len(az_angle) != len(az_pattern):
+                raise ValueError(
+                    "Lengths of `azimuth_angle` and `azimuth_pattern` \
+                        should be the same"
+                )
+
+            txch_prop["antenna_gains"][tx_idx] = np.max(az_pattern)
+            az_pattern = az_pattern - txch_prop["antenna_gains"][tx_idx]
+
+            txch_prop["az_angles"].append(az_angle)
+            txch_prop["az_patterns"].append(az_pattern)
+
+            # elevation pattern
+            el_angle = np.array(tx_element.get("elevation_angle", [-90, 90]))
+            el_pattern = np.array(tx_element.get("elevation_pattern", [0, 0]))
+            if len(el_angle) != len(el_pattern):
+                raise ValueError(
+                    "Lengths of `elevation_angle` and `elevation_pattern` \
+                        should be the same"
+                )
+            el_pattern = el_pattern - np.max(el_pattern)
+
+            txch_prop["el_angles"].append(el_angle)
+            txch_prop["el_patterns"].append(el_pattern)
+
+        return txch_prop
 
 
 class Receiver:
