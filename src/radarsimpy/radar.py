@@ -639,6 +639,11 @@ class Radar:
     :param int seed:
         Seed for noise generator
 
+    :ivar dict time_prop: Time properties
+        ``frame_size``: Number of frames
+    :ivar dict sample_prop: Sample properties
+    :ivar dict array_prop: Array properties
+    :ivar dict radar_prop: Radar properties
     :ivar int samples_per_pulse:
         Number of samples in one pulse
     :ivar int channel_size:
