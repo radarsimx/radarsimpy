@@ -44,12 +44,12 @@ def test_sim_cw():
     nfft = 2048
     spectrum = np.abs(np.fft.fft(demod - np.mean(demod), nfft))
     fft_length = np.shape(spectrum)[0]
-    f = np.linspace(0, radar.receiver.bb_prop["fs"], nfft)
+    f = np.linspace(0, radar.radar_prop["receiver"].bb_prop["fs"], nfft)
 
     npt.assert_almost_equal(f[np.argmax(spectrum[0 : int(nfft / 2)])], 1, decimal=2)
     npt.assert_almost_equal(
         timestamp[0, 0, :],
-        np.arange(0, radar.samples_per_pulse) / radar.receiver.bb_prop["fs"],
+        np.arange(0, radar.samples_per_pulse) / radar.radar_prop["receiver"].bb_prop["fs"],
     )
 
 
@@ -89,16 +89,16 @@ def test_sim_fmcw():
 
     assert np.array_equal(
         (
-            radar.channel_size * radar.frames,
-            radar.transmitter.waveform_prop["pulses"],
+            radar.channel_size * radar.time_prop["frame_size"],
+            radar.radar_prop["transmitter"].waveform_prop["pulses"],
             radar.samples_per_pulse,
         ),
         np.shape(timestamp),
     )
     assert np.array_equal(
         (
-            radar.channel_size * radar.frames,
-            radar.transmitter.waveform_prop["pulses"],
+            radar.channel_size * radar.time_prop["frame_size"],
+            radar.radar_prop["transmitter"].waveform_prop["pulses"],
             radar.samples_per_pulse,
         ),
         np.shape(baseband),
@@ -106,20 +106,20 @@ def test_sim_fmcw():
 
     npt.assert_almost_equal(
         timestamp[0, 0, :],
-        (np.arange(0, radar.samples_per_pulse) / radar.receiver.bb_prop["fs"]),
+        (np.arange(0, radar.samples_per_pulse) / radar.radar_prop["receiver"].bb_prop["fs"]),
     )
     npt.assert_almost_equal(
         timestamp[0, :, 0],
         (
-            np.arange(0, radar.transmitter.waveform_prop["pulses"])
-            * radar.transmitter.waveform_prop["prp"][0]
+            np.arange(0, radar.radar_prop["transmitter"].waveform_prop["pulses"])
+            * radar.radar_prop["transmitter"].waveform_prop["prp"][0]
         ),
     )
 
     range_window = signal.windows.chebwin(radar.samples_per_pulse, at=60)
     range_profile = proc.range_fft(baseband, range_window)
     doppler_window = signal.windows.chebwin(
-        radar.transmitter.waveform_prop["pulses"], at=60
+        radar.radar_prop["transmitter"].waveform_prop["pulses"], at=60
     )
     range_doppler = proc.doppler_fft(range_profile, doppler_window)
     rng_dop = 20 * np.log10(np.abs(range_doppler))
@@ -133,14 +133,14 @@ def test_sim_fmcw():
 
     max_range = (
         const.c
-        * radar.receiver.bb_prop["fs"]
-        * radar.transmitter.waveform_prop["pulse_length"]
-        / radar.transmitter.waveform_prop["bandwidth"]
+        * radar.radar_prop["receiver"].bb_prop["fs"]
+        * radar.radar_prop["transmitter"].waveform_prop["pulse_length"]
+        / radar.radar_prop["transmitter"].waveform_prop["bandwidth"]
         / 2
     )
 
     unambiguous_speed = (
-        const.c / radar.transmitter.waveform_prop["prp"][0] / 24.125e9 / 2
+        const.c / radar.radar_prop["transmitter"].waveform_prop["prp"][0] / 24.125e9 / 2
     )
 
     range_axis = np.linspace(0, max_range, radar.samples_per_pulse, endpoint=False)
@@ -149,7 +149,7 @@ def test_sim_fmcw():
     npt.assert_almost_equal(rng_targets, rng_dets, decimal=0)
 
     doppler_axis = np.linspace(
-        -unambiguous_speed, 0, radar.transmitter.waveform_prop["pulses"], endpoint=False
+        -unambiguous_speed, 0, radar.radar_prop["transmitter"].waveform_prop["pulses"], endpoint=False
     )
 
     dop_dets = np.sort(doppler_axis[dop_peaks])
@@ -170,7 +170,7 @@ def test_sim_fmcw():
     npt.assert_almost_equal(np.array([9.0, 48.0, 195.0]), rng_dets, decimal=0)
 
     doppler_axis = np.linspace(
-        -unambiguous_speed, 0, radar.transmitter.waveform_prop["pulses"], endpoint=False
+        -unambiguous_speed, 0, radar.radar_prop["transmitter"].waveform_prop["pulses"], endpoint=False
     )
 
     dop_dets = np.sort(doppler_axis[dop_peaks])
@@ -204,7 +204,7 @@ def test_sim_tdm_fmcw():
     assert np.array_equal(
         (
             radar.channel_size,
-            radar.transmitter.waveform_prop["pulses"],
+            radar.radar_prop["transmitter"].waveform_prop["pulses"],
             radar.samples_per_pulse,
         ),
         np.shape(timestamp),
@@ -212,7 +212,7 @@ def test_sim_tdm_fmcw():
     assert np.array_equal(
         (
             radar.channel_size,
-            radar.transmitter.waveform_prop["pulses"],
+            radar.radar_prop["transmitter"].waveform_prop["pulses"],
             radar.samples_per_pulse,
         ),
         np.shape(baseband),
@@ -220,13 +220,13 @@ def test_sim_tdm_fmcw():
 
     npt.assert_almost_equal(
         timestamp[0, 0, :],
-        (np.arange(0, radar.samples_per_pulse) / radar.receiver.bb_prop["fs"]),
+        (np.arange(0, radar.samples_per_pulse) / radar.radar_prop["receiver"].bb_prop["fs"]),
     )
     npt.assert_almost_equal(
         timestamp[0, :, 0],
         (
-            np.arange(0, radar.transmitter.waveform_prop["pulses"])
-            * radar.transmitter.waveform_prop["prp"][0]
+            np.arange(0, radar.radar_prop["transmitter"].waveform_prop["pulses"])
+            * radar.radar_prop["transmitter"].waveform_prop["prp"][0]
         ),
     )
     npt.assert_almost_equal(
@@ -285,9 +285,9 @@ def test_sim_tdm_fmcw():
 
     max_range = (
         const.c
-        * radar.receiver.bb_prop["fs"]
-        * radar.transmitter.waveform_prop["pulse_length"]
-        / radar.transmitter.waveform_prop["bandwidth"]
+        * radar.radar_prop["receiver"].bb_prop["fs"]
+        * radar.radar_prop["transmitter"].waveform_prop["pulse_length"]
+        / radar.radar_prop["transmitter"].waveform_prop["bandwidth"]
         / 2
     )
 
@@ -856,7 +856,7 @@ def test_sim_pmcw():
     assert np.array_equal(
         (
             radar.channel_size,
-            radar.transmitter.waveform_prop["pulses"],
+            radar.radar_prop["transmitter"].waveform_prop["pulses"],
             radar.samples_per_pulse,
         ),
         np.shape(timestamp),
@@ -864,7 +864,7 @@ def test_sim_pmcw():
     assert np.array_equal(
         (
             radar.channel_size,
-            radar.transmitter.waveform_prop["pulses"],
+            radar.radar_prop["transmitter"].waveform_prop["pulses"],
             radar.samples_per_pulse,
         ),
         np.shape(baseband),
@@ -872,23 +872,23 @@ def test_sim_pmcw():
 
     npt.assert_almost_equal(
         timestamp[0, 0, :],
-        (np.arange(0, radar.samples_per_pulse) / radar.receiver.bb_prop["fs"]),
+        (np.arange(0, radar.samples_per_pulse) / radar.radar_prop["receiver"].bb_prop["fs"]),
     )
     npt.assert_almost_equal(
         timestamp[0, :, 0],
         (
-            np.arange(0, radar.transmitter.waveform_prop["pulses"])
-            * radar.transmitter.waveform_prop["prp"][0]
+            np.arange(0, radar.radar_prop["transmitter"].waveform_prop["pulses"])
+            * radar.radar_prop["transmitter"].waveform_prop["prp"][0]
         ),
     )
 
     code_length = 255
     range_profile = np.zeros(
-        (radar.channel_size, radar.transmitter.waveform_prop["pulses"], code_length),
+        (radar.channel_size, radar.radar_prop["transmitter"].waveform_prop["pulses"], code_length),
         dtype=complex,
     )
 
-    for pulse_idx in range(0, radar.transmitter.waveform_prop["pulses"]):
+    for pulse_idx in range(0, radar.radar_prop["transmitter"].waveform_prop["pulses"]):
         for bin_idx in range(0, code_length):
             range_profile[:, pulse_idx, bin_idx] = np.sum(
                 code2 * baseband[1, pulse_idx, bin_idx : (bin_idx + code_length)]
@@ -898,7 +898,7 @@ def test_sim_pmcw():
     range_bin = np.arange(0, code_length, 1) * bin_size
 
     doppler_window = signal.windows.chebwin(
-        radar.transmitter.waveform_prop["pulses"], at=50
+        radar.radar_prop["transmitter"].waveform_prop["pulses"], at=50
     )
 
     range_doppler = np.zeros(np.shape(range_profile), dtype=complex)
@@ -907,11 +907,11 @@ def test_sim_pmcw():
             range_doppler[ii, :, jj] = np.fft.fftshift(
                 np.fft.fft(
                     range_profile[ii, :, jj] * doppler_window,
-                    n=radar.transmitter.waveform_prop["pulses"],
+                    n=radar.radar_prop["transmitter"].waveform_prop["pulses"],
                 )
             )
     unambiguous_speed = (
-        const.c / radar.transmitter.waveform_prop["prp"][0] / 24.125e9 / 2
+        const.c / radar.radar_prop["transmitter"].waveform_prop["prp"][0] / 24.125e9 / 2
     )
 
     rng_dop = 20 * np.log10(np.abs(range_doppler[1, :, :]))
@@ -930,7 +930,7 @@ def test_sim_pmcw():
     doppler_axis = np.linspace(
         -unambiguous_speed / 2,
         unambiguous_speed / 2,
-        radar.transmitter.waveform_prop["pulses"],
+        radar.radar_prop["transmitter"].waveform_prop["pulses"],
         endpoint=False,
     )
     dop_dets = np.sort(doppler_axis[dop_peaks])

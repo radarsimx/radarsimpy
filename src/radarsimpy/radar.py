@@ -671,7 +671,7 @@ class Radar:
 
     """
 
-    def __init__(   # pylint: disable=too-many-arguments
+    def __init__(  # pylint: disable=too-many-arguments
         self,
         transmitter,
         receiver,
@@ -684,30 +684,29 @@ class Radar:
         seed=None,
         **kwargs
     ):
-        self.transmitter = transmitter
-        self.receiver = receiver
-
-        self.validation = kwargs.get("validation", False)
+        self.time_prop = {
+            "frame_size": np.size(time),
+            "frame_start_time": np.array(time),
+        }
+        # self.sample_prop={}
+        self.array_prop = {}
+        self.radar_prop = {"transmitter": transmitter, "receiver": receiver}
 
         self.samples_per_pulse = int(
-            self.transmitter.waveform_prop["pulse_length"] * self.receiver.bb_prop["fs"]
+            transmitter.waveform_prop["pulse_length"] * receiver.bb_prop["fs"]
         )
-
-        self.t_offset = np.array(time)
-        self.frames = np.size(time)
 
         # virtual array
         self.channel_size = (
-            self.transmitter.txchannel_prop["size"]
-            * self.receiver.rxchannel_prop["size"]
+            transmitter.txchannel_prop["size"] * receiver.rxchannel_prop["size"]
         )
         self.virtual_array = np.repeat(
-            self.transmitter.txchannel_prop["locations"],
-            self.receiver.rxchannel_prop["size"],
+            transmitter.txchannel_prop["locations"],
+            receiver.rxchannel_prop["size"],
             axis=0,
         ) + np.tile(
-            self.receiver.rxchannel_prop["locations"],
-            (self.transmitter.txchannel_prop["size"], 1),
+            receiver.rxchannel_prop["locations"],
+            (transmitter.txchannel_prop["size"], 1),
         )
 
         self.timestamp = self.gen_timestamp()
@@ -715,39 +714,39 @@ class Radar:
 
         self.noise = self.cal_noise()
 
-        beat_time_samples = (
-            np.arange(0, self.samples_per_pulse, 1) / self.receiver.bb_prop["fs"]
-        )
-        self.beat_time = np.tile(
-            beat_time_samples[np.newaxis, np.newaxis, ...],
-            (self.channel_size, self.transmitter.waveform_prop["pulses"], 1),
-        )
+        # beat_time_samples = (
+        #     np.arange(0, self.samples_per_pulse, 1) / receiver.bb_prop["fs"]
+        # )
+        # self.beat_time = np.tile(
+        #     beat_time_samples[np.newaxis, np.newaxis, ...],
+        #     (self.channel_size, transmitter.waveform_prop["pulses"], 1),
+        # )
 
         if (
-            self.transmitter.rf_prop["pn_f"] is not None
-            and self.transmitter.rf_prop["pn_power"] is not None
+            transmitter.rf_prop["pn_f"] is not None
+            and transmitter.rf_prop["pn_power"] is not None
         ):
             dummy_sig = np.ones(
                 (
                     self.channel_size
-                    * self.frames
-                    * self.transmitter.waveform_prop["pulses"],
+                    * self.time_prop["frame_size"]
+                    * transmitter.waveform_prop["pulses"],
                     self.samples_per_pulse,
                 )
             )
             self.phase_noise = cal_phase_noise(
                 dummy_sig,
-                self.receiver.bb_prop["fs"],
-                self.transmitter.rf_prop["pn_f"],
-                self.transmitter.rf_prop["pn_power"],
+                receiver.bb_prop["fs"],
+                transmitter.rf_prop["pn_f"],
+                transmitter.rf_prop["pn_power"],
                 seed=seed,
-                validation=self.validation,
+                validation=kwargs.get("validation", False),
             )
             self.phase_noise = np.reshape(
                 self.phase_noise,
                 (
-                    self.channel_size * self.frames,
-                    self.transmitter.waveform_prop["pulses"],
+                    self.channel_size * self.time_prop["frame_size"],
+                    transmitter.waveform_prop["pulses"],
                     self.samples_per_pulse,
                 ),
             )
@@ -923,12 +922,12 @@ class Radar:
         """
 
         channel_size = self.channel_size
-        rx_channel_size = self.receiver.rxchannel_prop["size"]
-        pulses = self.transmitter.waveform_prop["pulses"]
+        rx_channel_size = self.radar_prop["receiver"].rxchannel_prop["size"]
+        pulses = self.radar_prop["transmitter"].waveform_prop["pulses"]
         samples = self.samples_per_pulse
-        crp = self.transmitter.waveform_prop["prp"]
-        delay = self.transmitter.txchannel_prop["delay"]
-        fs = self.receiver.bb_prop["fs"]
+        crp = self.radar_prop["transmitter"].waveform_prop["prp"]
+        delay = self.radar_prop["transmitter"].txchannel_prop["delay"]
+        fs = self.radar_prop["receiver"].bb_prop["fs"]
 
         chirp_delay = np.tile(
             np.expand_dims(np.expand_dims(np.cumsum(crp) - crp[0], axis=1), axis=0),
@@ -951,13 +950,16 @@ class Radar:
             / fs
         )
 
-        if self.frames > 1:
+        if self.time_prop["frame_size"] > 1:
             toffset = np.repeat(
                 np.tile(
-                    np.expand_dims(np.expand_dims(self.t_offset, axis=1), axis=2),
+                    np.expand_dims(
+                        np.expand_dims(self.time_prop["frame_start_time"], axis=1),
+                        axis=2,
+                    ),
                     (
                         1,
-                        self.transmitter.waveform_prop["pulses"],
+                        self.radar_prop["transmitter"].waveform_prop["pulses"],
                         self.samples_per_pulse,
                     ),
                 ),
@@ -965,9 +967,11 @@ class Radar:
                 axis=0,
             )
 
-            timestamp = np.tile(timestamp, (self.frames, 1, 1)) + toffset
-        elif self.frames == 1:
-            timestamp = timestamp + self.t_offset
+            timestamp = (
+                np.tile(timestamp, (self.time_prop["frame_size"], 1, 1)) + toffset
+            )
+        elif self.time_prop["frame_size"] == 1:
+            timestamp = timestamp + self.time_prop["frame_start_time"]
 
         return timestamp
 
@@ -980,9 +984,11 @@ class Radar:
         :rtype: numpy.2darray
         """
 
-        pulse_phs = self.transmitter.txchannel_prop["pulse_mod"]
-        pulse_phs = np.repeat(pulse_phs, self.receiver.rxchannel_prop["size"], axis=0)
-        pulse_phs = np.repeat(pulse_phs, self.frames, axis=0)
+        pulse_phs = self.radar_prop["transmitter"].txchannel_prop["pulse_mod"]
+        pulse_phs = np.repeat(
+            pulse_phs, self.radar_prop["receiver"].rxchannel_prop["size"], axis=0
+        )
+        pulse_phs = np.repeat(pulse_phs, self.time_prop["frame_size"], axis=0)
         return pulse_phs
 
     def cal_noise(self, noise_temp=290):
@@ -998,7 +1004,7 @@ class Radar:
         noise_amp = np.zeros(
             [
                 self.channel_size,
-                self.transmitter.waveform_prop["pulses"],
+                self.radar_prop["transmitter"].waveform_prop["pulses"],
                 self.samples_per_pulse,
             ]
         )
@@ -1008,14 +1014,14 @@ class Radar:
         input_noise_dbm = 10 * np.log10(boltzmann_const * noise_temp * 1000)  # dBm/Hz
         receiver_noise_dbm = (
             input_noise_dbm
-            + self.receiver.rf_prop["rf_gain"]
-            + self.receiver.rf_prop["noise_figure"]
-            + 10 * np.log10(self.receiver.bb_prop["noise_bandwidth"])
-            + self.receiver.bb_prop["baseband_gain"]
+            + self.radar_prop["receiver"].rf_prop["rf_gain"]
+            + self.radar_prop["receiver"].rf_prop["noise_figure"]
+            + 10 * np.log10(self.radar_prop["receiver"].bb_prop["noise_bandwidth"])
+            + self.radar_prop["receiver"].bb_prop["baseband_gain"]
         )  # dBm/Hz
         receiver_noise_watts = 1e-3 * 10 ** (receiver_noise_dbm / 10)  # Watts/sqrt(hz)
         noise_amplitude_mixer = np.sqrt(
-            receiver_noise_watts * self.receiver.bb_prop["load_resistor"]
+            receiver_noise_watts * self.radar_prop["receiver"].bb_prop["load_resistor"]
         )
         noise_amplitude_peak = np.sqrt(2) * noise_amplitude_mixer + noise_amp
         return noise_amplitude_peak

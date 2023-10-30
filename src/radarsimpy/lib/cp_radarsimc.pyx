@@ -151,9 +151,9 @@ cdef Transmitter[float_t] cp_Transmitter(radar):
     :return: C++ object of a radar transmitter
     :rtype: Transmitter
     """
-    cdef int_t frames_c = radar.frames
+    cdef int_t frames_c = radar.time_prop["frame_size"]
     cdef int_t channles_c = radar.channel_size
-    cdef int_t pulses_c = radar.transmitter.waveform_prop["pulses"]
+    cdef int_t pulses_c = radar.radar_prop["transmitter"].waveform_prop["pulses"]
     cdef int_t samples_c = radar.samples_per_pulse
 
     cdef vector[double] t_frame_vt
@@ -165,26 +165,26 @@ cdef Transmitter[float_t] cp_Transmitter(radar):
     # frame time offset
     cdef double[:] t_frame_mv
     if frames_c > 1:
-        t_frame_mv = radar.t_offset.astype(np.float64)
+        t_frame_mv = radar.time_prop["frame_start_time"].astype(np.float64)
         Mem_Copy(&t_frame_mv[0], frames_c, t_frame_vt)
     else:
-        t_frame_vt.push_back(<double> (radar.t_offset))
+        t_frame_vt.push_back(<double> (radar.time_prop["frame_start_time"]))
 
     # frequency
-    cdef double[:] f_mv = radar.transmitter.waveform_prop["f"].astype(np.float64)
-    Mem_Copy(&f_mv[0], <int_t>(len(radar.transmitter.waveform_prop["f"])), f_vt)
+    cdef double[:] f_mv = radar.radar_prop["transmitter"].waveform_prop["f"].astype(np.float64)
+    Mem_Copy(&f_mv[0], <int_t>(len(radar.radar_prop["transmitter"].waveform_prop["f"])), f_vt)
 
     # time
-    cdef double[:] t_mv = radar.transmitter.waveform_prop["t"].astype(np.float64)
-    Mem_Copy(&t_mv[0], <int_t>(len(radar.transmitter.waveform_prop["t"])), t_vt)
+    cdef double[:] t_mv = radar.radar_prop["transmitter"].waveform_prop["t"].astype(np.float64)
+    Mem_Copy(&t_mv[0], <int_t>(len(radar.radar_prop["transmitter"].waveform_prop["t"])), t_vt)
 
     # frequency offset per pulse
-    cdef double[:] f_offset_mv = radar.transmitter.waveform_prop["f_offset"].astype(np.float64)
-    Mem_Copy(&f_offset_mv[0], <int_t>(len(radar.transmitter.waveform_prop["f_offset"])), f_offset_vt)
+    cdef double[:] f_offset_mv = radar.radar_prop["transmitter"].waveform_prop["f_offset"].astype(np.float64)
+    Mem_Copy(&f_offset_mv[0], <int_t>(len(radar.radar_prop["transmitter"].waveform_prop["f_offset"])), f_offset_vt)
 
     # pulse start time
-    cdef double[:] t_pstart_mv = radar.transmitter.waveform_prop["pulse_start_time"].astype(np.float64)
-    Mem_Copy(&t_pstart_mv[0], <int_t>(len(radar.transmitter.waveform_prop["pulse_start_time"])), t_pstart_vt)
+    cdef double[:] t_pstart_mv = radar.radar_prop["transmitter"].waveform_prop["pulse_start_time"].astype(np.float64)
+    Mem_Copy(&t_pstart_mv[0], <int_t>(len(radar.radar_prop["transmitter"].waveform_prop["pulse_start_time"])), t_pstart_vt)
 
     # phase noise
     cdef double[:, :, :] pn_real_mv
@@ -195,7 +195,7 @@ cdef Transmitter[float_t] cp_Transmitter(radar):
         Mem_Copy_Complex(&pn_real_mv[0,0,0], &pn_imag_mv[0,0,0], <int_t>(frames_c*channles_c*pulses_c*samples_c), pn_vt)
 
     return Transmitter[float_t](
-        <float_t> radar.transmitter.rf_prop["tx_power"],
+        <float_t> radar.radar_prop["transmitter"].rf_prop["tx_power"],
         f_vt,
         t_vt,
         f_offset_vt,
@@ -375,7 +375,7 @@ cdef Target[float_t] cp_Target(radar,
     cdef cpp_complex[float_t] ep_c, mu_c
 
     cdef int_t ch_idx, ps_idx, sp_idx
-    cdef int_t bbsize_c = <int_t>(radar.channel_size*radar.frames*radar.transmitter.waveform_prop["pulses"]*radar.samples_per_pulse)
+    cdef int_t bbsize_c = <int_t>(radar.channel_size*radar.time_prop["frame_size"]*radar.radar_prop["transmitter"].waveform_prop["pulses"]*radar.samples_per_pulse)
 
     cdef float_t[:, :] points_mv
     cdef int_t[:, :] cells_mv
