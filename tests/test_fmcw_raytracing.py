@@ -17,9 +17,9 @@ Website: https://radarsimx.com
 
 import numpy as np
 import numpy.testing as npt
+from scipy import signal
 
 from radarsimpy import Radar, Transmitter, Receiver
-from scipy import signal
 from radarsimpy.rt import scene
 import radarsimpy.processing as proc
 

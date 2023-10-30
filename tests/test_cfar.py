@@ -15,10 +15,10 @@ Website: https://radarsimx.com
 
 """
 
-
-import radarsimpy.processing as proc
 import numpy as np
 import numpy.testing as npt
+
+import radarsimpy.processing as proc
 
 
 def test_ca_cfar():

@@ -15,9 +15,11 @@ Website: https://radarsimx.com
 
 """
 
-import radarsimpy.processing as proc
 import numpy as np
 import numpy.testing as npt
+
+import radarsimpy.processing as proc
+
 
 covmat_est = np.array(
     [
