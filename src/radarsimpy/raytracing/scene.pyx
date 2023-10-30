@@ -314,7 +314,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
 
     if noise:
         baseband = baseband +\
-            radar.noise*(
+            radar.sample_prop["noise"]*(
                 np.random.randn(
                     frames_c*channles_c,
                     pulses_c,

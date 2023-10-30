@@ -240,7 +240,7 @@ cpdef simc(radar, targets, noise=True):
 
     if noise:
         baseband = baseband +\
-            radar.noise*(
+            radar.sample_prop["noise"]*(
                 np.random.randn(
                     frames_c*channles_c,
                     pulses_c,

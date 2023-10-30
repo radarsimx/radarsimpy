@@ -713,9 +713,7 @@ class Radar:
         self.time_prop["timestamp"] = self.gen_timestamp()
 
         # sample properties
-        self.pulse_phs = self.cal_frame_phases()
-
-        self.noise = self.cal_noise()
+        self.sample_prop["noise"] = self.cal_noise()
 
         if (
             transmitter.rf_prop["pn_f"] is not None
@@ -729,7 +727,7 @@ class Radar:
                     self.sample_prop["samples_per_pulse"],
                 )
             )
-            self.phase_noise = cal_phase_noise(
+            self.sample_prop["phase_noise"] = cal_phase_noise(
                 dummy_sig,
                 receiver.bb_prop["fs"],
                 transmitter.rf_prop["pn_f"],
@@ -737,8 +735,8 @@ class Radar:
                 seed=seed,
                 validation=kwargs.get("validation", False),
             )
-            self.phase_noise = np.reshape(
-                self.phase_noise,
+            self.sample_prop["phase_noise"] = np.reshape(
+                self.sample_prop["phase_noise"],
                 (
                     self.array_prop["size"] * self.time_prop["frame_size"],
                     transmitter.waveform_prop["pulses"],
@@ -746,7 +744,7 @@ class Radar:
                 ),
             )
         else:
-            self.phase_noise = None
+            self.sample_prop["phase_noise"] = None
 
         self.location = np.array(location)
         self.speed = np.array(speed)
@@ -970,21 +968,6 @@ class Radar:
 
         return timestamp
 
-    def cal_frame_phases(self):
-        """
-        Calculate phase sequence for frame level modulation
-
-        :return:
-            Phase sequence. ``[channes/frames, pulses, samples]``
-        :rtype: numpy.2darray
-        """
-
-        pulse_phs = self.radar_prop["transmitter"].txchannel_prop["pulse_mod"]
-        pulse_phs = np.repeat(
-            pulse_phs, self.radar_prop["receiver"].rxchannel_prop["size"], axis=0
-        )
-        pulse_phs = np.repeat(pulse_phs, self.time_prop["frame_size"], axis=0)
-        return pulse_phs
 
     def cal_noise(self, noise_temp=290):
         """
