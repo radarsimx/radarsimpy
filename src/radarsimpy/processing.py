@@ -34,7 +34,7 @@ import numpy as np
 from scipy.signal import convolve, find_peaks
 from scipy import linalg
 from scipy import fft
-from .tools import log_factorial
+from .tools import log_factorial  # pylint: disable=no-name-in-module
 
 
 def range_fft(data, rwin=None, n=None):
@@ -115,55 +115,6 @@ def range_doppler_fft(data, rwin=None, dwin=None, rn=None, dn=None):
     """
 
     return doppler_fft(range_fft(data, rwin=rwin, n=rn), dwin=dwin, n=dn)
-
-
-# def get_polar_image(image, range_bins, angle_bins, fov_deg):
-#     """
-#     Convert cartesian coordinate to polar
-
-#     :param numpy.2darray image:
-#         Data with cartesian coordinate, [range, angle]
-#     :param int range_bins:
-#         Number of range bins
-#     :param int angle_bins:
-#         Number of angle bins
-#     :param float fov_deg:
-#         Field of view (deg)
-
-#     :return: A 2D image with polar coordinate
-#     :rtype: numpy.2darray
-#     """
-
-#     angle_bin_res = fov_deg / angle_bins
-
-#     latitude_bins = int(range_bins * np.sin(fov_deg / 360 * np.pi) + 1)
-#     polar = np.zeros((range_bins, latitude_bins * 2), dtype=complex)
-
-#     x = np.arange(1, range_bins, 1, dtype=int)
-#     y = np.arange(0, latitude_bins * 2, 1, dtype=int)
-#     X_data, Y_data = np.meshgrid(x, y)
-
-#     b = (
-#         180 * np.arctan((Y_data - latitude_bins) / X_data) / angle_bin_res / np.pi
-#         + fov_deg / angle_bin_res / 2
-#     )
-#     a = X_data / (np.cos((angle_bin_res * b - fov_deg / 2) / 180 * np.pi))
-#     b = b.astype(int)
-#     a = a.astype(int)
-
-#     idx = np.where(
-#         np.logical_and(
-#             np.logical_and(np.less(b, angle_bins), np.greater_equal(b, 0)),
-#             np.logical_and(np.less(a, range_bins), np.greater_equal(a, 0)),
-#         )
-#     )
-#     b = b[idx]
-#     a = a[idx]
-#     xx = X_data[idx]
-#     yy = Y_data[idx]
-
-#     polar[xx, yy] = image[a, b]
-#     return polar
 
 
 def cfar_ca_1d(
@@ -580,8 +531,8 @@ def doa_music(covmat, nsig, spacing=0.5, scanangles=range(-90, 91)):
     :return: doa angles in degrees, doa index, pseudo spectrum (dB)
     :rtype: list, list, numpy.1darray
     """
-    N_array = np.shape(covmat)[0]
-    array = np.linspace(0, (N_array - 1) * spacing, N_array)
+    n_array = np.shape(covmat)[0]
+    array = np.linspace(0, (n_array - 1) * spacing, n_array)
     scanangles = np.array(scanangles)
 
     # `eigh` guarantees the eigen values are sorted
@@ -590,7 +541,7 @@ def doa_music(covmat, nsig, spacing=0.5, scanangles=range(-90, 91)):
 
     array_grid, angle_grid = np.meshgrid(array, np.radians(scanangles), indexing="ij")
     steering_vect = np.exp(1j * 2 * np.pi * array_grid * np.sin(angle_grid)) / np.sqrt(
-        N_array
+        n_array
     )
 
     pseudo_spectrum = 1 / linalg.norm((noise_subspace.T.conj() @ steering_vect), axis=0)
@@ -700,13 +651,13 @@ def doa_bartlett(covmat, spacing=0.5, scanangles=range(-90, 91)):
     :rtype: numpy.1darray
     """
 
-    N_array = np.shape(covmat)[0]
-    array = np.linspace(0, (N_array - 1) * spacing, N_array)
+    n_array = np.shape(covmat)[0]
+    array = np.linspace(0, (n_array - 1) * spacing, n_array)
     scanangles = np.array(scanangles)
 
     array_grid, angle_grid = np.meshgrid(array, np.radians(scanangles), indexing="ij")
     steering_vect = np.exp(1j * 2 * np.pi * array_grid * np.sin(angle_grid)) / np.sqrt(
-        N_array
+        n_array
     )
 
     ps = np.sum(steering_vect.conj() * (covmat @ steering_vect), axis=0).real
@@ -733,16 +684,16 @@ def doa_capon(covmat, spacing=0.5, scanangles=range(-90, 91)):
     :rtype: numpy.1darray
     """
 
-    N_array = np.shape(covmat)[0]
-    array = np.linspace(0, (N_array - 1) * spacing, N_array)
+    n_array = np.shape(covmat)[0]
+    array = np.linspace(0, (n_array - 1) * spacing, n_array)
     scanangles = np.array(scanangles)
 
     array_grid, angle_grid = np.meshgrid(array, np.radians(scanangles), indexing="ij")
     steering_vect = np.exp(1j * 2 * np.pi * array_grid * np.sin(angle_grid)) / np.sqrt(
-        N_array
+        n_array
     )
 
-    covmat = covmat + np.eye(N_array) * 0.000000001
+    covmat = covmat + np.eye(n_array) * 0.000000001
     inv_covmat = linalg.pinv(covmat)
 
     ps = np.zeros(scanangles.shape)
