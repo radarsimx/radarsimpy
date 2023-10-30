@@ -34,7 +34,7 @@ functions:
 
 import warnings
 import numpy as np
-from scipy.special import erfc, erfcinv, gammainc
+from scipy.special import erfc, erfcinv, gammainc # pylint: disable=no-name-in-module
 
 
 def log_factorial(n):
@@ -69,13 +69,13 @@ def log_factorial(n):
     )
 
 
-def threshold(pfa, N):
+def threshold(pfa, npulses):
     """
     Threshold ratio
 
     :param float pfa:
         Probability of false alarm
-    :param int N:
+    :param int npulses:
         Number of pulses for integration
 
     :return:
@@ -90,15 +90,17 @@ def threshold(pfa, N):
 
     eps = 0.00000001
     delta = 10000.0
-    nfa = N * np.log(2) / pfa
+    nfa = npulses * np.log(2) / pfa
     sqrtpfa = np.sqrt(-np.log10(pfa))
-    sqrtnp = np.sqrt(N)
-    thred0 = N - sqrtnp + 2.3 * sqrtpfa * (sqrtpfa + sqrtnp - 1.0)
+    sqrtnp = np.sqrt(npulses)
+    thred0 = npulses - sqrtnp + 2.3 * sqrtpfa * (sqrtpfa + sqrtnp - 1.0)
     thred = thred0
     while delta >= thred0:
-        igf = gammainc(N, thred0)
-        deno = np.exp((N - 1) * np.log(thred0 + eps) - thred0 - log_factorial(N - 1))
-        thred = thred0 + ((0.5 ** (N / nfa) - igf) / (deno + eps))
+        igf = gammainc(npulses, thred0)
+        deno = np.exp(
+            (npulses - 1) * np.log(thred0 + eps) - thred0 - log_factorial(npulses - 1)
+        )
+        thred = thred0 + ((0.5 ** (npulses / nfa) - igf) / (deno + eps))
 
         delta = np.abs(thred - thred0) * 10000.0
         thred0 = thred
@@ -106,7 +108,7 @@ def threshold(pfa, N):
     return thred
 
 
-def roc_pd(pfa, snr, N=1, stype="Coherent"):
+def roc_pd(pfa, snr, npulses=1, stype="Coherent"):
     """
     Calculate probability of detection (Pd) in receiver operating
     characteristic (ROC)
@@ -117,7 +119,7 @@ def roc_pd(pfa, snr, N=1, stype="Coherent"):
     :param snr:
         Signal to noise ratio in decibel (dB)
     :type snr: float or numpy.1darray
-    :param int N:
+    :param int npulses:
         Number of pulses for integration (default is 1)
     :param str stype:
         Signal type (default is ``Coherent``)
@@ -152,48 +154,50 @@ def roc_pd(pfa, snr, N=1, stype="Coherent"):
 
     it_pfa = np.nditer(pfa, flags=["f_index"])
     while not it_pfa.finished:
-        thred = threshold(it_pfa[0], N)
+        thred = threshold(it_pfa[0], npulses)
 
         if stype == "Swerling 1":
-            if N == 1:
+            if npulses == 1:
                 pd[it_pfa.index, :] = np.exp(-thred / (1 + snr))
             else:
-                temp_sw1 = 1 + 1 / (N * snr)
-                igf1 = gammainc(N - 1, thred)
-                igf2 = gammainc(N - 1, thred / temp_sw1)
+                temp_sw1 = 1 + 1 / (npulses * snr)
+                igf1 = gammainc(npulses - 1, thred)
+                igf2 = gammainc(npulses - 1, thred / temp_sw1)
                 pd[it_pfa.index, :] = (
                     1
                     - igf1
-                    + (temp_sw1 ** (N - 1)) * igf2 * np.exp(-thred / (1 + N * snr))
+                    + (temp_sw1 ** (npulses - 1))
+                    * igf2
+                    * np.exp(-thred / (1 + npulses * snr))
                 )
         elif stype == "Swerling 2":
-            if N <= 50:
-                pd[it_pfa.index, :] = 1 - gammainc(N, (thred / (1 + snr)))
+            if npulses <= 50:
+                pd[it_pfa.index, :] = 1 - gammainc(npulses, (thred / (1 + snr)))
             else:
-                V = (thred - N * (snr + 1)) / (np.sqrt(N) * (snr + 1))
+                V = (thred - npulses * (snr + 1)) / (np.sqrt(npulses) * (snr + 1))
                 Vsqr = V**2
                 val1 = np.exp(-Vsqr / 2) / np.sqrt(2 * np.pi)
                 val2 = (
-                    -1 / np.sqrt(9 * N) * (Vsqr - 1)
-                    + 0.25 * V * (3 - Vsqr) / N
-                    - V * (V**4 - 10 * Vsqr + 15) / (18 * N)
+                    -1 / np.sqrt(9 * npulses) * (Vsqr - 1)
+                    + 0.25 * V * (3 - Vsqr) / npulses
+                    - V * (V**4 - 10 * Vsqr + 15) / (18 * npulses)
                 )
                 pd[it_pfa.index, :] = 0.5 * erfc(V / np.sqrt(2)) - val1 * val2
         elif stype == "Swerling 3":
-            temp_1 = thred / (1 + 0.5 * N * snr)
+            temp_1 = thred / (1 + 0.5 * npulses * snr)
             ko = (
                 np.exp(-temp_1)
-                * (1 + 2 / (N * snr)) ** (N - 2)
-                * (1 + temp_1 - 2 * (N - 2) / (N * snr))
+                * (1 + 2 / (npulses * snr)) ** (npulses - 2)
+                * (1 + temp_1 - 2 * (npulses - 2) / (npulses * snr))
             )
-            if N <= 2:
+            if npulses <= 2:
                 pd[it_pfa.index, :] = ko
             else:
                 warnings.filterwarnings("ignore", category=RuntimeWarning)
                 temp4 = (
-                    thred ** (N - 1)
+                    thred ** (npulses - 1)
                     * np.exp(-thred)
-                    / (temp_1 * np.exp(log_factorial(N - 2.0)))
+                    / (temp_1 * np.exp(log_factorial(npulses - 2.0)))
                 )
                 warnings.filterwarnings("default", category=RuntimeWarning)
 
@@ -207,8 +211,8 @@ def roc_pd(pfa, snr, N=1, stype="Coherent"):
                 pd[it_pfa.index, :] = (
                     temp4
                     + 1
-                    - gammainc(N - 1, thred)
-                    + ko * gammainc(N - 1, thred / (1 + 2 / (N * snr)))
+                    - gammainc(npulses - 1, thred)
+                    + ko * gammainc(npulses - 1, thred / (1 + 2 / (npulses * snr)))
                 )
             if np.size(pd[it_pfa.index, :]) == 1:
                 if pd[it_pfa.index, :] > 1:
@@ -218,12 +222,12 @@ def roc_pd(pfa, snr, N=1, stype="Coherent"):
                 pd[it_pfa.index, :][neg_idx[0]] = 1
         elif stype == "Swerling 4":
             beta = 1 + snr / 2
-            if N >= 50:
-                omegabar = np.sqrt(N * (2 * beta**2 - 1))
+            if npulses >= 50:
+                omegabar = np.sqrt(npulses * (2 * beta**2 - 1))
                 c3 = (2 * beta**3 - 1) / (3 * (2 * beta**2 - 1) * omegabar)
-                c4 = (2 * beta**4 - 1) / (4 * N * (2 * beta**2 - 1) ** 2)
+                c4 = (2 * beta**4 - 1) / (4 * npulses * (2 * beta**2 - 1) ** 2)
                 c6 = c3**2 / 2
-                V = (thred - N * (1 + snr)) / omegabar
+                V = (thred - npulses * (1 + snr)) / omegabar
                 Vsqr = V**2
                 val1 = np.exp(-Vsqr / 2) / np.sqrt(2 * np.pi)
                 val2 = (
@@ -233,28 +237,28 @@ def roc_pd(pfa, snr, N=1, stype="Coherent"):
                 )
                 pd[it_pfa.index, :] = 0.5 * erfc(V / np.sqrt(2)) - val1 * val2
             else:
-                gamma0 = gammainc(N, thred / beta)
-                a1 = (thred / beta) ** N / (
-                    np.exp(log_factorial(N)) * np.exp(thred / beta)
+                gamma0 = gammainc(npulses, thred / beta)
+                a1 = (thred / beta) ** npulses / (
+                    np.exp(log_factorial(npulses)) * np.exp(thred / beta)
                 )
                 sum_var = gamma0
-                for i in range(1, N + 1, 1):
+                for i in range(1, npulses + 1, 1):
                     temp_sw4 = 1
                     if i == 1:
                         ai = a1
                     else:
-                        ai = (thred / beta) * a1 / (N + i - 1)
+                        ai = (thred / beta) * a1 / (npulses + i - 1)
                     a1 = ai
                     gammai = gamma0 - ai
                     gamma0 = gammai
                     a1 = ai
 
                     for ii in range(1, i + 1, 1):
-                        temp_sw4 = temp_sw4 * int(N + 1 - ii)
+                        temp_sw4 = temp_sw4 * int(npulses + 1 - ii)
 
                     term = (snr / 2) ** i * gammai * temp_sw4 / np.exp(log_factorial(i))
                     sum_var = sum_var + term
-                pd[it_pfa.index, :] = 1 - sum_var / beta**N
+                pd[it_pfa.index, :] = 1 - sum_var / beta**npulses
             if np.size(pd[it_pfa.index, :]) == 1:
                 if pd[it_pfa.index, :] < 0:
                     pd[it_pfa.index, :] = 0
@@ -263,11 +267,11 @@ def roc_pd(pfa, snr, N=1, stype="Coherent"):
                 pd[it_pfa.index, :][neg_idx[0]] = 0
         elif stype == "Swerling 5" or stype == "Swerling 0":
             temp_1 = 2 * snr + 1
-            omegabar = np.sqrt(N * temp_1)
-            c3 = -(snr + 1 / 3) / (np.sqrt(N) * temp_1**1.5)
-            c4 = (snr + 0.25) / (N * temp_1**2.0)
+            omegabar = np.sqrt(npulses * temp_1)
+            c3 = -(snr + 1 / 3) / (np.sqrt(npulses) * temp_1**1.5)
+            c4 = (snr + 0.25) / (npulses * temp_1**2.0)
             c6 = c3 * c3 / 2
-            V = (thred - N * (1 + snr)) / omegabar
+            V = (thred - npulses * (1 + snr)) / omegabar
             Vsqr = V**2
             val1 = np.exp(-Vsqr / 2) / np.sqrt(2 * np.pi)
             val2 = (
@@ -278,10 +282,10 @@ def roc_pd(pfa, snr, N=1, stype="Coherent"):
             q = 0.5 * erfc(V / np.sqrt(2))
             pd[it_pfa.index, :] = q - val1 * val2
         elif stype == "Coherent":
-            snr = snr * N
+            snr = snr * npulses
             pd[it_pfa.index, :] = erfc(erfcinv(2 * it_pfa[0]) - np.sqrt(snr)) / 2
         elif stype == "Real":
-            snr = snr * N / 2
+            snr = snr * npulses / 2
             pd[it_pfa.index, :] = erfc(erfcinv(2 * it_pfa[0]) - np.sqrt(snr)) / 2
         else:
             return None
@@ -298,7 +302,7 @@ def roc_pd(pfa, snr, N=1, stype="Coherent"):
         return pd
 
 
-def roc_snr(pfa, pd, N=1, stype="Coherent"):
+def roc_snr(pfa, pd, npulses=1, stype="Coherent"):
     """
     Calculate the minimal SNR for certain probability of
     detection (Pd) and probability of false alarm (Pfa) in
@@ -310,7 +314,7 @@ def roc_snr(pfa, pd, N=1, stype="Coherent"):
     :param pd:
          Probability of detection (Pd)
     :type pd: float or numpy.1darray
-    :param int N:
+    :param int npulses:
         Number of pulses for integration (default is 1)
     :param str stype:
         Signal type (default is ``Coherent``)
@@ -345,7 +349,7 @@ def roc_snr(pfa, pd, N=1, stype="Coherent"):
     """
 
     def fun(pfa, pd, snr):
-        return roc_pd(pfa, snr, N, stype) - pd
+        return roc_pd(pfa, snr, npulses, stype) - pd
 
     max_iter = 1000
     snra = 40
@@ -367,7 +371,7 @@ def roc_snr(pfa, pd, N=1, stype="Coherent"):
                 return None
             a_n = snra
             b_n = snrb
-            for n in range(1, max_iter + 1):
+            for _ in range(1, max_iter + 1):
                 m_n = a_n - fun(it_pfa[0], it_pd[0], a_n) * (b_n - a_n) / (
                     fun(it_pfa[0], it_pd[0], b_n) - fun(it_pfa[0], it_pd[0], a_n)
                 )
@@ -381,11 +385,11 @@ def roc_snr(pfa, pd, N=1, stype="Coherent"):
                     snr[it_pfa.index, it_pd.index] = m_n
                     break
                 elif fun(it_pfa[0], it_pd[0], a_n) * f_m_n < 0:
-                    a_n = a_n
+                    # a_n = a_n
                     b_n = m_n
                 elif fun(it_pfa[0], it_pd[0], b_n) * f_m_n < 0:
                     a_n = m_n
-                    b_n = b_n
+                    # b_n = b_n
                 else:
                     # print("Secant method fails.")
                     # return None
