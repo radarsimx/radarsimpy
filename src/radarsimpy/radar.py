@@ -530,79 +530,84 @@ class Receiver:
         if channels is None:
             channels = [{"location": (0, 0, 0)}]
 
-        self.rxchannel_prop["size"] = len(channels)
-
-        self.rxchannel_prop["locations"] = np.zeros((self.rxchannel_prop["size"], 3))
-        self.rxchannel_prop["polarization"] = np.zeros((self.rxchannel_prop["size"], 3))
-
-        self.rxchannel_prop["az_patterns"] = []
-        self.rxchannel_prop["az_angles"] = []
-
-        self.rxchannel_prop["el_patterns"] = []
-        self.rxchannel_prop["el_angles"] = []
-
-        self.rxchannel_prop["antenna_gains"] = np.zeros((self.rxchannel_prop["size"]))
-
-        for rx_idx, rx_element in enumerate(channels):
-            self.rxchannel_prop["locations"][rx_idx, :] = np.array(
-                rx_element.get("location")
-            )
-            self.rxchannel_prop["polarization"][rx_idx, :] = np.array(
-                rx_element.get("polarization", [0, 0, 1])
-            )
-
-            self.process_patterns(rx_element, rx_idx)
+        self.rxchannel_prop = self.process_rxchannel_prop(channels)
 
     def validate_bb_prop(self, bb_prop):
-        """_summary_
+        """
+        Validate baseband properties
 
-        Args:
-            bb_prop (_type_): _description_
+        :param dict bb_prop: Baseband properties
 
-        Raises:
-            ValueError: _description_
+        :raises ValueError: Invalid baseband type
         """
         if bb_prop["bb_type"] != "complex" and bb_prop["bb_type"] != "real":
             raise ValueError("Invalid baseband type")
 
-    def process_patterns(self, rx_channel, rx_idx):
-        """_summary_
-
-        Args:
-            rx_channel (_type_): _description_
-            rx_idx (_type_): _description_
-
-        Raises:
-            ValueError: _description_
-            ValueError: _description_
+    def process_rxchannel_prop(self, channels):
         """
-        # azimuth pattern
-        az_angle = np.array(rx_channel.get("azimuth_angle", [-90, 90]))
-        az_pattern = np.array(rx_channel.get("azimuth_pattern", [0, 0]))
-        if len(az_angle) != len(az_pattern):
-            raise ValueError(
-                "Lengths of `azimuth_angle` and `azimuth_pattern` \
-                    should be the same"
+        Process receiver channel parameters
+
+        :param dict channels: Dictionary of receiver channels
+
+        :raises ValueError: Lengths of `azimuth_angle` and `azimuth_pattern`
+            should be the same
+        :raises ValueError: Lengths of `elevation_angle` and `elevation_pattern`
+            should be the same
+
+        :return:
+            Receiver channel properties
+        :rtype: dict
+        """
+        rxch_prop = {}
+
+        rxch_prop["size"] = len(channels)
+
+        rxch_prop["locations"] = np.zeros((rxch_prop["size"], 3))
+        rxch_prop["polarization"] = np.zeros((rxch_prop["size"], 3))
+
+        rxch_prop["az_patterns"] = []
+        rxch_prop["az_angles"] = []
+
+        rxch_prop["el_patterns"] = []
+        rxch_prop["el_angles"] = []
+
+        rxch_prop["antenna_gains"] = np.zeros((rxch_prop["size"]))
+
+        for rx_idx, rx_element in enumerate(channels):
+            rxch_prop["locations"][rx_idx, :] = np.array(rx_element.get("location"))
+            rxch_prop["polarization"][rx_idx, :] = np.array(
+                rx_element.get("polarization", [0, 0, 1])
             )
 
-        self.rxchannel_prop["antenna_gains"][rx_idx] = np.max(az_pattern)
-        az_pattern = az_pattern - self.rxchannel_prop["antenna_gains"][rx_idx]
+            # azimuth pattern
+            az_angle = np.array(rx_element.get("azimuth_angle", [-90, 90]))
+            az_pattern = np.array(rx_element.get("azimuth_pattern", [0, 0]))
+            if len(az_angle) != len(az_pattern):
+                raise ValueError(
+                    "Lengths of `azimuth_angle` and `azimuth_pattern` \
+                        should be the same"
+                )
 
-        self.rxchannel_prop["az_angles"].append(az_angle)
-        self.rxchannel_prop["az_patterns"].append(az_pattern)
+            rxch_prop["antenna_gains"][rx_idx] = np.max(az_pattern)
+            az_pattern = az_pattern - rxch_prop["antenna_gains"][rx_idx]
 
-        # elevation pattern
-        el_angle = np.array(rx_channel.get("elevation_angle", [-90, 90]))
-        el_pattern = np.array(rx_channel.get("elevation_pattern", [0, 0]))
-        if len(el_angle) != len(el_pattern):
-            raise ValueError(
-                "Lengths of `elevation_angle` and `elevation_pattern` \
-                    should be the same"
-            )
-        el_pattern = el_pattern - np.max(el_pattern)
+            rxch_prop["az_angles"].append(az_angle)
+            rxch_prop["az_patterns"].append(az_pattern)
 
-        self.rxchannel_prop["el_angles"].append(el_angle)
-        self.rxchannel_prop["el_patterns"].append(el_pattern)
+            # elevation pattern
+            el_angle = np.array(rx_element.get("elevation_angle", [-90, 90]))
+            el_pattern = np.array(rx_element.get("elevation_pattern", [0, 0]))
+            if len(el_angle) != len(el_pattern):
+                raise ValueError(
+                    "Lengths of `elevation_angle` and `elevation_pattern` \
+                        should be the same"
+                )
+            el_pattern = el_pattern - np.max(el_pattern)
+
+            rxch_prop["el_angles"].append(el_angle)
+            rxch_prop["el_patterns"].append(el_pattern)
+
+        return rxch_prop
 
 
 class Radar:
@@ -666,7 +671,7 @@ class Radar:
 
     """
 
-    def __init__(
+    def __init__(   # pylint: disable=too-many-arguments
         self,
         transmitter,
         receiver,

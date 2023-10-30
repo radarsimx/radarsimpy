@@ -19,6 +19,7 @@ radarsimpy.Receiver
     :undoc-members:
     :inherited-members:
     :show-inheritance:
+    :exclude-members: validate_bb_prop, process_rxchannel_prop
 
 radarsimpy.Radar
 -----------------
