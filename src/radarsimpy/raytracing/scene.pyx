@@ -169,7 +169,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     """
     Targets
     """
-    cdef double[:, :, :] timestamp_mv = radar.timestamp.astype(np.float64)
+    cdef double[:, :, :] timestamp_mv = radar.time_prop["timestamp"].astype(np.float64)
 
     for idx_c in range(0, len(targets)):
         scene_c.AddTarget(
@@ -407,5 +407,5 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     free(bb_imag)
 
     return {"baseband": baseband,
-            "timestamp": radar.timestamp,
+            "timestamp": radar.time_prop["timestamp"],
             "interference": interference}

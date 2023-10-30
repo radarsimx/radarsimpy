@@ -31,7 +31,7 @@ def test_sim_cw():
     radar = cw_radar()
 
     target = dict(
-        location=(1.5 + 1e-3 * np.sin(2 * np.pi * 1 * radar.timestamp), 0, 0),
+        location=(1.5 + 1e-3 * np.sin(2 * np.pi * 1 * radar.time_prop["timestamp"]), 0, 0),
         rcs=0,
         phase=0,
     )

@@ -153,7 +153,7 @@ cpdef simc(radar, targets, noise=True):
         phase = targets[idx_c].get("phase", 0)
 
         point_vt.push_back(
-            cp_Point(location, speed, rcs, phase, np.shape(radar.timestamp))
+            cp_Point(location, speed, rcs, phase, np.shape(radar.time_prop["timestamp"]))
         )
 
     """
@@ -335,5 +335,5 @@ cpdef simc(radar, targets, noise=True):
     free(bb_imag)
 
     return {"baseband": baseband,
-            "timestamp": radar.timestamp,
+            "timestamp": radar.time_prop["timestamp"],
             "interference": interference}

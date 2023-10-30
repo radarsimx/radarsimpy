@@ -709,8 +709,10 @@ class Radar:
         }
         self.radar_prop = {"transmitter": transmitter, "receiver": receiver}
 
+        # timing properties
+        self.time_prop["timestamp"] = self.gen_timestamp()
 
-        self.timestamp = self.gen_timestamp()
+        # sample properties
         self.pulse_phs = self.cal_frame_phases()
 
         self.noise = self.cal_noise()
@@ -750,7 +752,7 @@ class Radar:
         self.speed = np.array(speed)
         self.rotation = np.array(rotation)
         self.rotation_rate = np.array(rotation_rate)
-        shape = np.shape(self.timestamp)
+        shape = np.shape(self.time_prop["timestamp"])
 
         if any(
             np.size(var) > 1
@@ -802,7 +804,7 @@ class Radar:
                     )
                 self.location[:, :, :, 0] = location[0]
             else:
-                self.location[:, :, :, 0] = location[0] + speed[0] * self.timestamp
+                self.location[:, :, :, 0] = location[0] + speed[0] * self.time_prop["timestamp"]
 
             if np.size(location[1]) > 1:
                 if np.shape(location[1]) != shape:
@@ -812,7 +814,7 @@ class Radar:
                     )
                 self.location[:, :, :, 1] = location[1]
             else:
-                self.location[:, :, :, 1] = location[1] + speed[1] * self.timestamp
+                self.location[:, :, :, 1] = location[1] + speed[1] * self.time_prop["timestamp"]
 
             if np.size(location[2]) > 1:
                 if np.shape(location[2]) != shape:
@@ -822,7 +824,7 @@ class Radar:
                     )
                 self.location[:, :, :, 2] = location[2]
             else:
-                self.location[:, :, :, 2] = location[2] + speed[2] * self.timestamp
+                self.location[:, :, :, 2] = location[2] + speed[2] * self.time_prop["timestamp"]
 
             if np.size(rotation_rate[0]) > 1:
                 if np.shape(rotation_rate[0]) != shape:
@@ -869,7 +871,7 @@ class Radar:
                 self.rotation[:, :, :, 0] = np.radians(rotation[0])
             else:
                 self.rotation[:, :, :, 0] = np.radians(
-                    rotation[0] + rotation_rate[0] * self.timestamp
+                    rotation[0] + rotation_rate[0] * self.time_prop["timestamp"]
                 )
 
             if np.size(rotation[1]) > 1:
@@ -881,7 +883,7 @@ class Radar:
                 self.rotation[:, :, :, 1] = np.radians(rotation[1])
             else:
                 self.rotation[:, :, :, 1] = np.radians(
-                    rotation[1] + rotation_rate[1] * self.timestamp
+                    rotation[1] + rotation_rate[1] * self.time_prop["timestamp"]
                 )
 
             if np.size(rotation[2]) > 1:
@@ -893,7 +895,7 @@ class Radar:
                 self.rotation[:, :, :, 2] = np.radians(rotation[2])
             else:
                 self.rotation[:, :, :, 2] = np.radians(
-                    rotation[2] + rotation_rate[2] * self.timestamp
+                    rotation[2] + rotation_rate[2] * self.time_prop["timestamp"]
                 )
         else:
             self.speed = np.array(speed)

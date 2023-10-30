@@ -359,7 +359,7 @@ cdef Target[float_t] cp_Target(radar,
     :return: C++ object of a target
     :rtype: Target
     """
-    timestamp = radar.timestamp
+    timestamp = radar.time_prop["timestamp"]
 
     # vector of location, speed, rotation, rotation rate
     cdef vector[Vec3[float_t]] loc_vt
