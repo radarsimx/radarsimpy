@@ -640,20 +640,13 @@ class Radar:
         Seed for noise generator
 
     :ivar dict time_prop: Time properties
+
         ``frame_size``: Number of frames
-    :ivar dict sample_prop: Sample properties
-    :ivar dict array_prop: Array properties
-    :ivar dict radar_prop: Radar properties
-    :ivar int samples_per_pulse:
-        Number of samples in one pulse
-    :ivar int channel_size:
-        Total number of channels.
-        ``channel_size = transmitter.channel_size * receiver.channel_size``
-    :ivar numpy.2darray virtual_array:
-        Locations of virtual array elements. [channel_size, 3 <x, y, z>]
-    :ivar numpy.3darray timestamp:
-        Timestamp for each samples. Frame start time is
-        defined in ``time``.
+
+        ``frame_start_time``: Frame start time
+
+        ``timestamp``: Timestamp for each samples
+
         ``[channes/frames, pulses, samples]``
 
         *Channel/frame order in timestamp*
@@ -673,6 +666,38 @@ class Radar:
         *[M]* ``Frame[1] -- Tx[0] -- Rx[0]``
 
         *[M+1]* ``Frame[1] -- Tx[0] -- Rx[1]``
+
+        ``timestamp_shape``: Shape of timestamp
+
+    :ivar dict sample_prop: Sample properties
+
+        ``samples_per_pulse``: Number of samples in one pulse
+
+        ``noise``: Noise amplitude
+
+        ``phase_noise``: Phase noise matrix
+
+    :ivar dict array_prop: Array properties
+
+        ``size``: Number of virtual array elements
+
+        ``virtual_array``: Locations of virtual array elements. [channel_size, 3 <x, y, z>]
+
+    :ivar dict radar_prop: Radar properties
+
+        ``transmitter``: Radar transmitter
+
+        ``receiver``: Radar receiver
+
+        ``interf``: Interference radar
+
+        ``location``: Radar location (m)
+
+        ``speed``: Radar speed (m/s)
+
+        ``rotation``: Radar rotation (rad)
+
+        ``rotation_rate``: Radar rotation rate (rad/s)
 
     """
 
@@ -720,6 +745,7 @@ class Radar:
 
         # timing properties
         self.time_prop["timestamp"] = self.gen_timestamp()
+        self.time_prop["timestamp_shape"] = np.shape(self.time_prop["timestamp"])
 
         # sample properties
         self.sample_prop["noise"] = self.cal_noise()
@@ -862,25 +888,25 @@ class Radar:
         noise_amplitude_peak = np.sqrt(2) * noise_amplitude_mixer + noise_amp
         return noise_amplitude_peak
 
-    def validate_radar_motion(self, location, speed, rotation, rotation_rate, shape):
-        """_summary_
+    def validate_radar_motion(self, location, speed, rotation, rotation_rate):
+        """
+        Validate radar motion inputs
 
-        Args:
-            location (_type_): _description_
-            speed (_type_): _description_
-            rotation (_type_): _description_
-            rotation_rate (_type_): _description_
+        :param list location: 3D location of the radar [x, y, z] (m)
+        :param list speed: Speed of the radar (m/s), [vx, vy, vz]
+        :param list rotation: Radar's angle (deg), [yaw, pitch, roll]
+        :param list rotation_rate: Radar's rotation rate (deg/s),
+        [yaw rate, pitch rate, roll rate]
 
-        Raises:
-            ValueError: _description_
-            ValueError: _description_
-            ValueError: _description_
-            ValueError: _description_
+        :raises ValueError: speed[x] must be a scalar or have the same shape as timestamp
+        :raises ValueError: location[x] must be a scalar or have the same shape as timestamp
+        :raises ValueError: rotation_rate[x] must be a scalar or have the same shape as timestamp
+        :raises ValueError: rotation[x] must be a scalar or have the same shape as timestamp
         """
 
         for idx in range(0, 3):
             if np.size(speed[idx]) > 1:
-                if np.shape(speed[idx]) != shape:
+                if np.shape(speed[idx]) != self.time_prop["timestamp_shape"]:
                     raise ValueError(
                         "speed ["
                         + str(idx)
@@ -889,7 +915,7 @@ class Radar:
                     )
 
             if np.size(location[idx]) > 1:
-                if np.shape(location[idx]) != shape:
+                if np.shape(location[idx]) != self.time_prop["timestamp_shape"]:
                     raise ValueError(
                         "location["
                         + str(idx)
@@ -898,7 +924,7 @@ class Radar:
                     )
 
             if np.size(rotation_rate[idx]) > 1:
-                if np.shape(rotation_rate[idx]) != shape:
+                if np.shape(rotation_rate[idx]) != self.time_prop["timestamp_shape"]:
                     raise ValueError(
                         "rotation_rate["
                         + str(idx)
@@ -907,7 +933,7 @@ class Radar:
                     )
 
             if np.size(rotation[idx]) > 1:
-                if np.shape(rotation[idx]) != shape:
+                if np.shape(rotation[idx]) != self.time_prop["timestamp_shape"]:
                     raise ValueError(
                         "rotation["
                         + str(idx)
@@ -916,29 +942,17 @@ class Radar:
                     )
 
     def process_radar_motion(self, location, speed, rotation, rotation_rate):
-        """_summary_
-
-        Args:
-            location (_type_): _description_
-            speed (_type_): _description_
-            rotation (_type_): _description_
-            rotation_rate (_type_): _description_
-
-        Raises:
-            ValueError: _description_
-            ValueError: _description_
-            ValueError: _description_
-            ValueError: _description_
-            ValueError: _description_
-            ValueError: _description_
-            ValueError: _description_
-            ValueError: _description_
-            ValueError: _description_
-            ValueError: _description_
-            ValueError: _description_
-            ValueError: _description_
         """
-        shape = np.shape(self.time_prop["timestamp"])
+        Process radar motion parameters
+
+        :param list location: 3D location of the radar [x, y, z] (m)
+        :param list speed: Speed of the radar (m/s), [vx, vy, vz]
+        :param list rotation: Radar's angle (deg), [yaw, pitch, roll]
+        :param list rotation_rate: Radar's rotation rate (deg/s),
+        [yaw rate, pitch rate, roll rate]
+
+        """
+        shape = self.time_prop["timestamp_shape"]
 
         if any(
             np.size(var) > 1
@@ -947,7 +961,7 @@ class Radar:
             + list(rotation)
             + list(rotation_rate)
         ):
-            self.validate_radar_motion(location, speed, rotation, rotation_rate, shape)
+            self.validate_radar_motion(location, speed, rotation, rotation_rate)
             self.radar_prop["location"] = np.zeros(shape + (3,))
             self.radar_prop["speed"] = np.zeros(shape + (3,))
             self.radar_prop["rotation"] = np.zeros(shape + (3,))

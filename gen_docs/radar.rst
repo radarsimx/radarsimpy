@@ -29,4 +29,4 @@ radarsimpy.Radar
     :undoc-members:
     :inherited-members:
     :show-inheritance:
-    :exclude-members: cal_code_timestamp, cal_frame_phases, cal_noise, gen_timestamp
+    :exclude-members: cal_noise, gen_timestamp, validate_radar_motion, process_radar_motion
