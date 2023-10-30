@@ -11,11 +11,11 @@ functions:
 * cal_range_doppler - range-Doppler processing
 * get_polar_image - convert cartesian coordinate to polar
 
-----------
-RadarSimPy - A Radar Simulator Built with Python
-Copyright (C) 2018 - PRESENT  radarsimx.com
-E-mail: info@radarsimx.com
-Website: https://radarsimx.com
+---
+
+- Copyright (C) 2018 - PRESENT  radarsimx.com
+- E-mail: info@radarsimx.com
+- Website: https://radarsimx.com
 
 ::
 
