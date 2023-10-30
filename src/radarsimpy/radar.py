@@ -641,63 +641,63 @@ class Radar:
 
     :ivar dict time_prop: Time properties
 
-        ``frame_size``: Number of frames
+        - **frame_size**: Number of frames
 
-        ``frame_start_time``: Frame start time
+        - **frame_start_time**: Frame start time
 
-        ``timestamp``: Timestamp for each samples
+        - **timestamp_shape**: Shape of timestamp
 
-        ``[channes/frames, pulses, samples]``
+        - **timestamp**: Timestamp for each samples
 
-        *Channel/frame order in timestamp*
+            ``[channes/frames, pulses, samples]``
 
-        *[0]* ``Frame[0] -- Tx[0] -- Rx[0]``
+            *Channel/frame order in timestamp*
 
-        *[1]* ``Frame[0] -- Tx[0] -- Rx[1]``
+            *[0]* ``Frame[0] -- Tx[0] -- Rx[0]``
 
-        ...
+            *[1]* ``Frame[0] -- Tx[0] -- Rx[1]``
 
-        *[N]* ``Frame[0] -- Tx[1] -- Rx[0]``
+            ...
 
-        *[N+1]* ``Frame[0] -- Tx[1] -- Rx[1]``
+            *[N]* ``Frame[0] -- Tx[1] -- Rx[0]``
 
-        ...
+            *[N+1]* ``Frame[0] -- Tx[1] -- Rx[1]``
 
-        *[M]* ``Frame[1] -- Tx[0] -- Rx[0]``
+            ...
 
-        *[M+1]* ``Frame[1] -- Tx[0] -- Rx[1]``
+            *[M]* ``Frame[1] -- Tx[0] -- Rx[0]``
 
-        ``timestamp_shape``: Shape of timestamp
+            *[M+1]* ``Frame[1] -- Tx[0] -- Rx[1]``
 
     :ivar dict sample_prop: Sample properties
 
-        ``samples_per_pulse``: Number of samples in one pulse
+        - **samples_per_pulse**: Number of samples in one pulse
 
-        ``noise``: Noise amplitude
+        - **noise**: Noise amplitude
 
-        ``phase_noise``: Phase noise matrix
+        - **phase_noise**: Phase noise matrix
 
     :ivar dict array_prop: Array properties
 
-        ``size``: Number of virtual array elements
+        - **size**: Number of virtual array elements
 
-        ``virtual_array``: Locations of virtual array elements. [channel_size, 3 <x, y, z>]
+        - **virtual_array**: Locations of virtual array elements. [channel_size, 3 <x, y, z>]
 
     :ivar dict radar_prop: Radar properties
 
-        ``transmitter``: Radar transmitter
+        - **transmitter**: Radar transmitter
 
-        ``receiver``: Radar receiver
+        - **receiver**: Radar receiver
 
-        ``interf``: Interference radar
+        - **interf**: Interference radar
 
-        ``location``: Radar location (m)
+        - **location**: Radar location (m)
 
-        ``speed``: Radar speed (m/s)
+        - **speed**: Radar speed (m/s)
 
-        ``rotation``: Radar rotation (rad)
+        - **rotation**: Radar rotation (rad)
 
-        ``rotation_rate``: Radar rotation rate (rad/s)
+        - **rotation_rate**: Radar rotation rate (rad/s)
 
     """
 
