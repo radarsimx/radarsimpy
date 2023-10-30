@@ -217,7 +217,7 @@ class Transmitter:
         """
         Validate RF properties
 
-        :param rf_prop (dict): RF properties
+        :param dict rf_prop: RF properties
 
         :raises ValueError: Lengths of `pn_f` and `pn_power` should be the same
         :raises ValueError: Lengths of `pn_f` and `pn_power` should be the same
@@ -255,19 +255,20 @@ class Transmitter:
             raise ValueError("`prp` should be larger than `pulse_length`")
 
     def process_waveform_modulation(self, mod_t, amp, phs):
-        """_summary_
+        """
+        Process waveform modulation parameters
 
-        Args:
-            mod_t (_type_): _description_
-            amp (_type_): _description_
-            phs (_type_): _description_
+        :param numpy.1darray mod_t: Time stamps for waveform modulation (s). ``default None``
+        :param numpy.1darray amp:
+            Relative amplitude scheme for waveform modulation. ``default None``
+        :param numpy.1darray phs: Phase scheme for waveform modulation (deg). ``default None``
 
-        Raises:
-            ValueError: _description_
-            ValueError: _description_
+        :raises ValueError: Lengths of `amp` and `phs` should be the same
+        :raises ValueError: Lengths of `mod_t`, `amp`, and `phs` should be the same
 
-        Returns:
-            _type_: _description_
+        :return:
+            Waveform modulation
+        :rtype: dict
         """
 
         if phs is not None and amp is None:
@@ -304,18 +305,22 @@ class Transmitter:
         return {"enabled": True, "var": mod_var, "t": mod_t}
 
     def process_pulse_modulation(self, pulse_amp, pulse_phs):
-        """_summary_
+        """
+        Process pulse modulation parameters
 
-        Args:
-            pulse_amp (_type_): _description_
-            pulse_phs (_type_): _description_
+        :param numpy.1darray pulse_amp:
+            Relative amplitude sequence for pulse's amplitude modulation.
+            The array length should be the same as `pulses`. ``default 1``
+        :param numpy.1darray pulse_phs:
+            Phase code sequence for pulse's phase modulation (deg).
+            The array length should be the same as `pulses`. ``default 0``
 
-        Raises:
-            ValueError: _description_
-            ValueError: _description_
+        :raises ValueError: Lengths of `pulse_amp` and `pulses` should be the same
+        :raises ValueError: Length of `pulse_phs` and `pulses` should be the same
 
-        Returns:
-            _type_: _description_
+        :return:
+            Pulse modulation array
+        :rtype: numpy.1darray
         """
         if len(pulse_amp) != self.waveform_prop["pulses"]:
             raise ValueError("Lengths of `pulse_amp` and `pulses` should be the same")
@@ -325,15 +330,19 @@ class Transmitter:
         return pulse_amp * np.exp(1j * (pulse_phs / 180 * np.pi))
 
     def process_txchannel_prop(self, channels):
-        """_summary_
+        """
+        Process transmitter channel parameters
 
-        Args:
-            tx_channel (_type_): _description_
-            tx_idx (_type_): _description_
+        :param dict channels: Dictionary of transmitter channels
 
-        Raises:
-            ValueError: _description_
-            ValueError: _description_
+        :raises ValueError: Lengths of `azimuth_angle` and `azimuth_pattern`
+            should be the same
+        :raises ValueError: Lengths of `elevation_angle` and `elevation_pattern`
+            should be the same
+
+        :return:
+            Transmitter channel properties
+        :rtype: dict
         """
         # number of transmitter channels
         txch_prop = {}
