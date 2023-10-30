@@ -688,26 +688,27 @@ class Radar:
             "frame_size": np.size(time),
             "frame_start_time": np.array(time),
         }
-        # self.sample_prop={}
-        self.array_prop = {}
+        self.sample_prop = {
+            "samples_per_pulse": int(
+                transmitter.waveform_prop["pulse_length"] * receiver.bb_prop["fs"]
+            )
+        }
+        self.array_prop = {
+            "size": (
+                transmitter.txchannel_prop["size"] * receiver.rxchannel_prop["size"]
+            ),
+            "virtual_array": np.repeat(
+                transmitter.txchannel_prop["locations"],
+                receiver.rxchannel_prop["size"],
+                axis=0,
+            )
+            + np.tile(
+                receiver.rxchannel_prop["locations"],
+                (transmitter.txchannel_prop["size"], 1),
+            ),
+        }
         self.radar_prop = {"transmitter": transmitter, "receiver": receiver}
 
-        self.samples_per_pulse = int(
-            transmitter.waveform_prop["pulse_length"] * receiver.bb_prop["fs"]
-        )
-
-        # virtual array
-        self.channel_size = (
-            transmitter.txchannel_prop["size"] * receiver.rxchannel_prop["size"]
-        )
-        self.virtual_array = np.repeat(
-            transmitter.txchannel_prop["locations"],
-            receiver.rxchannel_prop["size"],
-            axis=0,
-        ) + np.tile(
-            receiver.rxchannel_prop["locations"],
-            (transmitter.txchannel_prop["size"], 1),
-        )
 
         self.timestamp = self.gen_timestamp()
         self.pulse_phs = self.cal_frame_phases()
@@ -720,10 +721,10 @@ class Radar:
         ):
             dummy_sig = np.ones(
                 (
-                    self.channel_size
+                    self.array_prop["size"]
                     * self.time_prop["frame_size"]
                     * transmitter.waveform_prop["pulses"],
-                    self.samples_per_pulse,
+                    self.sample_prop["samples_per_pulse"],
                 )
             )
             self.phase_noise = cal_phase_noise(
@@ -737,9 +738,9 @@ class Radar:
             self.phase_noise = np.reshape(
                 self.phase_noise,
                 (
-                    self.channel_size * self.time_prop["frame_size"],
+                    self.array_prop["size"] * self.time_prop["frame_size"],
                     transmitter.waveform_prop["pulses"],
-                    self.samples_per_pulse,
+                    self.sample_prop["samples_per_pulse"],
                 ),
             )
         else:
@@ -913,10 +914,10 @@ class Radar:
         :rtype: numpy.3darray
         """
 
-        channel_size = self.channel_size
+        channel_size = self.array_prop["size"]
         rx_channel_size = self.radar_prop["receiver"].rxchannel_prop["size"]
         pulses = self.radar_prop["transmitter"].waveform_prop["pulses"]
-        samples = self.samples_per_pulse
+        samples = self.sample_prop["samples_per_pulse"]
         crp = self.radar_prop["transmitter"].waveform_prop["prp"]
         delay = self.radar_prop["transmitter"].txchannel_prop["delay"]
         fs = self.radar_prop["receiver"].bb_prop["fs"]
@@ -952,10 +953,10 @@ class Radar:
                     (
                         1,
                         self.radar_prop["transmitter"].waveform_prop["pulses"],
-                        self.samples_per_pulse,
+                        self.sample_prop["samples_per_pulse"],
                     ),
                 ),
-                self.channel_size,
+                channel_size,
                 axis=0,
             )
 
@@ -995,9 +996,9 @@ class Radar:
 
         noise_amp = np.zeros(
             [
-                self.channel_size,
+                self.array_prop["size"],
                 self.radar_prop["transmitter"].waveform_prop["pulses"],
-                self.samples_per_pulse,
+                self.sample_prop["samples_per_pulse"],
             ]
         )
 

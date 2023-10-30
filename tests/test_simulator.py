@@ -50,7 +50,7 @@ def test_sim_cw():
     npt.assert_almost_equal(f[np.argmax(spectrum[0 : int(nfft / 2)])], 1, decimal=2)
     npt.assert_almost_equal(
         timestamp[0, 0, :],
-        np.arange(0, radar.samples_per_pulse)
+        np.arange(0, radar.sample_prop["samples_per_pulse"])
         / radar.radar_prop["receiver"].bb_prop["fs"],
     )
 
@@ -91,17 +91,17 @@ def test_sim_fmcw():
 
     assert np.array_equal(
         (
-            radar.channel_size * radar.time_prop["frame_size"],
+            radar.array_prop["size"] * radar.time_prop["frame_size"],
             radar.radar_prop["transmitter"].waveform_prop["pulses"],
-            radar.samples_per_pulse,
+            radar.sample_prop["samples_per_pulse"],
         ),
         np.shape(timestamp),
     )
     assert np.array_equal(
         (
-            radar.channel_size * radar.time_prop["frame_size"],
+            radar.array_prop["size"] * radar.time_prop["frame_size"],
             radar.radar_prop["transmitter"].waveform_prop["pulses"],
-            radar.samples_per_pulse,
+            radar.sample_prop["samples_per_pulse"],
         ),
         np.shape(baseband),
     )
@@ -109,7 +109,7 @@ def test_sim_fmcw():
     npt.assert_almost_equal(
         timestamp[0, 0, :],
         (
-            np.arange(0, radar.samples_per_pulse)
+            np.arange(0, radar.sample_prop["samples_per_pulse"])
             / radar.radar_prop["receiver"].bb_prop["fs"]
         ),
     )
@@ -121,7 +121,7 @@ def test_sim_fmcw():
         ),
     )
 
-    range_window = signal.windows.chebwin(radar.samples_per_pulse, at=60)
+    range_window = signal.windows.chebwin(radar.sample_prop["samples_per_pulse"], at=60)
     range_profile = proc.range_fft(baseband, range_window)
     doppler_window = signal.windows.chebwin(
         radar.radar_prop["transmitter"].waveform_prop["pulses"], at=60
@@ -148,7 +148,7 @@ def test_sim_fmcw():
         const.c / radar.radar_prop["transmitter"].waveform_prop["prp"][0] / 24.125e9 / 2
     )
 
-    range_axis = np.linspace(0, max_range, radar.samples_per_pulse, endpoint=False)
+    range_axis = np.linspace(0, max_range, radar.sample_prop["samples_per_pulse"], endpoint=False)
 
     rng_dets = np.sort(range_axis[rng_peaks])
     npt.assert_almost_equal(rng_targets, rng_dets, decimal=0)
@@ -172,7 +172,7 @@ def test_sim_fmcw():
     rng_peaks = signal.find_peaks(max_rng, height=-40)[0]
     dop_peaks = signal.find_peaks(max_dop, height=-40)[0]
 
-    range_axis = np.linspace(0, max_range, radar.samples_per_pulse, endpoint=False)
+    range_axis = np.linspace(0, max_range, radar.sample_prop["samples_per_pulse"], endpoint=False)
 
     rng_dets = np.sort(range_axis[rng_peaks])
     npt.assert_almost_equal(np.array([9.0, 48.0, 195.0]), rng_dets, decimal=0)
@@ -214,17 +214,17 @@ def test_sim_tdm_fmcw():
 
     assert np.array_equal(
         (
-            radar.channel_size,
+            radar.array_prop["size"],
             radar.radar_prop["transmitter"].waveform_prop["pulses"],
-            radar.samples_per_pulse,
+            radar.sample_prop["samples_per_pulse"],
         ),
         np.shape(timestamp),
     )
     assert np.array_equal(
         (
-            radar.channel_size,
+            radar.array_prop["size"],
             radar.radar_prop["transmitter"].waveform_prop["pulses"],
-            radar.samples_per_pulse,
+            radar.sample_prop["samples_per_pulse"],
         ),
         np.shape(baseband),
     )
@@ -232,7 +232,7 @@ def test_sim_tdm_fmcw():
     npt.assert_almost_equal(
         timestamp[0, 0, :],
         (
-            np.arange(0, radar.samples_per_pulse)
+            np.arange(0, radar.sample_prop["samples_per_pulse"])
             / radar.radar_prop["receiver"].bb_prop["fs"]
         ),
     )
@@ -290,7 +290,7 @@ def test_sim_tdm_fmcw():
         ),
     )
 
-    range_window = signal.windows.chebwin(radar.samples_per_pulse, at=60)
+    range_window = signal.windows.chebwin(radar.sample_prop["samples_per_pulse"], at=60)
     range_profile = proc.range_fft(baseband, range_window)
 
     rng_nci = 20 * np.log10(np.mean(np.abs(range_profile[:, 0, :]), axis=0))
@@ -305,7 +305,7 @@ def test_sim_tdm_fmcw():
         / 2
     )
 
-    range_axis = np.linspace(0, max_range, radar.samples_per_pulse, endpoint=False)
+    range_axis = np.linspace(0, max_range, radar.sample_prop["samples_per_pulse"], endpoint=False)
 
     rng_dets = np.sort(range_axis[rng_peaks])
 
@@ -869,17 +869,17 @@ def test_sim_pmcw():
 
     assert np.array_equal(
         (
-            radar.channel_size,
+            radar.array_prop["size"],
             radar.radar_prop["transmitter"].waveform_prop["pulses"],
-            radar.samples_per_pulse,
+            radar.sample_prop["samples_per_pulse"],
         ),
         np.shape(timestamp),
     )
     assert np.array_equal(
         (
-            radar.channel_size,
+            radar.array_prop["size"],
             radar.radar_prop["transmitter"].waveform_prop["pulses"],
-            radar.samples_per_pulse,
+            radar.sample_prop["samples_per_pulse"],
         ),
         np.shape(baseband),
     )
@@ -887,7 +887,7 @@ def test_sim_pmcw():
     npt.assert_almost_equal(
         timestamp[0, 0, :],
         (
-            np.arange(0, radar.samples_per_pulse)
+            np.arange(0, radar.sample_prop["samples_per_pulse"])
             / radar.radar_prop["receiver"].bb_prop["fs"]
         ),
     )
@@ -902,7 +902,7 @@ def test_sim_pmcw():
     code_length = 255
     range_profile = np.zeros(
         (
-            radar.channel_size,
+            radar.array_prop["size"],
             radar.radar_prop["transmitter"].waveform_prop["pulses"],
             code_length,
         ),
@@ -923,7 +923,7 @@ def test_sim_pmcw():
     )
 
     range_doppler = np.zeros(np.shape(range_profile), dtype=complex)
-    for ii in range(0, radar.channel_size):
+    for ii in range(0, radar.array_prop["size"]):
         for jj in range(0, code_length):
             range_doppler[ii, :, jj] = np.fft.fftshift(
                 np.fft.fft(

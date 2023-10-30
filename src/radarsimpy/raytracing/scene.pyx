@@ -153,11 +153,11 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     cdef vector[Vec3[float_t]] interf_rrt_vt
 
     cdef int_t frames_c = radar.time_prop["frame_size"]
-    cdef int_t channles_c = radar.channel_size
+    cdef int_t channles_c = radar.array_prop["size"]
     cdef int_t rxsize_c = radar.radar_prop["receiver"].rxchannel_prop["size"]
     cdef int_t txsize_c = radar.radar_prop["transmitter"].txchannel_prop["size"]
     cdef int_t pulses_c = radar.radar_prop["transmitter"].waveform_prop["pulses"]
-    cdef int_t samples_c = radar.samples_per_pulse
+    cdef int_t samples_c = radar.sample_prop["samples_per_pulse"]
 
     cdef int_t bbsize_c = channles_c*frames_c*pulses_c*samples_c
 

@@ -152,9 +152,9 @@ cdef Transmitter[float_t] cp_Transmitter(radar):
     :rtype: Transmitter
     """
     cdef int_t frames_c = radar.time_prop["frame_size"]
-    cdef int_t channles_c = radar.channel_size
+    cdef int_t channles_c = radar.array_prop["size"]
     cdef int_t pulses_c = radar.radar_prop["transmitter"].waveform_prop["pulses"]
-    cdef int_t samples_c = radar.samples_per_pulse
+    cdef int_t samples_c = radar.sample_prop["samples_per_pulse"]
 
     cdef vector[double] t_frame_vt
     cdef vector[double] f_vt, t_vt
@@ -375,7 +375,7 @@ cdef Target[float_t] cp_Target(radar,
     cdef cpp_complex[float_t] ep_c, mu_c
 
     cdef int_t ch_idx, ps_idx, sp_idx
-    cdef int_t bbsize_c = <int_t>(radar.channel_size*radar.time_prop["frame_size"]*radar.radar_prop["transmitter"].waveform_prop["pulses"]*radar.samples_per_pulse)
+    cdef int_t bbsize_c = <int_t>(radar.array_prop["size"]*radar.time_prop["frame_size"]*radar.radar_prop["transmitter"].waveform_prop["pulses"]*radar.sample_prop["samples_per_pulse"])
 
     cdef float_t[:, :] points_mv
     cdef int_t[:, :] cells_mv

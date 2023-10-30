@@ -31,9 +31,9 @@ def cw_radar():
 def test_cw_radar():
     cw = cw_radar()
 
-    assert cw.samples_per_pulse == 10 * 20
-    assert cw.channel_size == 1
-    assert np.array_equal(cw.virtual_array, np.array([[0, 0, 0]]))
+    assert cw.sample_prop["samples_per_pulse"] == 10 * 20
+    assert cw.array_prop["size"] == 1
+    assert np.array_equal(cw.array_prop["virtual_array"], np.array([[0, 0, 0]]))
 
 
 def fmcw_radar():
@@ -43,9 +43,9 @@ def fmcw_radar():
 def test_fmcw_radar():
     fmcw = fmcw_radar()
 
-    assert fmcw.samples_per_pulse == 80e-6 * 2e6
-    assert fmcw.channel_size == 1
-    assert np.array_equal(fmcw.virtual_array, np.array([[0, 0, 0]]))
+    assert fmcw.sample_prop["samples_per_pulse"] == 80e-6 * 2e6
+    assert fmcw.array_prop["size"] == 1
+    assert np.array_equal(fmcw.array_prop["virtual_array"], np.array([[0, 0, 0]]))
 
 
 def tdm_fmcw_radar():
@@ -56,10 +56,10 @@ def test_tdm_fmcw_radar():
     half_wavelength = const.c / 24.125e9 / 2
     tdm = tdm_fmcw_radar()
 
-    assert tdm.samples_per_pulse == 80e-6 * 2e6
-    assert tdm.channel_size == 16
+    assert tdm.sample_prop["samples_per_pulse"] == 80e-6 * 2e6
+    assert tdm.array_prop["size"] == 16
     npt.assert_almost_equal(
-        tdm.virtual_array,
+        tdm.array_prop["virtual_array"],
         np.array(
             [
                 [0, -8 * half_wavelength, 0],
@@ -608,6 +608,6 @@ def pmcw_radar():
 def test_pmcw_radar():
     pmcw = pmcw_radar()
 
-    assert pmcw.samples_per_pulse == 2.1e-6 * 250e6
-    assert pmcw.channel_size == 2
-    assert np.array_equal(pmcw.virtual_array, np.array([[0, 0, 0], [0, 0, 0]]))
+    assert pmcw.sample_prop["samples_per_pulse"] == 2.1e-6 * 250e6
+    assert pmcw.array_prop["size"] == 2
+    assert np.array_equal(pmcw.array_prop["virtual_array"], np.array([[0, 0, 0], [0, 0, 0]]))
