@@ -982,8 +982,7 @@ class Radar:
                     raise ValueError(
                         "speed ["
                         + str(idx)
-                        + "] must be a scalar or have the same shape as "
-                        "timestamp"
+                        + "] must be a scalar or have the same shape as timestamp"
                     )
 
             if np.size(location[idx]) > 1:
@@ -991,8 +990,7 @@ class Radar:
                     raise ValueError(
                         "location["
                         + str(idx)
-                        + "] must be a scalar or have the same shape "
-                        "as timestamp"
+                        + "] must be a scalar or have the same shape as timestamp"
                     )
 
             if np.size(rotation_rate[idx]) > 1:
@@ -1000,8 +998,7 @@ class Radar:
                     raise ValueError(
                         "rotation_rate["
                         + str(idx)
-                        + "] must be a scalar or have the same "
-                        "shape as timestamp"
+                        + "] must be a scalar or have the same shape as timestamp"
                     )
 
             if np.size(rotation[idx]) > 1:
@@ -1009,8 +1006,7 @@ class Radar:
                     raise ValueError(
                         "rotation["
                         + str(idx)
-                        + "] must be a scalar or have the same shape "
-                        "as timestamp"
+                        + "] must be a scalar or have the same shape as timestamp"
                     )
 
     def process_radar_motion(self, location, speed, rotation, rotation_rate):
