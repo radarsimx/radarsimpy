@@ -23,8 +23,8 @@ import numpy as np
 import numpy.testing as npt
 
 from radarsimpy import Radar, Transmitter, Receiver
-from radarsimpy.simulator import simc
-import radarsimpy.processing as proc
+from radarsimpy.simulator import simc  # pylint: disable=no-name-in-module
+from radarsimpy.processing import range_fft  # pylint: disable=no-name-in-module
 
 
 def test_arbitrary_waveform_cpp():
@@ -171,14 +171,14 @@ def test_arbitrary_waveform_cpp():
     targets = [target_1, target_2, target_3]
 
     data_nonlinear = simc(radar_nonlinear, targets, noise=False)
-    time_matrix_nonlinear = data_nonlinear["timestamp"]
+
     data_matrix_nonlinear = data_nonlinear["baseband"]
 
-    range_window = signal.windows.chebwin(radar_nonlinear.sample_prop["samples_per_pulse"], at=60)
-
-    range_profile_nonlinear = proc.range_fft(
-        data_matrix_nonlinear[:, :, :], range_window
+    range_window = signal.windows.chebwin(
+        radar_nonlinear.sample_prop["samples_per_pulse"], at=60
     )
+
+    range_profile_nonlinear = range_fft(data_matrix_nonlinear[:, :, :], range_window)
 
     range_profile = 20 * np.log10(np.abs(range_profile_nonlinear[0, 0, :]))
 
