@@ -33,7 +33,7 @@ python setup.py build_ext -b ./
 
 echo "## Copying lib files to ./radarsimpy ##"
 # mkdir ./radarsimpy/lib
-cp ./src/radarsimpy/__init__.py ./radarsimpy
+cp ./src/radarsimpy/*.py ./radarsimpy
 cp ./src/radarsimpy/lib/__init__.py ./radarsimpy/lib
 cp ./src/radarsimcpp/build/*.so ./radarsimpy
 

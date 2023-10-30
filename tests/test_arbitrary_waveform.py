@@ -25,6 +25,9 @@ import radarsimpy.processing as proc
 
 
 def test_arbitrary_waveform_cpp():
+    """
+    _summary_
+    """
     tx_channel = dict(
         location=(0, 0, 0),
     )

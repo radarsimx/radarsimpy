@@ -29,8 +29,8 @@ Website: https://radarsimx.com
 """
 
 
-import numpy as np
 import warnings
+import numpy as np
 from scipy.special import erfc, erfcinv, gammainc
 
 

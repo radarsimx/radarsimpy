@@ -38,7 +38,7 @@ python setup.py build_ext -b ./
 
 ECHO ## Copying dll files to ./radarsimpy ##
 XCOPY ".\src\radarsimcpp\build\Release\radarsimcpp.dll" ".\radarsimpy\"
-XCOPY ".\src\radarsimpy\__init__.py" ".\radarsimpy\"
+XCOPY ".\src\radarsimpy\*.py" ".\radarsimpy\"
 XCOPY ".\src\radarsimpy\lib\__init__.py" ".\radarsimpy\lib\"
 
 ECHO ## Cleaning radarsimpy builds ##

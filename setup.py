@@ -1,3 +1,11 @@
+"""_summary_
+
+:raises EnvironmentError: _description_
+:raises EnvironmentError: _description_
+:return: _description_
+:rtype: _type_
+"""
+
 import platform
 
 from setuptools import setup
@@ -20,12 +28,6 @@ MACROS = [("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]
 INCLUDE_DIRS = ["src/radarsimcpp/includes", "src/radarsimcpp/includes/zpvector"]
 
 ext_modules = [
-    Extension("radarsimpy.radar", ["src/radarsimpy/radar.py"], define_macros=MACROS),
-    Extension("radarsimpy.util", ["src/radarsimpy/util.py"], define_macros=MACROS),
-    Extension(
-        "radarsimpy.processing", ["src/radarsimpy/processing.py"], define_macros=MACROS
-    ),
-    Extension("radarsimpy.tools", ["src/radarsimpy/tools.py"], define_macros=MACROS),
     Extension(
         "radarsimpy.lib.cp_radarsimc",
         ["src/radarsimpy/lib/cp_radarsimc.pyx"],
