@@ -16,10 +16,11 @@ Website: https://radarsimx.com
 """
 
 import numpy as np
+import numpy.testing as npt
+
 from radarsimpy import Radar, Transmitter, Receiver
 from radarsimpy.rt import scene
 from radarsimpy.simulator import simc
-import numpy.testing as npt
 
 
 def test_scene_interference():

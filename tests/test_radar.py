@@ -15,13 +15,13 @@ Website: https://radarsimx.com
 
 """
 
-from radarsimpy import Transmitter, Receiver, Radar
-from .test_transmitter import cw_tx, fmcw_tx, tdm_fmcw_tx, pmcw_tx
-from .test_receiver import cw_rx, fmcw_rx, tdm_fmcw_rx, pmcw_rx
-
 import scipy.constants as const
 import numpy as np
 import numpy.testing as npt
+
+from radarsimpy import Radar
+from .test_transmitter import cw_tx, fmcw_tx, tdm_fmcw_tx, pmcw_tx
+from .test_receiver import cw_rx, fmcw_rx, tdm_fmcw_rx, pmcw_rx
 
 
 def cw_radar():

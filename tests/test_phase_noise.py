@@ -15,13 +15,14 @@ Website: https://radarsimx.com
 
 """
 
+from scipy import signal
+import numpy as np
+import numpy.testing as npt
+
 from radarsimpy import Radar, Transmitter, Receiver
 from radarsimpy.simulator import simc
 from radarsimpy.util import cal_phase_noise
-from scipy import signal
 import radarsimpy.processing as proc
-import numpy as np
-import numpy.testing as npt
 
 
 def test_phase_noise():

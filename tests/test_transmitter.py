@@ -15,10 +15,11 @@ Website: https://radarsimx.com
 
 """
 
-from radarsimpy import Transmitter
 import scipy.constants as const
 import numpy as np
 import numpy.testing as npt
+
+from radarsimpy import Transmitter
 
 
 def cw_tx():

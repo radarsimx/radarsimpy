@@ -15,7 +15,6 @@ Website: https://radarsimx.com
 
 """
 
-from .test_radar import cw_radar, fmcw_radar, tdm_fmcw_radar, pmcw_radar
 
 import numpy as np
 import numpy.testing as npt
@@ -24,6 +23,8 @@ from scipy import signal
 
 from radarsimpy.simulator import simc
 import radarsimpy.processing as proc
+
+from .test_radar import cw_radar, fmcw_radar, tdm_fmcw_radar, pmcw_radar
 
 
 def test_sim_cw():
@@ -49,7 +50,8 @@ def test_sim_cw():
     npt.assert_almost_equal(f[np.argmax(spectrum[0 : int(nfft / 2)])], 1, decimal=2)
     npt.assert_almost_equal(
         timestamp[0, 0, :],
-        np.arange(0, radar.samples_per_pulse) / radar.radar_prop["receiver"].bb_prop["fs"],
+        np.arange(0, radar.samples_per_pulse)
+        / radar.radar_prop["receiver"].bb_prop["fs"],
     )
 
 
@@ -106,7 +108,10 @@ def test_sim_fmcw():
 
     npt.assert_almost_equal(
         timestamp[0, 0, :],
-        (np.arange(0, radar.samples_per_pulse) / radar.radar_prop["receiver"].bb_prop["fs"]),
+        (
+            np.arange(0, radar.samples_per_pulse)
+            / radar.radar_prop["receiver"].bb_prop["fs"]
+        ),
     )
     npt.assert_almost_equal(
         timestamp[0, :, 0],
@@ -149,7 +154,10 @@ def test_sim_fmcw():
     npt.assert_almost_equal(rng_targets, rng_dets, decimal=0)
 
     doppler_axis = np.linspace(
-        -unambiguous_speed, 0, radar.radar_prop["transmitter"].waveform_prop["pulses"], endpoint=False
+        -unambiguous_speed,
+        0,
+        radar.radar_prop["transmitter"].waveform_prop["pulses"],
+        endpoint=False,
     )
 
     dop_dets = np.sort(doppler_axis[dop_peaks])
@@ -170,7 +178,10 @@ def test_sim_fmcw():
     npt.assert_almost_equal(np.array([9.0, 48.0, 195.0]), rng_dets, decimal=0)
 
     doppler_axis = np.linspace(
-        -unambiguous_speed, 0, radar.radar_prop["transmitter"].waveform_prop["pulses"], endpoint=False
+        -unambiguous_speed,
+        0,
+        radar.radar_prop["transmitter"].waveform_prop["pulses"],
+        endpoint=False,
     )
 
     dop_dets = np.sort(doppler_axis[dop_peaks])
@@ -220,7 +231,10 @@ def test_sim_tdm_fmcw():
 
     npt.assert_almost_equal(
         timestamp[0, 0, :],
-        (np.arange(0, radar.samples_per_pulse) / radar.radar_prop["receiver"].bb_prop["fs"]),
+        (
+            np.arange(0, radar.samples_per_pulse)
+            / radar.radar_prop["receiver"].bb_prop["fs"]
+        ),
     )
     npt.assert_almost_equal(
         timestamp[0, :, 0],
@@ -872,7 +886,10 @@ def test_sim_pmcw():
 
     npt.assert_almost_equal(
         timestamp[0, 0, :],
-        (np.arange(0, radar.samples_per_pulse) / radar.radar_prop["receiver"].bb_prop["fs"]),
+        (
+            np.arange(0, radar.samples_per_pulse)
+            / radar.radar_prop["receiver"].bb_prop["fs"]
+        ),
     )
     npt.assert_almost_equal(
         timestamp[0, :, 0],
@@ -884,7 +901,11 @@ def test_sim_pmcw():
 
     code_length = 255
     range_profile = np.zeros(
-        (radar.channel_size, radar.radar_prop["transmitter"].waveform_prop["pulses"], code_length),
+        (
+            radar.channel_size,
+            radar.radar_prop["transmitter"].waveform_prop["pulses"],
+            code_length,
+        ),
         dtype=complex,
     )
 

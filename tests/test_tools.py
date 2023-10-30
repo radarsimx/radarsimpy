@@ -15,7 +15,6 @@ Website: https://radarsimx.com
 
 """
 
-import numpy as np
 import numpy.testing as npt
 
 from radarsimpy.tools import roc_pd, roc_snr, threshold
