@@ -104,12 +104,57 @@ class Transmitter:
 
         }]
 
-    :ivar dict rf_prop:
-        RF properties
-    :ivar dict waveform_prop:
-        Waveform properties
-    :ivar dict txchannel_prop:
-        Transmitter channels
+    :ivar dict rf_prop: RF properties
+
+        - **tx_power**: Transmitter power (dBm)
+
+        - **pn_f**: Frequency of the phase noise (Hz)
+
+        - **pn_power**: Power of the phase noise (dB/Hz)
+
+    :ivar dict waveform_prop: Waveform properties
+
+        - **f**: Waveform frequency (Hz)
+
+        - **t**: Timing of each pulse (s)
+
+        - **bandwidth**: Transmitting bandwidth (Hz)
+
+        - **pulse_length**: Transmitting length (s)
+
+        - **pulses**: Number of pulses
+
+        - **f_offset**: Frequency offset for each pulse
+
+        - **prp**: Pulse repetition time (s)
+
+        - **pulse_start_time**: Start time of each pulse
+
+    :ivar dict txchannel_prop: Transmitter channels
+
+        - **size**: Number of transmitter channels
+
+        - **delay**: Tx start delay (s)
+
+        - **grid**: Ray tracing grid size (deg)
+
+        - **locations**: Location of the Tx channel [x, y, z] m
+
+        - **polarization**: Polarization of the Tx channel
+
+        - **waveform_mod**: Waveform modulation parameters
+
+        - **pulse_mod**: Pulse modulation parameters
+
+        - **az_angles**: Azimuth angles (deg)
+
+        - **az_patterns**: Azimuth pattern (dB)
+
+        - **el_angles**: Elevation angles (deg)
+
+        - **el_patterns**: Elevation pattern (dB)
+
+        - **antenna_gains**: Tx antenna gain (dB)
 
     **Waveform**
 
@@ -466,12 +511,39 @@ class Receiver:
 
         }]
 
-    :ivar dict rf_prop:
-        RF properties
-    :ivar dict bb_prop:
-        Baseband properties
-    :ivar dict rxchannel_prop:
-        Receiver channels
+    :ivar dict rf_prop: RF properties
+
+        - **rf_gain**: RF gain of the receiver (dB)
+
+        - **noise_figure**: Receiver noise figure (dB)
+
+    :ivar dict bb_prop: Baseband properties
+
+        - **fs**: Sampling rate
+
+        - **load_resistor**: Load resistor (ohm)
+
+        - **baseband_gain**: Baseband gain (dB)
+
+        - **bb_type**: Baseband type, ``real`` or ``complex``
+
+    :ivar dict rxchannel_prop: Receiver channels
+
+        - **size**: Number of receiver channels
+
+        - **locations**: Location of the Rx channel [x, y, z] m
+
+        - **polarization**: Polarization of the Rx channel
+
+        - **az_angles**: Azimuth angles (deg)
+
+        - **az_patterns**: Azimuth pattern (dB)
+
+        - **el_angles**: Elevation angles (deg)
+
+        - **el_patterns**: Elevation pattern (dB)
+
+        - **antenna_gains**: Rx antenna gain (dB)
 
     **Receiver noise**
 
