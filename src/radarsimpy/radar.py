@@ -714,14 +714,6 @@ class Radar:
 
         self.noise = self.cal_noise()
 
-        # beat_time_samples = (
-        #     np.arange(0, self.samples_per_pulse, 1) / receiver.bb_prop["fs"]
-        # )
-        # self.beat_time = np.tile(
-        #     beat_time_samples[np.newaxis, np.newaxis, ...],
-        #     (self.channel_size, transmitter.waveform_prop["pulses"], 1),
-        # )
-
         if (
             transmitter.rf_prop["pn_f"] is not None
             and transmitter.rf_prop["pn_power"] is not None
