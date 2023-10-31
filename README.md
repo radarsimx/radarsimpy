@@ -118,7 +118,7 @@ GPU parallelization (CUDA) has been added since v6.0.0.
   - roll (deg): rotation along the x-axis. Positive roll rotates the object from the positive z-axis to the negative y-axis
   - origin (m): `[x, y, z]`
   - rotation (deg): `[yaw, pitch, roll]`
-  - rotation (deg/s): rate `[yaw rate, pitch rate, roll rate]`
+  - rotation rate (deg/s): `[yaw rate, pitch rate, roll rate]`
 
 ## Usage Examples
 
