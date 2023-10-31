@@ -1,9 +1,21 @@
-"""_summary_
+"""
+Setup script for a Python package "radarsimpy" with CUDA
 
-:raises EnvironmentError: _description_
-:raises EnvironmentError: _description_
-:return: _description_
-:rtype: _type_
+---
+
+- Copyright (C) 2018 - PRESENT  radarsimx.com
+- E-mail: info@radarsimx.com
+- Website: https://radarsimx.com
+
+::
+
+    ██████╗  █████╗ ██████╗  █████╗ ██████╗ ███████╗██╗███╗   ███╗██╗  ██╗
+    ██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔════╝██║████╗ ████║╚██╗██╔╝
+    ██████╔╝███████║██║  ██║███████║██████╔╝███████╗██║██╔████╔██║ ╚███╔╝ 
+    ██╔══██╗██╔══██║██║  ██║██╔══██║██╔══██╗╚════██║██║██║╚██╔╝██║ ██╔██╗ 
+    ██║  ██║██║  ██║██████╔╝██║  ██║██║  ██║███████║██║██║ ╚═╝ ██║██╔╝ ██╗
+    ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝
+
 """
 
 import platform
@@ -17,27 +29,20 @@ from Cython.Build import cythonize
 import numpy
 
 
-os_type = platform.system()  # 'Linux', 'Windows'
-
-if os_type == "Linux":
-    LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
-    NVCC = "nvcc"
-    CUDALIB = "lib64"
-    LIBRARY_DIRS = ["src/radarsimcpp/build"]
-elif os_type == "Windows":
-    LINK_ARGS = []
-    NVCC = "nvcc.exe"
-    CUDALIB = "lib\\x64"
-    LIBRARY_DIRS = ["src/radarsimcpp/build/Release"]
-
-MACROS = [("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION"), ("_CUDA_", None)]
-INCLUDE_DIRS = ["src/radarsimcpp/includes", "src/radarsimcpp/includes/zpvector"]
-
-
 def find_in_path(name, path):
-    """Find a file in a search path"""
+    """Iterates over the directories in the search path by splitting the path string using
+    os.pathsep as the delimiter. os.pathsep is a string that represents the separator
+    used in the PATH environment variable on the current operating system
+    (e.g., : on Unix-like systems and ; on Windows).
 
-    # Adapted fom http://code.activestate.com/recipes/52224
+    :param name: The name of the file
+    :type name: str
+    :param path: The search path
+    :type path: str
+    :return: The absolute path of the file
+    :rtype: str
+    """
+
     for path_name in path.split(os.pathsep):
         binpath = pjoin(path_name, name)
         if os.path.exists(binpath):
@@ -46,19 +51,27 @@ def find_in_path(name, path):
 
 
 def locate_cuda():
-    """Locate the CUDA environment on the system
-    Returns a dict with keys 'home', 'nvcc', 'include', and 'lib64'
+    """Locate the CUDA installation on the system
+
+    :raises EnvironmentError: The nvcc binary could not be located in your $PATH.
+        Either add it to your path, or set $CUDA_PATH
+    :raises EnvironmentError: The CUDA <key> path could not be located in <val>
+    :return: dict with keys 'home', 'nvcc', 'include', and 'lib64'
     and values giving the absolute path to each directory.
-    Starts by looking for the CUDAHOME env variable. If not found,
-    everything is based on finding 'nvcc' in the PATH.
+    :rtype: dict
     """
 
-    # First check if the CUDA_PATH env variable is in use
+    # The code first checks if the CUDA_PATH environment variable is set.
+    # If it is, it uses the value of CUDA_PATH as the CUDA installation directory
+    # and constructs the path to the nvcc binary (NVIDIA CUDA Compiler) inside that directory.
     if "CUDA_PATH" in os.environ:
         home = os.environ["CUDA_PATH"]
         nvcc = pjoin(home, "bin", NVCC)
     else:
-        # otherwise, search the PATH for NVCC
+        # If the CUDA_PATH environment variable is not set, it searches for the nvcc
+        # binary in the system's PATH environment variable. If nvcc is not found in
+        # the PATH, it raises an EnvironmentError. Otherwise, it sets the home variable
+        # to the parent directory of nvcc.
         default_path = pjoin(os.sep, "usr", "local", "cuda", "bin")
         nvcc = find_in_path(NVCC, os.environ["PATH"] + os.pathsep + default_path)
         if nvcc is None:
@@ -83,7 +96,24 @@ def locate_cuda():
     return cudaconfig
 
 
+os_type = platform.system()  # 'Linux', 'Windows'
+
 CUDA = locate_cuda()
+
+if os_type == "Linux":
+    LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
+    NVCC = "nvcc"
+    CUDALIB = "lib64"
+    LIBRARY_DIRS = ["src/radarsimcpp/build"]
+elif os_type == "Windows":
+    LINK_ARGS = []
+    NVCC = "nvcc.exe"
+    CUDALIB = "lib\\x64"
+    LIBRARY_DIRS = ["src/radarsimcpp/build/Release"]
+
+MACROS = [("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION"), ("_CUDA_", None)]
+INCLUDE_DIRS = ["src/radarsimcpp/includes", "src/radarsimcpp/includes/zpvector"]
+
 
 ext_modules = [
     Extension(

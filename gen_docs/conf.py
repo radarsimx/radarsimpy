@@ -1,29 +1,33 @@
-# Configuration file for the Sphinx documentation builder.
-#
-# This file only contains a selection of the most common options. For a full
-# list see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
+"""
+Configuration file for the Sphinx documentation builder.
 
-# -- Path setup --------------------------------------------------------------
+This file only contains a selection of the most common options. For a full
+list see the documentation:
+https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-#
+-- Path setup --------------------------------------------------------------
+
+If extensions (or modules to document with autodoc) are in another directory,
+add these directories to sys.path here. If the directory is relative to the
+documentation root, use os.path.abspath to make it absolute, like shown here.
+"""
+
 import os
 import sys
 import datetime
 
 sys.path.insert(0, os.path.abspath(".."))
 
-import radarsimpy
+import radarsimpy  # pylint: disable=wrong-import-position
 
 # -- Project information -----------------------------------------------------
 
-project = "RadarSimPy"
-copyright = "2018 - " + str(datetime.datetime.now().year) + ", radarsimx.com"
-author = "Dr. Zhengyu Peng"
-version = radarsimpy.__version__
+project = "RadarSimPy"  # pylint: disable=invalid-name
+copyright = (  # pylint: disable=redefined-builtin, invalid-name
+    "2018 - " + str(datetime.datetime.now().year) + ", radarsimx.com"
+)
+author = "Dr. Zhengyu Peng"  # pylint: disable=invalid-name
+version = radarsimpy.__version__  # pylint: disable=invalid-name
 
 
 # -- General configuration ---------------------------------------------------
@@ -41,7 +45,7 @@ extensions = [
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
-html_favicon = "radarsimdoc.png"
+html_favicon = "radarsimdoc.png"  # pylint: disable=invalid-name
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -54,7 +58,7 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_rtd_theme"
+html_theme = "sphinx_rtd_theme"  # pylint: disable=invalid-name
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

@@ -1,9 +1,21 @@
-"""_summary_
+"""
+Setup script for a Python package "radarsimpy"
 
-:raises EnvironmentError: _description_
-:raises EnvironmentError: _description_
-:return: _description_
-:rtype: _type_
+---
+
+- Copyright (C) 2018 - PRESENT  radarsimx.com
+- E-mail: info@radarsimx.com
+- Website: https://radarsimx.com
+
+::
+
+    ██████╗  █████╗ ██████╗  █████╗ ██████╗ ███████╗██╗███╗   ███╗██╗  ██╗
+    ██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔════╝██║████╗ ████║╚██╗██╔╝
+    ██████╔╝███████║██║  ██║███████║██████╔╝███████╗██║██╔████╔██║ ╚███╔╝ 
+    ██╔══██╗██╔══██║██║  ██║██╔══██║██╔══██╗╚════██║██║██║╚██╔╝██║ ██╔██╗ 
+    ██║  ██║██║  ██║██████╔╝██║  ██║██║  ██║███████║██║██║ ╚═╝ ██║██╔╝ ██╗
+    ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝
+
 """
 
 import platform
