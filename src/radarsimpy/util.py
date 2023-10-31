@@ -33,7 +33,9 @@ class:
 import numpy as np
 
 
-def cal_phase_noise(signal, fs, freq, power, seed=None, validation=False):
+def cal_phase_noise(  # pylint: disable=too-many-arguments, too-many-locals
+    signal, fs, freq, power, seed=None, validation=False
+):
     """
     Oscillator Phase Noise Model
 
@@ -96,20 +98,22 @@ def cal_phase_noise(signal, fs, freq, power, seed=None, validation=False):
 
     ::
 
-        |  0 dBc/Hz
-        | \\                                                    /
-        |  \\                                                  /
-        |   \\                                                /
-        |    \\P dBc/Hz                                      /
-        |    .\\                                            /
-        |    . \\                                          /
-        |    .  \\                                        /
-        |    .   \\______________________________________/ <- This level
-        |    .              is defined by the power at the maximal freq
-        |  |__| _|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__  (N)
-        |  0   delta_f                    fs/2                       fs
-        |  DC
-        |
+        ███████████████████████████████████████████████████████████████████
+        █ 0 dBc/Hz                                                        █
+        █ \\                                                    /         █
+        █  \\                                                  /          █
+        █   \\                                                /           █
+        █    \\P dBc/Hz                                      /            █
+        █    .\\                                            /             █
+        █    . \\                                          /              █
+        █    .  \\                                        /               █
+        █    .   \\______________________________________/ <- This level  █
+        █    .              is defined by the power at the maximal freq   █
+        █  |__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__  (N) █
+        █  0   delta_f                    fs/2                       fs   █
+        █  DC                                                             █
+        ███████████████████████████████████████████████████████████████████
+
     """
 
     if seed is None:

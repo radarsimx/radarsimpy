@@ -106,26 +106,26 @@ class Receiver:
 
     ::
 
-        █████████████████████████████████████████████████████████████████
-        █        | n1 = 10*log10(boltzmann_const * noise_temp * 1000)   █
-        █        |      + 10*log10(noise_bandwidth)  (dBm)              █
-        █        ↓                                                      █
-        █ +------+------+                                               █
-        █ |   rf_gain   |                                               █
-        █ +------+------+                                               █
-        █        | n2 = n1 + noise_figure + rf_gain (dBm)               █
-        █        ↓ n3 = 1e-3 * 10^(n2/10) (Watts)                       █
-        █ +------+------+                                               █
-        █ |    mixer    |                                               █
-        █ +------+------+                                               █
-        █        | n4 = sqrt(n3 * load_resistor) (V)                    █
-        █        ↓                                                      █
-        █ +------+------+                                               █
-        █ |baseband_gain|                                               █
-        █ +------+------+                                               █
-        █        | noise amplitude (peak to peak)                       █
-        █        ↓ n5 = n4 * 10^(baseband_gain / 20) * sqrt(2) (V)      █
-        █████████████████████████████████████████████████████████████████
+        ██████████████████████████████████████████████████████████████████
+        █         | n1 = 10*log10(boltzmann_const * noise_temp * 1000)   █
+        █         |      + 10*log10(noise_bandwidth)  (dBm)              █
+        █         ↓                                                      █
+        █  +------+------+                                               █
+        █  |   rf_gain   |                                               █
+        █  +------+------+                                               █
+        █         | n2 = n1 + noise_figure + rf_gain (dBm)               █
+        █         ↓ n3 = 1e-3 * 10^(n2/10) (Watts)                       █
+        █  +------+------+                                               █
+        █  |    mixer    |                                               █
+        █  +------+------+                                               █
+        █         | n4 = sqrt(n3 * load_resistor) (V)                    █
+        █         ↓                                                      █
+        █  +------+------+                                               █
+        █  |baseband_gain|                                               █
+        █  +------+------+                                               █
+        █         | noise amplitude (peak to peak)                       █
+        █         ↓ n5 = n4 * 10^(baseband_gain / 20) * sqrt(2) (V)      █
+        ██████████████████████████████████████████████████████████████████
 
     """
 

@@ -177,29 +177,23 @@ class Radar:
             transmitter.rf_prop["pn_f"] is not None
             and transmitter.rf_prop["pn_power"] is not None
         ):
-            dummy_sig = np.ones(
-                (
-                    self.array_prop["size"]
-                    * self.time_prop["frame_size"]
-                    * transmitter.waveform_prop["pulses"],
-                    self.sample_prop["samples_per_pulse"],
-                )
-            )
-            self.sample_prop["phase_noise"] = cal_phase_noise(
-                dummy_sig,
-                receiver.bb_prop["fs"],
-                transmitter.rf_prop["pn_f"],
-                transmitter.rf_prop["pn_power"],
-                seed=seed,
-                validation=kwargs.get("validation", False),
-            )
             self.sample_prop["phase_noise"] = np.reshape(
-                self.sample_prop["phase_noise"],
-                (
-                    self.array_prop["size"] * self.time_prop["frame_size"],
-                    transmitter.waveform_prop["pulses"],
-                    self.sample_prop["samples_per_pulse"],
+                cal_phase_noise(
+                    np.ones(
+                        (
+                            self.array_prop["size"]
+                            * self.time_prop["frame_size"]
+                            * transmitter.waveform_prop["pulses"],
+                            self.sample_prop["samples_per_pulse"],
+                        )
+                    ),
+                    receiver.bb_prop["fs"],
+                    transmitter.rf_prop["pn_f"],
+                    transmitter.rf_prop["pn_power"],
+                    seed=seed,
+                    validation=kwargs.get("validation", False),
                 ),
+                self.time_prop["timestamp_shape"],
             )
         else:
             self.sample_prop["phase_noise"] = None
