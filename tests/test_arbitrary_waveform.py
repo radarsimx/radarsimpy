@@ -28,9 +28,6 @@ from radarsimpy.processing import range_fft  # pylint: disable=no-name-in-module
 
 
 def test_arbitrary_waveform_cpp():
-    """
-    _summary_
-    """
     tx_channel = dict(
         location=(0, 0, 0),
     )
