@@ -1,14 +1,9 @@
 """
 This script contains classes that define all the parameters for
-a radar system
+a radar transmitter
 
 This script requires that 'numpy' be installed within the Python
 environment you are running this script in.
-
-This file can be imported as a module and contains the following
-class:
-
-* Transmitter - A class defines parameters of a radar transmitter
 
 ---
 

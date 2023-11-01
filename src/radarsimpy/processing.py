@@ -1,15 +1,8 @@
 """
 Script for radar signal processing
 
-This script requires that `numpy` and be installed within the Python
+This script requires that `numpy` and `scipy` be installed within the Python
 environment you are running this script in.
-
-This file can be imported as a module and contains the following
-functions:
-
-* cal_range_profile - calculate range profile matrix
-* cal_range_doppler - range-Doppler processing
-* get_polar_image - convert cartesian coordinate to polar
 
 ---
 

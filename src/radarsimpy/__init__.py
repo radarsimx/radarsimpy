@@ -18,7 +18,6 @@ A Python module for radar simulation
 
 """
 
-# radar
 from .radar import Radar # pylint: disable=no-name-in-module
 from .transmitter import Transmitter
 from .receiver import Receiver

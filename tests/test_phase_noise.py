@@ -24,7 +24,7 @@ import numpy.testing as npt
 
 from radarsimpy import Radar, Transmitter, Receiver
 from radarsimpy.simulator import simc
-from radarsimpy.util import cal_phase_noise
+from radarsimpy.radar import cal_phase_noise
 import radarsimpy.processing as proc
 
 
