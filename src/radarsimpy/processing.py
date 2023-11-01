@@ -261,11 +261,11 @@ def os_cfar_threshold(k, n, pfa):
     (1983): 608-621.
     """
 
-    def fun(k, n, Tos, pfa):
+    def fun(k, n, t_os, pfa):
         return (
             log_factorial(n)
             - log_factorial(n - k)
-            - np.sum(np.log(np.arange(n, n - k, -1) + Tos))
+            - np.sum(np.log(np.arange(n, n - k, -1) + t_os))
             - np.log(pfa)
         )
 
