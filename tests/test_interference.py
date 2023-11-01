@@ -22,11 +22,13 @@ import numpy as np
 import numpy.testing as npt
 
 from radarsimpy import Radar, Transmitter, Receiver
-from radarsimpy.rt import scene
-from radarsimpy.simulator import simc
+from radarsimpy.rt import scene  # pylint: disable=no-name-in-module
+from radarsimpy.simulator import simc  # pylint: disable=no-name-in-module
 
 
 def test_scene_interference():
+    """_summary_
+    """
     f_offset_int = np.arange(0, 8) * 70e6
     int_tx = Transmitter(
         f=[60.4e9, 60.6e9],
@@ -36,7 +38,7 @@ def test_scene_interference():
         pulses=8,
         f_offset=f_offset_int,
         channels=[
-            dict(location=(0, 0.1, 0), pulse_phs=np.array([0, 180, 0, 0, 0, 0, 0, 0]))
+            {"location": (0, 0.1, 0), "pulse_phs": np.array([0, 180, 0, 0, 0, 0, 0, 0])}
         ],
     )
 
@@ -46,7 +48,7 @@ def test_scene_interference():
         rf_gain=20,
         load_resistor=500,
         baseband_gain=30,
-        channels=[dict(location=(0, 0.1, 0))],
+        channels=[{"location": (0, 0.1, 0)}],
     )
 
     int_radar = Radar(
@@ -61,7 +63,7 @@ def test_scene_interference():
         prp=20e-6,
         pulses=4,
         f_offset=f_offset_vit,
-        channels=[dict(location=(0, 0, 0), pulse_phs=np.array([180, 0, 0, 0]))],
+        channels=[{"location": (0, 0, 0), "pulse_phs": np.array([180, 0, 0, 0])}],
     )
 
     rx = Receiver(
@@ -70,7 +72,7 @@ def test_scene_interference():
         rf_gain=20,
         load_resistor=500,
         baseband_gain=60,
-        channels=[dict(location=(0, 0, 0))],
+        channels=[{"location": (0, 0, 0)}],
     )
 
     radar = Radar(transmitter=tx, receiver=rx, interf=int_radar)
@@ -1383,12 +1385,14 @@ def test_scene_interference():
 
 
 def test_simc_interference():
+    """_summary_
+    """
     channels = []
 
     channels.append(
-        dict(
-            location=(0, 10, 0),
-        )
+        {
+            "location": (0, 10, 0),
+        }
     )
 
     tx = Transmitter(
@@ -1416,9 +1420,9 @@ def test_simc_interference():
     channels = []
 
     channels.append(
-        dict(
-            location=(0, 0, 0),
-        )
+        {
+            "location": (0, 0, 0),
+        }
     )
 
     tx = Transmitter(
@@ -1441,7 +1445,7 @@ def test_simc_interference():
 
     radar = Radar(transmitter=tx, receiver=rx, interf=radar_int)
 
-    target_1 = dict(location=(40, 40, 0), speed=(0, 0, 0), rcs=10, phase=0)
+    target_1 = {"location": (40, 40, 0), "speed": (0, 0, 0), "rcs": 10, "phase": 0}
 
     targets = [target_1]
 

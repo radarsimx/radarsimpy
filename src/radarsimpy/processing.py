@@ -30,7 +30,7 @@ from scipy import fft
 from .tools import log_factorial  # pylint: disable=no-name-in-module
 
 
-def range_fft(data, rwin=None, n=None):
+def range_fft(data, rwin=None, n=None) -> np.ndarray:
     """
     Calculate range profile matrix
 
@@ -57,7 +57,7 @@ def range_fft(data, rwin=None, n=None):
     return fft.fft(data * rwin, n=n, axis=2)
 
 
-def doppler_fft(data, dwin=None, n=None):
+def doppler_fft(data, dwin=None, n=None) -> np.ndarray:
     """
     Calculate range-Doppler matrix
 
@@ -84,7 +84,7 @@ def doppler_fft(data, dwin=None, n=None):
     return fft.fft(data * dwin, n=n, axis=1)
 
 
-def range_doppler_fft(data, rwin=None, dwin=None, rn=None, dn=None):
+def range_doppler_fft(data, rwin=None, dwin=None, rn=None, dn=None) -> np.ndarray:
     """
     Range-Doppler processing
 

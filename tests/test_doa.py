@@ -1,5 +1,5 @@
 """
-A Python module for radar simulation
+System level test for DoA processing
 
 ---
 
@@ -300,12 +300,16 @@ covmat_beamforming = np.array(
 
 
 def test_doa_music():
+    """_summary_
+    """
     doa, _, _ = proc.doa_music(covmat_est, 3)
 
     npt.assert_equal(np.sort(doa), np.array([-12, 0, 85]))
 
 
 def test_doa_root_music():
+    """_summary_
+    """
     doa = proc.doa_root_music(covmat_est, 3)
 
     npt.assert_almost_equal(
@@ -316,12 +320,16 @@ def test_doa_root_music():
 
 
 def test_doa_esprit():
+    """_summary_
+    """
     doa = proc.doa_esprit(covmat_est, 3)
 
     npt.assert_almost_equal(doa, np.array([2.025e-15, -1.200e01, 8.500e01]), decimal=3)
 
 
 def test_doa_bartlett():
+    """_summary_
+    """
     ps = proc.doa_bartlett(covmat_beamforming)
 
     npt.assert_almost_equal(
@@ -516,6 +524,8 @@ def test_doa_bartlett():
 
 
 def test_doa_capon():
+    """_summary_
+    """
     ps = proc.doa_capon(covmat_beamforming)
 
     npt.assert_almost_equal(

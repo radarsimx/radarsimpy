@@ -1,5 +1,5 @@
 """
-A Python module for radar simulation
+System level test for CFAR
 
 ---
 
@@ -25,6 +25,8 @@ import radarsimpy.processing as proc
 
 
 def test_ca_cfar():
+    """_summary_
+    """
     sig = np.ones((2, 32))
     sig[0, 16] = 20
     sig[1, 10] = 30
@@ -201,6 +203,8 @@ def test_ca_cfar():
 
 
 def test_os_cfar():
+    """_summary_
+    """
     sig = np.ones((2, 32))
     sig[0, 16] = 20
     sig[1, 10] = 30

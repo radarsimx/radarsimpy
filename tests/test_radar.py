@@ -28,10 +28,17 @@ from .test_receiver import cw_rx, fmcw_rx, tdm_fmcw_rx, pmcw_rx
 
 
 def cw_radar():
+    """_summary_
+
+    :return: _description_
+    :rtype: _type_
+    """
     return Radar(transmitter=cw_tx(), receiver=cw_rx())
 
 
 def test_cw_radar():
+    """_summary_
+    """
     cw = cw_radar()
 
     assert cw.sample_prop["samples_per_pulse"] == 10 * 20
@@ -40,10 +47,17 @@ def test_cw_radar():
 
 
 def fmcw_radar():
+    """_summary_
+
+    :return: _description_
+    :rtype: _type_
+    """
     return Radar(transmitter=fmcw_tx(), receiver=fmcw_rx(), time=[0, 1])
 
 
 def test_fmcw_radar():
+    """_summary_
+    """
     fmcw = fmcw_radar()
 
     assert fmcw.sample_prop["samples_per_pulse"] == 80e-6 * 2e6
@@ -52,10 +66,17 @@ def test_fmcw_radar():
 
 
 def tdm_fmcw_radar():
+    """_summary_
+
+    :return: _description_
+    :rtype: _type_
+    """
     return Radar(transmitter=tdm_fmcw_tx(), receiver=tdm_fmcw_rx())
 
 
 def test_tdm_fmcw_radar():
+    """_summary_
+    """
     half_wavelength = const.c / 24.125e9 / 2
     tdm = tdm_fmcw_radar()
 
@@ -87,6 +108,11 @@ def test_tdm_fmcw_radar():
 
 
 def pmcw_radar():
+    """_summary_
+
+    :return: _description_
+    :rtype: _type_
+    """
     code1 = np.array(
         [
             1,
@@ -609,6 +635,8 @@ def pmcw_radar():
 
 
 def test_pmcw_radar():
+    """_summary_
+    """
     pmcw = pmcw_radar()
 
     assert pmcw.sample_prop["samples_per_pulse"] == 2.1e-6 * 250e6

@@ -23,12 +23,14 @@ import numpy as np
 import numpy.testing as npt
 
 from radarsimpy import Radar, Transmitter, Receiver
-from radarsimpy.simulator import simc
+from radarsimpy.simulator import simc  # pylint: disable=no-name-in-module
 from radarsimpy.radar import cal_phase_noise
 import radarsimpy.processing as proc
 
 
 def test_phase_noise():
+    """_summary_
+    """
     sig = np.ones((1, 256))
     pn_f = np.array([1000, 10000, 100000, 1000000])
     pn_power_db_per_hz = np.array([-84, -100, -96, -109])
@@ -47,7 +49,9 @@ def test_phase_noise():
 
 
 def test_fmcw_phase_noise_cpp():
-    tx_channel = dict(location=(0, 0, 0))
+    """_summary_
+    """
+    tx_channel = {"location": (0, 0, 0)}
 
     pn_f = np.array([1000, 10000, 100000, 1000000])
     pn_power = np.array([-65, -70, -65, -90])
@@ -72,7 +76,7 @@ def test_fmcw_phase_noise_cpp():
         channels=[tx_channel],
     )
 
-    rx_channel = dict(location=(0, 0, 0))
+    rx_channel = {"location": (0, 0, 0)}
 
     rx = Receiver(
         fs=2e6,
@@ -86,7 +90,7 @@ def test_fmcw_phase_noise_cpp():
     radar_pn = Radar(transmitter=tx_pn, receiver=rx, seed=1234, validation=True)
     radar = Radar(transmitter=tx, receiver=rx, seed=1234, validation=True)
 
-    target_1 = dict(location=(150, 20, 0), speed=(0, 0, 0), rcs=60, phase=0)
+    target_1 = {"location": (150, 20, 0), "speed": (0, 0, 0), "rcs": 60, "phase": 0}
 
     targets = [target_1]
 

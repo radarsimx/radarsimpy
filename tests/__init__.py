@@ -1,5 +1,5 @@
 """
-A Python module for radar simulation
+System level test of RadarSimPy
 
 ---
 

@@ -20,10 +20,12 @@ A Python module for radar simulation
 
 import numpy as np
 import numpy.testing as npt
-from radarsimpy.rt import lidar_scene
+from radarsimpy.rt import lidar_scene  # pylint: disable=no-name-in-module
 
 
 def test_lidar():
+    """_summary_
+    """
     ground = {
         "model": "./models/surface_60x60.stl",
         "location": (0, 0, 0),

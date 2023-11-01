@@ -27,17 +27,24 @@ from radarsimpy import Receiver
 
 
 def cw_rx():
+    """_summary_
+
+    :return: _description_
+    :rtype: _type_
+    """
     return Receiver(
         fs=20,
         noise_figure=12,
         rf_gain=20,
         baseband_gain=50,
         load_resistor=1000,
-        channels=[dict(location=(0, 0, 0))],
+        channels=[{"location": (0, 0, 0)}],
     )
 
 
 def test_cw_rx():
+    """_summary_
+    """
     print("#### CW receiver ####")
     cw = cw_rx()
 
@@ -59,16 +66,21 @@ def test_cw_rx():
 
 
 def fmcw_rx():
+    """_summary_
+
+    :return: _description_
+    :rtype: _type_
+    """
     angle = np.arange(-90, 91, 1)
     pattern = 20 * np.log10(np.cos(angle / 180 * np.pi) + 0.01) + 6
 
-    rx_channel = dict(
-        location=(0, 0, 0),
-        azimuth_angle=angle,
-        azimuth_pattern=pattern,
-        elevation_angle=angle,
-        elevation_pattern=pattern,
-    )
+    rx_channel = {
+        "location": (0, 0, 0),
+        "azimuth_angle": angle,
+        "azimuth_pattern": pattern,
+        "elevation_angle": angle,
+        "elevation_pattern": pattern,
+    }
 
     return Receiver(
         fs=2e6,
@@ -81,6 +93,8 @@ def fmcw_rx():
 
 
 def test_fmcw_rx():
+    """_summary_
+    """
     print("#### FMCW receiver ####")
     fmcw = fmcw_rx()
 
@@ -106,10 +120,15 @@ def test_fmcw_rx():
 
 
 def tdm_fmcw_rx():
+    """_summary_
+
+    :return: _description_
+    :rtype: _type_
+    """
     wavelength = const.c / 24.125e9
     channels = []
     for idx in range(0, 8):
-        channels.append(dict(location=(0, wavelength / 2 * idx, 0)))
+        channels.append({"location": (0, wavelength / 2 * idx, 0)})
 
     return Receiver(
         fs=2e6,
@@ -122,6 +141,8 @@ def tdm_fmcw_rx():
 
 
 def test_tdm_fmcw_rx():
+    """_summary_
+    """
     print("#### TDM FMCW receiver ####")
     tdm = tdm_fmcw_rx()
 
@@ -206,6 +227,11 @@ def test_tdm_fmcw_rx():
 
 
 def pmcw_rx():
+    """_summary_
+
+    :return: _description_
+    :rtype: _type_
+    """
     angle = np.arange(-90, 91, 1)
     pattern = np.ones(181) * 12
 
@@ -216,18 +242,20 @@ def pmcw_rx():
         baseband_gain=30,
         load_resistor=1000,
         channels=[
-            dict(
-                location=(0, 0, 0),
-                azimuth_angle=angle,
-                azimuth_pattern=pattern,
-                elevation_angle=angle,
-                elevation_pattern=pattern,
-            )
+            {
+                "location": (0, 0, 0),
+                "azimuth_angle": angle,
+                "azimuth_pattern": pattern,
+                "elevation_angle": angle,
+                "elevation_pattern": pattern,
+            }
         ],
     )
 
 
 def test_pmcw_rx():
+    """_summary_
+    """
     print("#### PMCW receiver ####")
     pmcw = pmcw_rx()
 

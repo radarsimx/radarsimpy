@@ -1,5 +1,5 @@
 """
-A Python module for radar simulation
+System level test for raytracing-based scene simulation
 
 ---
 
@@ -23,21 +23,22 @@ import numpy.testing as npt
 from scipy import signal
 
 from radarsimpy import Radar, Transmitter, Receiver
-from radarsimpy.rt import scene
+from radarsimpy.rt import scene  # pylint: disable=no-name-in-module
 import radarsimpy.processing as proc
 
 
 def test_fmcw_raytracing():
+    """_summary_"""
     angle = np.arange(-90, 91, 1)
     pattern = 20 * np.log10(np.cos(angle / 180 * np.pi) + 0.01)
 
-    tx_channel = dict(
-        location=(0, 0, 0),
-        azimuth_angle=angle,
-        azimuth_pattern=pattern,
-        elevation_angle=angle,
-        elevation_pattern=pattern,
-    )
+    tx_channel = {
+        "location": (0, 0, 0),
+        "azimuth_angle": angle,
+        "azimuth_pattern": pattern,
+        "elevation_angle": angle,
+        "elevation_pattern": pattern,
+    }
 
     tx = Transmitter(
         f=[1e9 - 50e6, 1e9 + 50e6],
@@ -48,13 +49,13 @@ def test_fmcw_raytracing():
         channels=[tx_channel],
     )
 
-    rx_channel = dict(
-        location=(0, 0, 0),
-        azimuth_angle=angle,
-        azimuth_pattern=pattern,
-        elevation_angle=angle,
-        elevation_pattern=pattern,
-    )
+    rx_channel = {
+        "location": (0, 0, 0),
+        "azimuth_angle": angle,
+        "azimuth_pattern": pattern,
+        "elevation_angle": angle,
+        "elevation_pattern": pattern,
+    }
 
     rx = Receiver(
         fs=2e6,
@@ -85,22 +86,66 @@ def test_fmcw_raytracing():
 
     assert np.array_equal(np.shape(range_profile), np.array([2, 2, 160]))
 
-    assert np.argmax(np.abs(range_profile[0, 0, :])) == 133
-    assert np.argmax(np.abs(range_profile[0, 1, :])) == 117
-    assert np.argmax(np.abs(range_profile[1, 0, :])) == 100
-    assert np.argmax(np.abs(range_profile[1, 1, :])) == 83
+    assert (
+        np.argmax(
+            np.abs(range_profile[0, 0, :])  # pylint: disable=invalid-sequence-index
+        )
+        == 133
+    )
+    assert (
+        np.argmax(
+            np.abs(range_profile[0, 1, :])  # pylint: disable=invalid-sequence-index
+        )
+        == 117
+    )
+    assert (
+        np.argmax(
+            np.abs(range_profile[1, 0, :])  # pylint: disable=invalid-sequence-index
+        )
+        == 100
+    )
+    assert (
+        np.argmax(
+            np.abs(range_profile[1, 1, :])  # pylint: disable=invalid-sequence-index
+        )
+        == 83
+    )
 
-    amp1 = 20 * np.log10(np.abs(range_profile[0, 0, 133]))
-    phs1 = np.angle(range_profile[0, 0, 133]) / np.pi * 180
+    amp1 = 20 * np.log10(
+        np.abs(range_profile[0, 0, 133])  # pylint: disable=invalid-sequence-index
+    )
+    phs1 = (
+        np.angle(range_profile[0, 0, 133])  # pylint: disable=invalid-sequence-index
+        / np.pi
+        * 180
+    )
 
-    amp2 = 20 * np.log10(np.abs(range_profile[0, 1, 117]))
-    phs2 = np.angle(range_profile[0, 1, 117]) / np.pi * 180
+    amp2 = 20 * np.log10(
+        np.abs(range_profile[0, 1, 117])  # pylint: disable=invalid-sequence-index
+    )
+    phs2 = (
+        np.angle(range_profile[0, 1, 117])  # pylint: disable=invalid-sequence-index
+        / np.pi
+        * 180
+    )
 
-    amp3 = 20 * np.log10(np.abs(range_profile[1, 0, 100]))
-    phs3 = np.angle(range_profile[1, 0, 100]) / np.pi * 180
+    amp3 = 20 * np.log10(
+        np.abs(range_profile[1, 0, 100])  # pylint: disable=invalid-sequence-index
+    )
+    phs3 = (
+        np.angle(range_profile[1, 0, 100])  # pylint: disable=invalid-sequence-index
+        / np.pi
+        * 180
+    )
 
-    amp4 = 20 * np.log10(np.abs(range_profile[1, 1, 83]))
-    phs4 = np.angle(range_profile[1, 1, 83]) / np.pi * 180
+    amp4 = 20 * np.log10(
+        np.abs(range_profile[1, 1, 83])  # pylint: disable=invalid-sequence-index
+    )
+    phs4 = (
+        np.angle(range_profile[1, 1, 83])  # pylint: disable=invalid-sequence-index
+        / np.pi
+        * 180
+    )
 
     npt.assert_almost_equal(amp1, 16.23, decimal=1)
     npt.assert_almost_equal(amp2, -7.61, decimal=1)
@@ -114,19 +159,21 @@ def test_fmcw_raytracing():
 
 
 def test_fmcw_raytracing_tx_azimuth():
+    """_summary_
+    """
     tx_az_angle = np.arange(-90, 91, 1)
     tx_az_pattern = tx_az_angle / 9
 
     tx_el_angle = np.arange(-90, 91, 1)
     tx_el_pattern = tx_el_angle / 9
 
-    tx_channel = dict(
-        location=(0, 0, 0),
-        azimuth_angle=tx_az_angle,
-        azimuth_pattern=tx_az_pattern,
-        elevation_angle=tx_el_angle,
-        elevation_pattern=tx_el_pattern,
-    )
+    tx_channel = {
+        "location": (0, 0, 0),
+        "azimuth_angle": tx_az_angle,
+        "azimuth_pattern": tx_az_pattern,
+        "elevation_angle": tx_el_angle,
+        "elevation_pattern": tx_el_pattern,
+    }
 
     tx = Transmitter(
         f=[10e9 - 50e6, 10e9 + 50e6],
@@ -137,9 +184,9 @@ def test_fmcw_raytracing_tx_azimuth():
         channels=[tx_channel],
     )
 
-    rx_channel = dict(
-        location=(0, 0, 0),
-    )
+    rx_channel = {
+        "location": (0, 0, 0),
+    }
 
     rx = Receiver(
         fs=2e6,
@@ -178,19 +225,21 @@ def test_fmcw_raytracing_tx_azimuth():
 
 
 def test_fmcw_raytracing_tx_elevation():
+    """_summary_
+    """
     tx_az_angle = np.arange(-90, 91, 1)
     tx_az_pattern = tx_az_angle / 9
 
     tx_el_angle = np.arange(-90, 91, 1)
     tx_el_pattern = tx_el_angle / 9
 
-    tx_channel = dict(
-        location=(0, 0, 0),
-        azimuth_angle=tx_az_angle,
-        azimuth_pattern=tx_az_pattern,
-        elevation_angle=tx_el_angle,
-        elevation_pattern=tx_el_pattern,
-    )
+    tx_channel = {
+        "location": (0, 0, 0),
+        "azimuth_angle": tx_az_angle,
+        "azimuth_pattern": tx_az_pattern,
+        "elevation_angle": tx_el_angle,
+        "elevation_pattern": tx_el_pattern,
+    }
 
     tx = Transmitter(
         f=[10e9 - 50e6, 10e9 + 50e6],
@@ -201,9 +250,9 @@ def test_fmcw_raytracing_tx_elevation():
         channels=[tx_channel],
     )
 
-    rx_channel = dict(
-        location=(0, 0, 0),
-    )
+    rx_channel = {
+        "location": (0, 0, 0),
+    }
 
     rx = Receiver(
         fs=2e6,
@@ -242,9 +291,11 @@ def test_fmcw_raytracing_tx_elevation():
 
 
 def test_fmcw_raytracing_rx_azimuth():
-    tx_channel = dict(
-        location=(0, 0, 0),
-    )
+    """_summary_
+    """
+    tx_channel = {
+        "location": (0, 0, 0),
+    }
 
     tx = Transmitter(
         f=[10e9 - 50e6, 10e9 + 50e6],
@@ -261,13 +312,13 @@ def test_fmcw_raytracing_rx_azimuth():
     rx_el_angle = np.arange(-90, 91, 1)
     rx_el_pattern = rx_el_angle / 9
 
-    rx_channel = dict(
-        location=(0, 0, 0),
-        azimuth_angle=rx_az_angle,
-        azimuth_pattern=rx_az_pattern,
-        elevation_angle=rx_el_angle,
-        elevation_pattern=rx_el_pattern,
-    )
+    rx_channel = {
+        "location": (0, 0, 0),
+        "azimuth_angle": rx_az_angle,
+        "azimuth_pattern": rx_az_pattern,
+        "elevation_angle": rx_el_angle,
+        "elevation_pattern": rx_el_pattern,
+    }
 
     rx = Receiver(
         fs=2e6,
@@ -306,7 +357,9 @@ def test_fmcw_raytracing_rx_azimuth():
 
 
 def test_fmcw_raytracing_rx_elevation():
-    tx_channel = dict(location=(0, 0, 0))
+    """_summary_
+    """
+    tx_channel = {"location": (0, 0, 0)}
 
     tx = Transmitter(
         f=[10e9 - 50e6, 10e9 + 50e6],
@@ -323,13 +376,13 @@ def test_fmcw_raytracing_rx_elevation():
     rx_el_angle = np.arange(-90, 91, 1)
     rx_el_pattern = rx_el_angle / 9
 
-    rx_channel = dict(
-        location=(0, 0, 0),
-        azimuth_angle=rx_az_angle,
-        azimuth_pattern=rx_az_pattern,
-        elevation_angle=rx_el_angle,
-        elevation_pattern=rx_el_pattern,
-    )
+    rx_channel = {
+        "location": (0, 0, 0),
+        "azimuth_angle": rx_az_angle,
+        "azimuth_pattern": rx_az_pattern,
+        "elevation_angle": rx_el_angle,
+        "elevation_pattern": rx_el_pattern,
+    }
 
     rx = Receiver(
         fs=2e6,
@@ -368,18 +421,16 @@ def test_fmcw_raytracing_rx_elevation():
 
 
 def test_fmcw_raytracing_radar_rotation():
-    tx_az_angle = np.arange(-90, 91, 1)
-    tx_az_pattern = np.abs(tx_az_angle) / 9
+    """_summary_
+    """
     tx_el_angle = np.arange(-90, 91, 1)
     tx_el_pattern = tx_el_angle / 9
 
-    tx_channel = dict(
-        location=(0, 0, 0),
-        # azimuth_angle=tx_az_angle,
-        # azimuth_pattern=tx_az_pattern,
-        elevation_angle=tx_el_angle,
-        elevation_pattern=tx_el_pattern,
-    )
+    tx_channel = {
+        "location": (0, 0, 0),
+        "elevation_angle": tx_el_angle,
+        "elevation_pattern": tx_el_pattern,
+    }
 
     tx = Transmitter(
         f=[10e9 - 50e6, 10e9 + 50e6],
@@ -390,9 +441,9 @@ def test_fmcw_raytracing_radar_rotation():
         channels=[tx_channel],
     )
 
-    rx_channel = dict(
-        location=(0, 0, 0),
-    )
+    rx_channel = {
+        "location": (0, 0, 0),
+    }
 
     rx = Receiver(
         fs=2e6,
@@ -431,18 +482,16 @@ def test_fmcw_raytracing_radar_rotation():
 
 
 def test_fmcw_raytracing_radar_speed():
-    tx_az_angle = np.arange(-90, 91, 1)
-    tx_az_pattern = np.abs(tx_az_angle) / 9
+    """_summary_
+    """
     tx_el_angle = np.arange(-90, 91, 1)
     tx_el_pattern = tx_el_angle / 9
 
-    tx_channel = dict(
-        location=(0, 0, 0),
-        # azimuth_angle=tx_az_angle,
-        # azimuth_pattern=tx_az_pattern,
-        elevation_angle=tx_el_angle,
-        elevation_pattern=tx_el_pattern,
-    )
+    tx_channel = {
+        "location": (0, 0, 0),
+        "elevation_angle": tx_el_angle,
+        "elevation_pattern": tx_el_pattern,
+    }
 
     tx = Transmitter(
         f=[10e9 - 50e6, 10e9 + 50e6],
@@ -453,9 +502,9 @@ def test_fmcw_raytracing_radar_speed():
         channels=[tx_channel],
     )
 
-    rx_channel = dict(
-        location=(0, 0, 0),
-    )
+    rx_channel = {
+        "location": (0, 0, 0),
+    }
 
     rx = Receiver(
         fs=2e6,

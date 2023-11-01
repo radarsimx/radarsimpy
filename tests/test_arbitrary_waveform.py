@@ -1,5 +1,5 @@
 """
-A Python module for radar simulation
+System level test for arbitrary waveform
 
 ---
 
@@ -24,13 +24,14 @@ import numpy.testing as npt
 
 from radarsimpy import Radar, Transmitter, Receiver
 from radarsimpy.simulator import simc  # pylint: disable=no-name-in-module
-from radarsimpy.processing import range_fft  # pylint: disable=no-name-in-module
+from radarsimpy.processing import range_fft
 
 
-def test_arbitrary_waveform_cpp():
-    tx_channel = dict(
-        location=(0, 0, 0),
-    )
+def test_arbitrary_waveform():
+    """_summary_"""
+    tx_channel = {
+        "location": (0, 0, 0),
+    }
 
     freq_nonlinear = np.array(
         [
@@ -146,9 +147,9 @@ def test_arbitrary_waveform_cpp():
         channels=[tx_channel],
     )
 
-    rx_channel = dict(
-        location=(0, 0, 0),
-    )
+    rx_channel = {
+        "location": (0, 0, 0),
+    }
 
     rx = Receiver(
         fs=2e6,
@@ -161,9 +162,9 @@ def test_arbitrary_waveform_cpp():
 
     radar_nonlinear = Radar(transmitter=tx_nonlinear, receiver=rx)
 
-    target_1 = dict(location=(200, 0, 0), speed=(-5, 0, 0), rcs=20, phase=0)
-    target_2 = dict(location=(95, 20, 0), speed=(-50, 0, 0), rcs=15, phase=0)
-    target_3 = dict(location=(30, -5, 0), speed=(-22, 0, 0), rcs=5, phase=0)
+    target_1 = {"location": (200, 0, 0), "speed": (-5, 0, 0), "rcs": 20, "phase": 0}
+    target_2 = {"location": (95, 20, 0), "speed": (-50, 0, 0), "rcs": 15, "phase": 0}
+    target_3 = {"location": (30, -5, 0), "speed": (-22, 0, 0), "rcs": 5, "phase": 0}
 
     targets = [target_1, target_2, target_3]
 
@@ -177,7 +178,11 @@ def test_arbitrary_waveform_cpp():
 
     range_profile_nonlinear = range_fft(data_matrix_nonlinear[:, :, :], range_window)
 
-    range_profile = 20 * np.log10(np.abs(range_profile_nonlinear[0, 0, :]))
+    range_profile = 20 * np.log10(
+        np.abs(
+            range_profile_nonlinear[0, 0, :]  # pylint: disable=invalid-sequence-index
+        )
+    )
 
     npt.assert_allclose(
         range_profile,

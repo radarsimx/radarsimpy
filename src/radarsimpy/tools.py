@@ -7,7 +7,6 @@ Python environment you are running this script in.
 This file can be imported as a module and contains the following
 functions:
 
-* threshold - Threshold ratio
 * roc_pd - Calculate probability of detection (Pd) in receiver operating
            characteristic (ROC)
 * roc_snr - Calculate the minimal SNR for certain probability of

@@ -21,10 +21,12 @@ A Python module for radar simulation
 import numpy as np
 import numpy.testing as npt
 
-from radarsimpy.rt import rcs_sbr
+from radarsimpy.rt import rcs_sbr  # pylint: disable=no-name-in-module
 
 
 def test_rcs_momostatic():
+    """_summary_
+    """
     phi = 0
     theta = 90
     freq = np.array([1e9, 3e9])
@@ -44,6 +46,8 @@ def test_rcs_momostatic():
 
 
 def test_rcs_bistatic():
+    """_summary_
+    """
     phi = np.array([-30, -24, 65])
     theta = 90
 

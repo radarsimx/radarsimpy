@@ -26,10 +26,17 @@ from radarsimpy import Transmitter
 
 
 def cw_tx():
+    """_summary_
+
+    :return: _description_
+    :rtype: _type_
+    """
     return Transmitter(f=24e9, t=10, tx_power=10, pulses=2)
 
 
 def test_cw_tx():
+    """_summary_
+    """
     print("#### CW transmitter ####")
     cw = cw_tx()
 
@@ -56,16 +63,21 @@ def test_cw_tx():
 
 
 def fmcw_tx():
+    """_summary_
+
+    :return: _description_
+    :rtype: _type_
+    """
     angle = np.arange(-90, 91, 1)
     pattern = 20 * np.log10(np.cos(angle / 180 * np.pi) + 0.01) + 6
 
-    tx_channel = dict(
-        location=(0, 0, 0),
-        azimuth_angle=angle,
-        azimuth_pattern=pattern,
-        elevation_angle=angle,
-        elevation_pattern=pattern,
-    )
+    tx_channel = {
+        "location": (0, 0, 0),
+        "azimuth_angle": angle,
+        "azimuth_pattern": pattern,
+        "elevation_angle": angle,
+        "elevation_pattern": pattern,
+    }
 
     return Transmitter(
         f=[24.125e9 - 50e6, 24.125e9 + 50e6],
@@ -78,6 +90,8 @@ def fmcw_tx():
 
 
 def test_fmcw_tx():
+    """_summary_
+    """
     print("#### FMCW transmitter ####")
     fmcw = fmcw_tx()
 
@@ -108,10 +122,15 @@ def test_fmcw_tx():
 
 
 def tdm_fmcw_tx():
+    """_summary_
+
+    :return: _description_
+    :rtype: _type_
+    """
     wavelength = const.c / 24.125e9
 
-    tx_channel_1 = dict(location=(0, -4 * wavelength, 0), delay=0)
-    tx_channel_2 = dict(location=(0, 0, 0), delay=100e-6)
+    tx_channel_1 = {"location": (0, -4 * wavelength, 0), "delay": 0}
+    tx_channel_2 = {"location": (0, 0, 0), "delay": 100e-6}
 
     return Transmitter(
         f=[24.125e9 - 50e6, 24.125e9 + 50e6],
@@ -124,6 +143,8 @@ def tdm_fmcw_tx():
 
 
 def test_tdm_fmcw_tx():
+    """_summary_
+    """
     print("#### TDM FMCW transmitter ####")
     tdm = tdm_fmcw_tx()
 
@@ -160,6 +181,15 @@ def test_tdm_fmcw_tx():
 
 
 def pmcw_tx(code1, code2):
+    """_summary_
+
+    :param code1: _description_
+    :type code1: _type_
+    :param code2: _description_
+    :type code2: _type_
+    :return: _description_
+    :rtype: _type_
+    """
     angle = np.arange(-90, 91, 1)
     pattern = np.ones(181) * 12
 
@@ -173,25 +203,25 @@ def pmcw_tx(code1, code2):
     mod_t1 = np.arange(0, len(code1)) * 4e-9
     mod_t2 = np.arange(0, len(code2)) * 4e-9
 
-    tx_channel_1 = dict(
-        location=(0, 0, 0),
-        azimuth_angle=angle,
-        azimuth_pattern=pattern,
-        elevation_angle=angle,
-        elevation_pattern=pattern,
-        mod_t=mod_t1,
-        phs=pulse_phs1,
-    )
+    tx_channel_1 = {
+        "location": (0, 0, 0),
+        "azimuth_angle": angle,
+        "azimuth_pattern": pattern,
+        "elevation_angle": angle,
+        "elevation_pattern": pattern,
+        "mod_t": mod_t1,
+        "phs": pulse_phs1,
+    }
 
-    tx_channel_2 = dict(
-        location=(0, 0, 0),
-        azimuth_angle=angle,
-        azimuth_pattern=pattern,
-        elevation_angle=angle,
-        elevation_pattern=pattern,
-        mod_t=mod_t2,
-        phs=pulse_phs2,
-    )
+    tx_channel_2 = {
+        "location": (0, 0, 0),
+        "azimuth_angle": angle,
+        "azimuth_pattern": pattern,
+        "elevation_angle": angle,
+        "elevation_pattern": pattern,
+        "mod_t": mod_t2,
+        "phs": pulse_phs2,
+    }
 
     return Transmitter(
         f=24.125e9,
@@ -203,6 +233,8 @@ def pmcw_tx(code1, code2):
 
 
 def test_pmcw_tx():
+    """_summary_
+    """
     code1 = np.array(
         [
             1,
@@ -766,8 +798,12 @@ def test_pmcw_tx():
 
 
 def test_fsk_tx():
+    """_summary_
+    """
     print("#### FSK transmitter ####")
 
 
 def test_bpm_fmcw_tx():
+    """_summary_
+    """
     print("#### BPM FMCW transmitter ####")

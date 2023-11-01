@@ -24,20 +24,26 @@ import numpy.testing as npt
 import scipy.constants as const
 from scipy import signal
 
-from radarsimpy.simulator import simc
+from radarsimpy.simulator import simc  # pylint: disable=no-name-in-module
 import radarsimpy.processing as proc
 
 from .test_radar import cw_radar, fmcw_radar, tdm_fmcw_radar, pmcw_radar
 
 
 def test_sim_cw():
+    """_summary_
+    """
     radar = cw_radar()
 
-    target = dict(
-        location=(1.5 + 1e-3 * np.sin(2 * np.pi * 1 * radar.time_prop["timestamp"]), 0, 0),
-        rcs=0,
-        phase=0,
-    )
+    target = {
+        "location": (
+            1.5 + 1e-3 * np.sin(2 * np.pi * 1 * radar.time_prop["timestamp"]),
+            0,
+            0,
+        ),
+        "rcs": 0,
+        "phase": 0,
+    }
     targets = [target]
 
     data = simc(radar, targets, noise=False)
@@ -59,10 +65,12 @@ def test_sim_cw():
 
 
 def test_sim_fmcw():
+    """_summary_
+    """
     radar = fmcw_radar()
-    target_1 = dict(location=(200, 0, 0), speed=(-5, 0, 0), rcs=20, phase=0)
-    target_2 = dict(location=(95, 20, 0), speed=(-50, 0, 0), rcs=15, phase=0)
-    target_3 = dict(location=(30, -5, 0), speed=(-22, 0, 0), rcs=5, phase=0)
+    target_1 = {"location": (200, 0, 0), "speed": (-5, 0, 0), "rcs": 20, "phase": 0}
+    target_2 = {"location": (95, 20, 0), "speed": (-50, 0, 0), "rcs": 15, "phase": 0}
+    target_3 = {"location": (30, -5, 0), "speed": (-22, 0, 0), "rcs": 5, "phase": 0}
 
     rng_targets = np.sort(
         np.array(
@@ -151,7 +159,9 @@ def test_sim_fmcw():
         const.c / radar.radar_prop["transmitter"].waveform_prop["prp"][0] / 24.125e9 / 2
     )
 
-    range_axis = np.linspace(0, max_range, radar.sample_prop["samples_per_pulse"], endpoint=False)
+    range_axis = np.linspace(
+        0, max_range, radar.sample_prop["samples_per_pulse"], endpoint=False
+    )
 
     rng_dets = np.sort(range_axis[rng_peaks])
     npt.assert_almost_equal(rng_targets, rng_dets, decimal=0)
@@ -175,7 +185,9 @@ def test_sim_fmcw():
     rng_peaks = signal.find_peaks(max_rng, height=-40)[0]
     dop_peaks = signal.find_peaks(max_dop, height=-40)[0]
 
-    range_axis = np.linspace(0, max_range, radar.sample_prop["samples_per_pulse"], endpoint=False)
+    range_axis = np.linspace(
+        0, max_range, radar.sample_prop["samples_per_pulse"], endpoint=False
+    )
 
     rng_dets = np.sort(range_axis[rng_peaks])
     npt.assert_almost_equal(np.array([9.0, 48.0, 195.0]), rng_dets, decimal=0)
@@ -194,10 +206,12 @@ def test_sim_fmcw():
 
 
 def test_sim_tdm_fmcw():
+    """_summary_
+    """
     radar = tdm_fmcw_radar()
-    target_1 = dict(location=(120, 0, 0), speed=(0, 0, 0), rcs=25, phase=0)
-    target_2 = dict(location=(80, -80, 0), speed=(0, 0, 0), rcs=20, phase=0)
-    target_3 = dict(location=(30, 20, 0), speed=(0, 0, 0), rcs=8, phase=0)
+    target_1 = {"location": (120, 0, 0), "speed": (0, 0, 0), "rcs": 25, "phase": 0}
+    target_2 = {"location": (80, -80, 0), "speed": (0, 0, 0), "rcs": 20, "phase": 0}
+    target_3 = {"location": (30, 20, 0), "speed": (0, 0, 0), "rcs": 8, "phase": 0}
 
     rng_targets = np.sort(
         np.array(
@@ -308,7 +322,9 @@ def test_sim_tdm_fmcw():
         / 2
     )
 
-    range_axis = np.linspace(0, max_range, radar.sample_prop["samples_per_pulse"], endpoint=False)
+    range_axis = np.linspace(
+        0, max_range, radar.sample_prop["samples_per_pulse"], endpoint=False
+    )
 
     rng_dets = np.sort(range_axis[rng_peaks])
 
@@ -316,6 +332,8 @@ def test_sim_tdm_fmcw():
 
 
 def test_sim_pmcw():
+    """_summary_
+    """
     code1 = np.array(
         [
             1,
@@ -836,11 +854,11 @@ def test_sim_pmcw():
     )
     radar = pmcw_radar()
 
-    target_1 = dict(location=(20, 0, 0), speed=(-185, 0, 0), rcs=20, phase=0)
+    target_1 = {"location": (20, 0, 0), "speed": (-185, 0, 0), "rcs": 20, "phase": 0}
 
-    target_2 = dict(location=(70, 0, 0), speed=(0, 0, 0), rcs=35, phase=0)
+    target_2 = {"location": (70, 0, 0), "speed": (0, 0, 0), "rcs": 35, "phase": 0}
 
-    target_3 = dict(location=(33, 10, 0), speed=(97, 0, 0), rcs=20, phase=0)
+    target_3 = {"location": (33, 10, 0), "speed": (97, 0, 0), "rcs": 20, "phase": 0}
 
     rng_targets = np.sort(
         np.array(
