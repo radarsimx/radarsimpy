@@ -257,6 +257,7 @@ cpdef simc(radar, targets, noise=True):
             )
     
     if radar.radar_prop["interf"] is not None:
+        interf_radar_prop = radar.radar_prop["interf"].radar_prop
         """
         Transmitter
         """
@@ -265,37 +266,37 @@ cpdef simc(radar, targets, noise=True):
         """
         Transmitter Channels
         """
-        for idx_c in range(0, radar.radar_prop["interf"].radar_prop["transmitter"].txchannel_prop["size"]):
-            interf_tx_c.AddChannel(cp_TxChannel(radar.radar_prop["interf"].radar_prop["transmitter"], idx_c))
+        for idx_c in range(0, interf_radar_prop["transmitter"].txchannel_prop["size"]):
+            interf_tx_c.AddChannel(cp_TxChannel(interf_radar_prop["transmitter"], idx_c))
 
         """
         Receiver
         """
         interf_rx_c = Receiver[float_t](
-            <float_t> radar.radar_prop["interf"].radar_prop["receiver"].bb_prop["fs"],
-            <float_t> radar.radar_prop["interf"].radar_prop["receiver"].rf_prop["rf_gain"],
-            <float_t> radar.radar_prop["interf"].radar_prop["receiver"].bb_prop["load_resistor"],
-            <float_t> radar.radar_prop["interf"].radar_prop["receiver"].bb_prop["baseband_gain"]
+            <float_t> interf_radar_prop["receiver"].bb_prop["fs"],
+            <float_t> interf_radar_prop["receiver"].rf_prop["rf_gain"],
+            <float_t> interf_radar_prop["receiver"].bb_prop["load_resistor"],
+            <float_t> interf_radar_prop["receiver"].bb_prop["baseband_gain"]
         )
 
-        for idx_c in range(0, radar.radar_prop["interf"].radar_prop["receiver"].rxchannel_prop["size"]):
-            interf_rx_c.AddChannel(cp_RxChannel(radar.radar_prop["interf"].radar_prop["receiver"], idx_c))
+        for idx_c in range(0, interf_radar_prop["receiver"].rxchannel_prop["size"]):
+            interf_rx_c.AddChannel(cp_RxChannel(interf_radar_prop["receiver"], idx_c))
 
         interf_radar_c = Radar[float_t](interf_tx_c, interf_rx_c)
 
-        if len(np.shape(radar.radar_prop["interf"].radar_prop["location"])) == 4:
-            locx_mv = radar.radar_prop["interf"].radar_prop["location"][:,:,:,0].astype(np_float)
-            locy_mv = radar.radar_prop["interf"].radar_prop["location"][:,:,:,1].astype(np_float)
-            locz_mv = radar.radar_prop["interf"].radar_prop["location"][:,:,:,2].astype(np_float)
-            spdx_mv = radar.radar_prop["interf"].radar_prop["speed"][:,:,:,0].astype(np_float)
-            spdy_mv = radar.radar_prop["interf"].radar_prop["speed"][:,:,:,1].astype(np_float)
-            spdz_mv = radar.radar_prop["interf"].radar_prop["speed"][:,:,:,2].astype(np_float)
-            rotx_mv = radar.radar_prop["interf"].radar_prop["rotation"][:,:,:,0].astype(np_float)
-            roty_mv = radar.radar_prop["interf"].radar_prop["rotation"][:,:,:,1].astype(np_float)
-            rotz_mv = radar.radar_prop["interf"].radar_prop["rotation"][:,:,:,2].astype(np_float)
-            rrtx_mv = radar.radar_prop["interf"].radar_prop["rotation_rate"][:,:,:,0].astype(np_float)
-            rrty_mv = radar.radar_prop["interf"].radar_prop["rotation_rate"][:,:,:,1].astype(np_float)
-            rrtz_mv = radar.radar_prop["interf"].radar_prop["rotation_rate"][:,:,:,2].astype(np_float)
+        if len(np.shape(interf_radar_prop["location"])) == 4:
+            locx_mv = interf_radar_prop["location"][:,:,:,0].astype(np_float)
+            locy_mv = interf_radar_prop["location"][:,:,:,1].astype(np_float)
+            locz_mv = interf_radar_prop["location"][:,:,:,2].astype(np_float)
+            spdx_mv = interf_radar_prop["speed"][:,:,:,0].astype(np_float)
+            spdy_mv = interf_radar_prop["speed"][:,:,:,1].astype(np_float)
+            spdz_mv = interf_radar_prop["speed"][:,:,:,2].astype(np_float)
+            rotx_mv = interf_radar_prop["rotation"][:,:,:,0].astype(np_float)
+            roty_mv = interf_radar_prop["rotation"][:,:,:,1].astype(np_float)
+            rotz_mv = interf_radar_prop["rotation"][:,:,:,2].astype(np_float)
+            rrtx_mv = interf_radar_prop["rotation_rate"][:,:,:,0].astype(np_float)
+            rrty_mv = interf_radar_prop["rotation_rate"][:,:,:,1].astype(np_float)
+            rrtz_mv = interf_radar_prop["rotation_rate"][:,:,:,2].astype(np_float)
 
             Mem_Copy_Vec3(&locx_mv[0,0,0], &locy_mv[0,0,0], &locz_mv[0,0,0], bbsize_c, interf_loc_vt)
             Mem_Copy_Vec3(&spdx_mv[0,0,0], &spdy_mv[0,0,0], &spdz_mv[0,0,0], bbsize_c, interf_spd_vt)
@@ -303,16 +304,16 @@ cpdef simc(radar, targets, noise=True):
             Mem_Copy_Vec3(&rrtx_mv[0,0,0], &rrty_mv[0,0,0], &rrtz_mv[0,0,0], bbsize_c, interf_rrt_vt)
                                                                            
         else:
-            location_mv = radar.radar_prop["interf"].radar_prop["location"].astype(np_float)
+            location_mv = interf_radar_prop["location"].astype(np_float)
             interf_loc_vt.push_back(Vec3[float_t](&location_mv[0]))
 
-            speed_mv = radar.radar_prop["interf"].radar_prop["speed"].astype(np_float)
+            speed_mv = interf_radar_prop["speed"].astype(np_float)
             interf_spd_vt.push_back(Vec3[float_t](&speed_mv[0]))
 
-            rotation_mv = radar.radar_prop["interf"].radar_prop["rotation"].astype(np_float)
+            rotation_mv = interf_radar_prop["rotation"].astype(np_float)
             interf_rot_vt.push_back(Vec3[float_t](&rotation_mv[0]))
 
-            rotation_rate_mv = radar.radar_prop["interf"].radar_prop["rotation_rate"].astype(np_float)
+            rotation_rate_mv = interf_radar_prop["rotation_rate"].astype(np_float)
             interf_rrt_vt.push_back(Vec3[float_t](&rotation_rate_mv[0]))
 
         interf_radar_c.SetMotion(interf_loc_vt,
