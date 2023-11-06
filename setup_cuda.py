@@ -98,7 +98,6 @@ def locate_cuda():
 
 os_type = platform.system()  # 'Linux', 'Windows'
 
-CUDA = locate_cuda()
 
 if os_type == "Linux":
     LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
@@ -110,6 +109,8 @@ elif os_type == "Windows":
     NVCC = "nvcc.exe"
     CUDALIB = "lib\\x64"
     LIBRARY_DIRS = ["src/radarsimcpp/build/Release"]
+
+CUDA = locate_cuda()
 
 MACROS = [("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION"), ("_CUDA_", None)]
 INCLUDE_DIRS = ["src/radarsimcpp/includes", "src/radarsimcpp/includes/zpvector"]
