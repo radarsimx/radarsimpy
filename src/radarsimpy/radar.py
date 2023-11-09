@@ -500,13 +500,13 @@ class Radar:
         :rtype: numpy.3darray
         """
 
-        noise_amp = np.zeros(
-            [
-                self.array_prop["size"],
-                self.radar_prop["transmitter"].waveform_prop["pulses"],
-                self.sample_prop["samples_per_pulse"],
-            ]
-        )
+        # noise_amp = np.zeros(
+        #     [
+        #         self.array_prop["size"],
+        #         self.radar_prop["transmitter"].waveform_prop["pulses"],
+        #         self.sample_prop["samples_per_pulse"],
+        #     ]
+        # )
 
         boltzmann_const = 1.38064852e-23
 
@@ -522,7 +522,7 @@ class Radar:
         noise_amplitude_mixer = np.sqrt(
             receiver_noise_watts * self.radar_prop["receiver"].bb_prop["load_resistor"]
         )
-        noise_amplitude_peak = np.sqrt(2) * noise_amplitude_mixer + noise_amp
+        noise_amplitude_peak = np.sqrt(2) * noise_amplitude_mixer
         return noise_amplitude_peak
 
     def validate_radar_motion(self, location, speed, rotation, rotation_rate):
