@@ -146,33 +146,27 @@ cpdef simc(radar, targets, noise=True):
 
     cdef int_t idx_c
 
-    """
-    Targets
-    """
-    for idx_c in range(0, len(targets)):
-        location = targets[idx_c]["location"]
-        speed = targets[idx_c].get("speed", (0, 0, 0))
-        rcs = targets[idx_c]["rcs"]
-        phase = targets[idx_c].get("phase", 0)
+    ts_shape = np.shape(radar.time_prop["timestamp"])
+
+    # Point Targets
+    for _, tgt in enumerate(targets):
+        loc = tgt["location"]
+        spd = tgt.get("speed", (0, 0, 0))
+        rcs = tgt["rcs"]
+        phs = tgt.get("phase", 0)
 
         point_vt.push_back(
-            cp_Point(location, speed, rcs, phase, np.shape(radar.time_prop["timestamp"]))
+            cp_Point(loc, spd, rcs, phs, ts_shape)
         )
 
-    """
-    Transmitter
-    """
+    # Transmitter
     tx_c = cp_Transmitter(radar)
 
-    """
-    Transmitter Channels
-    """
+    # Transmitter Channels
     for idx_c in range(0, radar.radar_prop["transmitter"].txchannel_prop["size"]):
         tx_c.AddChannel(cp_TxChannel(radar.radar_prop["transmitter"], idx_c))
 
-    """
-    Receiver
-    """
+    # Receiver
     rx_c = Receiver[float_t](
         <float_t> radar.radar_prop["receiver"].bb_prop["fs"],
         <float_t> radar.radar_prop["receiver"].rf_prop["rf_gain"],
@@ -183,9 +177,7 @@ cpdef simc(radar, targets, noise=True):
     for idx_c in range(0, radar.radar_prop["receiver"].rxchannel_prop["size"]):
         rx_c.AddChannel(cp_RxChannel(radar.radar_prop["receiver"], idx_c))
 
-    """
-    Radar
-    """
+    # Radar
     cdef float_t[:] location_mv, speed_mv, rotation_mv, rotation_rate_mv
     radar_c = Radar[float_t](tx_c, rx_c)
 
@@ -334,7 +326,7 @@ cpdef simc(radar, targets, noise=True):
     else:
         interference = None
 
-    # del bb_vect
+    # free memory
     free(bb_real)
     free(bb_imag)
 
