@@ -27,7 +27,7 @@ from Cython.Build import cythonize
 import numpy
 
 
-os_type = platform.system()  # 'Linux', 'Windows'
+os_type = platform.system()  # 'Linux', 'Windows', 'macOS'
 
 if os_type == "Linux":
     LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]

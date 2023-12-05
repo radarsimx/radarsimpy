@@ -1,6 +1,6 @@
 #!/bin/sh
 
-echo "Automatic build script of radarsimcpp/radarsimpy for Linux"
+echo "Automatic build script of radarsimcpp/radarsimpy for macOS"
 echo ""
 echo "----------"
 echo "RadarSimPy - A Radar Simulator Built with Python"
