@@ -21,6 +21,9 @@ jobs:
     - name: Increase git post buffer
       run: |
         git config --global http.postBuffer 157286400
+    - name: Disable compression
+      run: |
+        git config --global core.compression 0
     - uses: actions/checkout@v4
       with:
         ssh-key: ${{ secrets.RADARSIMC }}
