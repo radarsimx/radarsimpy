@@ -32,6 +32,9 @@ os_type = platform.system()  # 'Linux', 'Windows'
 if os_type == "Linux":
     LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
     LIBRARY_DIRS = ["src/radarsimcpp/build"]
+elif os_type == "Darwin":
+    LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
+    LIBRARY_DIRS = ["src/radarsimcpp/build"]
 elif os_type == "Windows":
     LINK_ARGS = []
     LIBRARY_DIRS = ["src/radarsimcpp/build/Release"]
