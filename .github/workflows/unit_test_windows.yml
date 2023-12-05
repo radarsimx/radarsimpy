@@ -18,13 +18,10 @@ jobs:
         python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
 
     steps:
-    - name: Increase git post buffer
-      run: |
-        git config --global http.postBuffer 157286400
-    - name: Disable compression
-      run: |
-        git config --global core.compression 0
     - uses: actions/checkout@v4
+    - run: |
+        git config --global http.postBuffer 52428800
+        git config --global core.compression 0
       with:
         ssh-key: ${{ secrets.RADARSIMC }}
         submodules: true
