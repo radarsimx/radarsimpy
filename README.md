@@ -1,5 +1,6 @@
 [![Windows Test](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_windows.yml/badge.svg)](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_windows.yml)
 [![Linux Test](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_linux.yml/badge.svg)](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_linux.yml)
+[![MacOS Test](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_macos.yml/badge.svg)](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_macos.yml)
 
 [![Documentations](https://img.shields.io/github/v/tag/radarsimx/radarsimpy?label=Documentation&logo=read-the-docs)](https://radarsimx.github.io/radarsimpy/)
 [![Download](https://img.shields.io/github/v/tag/radarsimx/radarsimpy?label=Download&logo=python)](https://radarsimx.com/product/radarsimpy/)
