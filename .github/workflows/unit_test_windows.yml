@@ -18,13 +18,11 @@ jobs:
         python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
 
     steps:
-    - name: Config git
-      run: |
-        git config --global core.compression 0
     - uses: actions/checkout@v4
       with:
         ssh-key: ${{ secrets.RADARSIMC }}
         submodules: true
+        fetch-depth: 5
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
