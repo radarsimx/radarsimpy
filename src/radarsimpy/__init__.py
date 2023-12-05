@@ -30,4 +30,4 @@ from .radar import Radar  # pylint: disable=no-name-in-module
 from .transmitter import Transmitter
 from .receiver import Receiver
 
-__version__ = "12.0.0"
+__version__ = "12.1.0"
