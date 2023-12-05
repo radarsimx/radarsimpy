@@ -18,6 +18,9 @@ jobs:
         python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
 
     steps:
+    - name: Sleep for 180 seconds
+      run: Start-Sleep -s 180
+      shell: powershell
     - uses: actions/checkout@v4
       with:
         ssh-key: ${{ secrets.RADARSIMC }}
