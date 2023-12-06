@@ -625,6 +625,54 @@ def doa_esprit(covmat, nsig, spacing=0.5):
     return np.degrees(np.arcsin(np.angle(eigs) / np.pi / (spacing / 0.5)))
 
 
+def doa_iaa(Y, A, nIt=15, P0=None):
+    """
+    IAA-APES follows Source Localization and Sensing: A Nonparametric Iterative Adaptive
+          Approach Based on Weighted Least Square and its notation
+          IAA-APES: iterative adaptive approach for amplitude and phase estimation
+                 y(n) = A*s(n) + e(n)   (n = 1,..,N snapshots)
+          Input: Y - M x N with M being the number of array elements and N
+                     being the number of pulses/snap shots. When N>1, 
+                     Y = [y(1),...,y(N))] with y(n) - M X 1
+                 A - M X K is the steering vectors matrix from array manifold. 
+                     K is the number of sources or the number of scanning points/grids
+                 nIt - number of iterations 
+                 P0 - initial estimation
+          Output: Pk - K X 1 contains a power at each angle on the scanning grid.
+    """
+
+    # According to the paper, IAA-APES does not provide significant improvements
+    # in performance after about 15 iterations
+
+    # Table II
+    # Initialization
+    bv_shape = np.shape(Y)
+    M = bv_shape[0]
+    N = bv_shape[1]
+    K = np.shape(A)[1]
+
+    if P0 is None:
+        Pk = np.zeros((K, 1))
+        for ik in range(0, K):
+            a = A[:, ik]
+            Pk[ik] = 1 / ((np.conj(a[np.newaxis,:]) @ a[:,np.newaxis])**2) * \
+                np.mean(np.abs(np.conj(a[np.newaxis,:]) @ Y)**2)
+    else:
+        Pk = P0
+
+    # Repeat
+    for it in range(0, nIt-1):
+        P = np.diag(Pk.flatten())
+        R = A @ P @ np.conj(np.transpose(A))
+        RI = np.linalg.inv(R)
+        for ik in range(0, K):
+            a = A[:, ik]
+            s = np.conj(a[np.newaxis,:]) @ RI @ Y / \
+                (np.conj(a[np.newaxis,:]) @ RI @ a[:, np.newaxis])
+            Pk[ik] = np.mean(np.abs(s)**2)
+    return Pk
+
+
 def doa_bartlett(covmat, spacing=0.5, scanangles=range(-90, 91)):
     """
     Bartlett beamforming for a uniform linear array (ULA)
