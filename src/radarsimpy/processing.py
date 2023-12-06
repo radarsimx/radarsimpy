@@ -625,52 +625,61 @@ def doa_esprit(covmat, nsig, spacing=0.5):
     return np.degrees(np.arcsin(np.angle(eigs) / np.pi / (spacing / 0.5)))
 
 
-def doa_iaa(Y, A, nIt=15, P0=None):
+def doa_iaa(beam_vect, steering_vect, num_it=15, p_init=None):
     """
     IAA-APES follows Source Localization and Sensing: A Nonparametric Iterative Adaptive
-          Approach Based on Weighted Least Square and its notation
-          IAA-APES: iterative adaptive approach for amplitude and phase estimation
-                 y(n) = A*s(n) + e(n)   (n = 1,..,N snapshots)
-          Input: Y - M x N with M being the number of array elements and N
-                     being the number of pulses/snap shots. When N>1, 
-                     Y = [y(1),...,y(N))] with y(n) - M X 1
-                 A - M X K is the steering vectors matrix from array manifold. 
-                     K is the number of sources or the number of scanning points/grids
-                 nIt - number of iterations 
-                 P0 - initial estimation
-          Output: Pk - K X 1 contains a power at each angle on the scanning grid.
+    Approach Based on Weighted Least Square and its notation
+
+    IAA-APES: iterative adaptive approach for amplitude and phase estimation
+        y(n) = A*s(n) + e(n)   (n = 1,..,N snapshots)
+
+    :param numpy.2darray beam_vect:
+        num_array X num_snap with num_array being the number of array elements and num_snap
+        being the number of pulses/snap shots. When num_snap>1,
+        beam_vect = [y(1),...,y(num_snap))] with y(n) - num_array X 1
+    :param numpy.2darray steering_vect:
+        num_array X num_grid is the steering vectors matrix from array manifold.
+        num_grid is the number of sources or the number of scanning points/grids
+    :param int num_it:
+        number of iterations. According to the paper, IAA-APES does not
+        provide significant improvements in performance after about
+        15 iterations. ``default 15``
+    :param numpy.1darray p_init:
+        Initial estimation. ``default None``
+
+    :return: power at each angle on the scanning grid
+    :rtype: numpy.1darray
     """
 
-    # According to the paper, IAA-APES does not provide significant improvements
-    # in performance after about 15 iterations
-
-    # Table II
     # Initialization
-    bv_shape = np.shape(Y)
-    M = bv_shape[0]
-    N = bv_shape[1]
-    K = np.shape(A)[1]
+    num_grid = np.shape(steering_vect)[1]
 
-    if P0 is None:
-        Pk = np.zeros((K, 1))
-        for ik in range(0, K):
-            a = A[:, ik]
-            Pk[ik] = 1 / ((np.conj(a[np.newaxis,:]) @ a[:,np.newaxis])**2) * \
-                np.mean(np.abs(np.conj(a[np.newaxis,:]) @ Y)**2)
+    if p_init is None:
+        spectrum_k = np.zeros(num_grid, dtype=complex)
+        for ik in range(0, num_grid):
+            a_vect = steering_vect[:, ik]
+            a_vect = np.conj(a_vect[np.newaxis, :])
+            spectrum_k[ik] = (
+                1
+                / ((a_vect @ a_vect.conj().T) ** 2)
+                * np.mean(np.abs(a_vect @ beam_vect) ** 2)
+            ).item()
     else:
-        Pk = P0
+        spectrum_k = p_init
 
-    # Repeat
-    for it in range(0, nIt-1):
-        P = np.diag(Pk.flatten())
-        R = A @ P @ np.conj(np.transpose(A))
-        RI = np.linalg.inv(R)
-        for ik in range(0, K):
-            a = A[:, ik]
-            s = np.conj(a[np.newaxis,:]) @ RI @ Y / \
-                (np.conj(a[np.newaxis,:]) @ RI @ a[:, np.newaxis])
-            Pk[ik] = np.mean(np.abs(s)**2)
-    return Pk
+    # iteration
+    for _ in range(0, num_it - 1):
+        p_diag = np.diag(spectrum_k.flatten())
+        r_mat = steering_vect @ p_diag @ steering_vect.conj().T
+        r_mat_inv = np.linalg.inv(r_mat)
+        for ik in range(0, num_grid):
+            a_vect = steering_vect[:, ik]
+            a_vect = np.conj(a_vect[np.newaxis, :])
+            spec = (
+                a_vect @ r_mat_inv @ beam_vect / (a_vect @ r_mat_inv @ a_vect.conj().T)
+            )
+            spectrum_k[ik] = np.mean(np.abs(spec) ** 2)
+    return spectrum_k
 
 
 def doa_bartlett(covmat, spacing=0.5, scanangles=range(-90, 91)):
