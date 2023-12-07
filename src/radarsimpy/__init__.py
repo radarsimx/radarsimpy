@@ -26,7 +26,7 @@ new radar technologies or expand their knowledge of radar systems.
 
 """
 
-from .radar import Radar  # pylint: disable=no-name-in-module
+from .radar import Radar
 from .transmitter import Transmitter
 from .receiver import Receiver
 
