@@ -114,30 +114,23 @@ radarsimpy/
 src/radarsimpy/*.html
 src/radarsimpy/sbr/*.html
 
-
 CMakeLists.txt.user
 
 src/build-*/
 
-src/radarsim/.vs/
-
 src/radarsim_main/.vs/
 
-src/radarsim/CMakeSettings.json
+src/radarsimcpp/.vs/
 
-src/radarsimc/.vs/
-
-src/radarsimc/CMakeSettings.json
+src/radarsimcpp/CMakeSettings.json
 
 src/radarsimc_entry/.vs/
 
-src/radarsimpy/radarsimc.dll
-
 tests/radarsimpy
 
-src/radarsimc/build*
+src/radarsimcpp/build*
 
-src/radarsimc/entry/.vs/
+src/radarsimcpp/entry/.vs/
 
 gen_docs/_build/
 
