@@ -123,9 +123,6 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
         - **timestamp** (*numpy.3darray*) --
             Refer to Radar.timestamp
 
-        - **rays** (*numpy.array*) --
-            Received rays
-
         }
     :rtype: dict
     """
