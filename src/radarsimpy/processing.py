@@ -647,7 +647,7 @@ def doa_iaa(beam_vect, steering_vect, num_it=15, p_init=None):
     :param numpy.1darray p_init:
         Initial estimation. ``default None``
 
-    :return: power at each angle on the scanning grid
+    :return: power (in dB) at each angle on the scanning grid
     :rtype: numpy.1darray
     """
 
@@ -679,7 +679,7 @@ def doa_iaa(beam_vect, steering_vect, num_it=15, p_init=None):
                 a_vect @ r_mat_inv @ beam_vect / (a_vect @ r_mat_inv @ a_vect.conj().T)
             )
             spectrum_k[ik] = np.mean(np.abs(spec) ** 2)
-    return spectrum_k
+    return 10 * np.log10(np.real(spectrum_k))
 
 
 def doa_bartlett(covmat, spacing=0.5, scanangles=range(-90, 91)):
