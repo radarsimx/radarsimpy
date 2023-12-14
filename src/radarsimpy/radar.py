@@ -496,17 +496,8 @@ class Radar:
 
         :return:
             Peak to peak amplitude of noise.
-            ``[channes/frames, pulses, samples]``
-        :rtype: numpy.3darray
+        :rtype: float
         """
-
-        # noise_amp = np.zeros(
-        #     [
-        #         self.array_prop["size"],
-        #         self.radar_prop["transmitter"].waveform_prop["pulses"],
-        #         self.sample_prop["samples_per_pulse"],
-        #     ]
-        # )
 
         boltzmann_const = 1.38064852e-23
 
