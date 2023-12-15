@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        python-version: ['3.11']
+        python-version: ['3.12']
         c_compiler: [gcc-12]
         cxx_compiler: [g++-12]
 
