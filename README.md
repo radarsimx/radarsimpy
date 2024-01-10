@@ -70,7 +70,8 @@ Download the [pre-built module](https://radarsimx.com/product/radarsimpy/), and 
   - radarsimpy
     - \_\_init__.py
     - radarsimcpp.dll
-    - scene.xxx.pyd
+    - simulator.xxx.pyd
+    - rt.xxx.pyd
     - ...
 
 ---
@@ -82,7 +83,8 @@ Download the [pre-built module](https://radarsimx.com/product/radarsimpy/), and 
   - radarsimpy
     - \_\_init__.py
     - libradarsimcpp.so
-    - scene.xxx.so
+    - simulator.xxx.so
+    - rt.xxx.so
     - ...
 
 ---
