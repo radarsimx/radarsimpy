@@ -46,13 +46,12 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
     """
     scene(radar, targets, density=1, level=None, noise=True, debug=False)
 
-    Radar scene simulator
+    This function generates radar's baseband response of a scene using the given radar and targets.
 
-    :param Radar radar:
-        Radar model
-    :param list[dict] targets:
-        Target list
-
+    :param radar: The radar object used for the scene.
+    :type radar: Radar
+    :param targets: The targets in the scene.
+    
         [{
 
         - **model** (*str*) --
@@ -81,21 +80,22 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, debug=False):
         *Note*: Target's parameters can be specified with
         ``Radar.timestamp`` to customize the time varying property.
         Example: ``location=(1e-3*np.sin(2*np.pi*1*radar.timestamp), 0, 0)``
-    :param float density:
-        Ray density (number of rays per wavelength). ``default 1``
-    :param str level:
-        Fidelity level of the simulation, ``default None``
-
+    :type targets: list
+    :param density: Ray density. Number of rays per wavelength (default=1).
+    :type density: float
+    :param level: Fidelity level of the simulation (default=None).
+    
         - ``None``: Perform one ray tracing simulation for the whole frame
         - ``pulse``: Perform ray tracing for each pulse
         - ``sample``: Perform ray tracing for each sample
+    :type level: str or None
 
-    :param bool noise:
-        Flag to enable noise calculation, ``default True``
-    :param bool debug:
-        Flag to enable debug output, ``default False``
+    :param noise: Whether to add noise to the baseband data (default=True).
+    :type noise: bool
+    :param debug: Whether to enable debug mode (default=False).
+    :type debug: bool
 
-    :return:
+    :return: A dictionary containing the baseband data, timestamp, and interference (if available).
         {
 
         - **baseband** (*numpy.3darray*) --
