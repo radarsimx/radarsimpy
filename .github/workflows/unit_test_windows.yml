@@ -5,38 +5,37 @@ name: Windows Test
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   build:
-
     runs-on: windows-latest
     strategy:
       matrix:
-        python-version: ['3.12']
+        python-version: ["3.12"]
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        ssh-key: ${{ secrets.RADARSIMC }}
-        submodules: true
-        fetch-depth: 5
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8 pytest numpy scipy pymeshlab cython setuptools
-    - name: Build
-      run: |
-        .\build_win.bat
-    - name: Test with Google Test
-      run: |
-        .\src\radarsimcpp\build\Release\radarsimcpp_test.exe
-    - name: Test with pytest
-      run: |
-        pytest
+      - uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.RADARSIMC }}
+          submodules: true
+          fetch-depth: 5
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest numpy scipy pymeshlab cython setuptools
+      - name: Build
+        run: |
+          .\build_win.bat
+      - name: Test with Google Test
+        run: |
+          .\src\radarsimcpp\build\Release\radarsimcpp_test.exe
+      - name: Test with pytest
+        run: |
+          pytest

@@ -3,10 +3,10 @@
 
 name: Generate Documentations
 
-on:  
+on:
   push:
     tags:
-      - '*'
+      - "*"
   workflow_dispatch:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
@@ -17,53 +17,51 @@ permissions:
 
 jobs:
   build:
-
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        python-version: ['3.12']
+        python-version: ["3.12"]
         c_compiler: [gcc-12]
         cxx_compiler: [g++-12]
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        ssh-key: ${{ secrets.RADARSIMC }}
-        submodules: true
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8 pytest numpy scipy pymeshlab cython Sphinx sphinx-rtd-theme setuptools
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Build
-      env:
-        CC: ${{ matrix.c_compiler }}
-        CXX: ${{ matrix.cxx_compiler }}
-      run: |
-        sudo chown -R $USER:$USER /home/runner/work/radarsimpy
-        chmod +x build_linux.sh
-        ./build_linux.sh
-    - name: Generate documentation
-      run: |
-        cd gen_docs && make html && cd ..
-    - name: Archive documentation
-      if: success()
-      uses: actions/upload-artifact@v3
-      with:
-        name: docs
-        path: ./gen_docs/_build/html
-    - name: Setup Pages
-      uses: actions/configure-pages@v3
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v1
-      with:
-        # Upload entire repository
-        path: './gen_docs/_build/html'
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v2
-
+      - uses: actions/checkout@v4
+        with:
+          ssh-key: ${{ secrets.RADARSIMC }}
+          submodules: true
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest numpy scipy pymeshlab cython Sphinx sphinx-rtd-theme setuptools
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Build
+        env:
+          CC: ${{ matrix.c_compiler }}
+          CXX: ${{ matrix.cxx_compiler }}
+        run: |
+          sudo chown -R $USER:$USER /home/runner/work/radarsimpy
+          chmod +x build_linux.sh
+          ./build_linux.sh
+      - name: Generate documentation
+        run: |
+          cd gen_docs && make html && cd ..
+      - name: Archive documentation
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: docs
+          path: ./gen_docs/_build/html
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          # Upload entire repository
+          path: "./gen_docs/_build/html"
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
