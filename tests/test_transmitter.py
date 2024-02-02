@@ -26,16 +26,15 @@ from radarsimpy import Transmitter
 
 
 def cw_tx():
-    """_summary_
-
-    :return: _description_
-    :rtype: _type_
+    """
+    Creates a continuous wave (CW) radar transmitter.
     """
     return Transmitter(f=24e9, t=10, tx_power=10, pulses=2)
 
 
 def test_cw_tx():
-    """_summary_
+    """
+    Test the CW radar transmitter.
     """
     print("#### CW transmitter ####")
     cw = cw_tx()
@@ -63,10 +62,8 @@ def test_cw_tx():
 
 
 def fmcw_tx():
-    """_summary_
-
-    :return: _description_
-    :rtype: _type_
+    """
+    Creates an FMCW radar transmitter.
     """
     angle = np.arange(-90, 91, 1)
     pattern = 20 * np.log10(np.cos(angle / 180 * np.pi) + 0.01) + 6
@@ -90,7 +87,8 @@ def fmcw_tx():
 
 
 def test_fmcw_tx():
-    """_summary_
+    """
+    Test the FMCW radar transmitter.
     """
     print("#### FMCW transmitter ####")
     fmcw = fmcw_tx()
@@ -122,10 +120,8 @@ def test_fmcw_tx():
 
 
 def tdm_fmcw_tx():
-    """_summary_
-
-    :return: _description_
-    :rtype: _type_
+    """
+    Creates a TDM-FMCW radar transmitter.
     """
     wavelength = const.c / 24.125e9
 
@@ -143,7 +139,8 @@ def tdm_fmcw_tx():
 
 
 def test_tdm_fmcw_tx():
-    """_summary_
+    """
+    Test the TDM-FMCW radar transmitter.
     """
     print("#### TDM FMCW transmitter ####")
     tdm = tdm_fmcw_tx()
@@ -181,14 +178,8 @@ def test_tdm_fmcw_tx():
 
 
 def pmcw_tx(code1, code2):
-    """_summary_
-
-    :param code1: _description_
-    :type code1: _type_
-    :param code2: _description_
-    :type code2: _type_
-    :return: _description_
-    :rtype: _type_
+    """
+    Creates a PMCW radar transmitter.
     """
     angle = np.arange(-90, 91, 1)
     pattern = np.ones(181) * 12
@@ -233,7 +224,8 @@ def pmcw_tx(code1, code2):
 
 
 def test_pmcw_tx():
-    """_summary_
+    """
+    Test the PMCW radar transmitter.
     """
     code1 = np.array(
         [
@@ -795,15 +787,3 @@ def test_pmcw_tx():
     )
 
     # assert np.array_equal(pmcw.chip_length, [4e-9, 4e-9])
-
-
-def test_fsk_tx():
-    """_summary_
-    """
-    print("#### FSK transmitter ####")
-
-
-def test_bpm_fmcw_tx():
-    """_summary_
-    """
-    print("#### BPM FMCW transmitter ####")

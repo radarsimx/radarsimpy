@@ -25,7 +25,8 @@ from radarsimpy.rt import rcs_sbr  # pylint: disable=no-name-in-module
 
 
 def test_rcs_momostatic():
-    """_summary_
+    """
+    Tests the radar cross-section (RCS) calculation for a monostatic radar system.
     """
     phi = 0
     theta = 90
@@ -46,7 +47,8 @@ def test_rcs_momostatic():
 
 
 def test_rcs_bistatic():
-    """_summary_
+    """
+    Tests the radar cross-section (RCS) calculation for a bistatic radar system.
     """
     phi = np.array([-30, -24, 65])
     theta = 90

@@ -24,7 +24,8 @@ from radarsimpy.rt import lidar_scene  # pylint: disable=no-name-in-module
 
 
 def test_lidar():
-    """_summary_
+    """
+    This function tests the Lidar point cloud simulator
     """
     ground = {
         "model": "./models/surface_60x60.stl",

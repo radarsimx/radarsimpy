@@ -29,7 +29,8 @@ import radarsimpy.processing as proc
 
 
 def test_phase_noise():
-    """_summary_
+    """
+    This function tests phase noise calculation
     """
     sig = np.ones((1, 256))
     pn_f = np.array([1000, 10000, 100000, 1000000])
@@ -49,7 +50,8 @@ def test_phase_noise():
 
 
 def test_fmcw_phase_noise_cpp():
-    """_summary_
+    """
+    This function tests the phase noise simulation
     """
     tx_channel = {"location": (0, 0, 0)}
 

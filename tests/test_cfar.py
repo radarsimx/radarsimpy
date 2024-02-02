@@ -25,7 +25,8 @@ import radarsimpy.processing as proc
 
 
 def test_ca_cfar():
-    """_summary_
+    """
+    This function tests the CA-CFAR algorithm.
     """
     sig = np.ones((2, 32))
     sig[0, 16] = 20
@@ -203,7 +204,8 @@ def test_ca_cfar():
 
 
 def test_os_cfar():
-    """_summary_
+    """
+    This function tests the OS-CFAR algorithm.
     """
     sig = np.ones((2, 32))
     sig[0, 16] = 20

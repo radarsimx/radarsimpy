@@ -433,14 +433,18 @@ bv = np.array(
 
 
 def test_doa_music():
-    """_summary_"""
+    """
+    This function tests the DOA MUSIC algorithm.
+    """
     doa, _, _ = proc.doa_music(covmat_est, 3)
 
     npt.assert_equal(np.sort(doa), np.array([-12, 0, 85]))
 
 
 def test_doa_root_music():
-    """_summary_"""
+    """
+    Test the DOA (Direction of Arrival) estimation using root MUSIC algorithm.
+    """
     doa = proc.doa_root_music(covmat_est, 3)
 
     npt.assert_almost_equal(
@@ -451,14 +455,18 @@ def test_doa_root_music():
 
 
 def test_doa_esprit():
-    """_summary_"""
+    """
+    Test the DOA (Direction of Arrival) estimation using the ESPRIT algorithm.
+    """
     doa = proc.doa_esprit(covmat_est, 3)
 
     npt.assert_almost_equal(doa, np.array([2.025e-15, -1.200e01, 8.500e01]), decimal=3)
 
 
 def test_doa_iaa():
-    """_summary_"""
+    """
+    Test the DOA (Direction of Arrival) estimation using the IAA algorithm.
+    """
     azimuth = np.arange(-90, 90, 1)
     array_loc = np.array(
         [
@@ -792,7 +800,9 @@ def test_doa_iaa():
 
 
 def test_doa_bartlett():
-    """_summary_"""
+    """
+    Test the DOA (Direction of Arrival) estimation using the Bartlett beamformer.
+    """
     ps = proc.doa_bartlett(covmat_beamforming)
 
     npt.assert_almost_equal(
@@ -987,7 +997,9 @@ def test_doa_bartlett():
 
 
 def test_doa_capon():
-    """_summary_"""
+    """
+    Test the DOA (Direction of Arrival) estimation using the Capon beamformer.
+    """
     ps = proc.doa_capon(covmat_beamforming)
 
     npt.assert_almost_equal(

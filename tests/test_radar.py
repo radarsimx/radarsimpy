@@ -28,16 +28,18 @@ from .test_receiver import cw_rx, fmcw_rx, tdm_fmcw_rx, pmcw_rx
 
 
 def cw_radar():
-    """_summary_
+    """
+    Creates a continuous wave (CW) radar system.
 
-    :return: _description_
-    :rtype: _type_
+    :return: A Radar object with a transmitter and receiver.
+    :rtype: Radar
     """
     return Radar(transmitter=cw_tx(), receiver=cw_rx())
 
 
 def test_cw_radar():
-    """_summary_
+    """
+    Test the CW radar
     """
     cw = cw_radar()
 
@@ -47,16 +49,18 @@ def test_cw_radar():
 
 
 def fmcw_radar():
-    """_summary_
+    """
+    Creates an FMCW radar system.
 
-    :return: _description_
-    :rtype: _type_
+    :return: A Radar object with a transmitter and receiver.
+    :rtype: Radar
     """
     return Radar(transmitter=fmcw_tx(), receiver=fmcw_rx(), time=[0, 1])
 
 
 def test_fmcw_radar():
-    """_summary_
+    """
+    Test the FMCW radar
     """
     fmcw = fmcw_radar()
 
@@ -66,16 +70,18 @@ def test_fmcw_radar():
 
 
 def tdm_fmcw_radar():
-    """_summary_
+    """
+    Creates a TDM-FMCW radar system.
 
-    :return: _description_
-    :rtype: _type_
+    :return: A Radar object with a transmitter and receiver.
+    :rtype: Radar
     """
     return Radar(transmitter=tdm_fmcw_tx(), receiver=tdm_fmcw_rx())
 
 
 def test_tdm_fmcw_radar():
-    """_summary_
+    """
+    Test the TDM FMCW radar
     """
     half_wavelength = const.c / 24.125e9 / 2
     tdm = tdm_fmcw_radar()
@@ -108,10 +114,11 @@ def test_tdm_fmcw_radar():
 
 
 def pmcw_radar():
-    """_summary_
+    """
+    Creates a PMCW radar system.
 
-    :return: _description_
-    :rtype: _type_
+    :return: A Radar object with a transmitter and receiver.
+    :rtype: Radar
     """
     code1 = np.array(
         [
@@ -635,7 +642,8 @@ def pmcw_radar():
 
 
 def test_pmcw_radar():
-    """_summary_
+    """
+    Test the PMCW radar
     """
     pmcw = pmcw_radar()
 

@@ -28,7 +28,9 @@ from radarsimpy.processing import range_fft
 
 
 def test_arbitrary_waveform():
-    """_summary_"""
+    """
+    This function tests the arbitrary waveform.
+    """
     tx_channel = {
         "location": (0, 0, 0),
     }

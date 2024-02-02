@@ -27,7 +27,8 @@ from radarsimpy.simulator import simc  # pylint: disable=no-name-in-module
 
 
 def test_scene_interference():
-    """_summary_
+    """
+    This function tests the interference simulation in the scene simulator
     """
     f_offset_int = np.arange(0, 8) * 70e6
     int_tx = Transmitter(
@@ -1385,7 +1386,8 @@ def test_scene_interference():
 
 
 def test_simc_interference():
-    """_summary_
+    """
+    This function tests the interference simulation in the ideal simulator
     """
     channels = []
 

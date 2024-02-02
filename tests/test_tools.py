@@ -24,7 +24,8 @@ from radarsimpy.tools import roc_pd, roc_snr, threshold
 
 
 def test_roc_pd():
-    """_summary_
+    """
+    Test the ROC Pd function
     """
     npt.assert_almost_equal(roc_pd(1e-8, 13, 1, "Swerling 5"), 0.6290, decimal=4)
     npt.assert_almost_equal(roc_pd(1e-8, 11, 1, "Swerling 5"), 0.1681, decimal=4)
@@ -58,7 +59,8 @@ def test_roc_pd():
 
 
 def test_threshold():
-    """_summary_
+    """
+    Test the ROC threshold function
     """
     npt.assert_almost_equal(threshold(1e-4, 1), 9.21, decimal=2)
     npt.assert_almost_equal(threshold(1e-4, 10), 26.19, decimal=2)
@@ -67,7 +69,8 @@ def test_threshold():
 
 
 def test_roc_snr():
-    """_summary_
+    """
+    Test the ROC SNR function
     """
     npt.assert_almost_equal(roc_snr(1e-8, 0.6290, 1, "Swerling 5"), 13, decimal=0)
     npt.assert_almost_equal(roc_snr(1e-8, 0.1681, 1, "Swerling 5"), 11, decimal=0)

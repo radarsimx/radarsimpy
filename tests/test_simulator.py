@@ -31,7 +31,8 @@ from .test_radar import cw_radar, fmcw_radar, tdm_fmcw_radar, pmcw_radar
 
 
 def test_sim_cw():
-    """_summary_
+    """
+    Test the CW radar simulator.
     """
     radar = cw_radar()
 
@@ -65,7 +66,8 @@ def test_sim_cw():
 
 
 def test_sim_fmcw():
-    """_summary_
+    """
+    Test the FMCW radar simulator.
     """
     radar = fmcw_radar()
     target_1 = {"location": (200, 0, 0), "speed": (-5, 0, 0), "rcs": 20, "phase": 0}
@@ -206,7 +208,8 @@ def test_sim_fmcw():
 
 
 def test_sim_tdm_fmcw():
-    """_summary_
+    """
+    Test the TDM-FMCW radar simulator.
     """
     radar = tdm_fmcw_radar()
     target_1 = {"location": (120, 0, 0), "speed": (0, 0, 0), "rcs": 25, "phase": 0}
@@ -332,7 +335,8 @@ def test_sim_tdm_fmcw():
 
 
 def test_sim_pmcw():
-    """_summary_
+    """
+    Test the PMCW radar simulator.
     """
     code1 = np.array(
         [

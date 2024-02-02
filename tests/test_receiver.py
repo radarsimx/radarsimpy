@@ -27,10 +27,8 @@ from radarsimpy import Receiver
 
 
 def cw_rx():
-    """_summary_
-
-    :return: _description_
-    :rtype: _type_
+    """
+    Creates a continuous wave (CW) radar receiver.
     """
     return Receiver(
         fs=20,
@@ -43,7 +41,8 @@ def cw_rx():
 
 
 def test_cw_rx():
-    """_summary_
+    """
+    Test the CW radar receiver.
     """
     print("#### CW receiver ####")
     cw = cw_rx()
@@ -66,10 +65,8 @@ def test_cw_rx():
 
 
 def fmcw_rx():
-    """_summary_
-
-    :return: _description_
-    :rtype: _type_
+    """
+    Creates an FMCW radar receiver.
     """
     angle = np.arange(-90, 91, 1)
     pattern = 20 * np.log10(np.cos(angle / 180 * np.pi) + 0.01) + 6
@@ -93,7 +90,8 @@ def fmcw_rx():
 
 
 def test_fmcw_rx():
-    """_summary_
+    """
+    Test the FMCW radar receiver.
     """
     print("#### FMCW receiver ####")
     fmcw = fmcw_rx()
@@ -120,10 +118,8 @@ def test_fmcw_rx():
 
 
 def tdm_fmcw_rx():
-    """_summary_
-
-    :return: _description_
-    :rtype: _type_
+    """
+    Creates a TDM-FMCW radar receiver.
     """
     wavelength = const.c / 24.125e9
     channels = []
@@ -141,7 +137,8 @@ def tdm_fmcw_rx():
 
 
 def test_tdm_fmcw_rx():
-    """_summary_
+    """
+    Test the TDM-FMCW radar receiver.
     """
     print("#### TDM FMCW receiver ####")
     tdm = tdm_fmcw_rx()
@@ -227,10 +224,8 @@ def test_tdm_fmcw_rx():
 
 
 def pmcw_rx():
-    """_summary_
-
-    :return: _description_
-    :rtype: _type_
+    """
+    Creates a PMCW radar receiver.
     """
     angle = np.arange(-90, 91, 1)
     pattern = np.ones(181) * 12
@@ -254,7 +249,8 @@ def pmcw_rx():
 
 
 def test_pmcw_rx():
-    """_summary_
+    """
+    Test the PMCW radar receiver.
     """
     print("#### PMCW receiver ####")
     pmcw = pmcw_rx()

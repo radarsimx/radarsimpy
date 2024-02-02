@@ -28,7 +28,9 @@ import radarsimpy.processing as proc
 
 
 def test_fmcw_raytracing():
-    """_summary_"""
+    """
+    This function tests an FMCW radar using raytracing.
+    """
     angle = np.arange(-90, 91, 1)
     pattern = 20 * np.log10(np.cos(angle / 180 * np.pi) + 0.01)
 
@@ -159,7 +161,8 @@ def test_fmcw_raytracing():
 
 
 def test_fmcw_raytracing_tx_azimuth():
-    """_summary_
+    """
+    This function tests the transmitter's azimuth pattern in an FMCW radar using raytracing.
     """
     tx_az_angle = np.arange(-90, 91, 1)
     tx_az_pattern = tx_az_angle / 9
@@ -225,7 +228,8 @@ def test_fmcw_raytracing_tx_azimuth():
 
 
 def test_fmcw_raytracing_tx_elevation():
-    """_summary_
+    """
+    This function tests the transmitter's elevation pattern in an FMCW radar using raytracing.
     """
     tx_az_angle = np.arange(-90, 91, 1)
     tx_az_pattern = tx_az_angle / 9
@@ -291,7 +295,8 @@ def test_fmcw_raytracing_tx_elevation():
 
 
 def test_fmcw_raytracing_rx_azimuth():
-    """_summary_
+    """
+    This function tests the receiver's azimuth pattern in an FMCW radar using raytracing.
     """
     tx_channel = {
         "location": (0, 0, 0),
@@ -357,7 +362,8 @@ def test_fmcw_raytracing_rx_azimuth():
 
 
 def test_fmcw_raytracing_rx_elevation():
-    """_summary_
+    """
+    This function tests the receiver's elevation pattern in an FMCW radar using raytracing.
     """
     tx_channel = {"location": (0, 0, 0)}
 
@@ -421,7 +427,8 @@ def test_fmcw_raytracing_rx_elevation():
 
 
 def test_fmcw_raytracing_radar_rotation():
-    """_summary_
+    """
+    This function tests the rotation of an FMCW radar using raytracing.
     """
     tx_el_angle = np.arange(-90, 91, 1)
     tx_el_pattern = tx_el_angle / 9
@@ -482,7 +489,8 @@ def test_fmcw_raytracing_radar_rotation():
 
 
 def test_fmcw_raytracing_radar_speed():
-    """_summary_
+    """
+    This function tests the speed of an FMCW radar using raytracing.
     """
     tx_el_angle = np.arange(-90, 91, 1)
     tx_el_pattern = tx_el_angle / 9
