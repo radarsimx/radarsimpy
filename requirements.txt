@@ -3,5 +3,4 @@ scipy
 pymeshlab
 cython
 setuptools
-flake8
 pytest
