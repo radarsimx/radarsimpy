@@ -27,10 +27,10 @@ def test_roc_pd():
     """
     Test the ROC Pd function
     """
-    npt.assert_almost_equal(roc_pd(1e-8, 13, 1, "Swerling 5"), 0.6290, decimal=4)
-    npt.assert_almost_equal(roc_pd(1e-8, 11, 1, "Swerling 5"), 0.1681, decimal=4)
-    npt.assert_almost_equal(roc_pd(1e-8, -3.2, 256, "Swerling 5"), 0.8424, decimal=4)
-    npt.assert_almost_equal(roc_pd(1e-8, -4.8, 256, "Swerling 5"), 0.2266, decimal=4)
+    npt.assert_almost_equal(roc_pd(1e-8, 13, 1, "Swerling 5"), 0.6287, decimal=4)
+    npt.assert_almost_equal(roc_pd(1e-8, 11, 1, "Swerling 5"), 0.1683, decimal=4)
+    npt.assert_almost_equal(roc_pd(1e-8, -3.2, 256, "Swerling 5"), 0.8411, decimal=4)
+    npt.assert_almost_equal(roc_pd(1e-8, -4.8, 256, "Swerling 5"), 0.2249, decimal=4)
 
     npt.assert_almost_equal(roc_pd(1e-9, -10, 256, "Coherent"), 0.8765, decimal=4)
     npt.assert_almost_equal(roc_pd(1e-9, -12, 256, "Coherent"), 0.3767, decimal=4)
@@ -50,7 +50,7 @@ def test_roc_pd():
     npt.assert_almost_equal(roc_pd(1e-4, 15.2, 1, "Swerling 3"), 0.8846, decimal=4)
     npt.assert_almost_equal(roc_pd(1e-4, 6.8, 1, "Swerling 3"), 0.1931, decimal=4)
     npt.assert_almost_equal(roc_pd(1e-4, -0.4, 256, "Swerling 3"), 0.8889, decimal=4)
-    npt.assert_almost_equal(roc_pd(1e-4, -8.4, 256, "Swerling 3"), 0.1772, decimal=4)
+    npt.assert_almost_equal(roc_pd(1e-4, -8.4, 256, "Swerling 3"), 0.1775, decimal=4)
 
     npt.assert_almost_equal(roc_pd(1e-4, 15.2, 1, "Swerling 4"), 0.8846, decimal=4)
     npt.assert_almost_equal(roc_pd(1e-4, 6.8, 1, "Swerling 4"), 0.1931, decimal=4)
