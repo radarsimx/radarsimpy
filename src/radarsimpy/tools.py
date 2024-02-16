@@ -30,7 +30,7 @@ functions:
 
 """
 
-import warnings
+# import warnings
 import numpy as np
 from scipy.special import (  # pylint: disable=no-name-in-module
     erfc,
@@ -85,25 +85,6 @@ def log_factorial(n):
 
     return val
 
-    # n = n + 9.0
-    # n2 = n**2
-    # return (
-    #     (n - 1) * np.log(n)
-    #     - n
-    #     + np.log(np.sqrt(2 * np.pi * n))
-    #     + ((1 - (1 / 30 + (1 / 105) / n2) / n2) / 12) / n
-    #     - np.log(
-    #         (n - 1)
-    #         * (n - 2)
-    #         * (n - 3)
-    #         * (n - 4)
-    #         * (n - 5)
-    #         * (n - 6)
-    #         * (n - 7)
-    #         * (n - 8)
-    #     )
-    # )
-
 
 def threshold(pfa, npulses):
     """
@@ -127,6 +108,26 @@ def threshold(pfa, npulses):
 
 
 def pd_swerling0(npulses, snr, thred):
+    """
+    Calculates the probability of detection (Pd) for Swerling 0 target model.
+
+    :param npulses: Number of pulses.
+    :type npulses: int
+    :param snr: Signal-to-noise ratio.
+    :type snr: float
+    :param thred: Detection threshold.
+    :type thred: float
+    :return: Probability of detection (Pd).
+    :rtype: float
+
+    :Notes:
+        - For npulses <= 50, uses the Marcum Q function and modified Bessel functions.
+        - For npulses > 50, employs an approximation based on statistical parameters.
+
+    :References:
+        - Swerling, P. (1953). Probability of Detection for Fluctuating Targets.
+          IRE Transactions on Information Theory, 6(3), 269-308.
+    """
     if npulses <= 50:
         sum_array = np.arange(2, npulses + 1)
 
@@ -137,43 +138,110 @@ def pd_swerling0(npulses, snr, thred):
             * iv(sum_array - 1, 2 * np.sqrt(npulses * snr * thred))
         )
 
-    else:
-        temp_1 = 2 * snr + 1
-        omegabar = np.sqrt(npulses * temp_1)
-        c3 = -(snr + 1 / 3) / (np.sqrt(npulses) * temp_1**1.5)
-        c4 = (snr + 0.25) / (npulses * temp_1**2.0)
-        c6 = c3 * c3 / 2
-        v_var = (thred - npulses * (1 + snr)) / omegabar
-        v_sqr = v_var**2
-        val1 = np.exp(-v_sqr / 2) / np.sqrt(2 * np.pi)
-        val2 = (
-            c3 * (v_sqr - 1)
-            + c4 * v_var * (3 - v_sqr)
-            - c6 * v_var * (v_var**4 - 10 * v_sqr + 15)
-        )
-        q = 0.5 * erfc(v_var / np.sqrt(2))
-        return q - val1 * val2
+    temp_1 = 2 * snr + 1
+    omegabar = np.sqrt(npulses * temp_1)
+    c3 = -(snr + 1 / 3) / (np.sqrt(npulses) * temp_1**1.5)
+    c4 = (snr + 0.25) / (npulses * temp_1**2.0)
+    c6 = c3 * c3 / 2
+    v_var = (thred - npulses * (1 + snr)) / omegabar
+    v_sqr = v_var**2
+    val1 = np.exp(-v_sqr / 2) / np.sqrt(2 * np.pi)
+    val2 = (
+        c3 * (v_sqr - 1)
+        + c4 * v_var * (3 - v_sqr)
+        - c6 * v_var * (v_var**4 - 10 * v_sqr + 15)
+    )
+    q = 0.5 * erfc(v_var / np.sqrt(2))
+    return q - val1 * val2
 
 
 def pd_swerling1(npulses, snr, thred):
+    """
+    Calculates the probability of detection (Pd) for Swerling 1 target model.
+
+    :param npulses: Number of pulses.
+    :type npulses: int
+    :param snr: Signal-to-noise ratio.
+    :type snr: float
+    :param thred: Detection threshold.
+    :type thred: float
+    :return: Probability of detection (Pd).
+    :rtype: float
+
+    :Notes:
+        - Swerling 1 assumes a target made up of many independent scatterers of roughly equal areas.
+        - The RCS varies according to a chi-squared probability density function with two degrees
+            of freedom (m = 1).
+        - The radar cross section is constant from pulse-to-pulse but varies independently from
+            scan to scan.
+
+    :References:
+        - Swerling, P. (1953). Probability of Detection for Fluctuating Targets.
+          IRE Transactions on Information Theory, 6(3), 269-308.
+    """
     if npulses == 1:
         return np.exp(-thred / (1 + snr))
-    else:
-        temp_sw1 = 1 + 1 / (npulses * snr)
-        igf1 = gammainc(npulses - 1, thred)
-        igf2 = gammainc(npulses - 1, thred / temp_sw1)
-        return (
-            1
-            - igf1
-            + (temp_sw1 ** (npulses - 1)) * igf2 * np.exp(-thred / (1 + npulses * snr))
-        )
+
+    temp_sw1 = 1 + 1 / (npulses * snr)
+    igf1 = gammainc(npulses - 1, thred)
+    igf2 = gammainc(npulses - 1, thred / temp_sw1)
+    return (
+        1
+        - igf1
+        + (temp_sw1 ** (npulses - 1)) * igf2 * np.exp(-thred / (1 + npulses * snr))
+    )
 
 
 def pd_swerling2(npulses, snr, thred):
+    """
+    Calculates the probability of detection (Pd) for Swerling 2 target model.
+
+    :param npulses: Number of pulses.
+    :type npulses: int
+    :param snr: Signal-to-noise ratio.
+    :type snr: float
+    :param thred: Detection threshold.
+    :type thred: float
+    :return: Probability of detection (Pd).
+    :rtype: float
+
+    :Notes:
+        - Swerling 2 assumes a target made up of many independent scatterers of roughly equal areas.
+        - The radar cross section (RCS) varies from pulse to pulse.
+        - Statistics follow a chi-squared probability density function with two degrees of freedom.
+
+    :References:
+        - Swerling, P. (1953). Probability of Detection for Fluctuating Targets.
+          IRE Transactions on Information Theory, 6(3), 269-308.
+    """
     return 1 - gammainc(npulses, (thred / (1 + snr)))
 
 
 def pd_swerling3(npulses, snr, thred):
+    """
+    Calculates the probability of detection (Pd) for Swerling 3 target model.
+
+    :param npulses: Number of pulses.
+    :type npulses: int
+    :param snr: Signal-to-noise ratio.
+    :type snr: float
+    :param thred: Detection threshold.
+    :type thred: float
+    :return: Probability of detection (Pd).
+    :rtype: float
+
+    :Notes:
+        - Swerling 3 assumes a target made up of one dominant isotropic reflector superimposed
+            by several small reflectors.
+        - The radar cross section (RCS) varies from pulse to pulse but remains constant within
+            a single scan.
+        - The statistical properties follow a density of probability based on the Chi-squared
+            distribution with four degrees of freedom (m = 2).
+
+    :References:
+        - Swerling, P. (1953). Probability of Detection for Fluctuating Targets.
+          IRE Transactions on Information Theory, 6(3), 269-308.
+    """
     temp_1 = thred / (1 + 0.5 * npulses * snr)
     ko = (
         np.exp(-temp_1)
@@ -198,6 +266,29 @@ def pd_swerling3(npulses, snr, thred):
 
 
 def pd_swerling4(npulses, snr, thred):
+    """
+    Calculates the probability of detection (Pd) for Swerling 4 target model.
+
+    :param npulses: Number of pulses.
+    :type npulses: int
+    :param snr: Signal-to-noise ratio.
+    :type snr: float
+    :param thred: Detection threshold.
+    :type thred: float
+    :return: Probability of detection (Pd).
+    :rtype: float
+
+    :Notes:
+        - Swerling 4 assumes a target made up of one dominant isotropic reflector
+            superimposed by several small reflectors.
+        - The radar cross section (RCS) varies from pulse to pulse rather than from scan to scan.
+        - The statistical properties follow a density of probability based on the Chi-squared
+            distribution with four degrees of freedom (m = 2).
+
+    :References:
+        - Swerling, P. (1953). Probability of Detection for Fluctuating Targets.
+          IRE Transactions on Information Theory, 6(3), 269-308.
+    """
     beta = 1 + snr / 2
     if npulses >= 100:
         omegabar = np.sqrt(npulses * (2 * beta**2 - 1))
@@ -213,29 +304,29 @@ def pd_swerling4(npulses, snr, thred):
             - c6 * v_var * (v_var**4 - 10 * v_sqr + 15)
         )
         return 0.5 * erfc(v_var / np.sqrt(2)) - val1 * val2
-    else:
-        gamma0 = gammainc(npulses, thred / beta)
-        a1 = (thred / beta) ** npulses / (
-            np.exp(log_factorial(npulses)) * np.exp(thred / beta)
-        )
-        sum_var = gamma0
-        for i in range(1, npulses + 1, 1):
-            temp_sw4 = 1
-            if i == 1:
-                ai = a1
-            else:
-                ai = (thred / beta) * a1 / (npulses + i - 1)
-            a1 = ai
-            gammai = gamma0 - ai
-            gamma0 = gammai
-            a1 = ai
 
-            for ii in range(1, i + 1, 1):
-                temp_sw4 = temp_sw4 * int(npulses + 1 - ii)
+    gamma0 = gammainc(npulses, thred / beta)
+    a1 = (thred / beta) ** npulses / (
+        np.exp(log_factorial(npulses)) * np.exp(thred / beta)
+    )
+    sum_var = gamma0
+    for idx_1 in range(1, npulses + 1, 1):
+        temp_sw4 = 1
+        if idx_1 == 1:
+            ai = a1
+        else:
+            ai = (thred / beta) * a1 / (npulses + idx_1 - 1)
+        a1 = ai
+        gammai = gamma0 - ai
+        gamma0 = gammai
+        a1 = ai
 
-            term = (snr / 2) ** i * gammai * temp_sw4 / np.exp(log_factorial(i))
-            sum_var = sum_var + term
-        return 1 - sum_var / beta**npulses
+        for idx_2 in range(1, idx_1 + 1, 1):
+            temp_sw4 = temp_sw4 * int(npulses + 1 - idx_2)
+
+        term = (snr / 2) ** idx_1 * gammai * temp_sw4 / np.exp(log_factorial(idx_1))
+        sum_var = sum_var + term
+    return 1 - sum_var / beta**npulses
 
 
 def roc_pd(pfa, snr, npulses=1, stype="Coherent"):
