@@ -131,12 +131,18 @@ def pd_swerling0(npulses, snr, thred):
     if npulses <= 50:
         sum_array = np.arange(2, npulses + 1)
 
-        return marcumq(np.sqrt(2 * npulses * snr), np.sqrt(2 * thred)) + np.exp(
-            -(thred + npulses * snr)
-        ) * np.sum(
+        var_1 = np.exp(-(thred + npulses * snr)) * np.sum(
             (thred / (npulses * snr)) ** ((sum_array - 1) / 2)
             * iv(sum_array - 1, 2 * np.sqrt(npulses * snr * thred))
         )
+
+        if np.isscalar(var_1):
+            if np.isnan(var_1):
+                var_1 = 0
+        else:
+            var_1[np.isnan(var_1)] = 0
+
+        return marcumq(np.sqrt(2 * npulses * snr), np.sqrt(2 * thred)) + var_1
 
     temp_1 = 2 * snr + 1
     omegabar = np.sqrt(npulses * temp_1)
@@ -290,7 +296,7 @@ def pd_swerling4(npulses, snr, thred):
           IRE Transactions on Information Theory, 6(3), 269-308.
     """
     beta = 1 + snr / 2
-    if npulses >= 100:
+    if npulses >= 50:
         omegabar = np.sqrt(npulses * (2 * beta**2 - 1))
         c3 = (2 * beta**3 - 1) / (3 * (2 * beta**2 - 1) * omegabar)
         c4 = (2 * beta**4 - 1) / (4 * npulses * (2 * beta**2 - 1) ** 2)
@@ -324,7 +330,11 @@ def pd_swerling4(npulses, snr, thred):
         for idx_2 in range(1, idx_1 + 1, 1):
             temp_sw4 = temp_sw4 * int(npulses + 1 - idx_2)
 
-        term = (snr / 2) ** idx_1 * gammai * temp_sw4 / np.exp(log_factorial(idx_1))
+        try:
+            term = (snr / 2) ** idx_1 * gammai * temp_sw4 / np.exp(log_factorial(idx_1))
+        except:
+            term = 0
+
         sum_var = sum_var + term
     return 1 - sum_var / beta**npulses
 
