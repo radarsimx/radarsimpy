@@ -30,7 +30,7 @@ functions:
 
 """
 
-# import warnings
+import warnings
 import numpy as np
 from scipy.special import (  # pylint: disable=no-name-in-module
     erfc,
@@ -129,17 +129,36 @@ def pd_swerling0(npulses, snr, thred):
           IRE Transactions on Information Theory, 6(3), 269-308.
     """
     if npulses <= 50:
-        sum_array = np.arange(2, npulses + 1)
 
-        var_1 = np.exp(-(thred + npulses * snr)) * np.sum(
-            (thred / (npulses * snr)) ** ((sum_array - 1) / 2)
-            * iv(sum_array - 1, 2 * np.sqrt(npulses * snr * thred))
-        )
+        if np.isscalar(snr):
+            sum_array = np.arange(2, npulses + 1)
 
-        if np.isscalar(var_1):
+            warnings.filterwarnings("ignore", category=RuntimeWarning)
+            var_1 = np.exp(-(thred + npulses * snr)) * np.sum(
+                (thred / (npulses * snr)) ** ((sum_array - 1) / 2)
+                * iv(sum_array - 1, 2 * np.sqrt(npulses * snr * thred))
+            )
+            warnings.filterwarnings("default", category=RuntimeWarning)
+
             if np.isnan(var_1):
                 var_1 = 0
+
         else:
+            snr_len = np.size(snr)
+            sum_array = np.arange(2, npulses + 1)
+
+            sum_array = np.repeat(sum_array[np.newaxis, :], snr_len, axis=0)
+
+            snr_mat = np.repeat(snr[:, np.newaxis], np.shape(sum_array)[1], axis=1)
+
+            warnings.filterwarnings("ignore", category=RuntimeWarning)
+            var_1 = np.exp(-(thred + npulses * snr)) * np.sum(
+                (thred / (npulses * snr_mat)) ** ((sum_array - 1) / 2)
+                * iv(sum_array - 1, 2 * np.sqrt(npulses * snr_mat * thred)),
+                axis=1,
+            )
+            warnings.filterwarnings("default", category=RuntimeWarning)
+
             var_1[np.isnan(var_1)] = 0
 
         return marcumq(np.sqrt(2 * npulses * snr), np.sqrt(2 * thred)) + var_1
