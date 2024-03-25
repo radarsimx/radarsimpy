@@ -95,7 +95,8 @@ cdef extern from "rcs.hpp":
         Rcs(const vector[Target[float]] & targets,
             const Vec3[T] & inc_dir,
             const Vec3[T] & obs_dir,
-            const Vec3[T] & polarization,
+            const Vec3[cpp_complex[T]] & inc_polarization,
+            const Vec3[cpp_complex[T]] & obs_polarization,
             const T & frequency,
             const T & density) except +
 

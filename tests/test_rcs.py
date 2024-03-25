@@ -40,7 +40,7 @@ def test_rcs_momostatic():
     }
     for f_idx, f in enumerate(freq):
         rcs[f_idx] = 10 * np.log10(
-            rcs_sbr([target], f, phi, theta, pol=pol, density=density)
+            rcs_sbr([target], f, phi, theta, inc_pol=pol, density=density)
         )
 
     npt.assert_almost_equal(rcs, np.array([48.3, 59.2]), decimal=1)
@@ -74,7 +74,7 @@ def test_rcs_bistatic():
                 theta,
                 inc_phi=inc_phi,
                 inc_theta=inc_theta,
-                pol=pol,
+                inc_pol=pol,
                 density=density,
             )
         )

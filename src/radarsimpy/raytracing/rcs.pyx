@@ -25,6 +25,8 @@ from radarsimpy.includes.type_def cimport vector
 from radarsimpy.lib.cp_radarsimc cimport cp_RCS_Target
 from radarsimpy.includes.radarsimc cimport Target, Rcs
 
+from libcpp.complex cimport complex as cpp_complex
+
 import numpy as np
 
 cimport cython
@@ -42,7 +44,8 @@ cpdef rcs_sbr(targets,
               obs_theta,
               inc_phi=None,
               inc_theta=None,
-              pol=[0, 0, 1],
+              inc_pol=[0, 0, 1],
+              obs_pol=None,
               density=1):
     """
     rcs_sbr(targets, f, obs_phi, obs_theta, inc_phi=None, inc_theta=None, pol=[0, 0, 1], density=1)
@@ -93,6 +96,16 @@ cpdef rcs_sbr(targets,
     """
     cdef vector[Target[float]] targets_vt
 
+    cdef Vec3[cpp_complex[double]] inc_pol_cpp
+    cdef Vec3[cpp_complex[double]] obs_pol_cpp
+
+    if obs_pol is None:
+        obs_pol = inc_pol
+
+    inc_pol_cpp = Vec3[cpp_complex[double]](cpp_complex[double](np.real(inc_pol[0]), np.imag(inc_pol[0])), cpp_complex[double](np.real(inc_pol[1]), np.imag(inc_pol[1])), cpp_complex[double](np.real(inc_pol[2]), np.imag(inc_pol[2])))
+
+    obs_pol_cpp = Vec3[cpp_complex[double]](cpp_complex[double](np.real(obs_pol[0]), np.imag(obs_pol[0])), cpp_complex[double](np.real(obs_pol[1]), np.imag(obs_pol[1])), cpp_complex[double](np.real(obs_pol[2]), np.imag(obs_pol[2])))
+
     for idx_c in range(0, len(targets)):
         targets_vt.push_back(cp_RCS_Target(targets[idx_c]))
 
@@ -122,7 +135,8 @@ cpdef rcs_sbr(targets,
     rcs = Rcs[double](targets_vt,
                       inc_dir,
                       obs_dir,
-                      Vec3[double](<double> pol[0], <double> pol[1], <double> pol[2]),
+                      inc_pol_cpp,
+                      obs_pol_cpp,
                       <double> f,
                       <double> density)
 
