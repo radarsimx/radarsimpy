@@ -172,7 +172,7 @@ cdef extern from "receiver.hpp":
     cdef cppclass RxChannel[T]:
         RxChannel() except +
         RxChannel(const Vec3[T] & location,
-                  const Vec3[T] & polar,
+                  const Vec3[cpp_complex[T]] & polar,
                   const vector[T] & phi,
                   const vector[T] & phi_ptn,
                   const vector[T] & theta,
