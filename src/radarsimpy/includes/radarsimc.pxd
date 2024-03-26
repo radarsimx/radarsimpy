@@ -135,7 +135,7 @@ cdef extern from "transmitter.hpp":
     cdef cppclass TxChannel[T]:
         TxChannel() except +
         TxChannel(const Vec3[T] & location,
-                  const Vec3[T] & polar,
+                  const Vec3[cpp_complex[T]] & polar,
                   const vector[T] & phi,
                   const vector[T] & phi_ptn,
                   const vector[T] & theta,

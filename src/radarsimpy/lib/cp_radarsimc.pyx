@@ -273,10 +273,13 @@ cdef TxChannel[float_t] cp_TxChannel(tx,
         Mem_Copy(&mod_t_mv[0], <int_t>(len(tx.txchannel_prop["waveform_mod"][tx_idx]["t"])), mod_t_vt)
 
     cdef float_t[:] location_mv = tx.txchannel_prop["locations"][tx_idx].astype(np_float)
-    cdef float_t[:] polarization_mv = tx.txchannel_prop["polarization"][tx_idx].astype(np_float)
+
+    polar = tx.txchannel_prop["polarization"][tx_idx]
+    cdef Vec3[cpp_complex[float_t]] polarization_vt = Vec3[cpp_complex[float_t]](cpp_complex[float_t](np.real(polar[0]), np.imag(polar[0])), cpp_complex[float_t](np.real(polar[1]), np.imag(polar[1])), cpp_complex[float_t](np.real(polar[2]), np.imag(polar[2])))
+
     return TxChannel[float_t](
         Vec3[float_t](&location_mv[0]),
-        Vec3[float_t](&polarization_mv[0]),
+        polarization_vt,
         az_ang_vt,
         az_ptn_vt,
         el_ang_vt,
