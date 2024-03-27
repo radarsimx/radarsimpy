@@ -76,11 +76,11 @@ cdef extern from "target.hpp":
 
 
 """
-SimpleRay
+BasicRay
 """
-cdef extern from "simpleray.hpp":
-    cdef cppclass SimpleRay[T]:
-        SimpleRay() except +
+cdef extern from "basicray.hpp":
+    cdef cppclass BasicRay[T]:
+        BasicRay() except +
         Vec3[T] * direction_
         Vec3[T] * location_
         int reflections_
@@ -114,7 +114,7 @@ cdef extern from "pointcloud.hpp":
                  const vector[T] & theta,
                  const Vec3[T] & position)
 
-        vector[SimpleRay[T]] cloud_
+        vector[BasicRay[T]] cloud_
 
 
 """
