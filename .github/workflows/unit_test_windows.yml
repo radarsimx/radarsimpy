@@ -17,14 +17,7 @@ jobs:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
     steps:
-      - name: Setup SSH
-        uses: MrSquaare/ssh-setup-action@v3
-        with:
-            host: github.com
-            private-key: ${{ secrets.SSH_KEY }}
       - uses: actions/checkout@v4
-      - name: Checkout submodules
-        run: git submodule update --init --recursive
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
