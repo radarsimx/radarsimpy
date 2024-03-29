@@ -48,7 +48,7 @@ cpdef rcs_sbr(targets,
               obs_pol=None,
               density=1):
     """
-    rcs_sbr(targets, f, obs_phi, obs_theta, inc_phi=None, inc_theta=None, pol=[0, 0, 1], density=1)
+    rcs_sbr(targets, f, obs_phi, obs_theta, inc_phi=None, inc_theta=None, inc_pol=[0, 0, 1], obs_pol=None, density=1)
 
     Calculate target's RCS by using shooting and bouncing rays (SBR)
 
