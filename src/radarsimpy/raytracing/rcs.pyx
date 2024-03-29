@@ -84,9 +84,12 @@ cpdef rcs_sbr(targets,
     :param float inc_theta:
         Incidence angle theta (deg).
         ``default None`` means ``inc_theta = obs_theta``
-    :param list pol:
-        Polarization [x, y, z].
+    :param list inc_pol:
+        Incidence polarization [x, y, z].
         ``default [0, 0, 1]``
+    :param list obs_pol:
+        Observer polarization [x, y, z].
+        ``default same as inc_pol``
     :param float density:
         Ray density (number of rays per wavelength).
         ``default 1``
