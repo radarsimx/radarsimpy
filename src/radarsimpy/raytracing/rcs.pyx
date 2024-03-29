@@ -40,15 +40,15 @@ np_float = np.float32
 @cython.wraparound(False)
 cpdef rcs_sbr(targets,
               f,
-              obs_phi,
-              obs_theta,
-              inc_phi=None,
-              inc_theta=None,
+              inc_phi,
+              inc_theta,
               inc_pol=[0, 0, 1],
+              obs_phi=None,
+              obs_theta=None,
               obs_pol=None,
               density=1):
     """
-    rcs_sbr(targets, f, obs_phi, obs_theta, inc_phi=None, inc_theta=None, inc_pol=[0, 0, 1], obs_pol=None, density=1)
+    rcs_sbr(targets, f, inc_phi, inc_theta, inc_pol=[0, 0, 1], obs_phi=None, obs_theta=None, obs_pol=None, density=1)
 
     Calculate target's RCS by using shooting and bouncing rays (SBR)
 
@@ -74,19 +74,19 @@ cpdef rcs_sbr(targets,
         }]
     :param float f:
         Center frequency (Hz)
-    :param float obs_phi:
-        Observation angle phi (deg)
-    :param float obs_theta:
-        Observation angle theta (deg)
     :param float inc_phi:
         Incidence angle phi (deg).
-        ``default None`` means ``inc_phi = obs_phi``
     :param float inc_theta:
         Incidence angle theta (deg).
-        ``default None`` means ``inc_theta = obs_theta``
     :param list inc_pol:
         Incidence polarization [x, y, z].
         ``default [0, 0, 1]``
+    :param float obs_phi:
+        Observation angle phi (deg)
+        ``default None`` means ``obs_phi = inc_phi``
+    :param float obs_theta:
+        Observation angle theta (deg)
+        ``default None`` means ``obs_theta = inc_theta``
     :param list obs_pol:
         Observer polarization [x, y, z].
         ``default same as inc_pol``
@@ -112,11 +112,11 @@ cpdef rcs_sbr(targets,
     for idx_c in range(0, len(targets)):
         targets_vt.push_back(cp_RCS_Target(targets[idx_c]))
 
-    if inc_phi is None:
-        inc_phi = obs_phi
+    if obs_phi is None:
+        obs_phi = inc_phi
 
-    if inc_theta is None:
-        inc_theta = obs_theta
+    if obs_theta is None:
+        obs_theta = inc_theta
 
     inc_phi_rad = np.radians(inc_phi)
     inc_theta_rad = np.radians(inc_theta)

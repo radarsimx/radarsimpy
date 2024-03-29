@@ -70,11 +70,11 @@ def test_rcs_bistatic():
             rcs_sbr(
                 [target],
                 freq,
-                phi_ang,
-                theta,
                 inc_phi=inc_phi,
                 inc_theta=inc_theta,
                 inc_pol=pol,
+                obs_phi=phi_ang,
+                obs_theta=theta,
                 density=density,
             )
         )
