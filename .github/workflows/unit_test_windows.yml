@@ -23,7 +23,7 @@ jobs:
         with:
           repository: rookiepeng/radarsimcpp
           ssh-key: ${{ secrets.RADARSIMC }}
-          path: src
+          path: src/radarsimcpp
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
