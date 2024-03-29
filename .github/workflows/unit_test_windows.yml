@@ -17,6 +17,11 @@ jobs:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
     steps:
+      - name: Setup SSH
+        uses: MrSquaare/ssh-setup-action@v1
+        with:
+            host: github.com
+            private-key: ${{ secrets.RADARSIMC }}
       - uses: actions/checkout@v4
       - name: Checkout submodules
         run: git submodule update --init --recursive
