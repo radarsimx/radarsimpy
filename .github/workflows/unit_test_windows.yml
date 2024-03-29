@@ -18,10 +18,10 @@ jobs:
 
     steps:
       - name: Setup SSH
-        uses: MrSquaare/ssh-setup-action@v1
+        uses: MrSquaare/ssh-setup-action@v3
         with:
             host: github.com
-            private-key: ${{ secrets.RADARSIMC }}
+            private-key: ${{ secrets.SSH_KEY }}
       - uses: actions/checkout@v4
       - name: Checkout submodules
         run: git submodule update --init --recursive
