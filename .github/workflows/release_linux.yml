@@ -39,7 +39,7 @@ jobs:
           chmod +x build_linux.sh
           ./build_linux.sh
       - name: Archive built module
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: success()
         with:
           name: radarsimpy_linux_py${{ matrix.python-version }}
