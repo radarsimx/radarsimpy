@@ -112,7 +112,7 @@ elif os_type == "Windows":
 
 CUDA = locate_cuda()
 
-MACROS = [("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION"), ("_CUDA_", None)]
+MACROS = [("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION"), ("_CUDA_", None), ("_FREETIER_", 1)]
 INCLUDE_DIRS = ["src/radarsimcpp/includes", "src/radarsimcpp/includes/zpvector"]
 
 
