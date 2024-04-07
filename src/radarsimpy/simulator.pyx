@@ -32,6 +32,7 @@ from radarsimpy.includes.radarsimc cimport Radar
 from radarsimpy.lib.cp_radarsimc cimport cp_TxChannel, cp_Transmitter
 from radarsimpy.includes.radarsimc cimport Transmitter
 from radarsimpy.includes.radarsimc cimport Mem_Copy_Vec3
+from radarsimpy.includes.radarsimc cimport IsFreeTier
 from radarsimpy.lib.cp_radarsimc cimport cp_Point
 from radarsimpy.includes.radarsimc cimport Point
 
@@ -145,6 +146,16 @@ cpdef simc(radar, targets, noise=True):
     cdef vector[Vec3[float_t]] interf_rrt_vt
 
     cdef int_t idx_c
+
+    if IsFreeTier():
+        if len(targets) > 3:
+            raise Exception("You're currently using RadarSimPy's FreeTier, which limits RCS simulation to 3 maximum targets. Please consider supporting my work by upgrading to the standard version. Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ to access the standard version download links. Your support will help improve the software. Thank you for considering it.")
+
+        if radar.radar_prop["transmitter"].txchannel_prop["size"] > 2:
+            raise Exception("You're currently using RadarSimPy's FreeTier, which imposes a restriction on the maximum number of transmitter channels to 2. Please consider supporting my work by upgrading to the standard version. Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ to access the standard version download links. Your support will help improve the software. Thank you for considering it.")
+        
+        if radar.radar_prop["receiver"].rxchannel_prop["size"] > 2:
+            raise Exception("You're currently using RadarSimPy's FreeTier, which imposes a restriction on the maximum number of receiver channels to 2. Please consider supporting my work by upgrading to the standard version. Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ to access the standard version download links. Your support will help improve the software. Thank you for considering it.")
 
     ts_shape = np.shape(radar.time_prop["timestamp"])
 

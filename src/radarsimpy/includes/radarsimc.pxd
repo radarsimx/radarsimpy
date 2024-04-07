@@ -44,6 +44,9 @@ cdef extern from "libs/mem_lib.hpp":
                                int_t size,
                                vector[Vec3[T]] &vect) except +
 
+cdef extern from "libs/free_tier.hpp":
+    cdef int IsFreeTier() except +
+
 """
 Target
 """

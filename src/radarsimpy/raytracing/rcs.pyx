@@ -25,6 +25,8 @@ from radarsimpy.includes.type_def cimport vector
 from radarsimpy.lib.cp_radarsimc cimport cp_RCS_Target
 from radarsimpy.includes.radarsimc cimport Target, Rcs
 
+from radarsimpy.includes.radarsimc cimport IsFreeTier
+
 from libcpp.complex cimport complex as cpp_complex
 
 import numpy as np
@@ -97,6 +99,10 @@ cpdef rcs_sbr(targets,
     :return: Target's RCS (m^2), use 10*log10(RCS) to convert to dBsm
     :rtype: float
     """
+    if IsFreeTier():
+        if len(targets) > 3:
+            raise Exception("You're currently using RadarSimPy's FreeTier, which limits RCS simulation to 3 maximum targets. Please consider supporting my work by upgrading to the standard version. Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ to access the standard version download links. Your support will help improve the software. Thank you for considering it.")
+
     cdef vector[Target[float]] targets_vt
 
     cdef Vec3[cpp_complex[double]] inc_pol_cpp
