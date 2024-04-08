@@ -32,16 +32,16 @@ CD ".\src\radarsimcpp\build"
 
 ECHO ## Building radarsimcpp.dll with MSVC ##
 @REM MSVC needs to set the build type using '--config Relesae' 
-cmake -DGPU_BUILD=ON -DGTEST=ON ..
+cmake -DGTEST=ON ..
 cmake --build . --config Release
 
 ECHO ## Building radarsimpy with Cython ##
 CD %pwd%
-conda.exe run -n py38 python setup_cuda_freetier.py build_ext -b ./
-conda.exe run -n py39 python setup_cuda_freetier.py build_ext -b ./
-conda.exe run -n py310 python setup_cuda_freetier.py build_ext -b ./
-conda.exe run -n py311 python setup_cuda_freetier.py build_ext -b ./
-conda.exe run -n py312 python setup_cuda_freetier.py build_ext -b ./
+conda.exe run -n py38 python setup_freetier.py build_ext -b ./
+conda.exe run -n py39 python setup_freetier.py build_ext -b ./
+conda.exe run -n py310 python setup_freetier.py build_ext -b ./
+conda.exe run -n py311 python setup_freetier.py build_ext -b ./
+conda.exe run -n py312 python setup_freetier.py build_ext -b ./
 
 ECHO ## Copying dll files to ./radarsimpy ##
 XCOPY ".\src\radarsimcpp\build\Release\radarsimcpp.dll" ".\radarsimpy\"
@@ -64,16 +64,16 @@ DEL ".\src\*.html"
 
 ECHO ## Copying lib files to freetier release folder ##
 
-RMDIR /Q/S .\Windows_x86_64_GPU_FreeTier
-XCOPY /E /I .\radarsimpy .\Windows_x86_64_GPU_FreeTier\radarsimpy
+RMDIR /Q/S .\Windows_x86_64_CPU_FreeTier
+XCOPY /E /I .\radarsimpy .\Windows_x86_64_CPU_FreeTier\radarsimpy
 
 RMDIR /Q/S .\radarsimpy
 
-conda.exe run -n py38 python setup_cuda.py build_ext -b ./
-conda.exe run -n py39 python setup_cuda.py build_ext -b ./
-conda.exe run -n py310 python setup_cuda.py build_ext -b ./
-conda.exe run -n py311 python setup_cuda.py build_ext -b ./
-conda.exe run -n py312 python setup_cuda.py build_ext -b ./
+conda.exe run -n py38 python setup.py build_ext -b ./
+conda.exe run -n py39 python setup.py build_ext -b ./
+conda.exe run -n py310 python setup.py build_ext -b ./
+conda.exe run -n py311 python setup.py build_ext -b ./
+conda.exe run -n py312 python setup.py build_ext -b ./
 
 ECHO ## Copying dll files to ./radarsimpy ##
 XCOPY ".\src\radarsimcpp\build\Release\radarsimcpp.dll" ".\radarsimpy\"
@@ -96,8 +96,8 @@ DEL ".\src\*.html"
 
 ECHO ## Copying lib files to standard release folder ##
 
-RMDIR /Q/S .\Windows_x86_64_GPU
-XCOPY /E /I .\radarsimpy .\Windows_x86_64_GPU\radarsimpy
+RMDIR /Q/S .\Windows_x86_64_CPU
+XCOPY /E /I .\radarsimpy .\Windows_x86_64_CPU\radarsimpy
 
 ECHO ## Build completed ##
 
