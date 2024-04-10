@@ -37,11 +37,11 @@ cmake --build . --config Release
 
 ECHO ## Building radarsimpy with Cython ##
 CD %pwd%
-conda.exe run -n py38 python setup_freetier.py build_ext -b ./
-conda.exe run -n py39 python setup_freetier.py build_ext -b ./
-conda.exe run -n py310 python setup_freetier.py build_ext -b ./
-conda.exe run -n py311 python setup_freetier.py build_ext -b ./
-conda.exe run -n py312 python setup_freetier.py build_ext -b ./
+conda.exe run -n py38 python setup.py build_ext -b ./ --tier free
+conda.exe run -n py39 python setup.py build_ext -b ./ --tier free
+conda.exe run -n py310 python setup.py build_ext -b ./ --tier free
+conda.exe run -n py311 python setup.py build_ext -b ./ --tier free
+conda.exe run -n py312 python setup.py build_ext -b ./ --tier free
 
 ECHO ## Copying dll files to ./radarsimpy ##
 XCOPY ".\src\radarsimcpp\build\Release\radarsimcpp.dll" ".\radarsimpy\"
@@ -69,11 +69,11 @@ XCOPY /E /I .\radarsimpy .\Windows_x86_64_CPU_FreeTier\radarsimpy
 
 RMDIR /Q/S .\radarsimpy
 
-conda.exe run -n py38 python setup.py build_ext -b ./
-conda.exe run -n py39 python setup.py build_ext -b ./
-conda.exe run -n py310 python setup.py build_ext -b ./
-conda.exe run -n py311 python setup.py build_ext -b ./
-conda.exe run -n py312 python setup.py build_ext -b ./
+conda.exe run -n py38 python setup.py build_ext -b ./ --tier standard
+conda.exe run -n py39 python setup.py build_ext -b ./ --tier standard
+conda.exe run -n py310 python setup.py build_ext -b ./ --tier standard
+conda.exe run -n py311 python setup.py build_ext -b ./ --tier standard
+conda.exe run -n py312 python setup.py build_ext -b ./ --tier standard
 
 ECHO ## Copying dll files to ./radarsimpy ##
 XCOPY ".\src\radarsimcpp\build\Release\radarsimcpp.dll" ".\radarsimpy\"

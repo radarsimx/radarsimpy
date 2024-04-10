@@ -30,7 +30,7 @@ cmake --build .
 
 echo "## Building radarsimpy with Cython ##"
 cd $workpath
-python setup.py build_ext -b ./
+python setup.py build_ext -b ./ --tier standard
 
 echo "## Copying lib files to ./radarsimpy ##"
 # mkdir ./radarsimpy/lib

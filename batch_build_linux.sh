@@ -30,11 +30,11 @@ cmake --build .
 
 echo "## Building radarsimpy with Cython ##"
 cd $workpath
-conda run -n py38 python setup_freetier.py build_ext -b ./
-conda run -n py39 python setup_freetier.py build_ext -b ./
-conda run -n py310 python setup_freetier.py build_ext -b ./
-conda run -n py311 python setup_freetier.py build_ext -b ./
-conda run -n py312 python setup_freetier.py build_ext -b ./
+conda run -n py38 python setup.py build_ext -b ./ --tier free
+conda run -n py39 python setup.py build_ext -b ./ --tier free
+conda run -n py310 python setup.py build_ext -b ./ --tier free
+conda run -n py311 python setup.py build_ext -b ./ --tier free
+conda run -n py312 python setup.py build_ext -b ./ --tier free
 
 echo "## Copying lib files to ./radarsimpy ##"
 
@@ -65,11 +65,11 @@ cp -rf ./radarsimpy/* ./Linux_x86_64_CPU_FreeTier/radarsimpy
 
 rm -rf ./radarsimpy
 
-conda run -n py38 python setup.py build_ext -b ./
-conda run -n py39 python setup.py build_ext -b ./
-conda run -n py310 python setup.py build_ext -b ./
-conda run -n py311 python setup.py build_ext -b ./
-conda run -n py312 python setup.py build_ext -b ./
+conda run -n py38 python setup.py build_ext -b ./ --tier standard
+conda run -n py39 python setup.py build_ext -b ./ --tier standard
+conda run -n py310 python setup.py build_ext -b ./ --tier standard
+conda run -n py311 python setup.py build_ext -b ./ --tier standard
+conda run -n py312 python setup.py build_ext -b ./ --tier standard
 
 echo "## Copying lib files to ./radarsimpy ##"
 

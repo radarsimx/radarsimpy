@@ -20,12 +20,23 @@ Setup script for a Python package "radarsimpy"
 
 import platform
 
+import argparse
+import sys
+
 from setuptools import setup
 from setuptools import Extension
 from Cython.Distutils import build_ext
 from Cython.Build import cythonize
 import numpy
 
+
+ap = argparse.ArgumentParser()
+ap.add_argument("-t", "--tier", required=False, help="`free` or `standard`")
+
+
+args, unknown = ap.parse_known_args()
+sys.argv = [sys.argv[0]] + unknown
+# print(args.tier)
 
 os_type = platform.system()  # 'Linux', 'Windows', 'macOS'
 
@@ -39,7 +50,11 @@ elif os_type == "Windows":
     LINK_ARGS = []
     LIBRARY_DIRS = ["src/radarsimcpp/build/Release"]
 
-MACROS = [("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]
+if args.tier == "free":
+    MACROS = [("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION"), ("_FREETIER_", 1)]
+else:
+    MACROS = [("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]
+
 INCLUDE_DIRS = ["src/radarsimcpp/includes", "src/radarsimcpp/includes/zpvector"]
 
 ext_modules = [

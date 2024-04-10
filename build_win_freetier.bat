@@ -37,7 +37,7 @@ cmake --build . --config Release
 
 ECHO ## Building radarsimpy with Cython ##
 CD %pwd%
-python setup_freetier.py build_ext -b ./
+python setup.py build_ext -b ./ --tier free
 
 ECHO ## Copying dll files to ./radarsimpy ##
 XCOPY ".\src\radarsimcpp\build\Release\radarsimcpp.dll" ".\radarsimpy\"
