@@ -37,7 +37,7 @@ conda run -n py311 python setup.py build_ext -b ./ --tier free --arch cpu
 conda run -n py312 python setup.py build_ext -b ./ --tier free --arch cpu
 
 echo "## Copying lib files to ./radarsimpy ##"
-mkdir ./radarsimpy
+# mkdir ./radarsimpy
 cp ./src/radarsimpy/*.py ./radarsimpy
 cp ./src/radarsimpy/lib/__init__.py ./radarsimpy/lib
 cp ./src/radarsimcpp/build/*.so ./radarsimpy

@@ -64,7 +64,7 @@ cd $workpath
 python setup.py build_ext -b ./ --tier "${TIER}" --arch "${ARCH}"
 
 echo "## Copying lib files to ./radarsimpy ##"
-mkdir ./radarsimpy
+# mkdir ./radarsimpy
 cp ./src/radarsimpy/*.py ./radarsimpy
 cp ./src/radarsimpy/lib/__init__.py ./radarsimpy/lib
 cp ./src/radarsimcpp/build/*.so ./radarsimpy
