@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 echo "Automatic build script of radarsimcpp/radarsimpy for Linux"
 echo ""
@@ -30,11 +30,11 @@ cmake --build .
 
 echo "## Building radarsimpy with Cython ##"
 cd $workpath
-conda run -n py38 python setup_cuda_freetier.py build_ext -b ./
-conda run -n py39 python setup_cuda_freetier.py build_ext -b ./
-conda run -n py310 python setup_cuda_freetier.py build_ext -b ./
-conda run -n py311 python setup_cuda_freetier.py build_ext -b ./
-conda run -n py312 python setup_cuda_freetier.py build_ext -b ./
+conda run -n py38 python setup.py build_ext -b ./ --tier free --arch gpu
+conda run -n py39 python setup.py build_ext -b ./ --tier free --arch gpu
+conda run -n py310 python setup.py build_ext -b ./ --tier free --arch gpu
+conda run -n py311 python setup.py build_ext -b ./ --tier free --arch gpu
+conda run -n py312 python setup.py build_ext -b ./ --tier free --arch gpu
 
 echo "## Copying lib files to ./radarsimpy ##"
 
@@ -65,14 +65,14 @@ cp -rf ./radarsimpy/* ./Linux_x86_64_GPU_FreeTier/radarsimpy
 
 rm -rf ./radarsimpy
 
-conda run -n py38 python setup_cuda.py build_ext -b ./
-conda run -n py39 python setup_cuda.py build_ext -b ./
-conda run -n py310 python setup_cuda.py build_ext -b ./
-conda run -n py311 python setup_cuda.py build_ext -b ./
-conda run -n py312 python setup_cuda.py build_ext -b ./
+conda run -n py38 python setup.py build_ext -b ./ --tier standard --arch gpu
+conda run -n py39 python setup.py build_ext -b ./ --tier standard --arch gpu
+conda run -n py310 python setup.py build_ext -b ./ --tier standard --arch gpu
+conda run -n py311 python setup.py build_ext -b ./ --tier standard --arch gpu
+conda run -n py312 python setup.py build_ext -b ./ --tier standard --arch gpu
 
 echo "## Copying lib files to ./radarsimpy ##"
-
+mkdir ./radarsimpy
 cp ./src/radarsimpy/*.py ./radarsimpy
 cp ./src/radarsimpy/lib/__init__.py ./radarsimpy/lib
 cp ./src/radarsimcpp/build/*.so ./radarsimpy

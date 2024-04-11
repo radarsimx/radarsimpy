@@ -38,7 +38,7 @@ jobs:
         run: |
           sudo chown -R $USER:$USER /home/runner/work/radarsimpy
           chmod +x build_linux.sh
-          ./build_linux.sh
+          ./build_linux.sh --tier=standard --arch=cpu --test=off
       - name: Test with Google Test
         run: |
           ./src/radarsimcpp/build/radarsimcpp_test
