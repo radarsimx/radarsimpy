@@ -1,5 +1,15 @@
 @ECHO OFF
 
+goto GETOPTS
+
+:GETOPTS
+if /I "%1" == "--tier" set TIER=%2 & shift
+if /I "%1" == "--arch" set ARCH=%2 & shift
+if /I "%1" == "--test" set TEST=%2 & shift
+shift
+if not "%1" == "" goto GETOPTS
+
+
 ECHO Automatic build script of radarsimcpp/radarsimpy for Windows
 ECHO:
 ECHO ----------
@@ -32,12 +42,16 @@ CD ".\src\radarsimcpp\build"
 
 ECHO ## Building radarsimcpp.dll with MSVC ##
 @REM MSVC needs to set the build type using '--config Relesae' 
-cmake -DGTEST=ON ..
+if %ARCH% == gpu (
+    cmake -DGPU_BUILD=ON -DGTEST=ON ..
+) else if %ARCH% == cpu (
+    cmake -DGTEST=ON ..
+)
 cmake --build . --config Release
 
 ECHO ## Building radarsimpy with Cython ##
 CD %pwd%
-python setup.py build_ext -b ./ --tier standard
+python setup.py build_ext -b ./ --tier %TIER% --arch %ARCH%
 
 ECHO ## Copying dll files to ./radarsimpy ##
 XCOPY ".\src\radarsimcpp\build\Release\radarsimcpp.dll" ".\radarsimpy\"
@@ -65,8 +79,10 @@ XCOPY /E /I .\radarsimpy .\tests\radarsimpy
 
 ECHO ## Build completed ##
 
-@REM ECHO ## Run Google test ##
-@REM .\src\radarsimcpp\build\Release\radarsimcpp_test.exe
+if %TEST% == on (
+ECHO ## Run Google test ##
+.\src\radarsimcpp\build\Release\radarsimcpp_test.exe
 
-@REM ECHO ## Pytest ##
-@REM pytest
+ECHO ## Pytest ##
+pytest
+)

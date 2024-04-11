@@ -33,7 +33,7 @@ jobs:
           pip install -r requirements.txt
       - name: Build
         run: |
-          .\build_win_freetier.bat
+          .\build_win.bat --tier free --arch cpu --test off
       - name: Archive built module
         uses: actions/upload-artifact@v4
         if: success()

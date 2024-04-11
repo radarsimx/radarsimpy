@@ -34,7 +34,7 @@ jobs:
           pip install -r requirements.txt
       - name: Build
         run: |
-          .\build_win.bat
+          .\build_win.bat --tier standard --arch cpu --test off
       - name: Test with Google Test
         run: |
           .\src\radarsimcpp\build\Release\radarsimcpp_test.exe

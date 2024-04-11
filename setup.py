@@ -23,6 +23,8 @@ import platform
 import argparse
 import sys
 
+import os
+from os.path import join as pjoin
 from setuptools import setup
 from setuptools import Extension
 from Cython.Distutils import build_ext
@@ -32,30 +34,119 @@ import numpy
 
 ap = argparse.ArgumentParser()
 ap.add_argument("-t", "--tier", required=False, help="`free` or `standard`")
-
+ap.add_argument("-a", "--arch", required=False, help="`cpu` or `gpu`")
 
 args, unknown = ap.parse_known_args()
 sys.argv = [sys.argv[0]] + unknown
-# print(args.tier)
 
 os_type = platform.system()  # 'Linux', 'Windows', 'macOS'
 
 if os_type == "Linux":
     LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
     LIBRARY_DIRS = ["src/radarsimcpp/build"]
+    if args.arch == "gpu":
+        NVCC = "nvcc"
+        CUDALIB = "lib64"
 elif os_type == "Darwin":
     LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
     LIBRARY_DIRS = ["src/radarsimcpp/build"]
 elif os_type == "Windows":
     LINK_ARGS = []
     LIBRARY_DIRS = ["src/radarsimcpp/build/Release"]
+    if args.arch == "gpu":
+        NVCC = "nvcc.exe"
+        CUDALIB = "lib\\x64"
+
+
+def find_in_path(name, path):
+    """Iterates over the directories in the search path by splitting the path string using
+    os.pathsep as the delimiter. os.pathsep is a string that represents the separator
+    used in the PATH environment variable on the current operating system
+    (e.g., : on Unix-like systems and ; on Windows).
+
+    :param name: The name of the file
+    :type name: str
+    :param path: The search path
+    :type path: str
+    :return: The absolute path of the file
+    :rtype: str
+    """
+
+    for path_name in path.split(os.pathsep):
+        binpath = pjoin(path_name, name)
+        if os.path.exists(binpath):
+            return os.path.abspath(binpath)
+    return None
+
+
+def locate_cuda():
+    """Locate the CUDA installation on the system
+
+    :raises EnvironmentError: The nvcc binary could not be located in your $PATH.
+        Either add it to your path, or set $CUDA_PATH
+    :raises EnvironmentError: The CUDA <key> path could not be located in <val>
+    :return: dict with keys 'home', 'nvcc', 'include', and 'lib64'
+    and values giving the absolute path to each directory.
+    :rtype: dict
+    """
+
+    # The code first checks if the CUDA_PATH environment variable is set.
+    # If it is, it uses the value of CUDA_PATH as the CUDA installation directory
+    # and constructs the path to the nvcc binary (NVIDIA CUDA Compiler) inside that directory.
+    if "CUDA_PATH" in os.environ:
+        home = os.environ["CUDA_PATH"]
+        nvcc = pjoin(home, "bin", NVCC)
+    else:
+        # If the CUDA_PATH environment variable is not set, it searches for the nvcc
+        # binary in the system's PATH environment variable. If nvcc is not found in
+        # the PATH, it raises an EnvironmentError. Otherwise, it sets the home variable
+        # to the parent directory of nvcc.
+        default_path = pjoin(os.sep, "usr", "local", "cuda", "bin")
+        nvcc = find_in_path(NVCC, os.environ["PATH"] + os.pathsep + default_path)
+        if nvcc is None:
+            raise EnvironmentError(
+                "The nvcc binary could not be located in your $PATH. "
+                "Either add it to your path, or set $CUDA_PATH"
+            )
+        home = os.path.dirname(os.path.dirname(nvcc))
+
+    cudaconfig = {
+        "home": home,
+        "nvcc": nvcc,
+        "include": pjoin(home, "include"),
+        "lib64": pjoin(home, CUDALIB),
+    }
+    for key, val in cudaconfig.items():
+        if not os.path.exists(val):
+            raise EnvironmentError(
+                "The CUDA " + key + " path could not be located in " + val
+            )
+
+    return cudaconfig
+
 
 if args.tier == "free":
-    MACROS = [("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION"), ("_FREETIER_", 1)]
+    if args.arch == "gpu":
+        MACROS = [
+            ("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION"),
+            ("_FREETIER_", 1),
+            ("_CUDA_", None),
+        ]
+    elif args.arch == "cpu":
+        MACROS = [("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION"), ("_FREETIER_", 1)]
 else:
-    MACROS = [("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]
+    if args.arch == "gpu":
+        MACROS = [("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION"), ("_CUDA_", None)]
+    elif args.arch == "cpu":
+        MACROS = [("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]
 
 INCLUDE_DIRS = ["src/radarsimcpp/includes", "src/radarsimcpp/includes/zpvector"]
+
+if args.arch == "gpu":
+    CUDA = locate_cuda()
+    INCLUDE_DIRS = INCLUDE_DIRS + [CUDA["include"]]
+    LIBRARY_DIRS = LIBRARY_DIRS + [CUDA["lib64"]]
+
 
 ext_modules = [
     Extension(
