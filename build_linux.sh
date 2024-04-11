@@ -23,9 +23,6 @@ for i in "$@"; do
   esac
 done
 
-
-
-
 echo "Automatic build script of radarsimcpp/radarsimpy for Linux"
 echo ""
 echo "----------"

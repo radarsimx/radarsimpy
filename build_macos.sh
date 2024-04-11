@@ -1,4 +1,27 @@
-#!/bin/sh
+#!/bin/bash
+
+for i in "$@"; do
+  case $i in
+    --tier=*)
+      TIER="${i#*=}"
+      shift # past argument
+      ;;
+    --arch=*)
+      ARCH="${i#*=}"
+      shift # past argument
+      ;;
+    --test=*)
+      TEST="${i#*=}"
+      shift # past argument
+      ;;
+    --*)
+      echo "Unknown option $1"
+      exit 1
+      ;;
+    *)
+      ;;
+  esac
+done
 
 echo "Automatic build script of radarsimcpp/radarsimpy for macOS"
 echo ""
@@ -21,16 +44,20 @@ echo "## Clean old build files ##"
 rm -rf ./src/radarsimcpp/build
 rm -rf ./radarsimpy
 
-echo "## Building libradarsimcpp.so with CPU ##"
+echo "## Building libradarsimcpp.so with CP${ARCH}U ##"
 mkdir ./src/radarsimcpp/build 
 cd ./src/radarsimcpp/build
 
-cmake -DCMAKE_BUILD_TYPE=Release -DGTEST=ON ..
+if [ "${ARCH}" == "gpu" ]; then
+    cmake -DCMAKE_BUILD_TYPE=Release -DGPU_BUILD=ON -DGTEST=ON ..
+elif [ "${ARCH}" == "cpu" ]; then
+    cmake -DCMAKE_BUILD_TYPE=Release -DGTEST=ON ..
+fi
 cmake --build .
 
 echo "## Building radarsimpy with Cython ##"
 cd $workpath
-python setup.py build_ext -b ./ --tier standard
+python setup.py build_ext -b ./ --tier "${TIER}" --arch "${ARCH}"
 
 echo "## Copying lib files to ./radarsimpy ##"
 # mkdir ./radarsimpy/lib

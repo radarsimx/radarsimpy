@@ -37,7 +37,7 @@ jobs:
           CXX: ${{ matrix.cxx_compiler }}
         run: |
           chmod +x build_macos.sh
-          ./build_macos.sh
+          ./build_macos.sh --tier=standard --arch=cpu --test=off
       - name: Test with Google Test
         run: |
           ./src/radarsimcpp/build/radarsimcpp_test
