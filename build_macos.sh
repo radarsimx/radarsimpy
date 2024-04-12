@@ -41,17 +41,17 @@ for i in "$@"; do
   esac
 done
 
-if [ "${TIER,,}" != "standard" ] && [ "${TIER,,}" != "free" ]; then
+if [ "${TIER}" != "standard" ] && [ "${TIER}" != "free" ]; then
     echo "ERROR: Invalid --tier parameters, please choose 'free' or 'standard'"
     exit 1
 fi
 
-if [ "${ARCH,,}" != "cpu" ] && [ "${ARCH,,}" != "gpu" ]; then
+if [ "${ARCH}" != "cpu" ] && [ "${ARCH}" != "gpu" ]; then
     echo "ERROR: Invalid --arch parameters, please choose 'cpu' or 'gpu'"
     exit 1
 fi
 
-if [ "${TEST,,}" != "on" ] && [ "${TEST,,}" != "off" ]; then
+if [ "${TEST}" != "on" ] && [ "${TEST}" != "off" ]; then
     echo "ERROR: Invalid --test parameters, please choose 'on' or 'off'"
     exit 1
 fi
@@ -77,13 +77,13 @@ echo "## Clean old build files ##"
 rm -rf ./src/radarsimcpp/build
 rm -rf ./radarsimpy
 
-echo "## Building libradarsimcpp.so with ${ARCH^^} ##"
+echo "## Building libradarsimcpp.so with ${ARCH} ##"
 mkdir ./src/radarsimcpp/build 
 cd ./src/radarsimcpp/build
 
-if [ "${ARCH,,}" == "gpu" ]; then
+if [ "${ARCH}" == "gpu" ]; then
     cmake -DCMAKE_BUILD_TYPE=Release -DGPU_BUILD=ON -DGTEST=ON ..
-elif [ "${ARCH,,}" == "cpu" ]; then
+elif [ "${ARCH}" == "cpu" ]; then
     cmake -DCMAKE_BUILD_TYPE=Release -DGTEST=ON ..
 fi
 cmake --build .
@@ -114,7 +114,7 @@ rm -f ./src/*.html
 
 echo "## Build completed ##"
 
-if [ "${TEST,,}" == "on" ]; then
+if [ "${TEST}" == "on" ]; then
     echo "## Run Google test ##"
     ./src/radarsimcpp/build/radarsimcpp_test
 
