@@ -33,11 +33,30 @@ import numpy
 
 
 ap = argparse.ArgumentParser()
-ap.add_argument("-t", "--tier", required=False, help="`free` or `standard`")
-ap.add_argument("-a", "--arch", required=False, help="`cpu` or `gpu`")
+ap.add_argument("-t", "--tier", required=False, help="Build tier, choose `free` or `standard`")
+ap.add_argument("-a", "--arch", required=False, help="Build architecture, choose `cpu` or `gpu`")
 
 args, unknown = ap.parse_known_args()
 sys.argv = [sys.argv[0]] + unknown
+
+if args.tier is None:
+    ARG_TIER = "standard"
+elif args.tier.lower() == "free":
+    ARG_TIER = "free"
+elif args.tier.lower() == "standard":
+    ARG_TIER = "standard"
+else:
+    raise ValueError("Invalid --tier parameters, please choose 'free' or 'standard'")
+
+if args.arch is None:
+    ARG_ARCH = "cpu"
+elif args.arch.lower() == "cpu":
+    ARG_ARCH = "cpu"
+elif args.arch.lower() == "gpu":
+    ARG_ARCH = "gpu"
+else:
+    raise ValueError("Invalid --arch parameters, please choose 'cpu' or 'gpu'")
+
 
 os_type = platform.system()  # 'Linux', 'Windows', 'macOS'
 
@@ -125,24 +144,24 @@ def locate_cuda():
     return cudaconfig
 
 
-if args.tier == "free":
-    if args.arch == "gpu":
+if ARG_TIER == "free":
+    if ARG_ARCH == "gpu":
         MACROS = [
             ("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION"),
             ("_FREETIER_", 1),
             ("_CUDA_", None),
         ]
-    elif args.arch == "cpu":
+    elif ARG_ARCH == "cpu":
         MACROS = [("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION"), ("_FREETIER_", 1)]
 else:
-    if args.arch == "gpu":
+    if ARG_ARCH == "gpu":
         MACROS = [("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION"), ("_CUDA_", None)]
-    elif args.arch == "cpu":
+    elif ARG_ARCH == "cpu":
         MACROS = [("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]
 
 INCLUDE_DIRS = ["src/radarsimcpp/includes", "src/radarsimcpp/includes/zpvector"]
 
-if args.arch == "gpu":
+if ARG_ARCH == "gpu":
     CUDA = locate_cuda()
     INCLUDE_DIRS = INCLUDE_DIRS + [CUDA["include"]]
     LIBRARY_DIRS = LIBRARY_DIRS + [CUDA["lib64"]]
