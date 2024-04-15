@@ -189,25 +189,31 @@ The source files of these Jupyter notebooks are available [here](https://github.
 - Windows CPU
 
 ```batch
-build_win.bat
+build_win.bat --arch cpu --test on
 ```
 
 - Windows CUDA
 
 ```batch
-build_win_cuda.bat
+build_win.bat --arch gpu --test on
 ```
 
 - Linux CPU
 
 ```bash
-./build_linux.sh
+./build_linux.sh --arch=cpu --test=on
 ```
 
 - Linux CUDA
 
 ```bash
-./build_linux_cuda.sh
+./build_linux.sh --arch=gpu --test=on
+```
+
+- MacOS CPU
+
+```bash
+./build_linux.sh --arch=cpu --test=on
 ```
 
 ## API Reference
