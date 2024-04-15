@@ -22,7 +22,6 @@ environment you are running this script in.
 
 """
 
-
 import numpy as np
 
 
@@ -178,7 +177,7 @@ class Transmitter:
         █     modulation    |           amp / phs / mod_t          |  ...       █
         █                   +--------------------------------------+            █
         █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █
-        
+
     """
 
     def __init__(  # pylint: disable=too-many-arguments

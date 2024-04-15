@@ -22,7 +22,6 @@ environment you are running this script in.
 
 """
 
-
 import numpy as np
 
 

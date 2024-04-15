@@ -21,7 +21,6 @@ environment you are running this script in.
 
 """
 
-
 from warnings import warn
 import numpy as np
 from scipy.signal import convolve, find_peaks
