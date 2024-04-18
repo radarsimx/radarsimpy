@@ -35,7 +35,7 @@ jobs:
           CC: ${{ matrix.c_compiler }}
           CXX: ${{ matrix.cxx_compiler }}
         run: |
-          chmod +x build_macos_freetier.sh
+          chmod +x build_macos.sh
           ./build_macos.sh --tier=free --arch=cpu --test=off
       - name: Archive built module
         uses: actions/upload-artifact@v4
