@@ -65,17 +65,17 @@ else:
 os_type = platform.system()  # 'Linux', 'Windows', 'macOS'
 
 if os_type == "Linux":
-    LINK_ARGS = ["-arch x86_64,-Wl,-rpath,$ORIGIN"]
+    LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
     LIBRARY_DIRS = ["src/radarsimcpp/build"]
     if args.arch == "gpu":
         NVCC = "nvcc"
         CUDALIB = "lib64"
 elif os_type == "Darwin":
     if platform.processor() == "arm":
-        LINK_ARGS = ["-arch arm64,-Wl,-rpath,$ORIGIN"]
+        LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
         LIBRARY_DIRS = ["src/radarsimcpp/build"]
     else:
-        LINK_ARGS = ["-arch x86_64,-Wl,-ld_classic,-rpath,$ORIGIN"]
+        LINK_ARGS = ["-Wl,-ld_classic,-rpath,$ORIGIN"]
         LIBRARY_DIRS = ["src/radarsimcpp/build"]
 elif os_type == "Windows":
     LINK_ARGS = []
