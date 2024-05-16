@@ -1,4 +1,4 @@
-name: Release on MacOS x86_64 Free Tier
+name: Release on MacOS Apple Silicon Free Tier
 
 on:
   push:
