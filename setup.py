@@ -67,7 +67,7 @@ if os_type == "Linux":
         NVCC = "nvcc"
         CUDALIB = "lib64"
 elif os_type == "Darwin":
-    LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
+    LINK_ARGS = ["-Wl,-ld_classic,-rpath,$ORIGIN"]
     LIBRARY_DIRS = ["src/radarsimcpp/build"]
 elif os_type == "Windows":
     LINK_ARGS = []
