@@ -10,12 +10,12 @@ on:
 
 jobs:
   build:
-    runs-on: macos-12
+    runs-on: macos-13
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
-        c_compiler: [gcc-12]
-        cxx_compiler: [g++-12]
+        c_compiler: [gcc-13]
+        cxx_compiler: [g++-13]
 
     steps:
       - uses: actions/checkout@v4
