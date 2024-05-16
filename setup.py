@@ -33,8 +33,12 @@ import numpy
 
 
 ap = argparse.ArgumentParser()
-ap.add_argument("-t", "--tier", required=False, help="Build tier, choose `free` or `standard`")
-ap.add_argument("-a", "--arch", required=False, help="Build architecture, choose `cpu` or `gpu`")
+ap.add_argument(
+    "-t", "--tier", required=False, help="Build tier, choose `free` or `standard`"
+)
+ap.add_argument(
+    "-a", "--arch", required=False, help="Build architecture, choose `cpu` or `gpu`"
+)
 
 args, unknown = ap.parse_known_args()
 sys.argv = [sys.argv[0]] + unknown
@@ -61,14 +65,18 @@ else:
 os_type = platform.system()  # 'Linux', 'Windows', 'macOS'
 
 if os_type == "Linux":
-    LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
+    LINK_ARGS = ["-arch x86_64,-Wl,-rpath,$ORIGIN"]
     LIBRARY_DIRS = ["src/radarsimcpp/build"]
     if args.arch == "gpu":
         NVCC = "nvcc"
         CUDALIB = "lib64"
 elif os_type == "Darwin":
-    LINK_ARGS = ["-Wl,-ld_classic,-rpath,$ORIGIN"]
-    LIBRARY_DIRS = ["src/radarsimcpp/build"]
+    if platform.processor() == "arm":
+        LINK_ARGS = ["-arch arm64,-Wl,-rpath,$ORIGIN"]
+        LIBRARY_DIRS = ["src/radarsimcpp/build"]
+    else:
+        LINK_ARGS = ["-arch x86_64,-Wl,-ld_classic,-rpath,$ORIGIN"]
+        LIBRARY_DIRS = ["src/radarsimcpp/build"]
 elif os_type == "Windows":
     LINK_ARGS = []
     LIBRARY_DIRS = ["src/radarsimcpp/build/Release"]

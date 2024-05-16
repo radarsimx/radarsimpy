@@ -1,5 +1,6 @@
 numpy
 scipy
+meshio
 cython
 setuptools
 pytest
