@@ -1,10 +1,9 @@
-name: MacOS Apple Silicon Test
+name: Release on MacOS x86_64 Free Tier
 
 on:
   push:
-    branches: [master]
-  pull_request:
-    branches: [master]
+    tags:
+      - "*"
 
 jobs:
   build:
@@ -34,10 +33,10 @@ jobs:
           CXX: ${{matrix.cxx_compiler}}
         run: |
           chmod +x build_macos.sh
-          ./build_macos.sh --tier=standard --arch=cpu --test=off
-      - name: Test with Google Test
-        run: |
-          ./src/radarsimcpp/build/radarsimcpp_test
-      - name: Test with pytest
-        run: |
-          pytest
+          ./build_macos.sh --tier=free --arch=cpu --test=off
+      - name: Archive built module
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: radarsimpy_macos_py${{matrix.python-version}}_freetier
+          path: ./radarsimpy

@@ -1,20 +1,16 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
-name: MacOS Test
+name: Release on MacOS Apple Silicon
 
 on:
   push:
-    branches: [master]
-  pull_request:
-    branches: [master]
+    tags:
+      - "*"
 
 jobs:
   build:
-    runs-on: macos-13
+    runs-on: macos-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
         c_compiler: [gcc-13]
         cxx_compiler: [g++-13]
 
@@ -30,7 +26,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements_apple_silicon.txt
       - name: Build
         env:
           CC: ${{matrix.c_compiler}}
@@ -38,9 +34,9 @@ jobs:
         run: |
           chmod +x build_macos.sh
           ./build_macos.sh --tier=standard --arch=cpu --test=off
-      - name: Test with Google Test
-        run: |
-          ./src/radarsimcpp/build/radarsimcpp_test
-      - name: Test with pytest
-        run: |
-          pytest
+      - name: Archive built module
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: radarsimpy_macos_py${{matrix.python-version}}
+          path: ./radarsimpy
