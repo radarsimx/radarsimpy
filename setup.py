@@ -65,6 +65,7 @@ else:
 os_type = platform.system()  # 'Linux', 'Windows', 'macOS'
 
 if os_type == "Linux":
+    COMPILE_ARGS=[]
     LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
     LIBRARY_DIRS = ["src/radarsimcpp/build"]
     if args.arch == "gpu":
@@ -72,12 +73,15 @@ if os_type == "Linux":
         CUDALIB = "lib64"
 elif os_type == "Darwin":
     if platform.processor() == "arm":
+        COMPILE_ARGS=["-arch arm64"]
         LINK_ARGS = ["-Wl,-ld_classic,-rpath,$ORIGIN"]
         LIBRARY_DIRS = ["src/radarsimcpp/build"]
     else:
+        COMPILE_ARGS=["-arch x86_64"]
         LINK_ARGS = ["-Wl,-ld_classic,-rpath,$ORIGIN"]
         LIBRARY_DIRS = ["src/radarsimcpp/build"]
 elif os_type == "Windows":
+    COMPILE_ARGS=[]
     LINK_ARGS = []
     LIBRARY_DIRS = ["src/radarsimcpp/build/Release"]
     if args.arch == "gpu":
@@ -183,6 +187,7 @@ ext_modules = [
         include_dirs=INCLUDE_DIRS,
         libraries=["radarsimcpp"],
         library_dirs=LIBRARY_DIRS,
+        extra_compile_args=COMPILE_ARGS,
         extra_link_args=LINK_ARGS,
     ),
     Extension(
@@ -192,6 +197,7 @@ ext_modules = [
         include_dirs=INCLUDE_DIRS,
         libraries=["radarsimcpp"],
         library_dirs=LIBRARY_DIRS,
+        extra_compile_args=COMPILE_ARGS,
         extra_link_args=LINK_ARGS,
     ),
     Extension(
@@ -201,6 +207,7 @@ ext_modules = [
         include_dirs=INCLUDE_DIRS,
         libraries=["radarsimcpp"],
         library_dirs=LIBRARY_DIRS,
+        extra_compile_args=COMPILE_ARGS,
         extra_link_args=LINK_ARGS,
     ),
 ]
