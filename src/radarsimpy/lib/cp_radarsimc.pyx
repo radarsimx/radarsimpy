@@ -387,8 +387,20 @@ cdef Target[float_t] cp_Target(radar,
     cdef int_t ch_idx, ps_idx, sp_idx
     cdef int_t bbsize_c = <int_t>(radar.array_prop["size"]*radar.time_prop["frame_size"]*radar.radar_prop["transmitter"].waveform_prop["pulses"]*radar.sample_prop["samples_per_pulse"])
 
+    cdef float_t scale
     cdef float_t[:, :] points_mv
     cdef int_t[:, :] cells_mv
+
+    unit = target.get("unit", "m")
+    if unit == "m":
+        scale = 1
+    elif unit == "cm":
+        scale = 100
+    elif unit == "mm":
+        scale = 1000
+    else:
+        scale = 1
+
     try:
         import pymeshlab
     except:
@@ -398,7 +410,7 @@ cdef Target[float_t] cp_Target(radar,
             raise("PyMeshLab is requied to process the 3D model.")
         else:
             t_mesh = meshio.read(target["model"])
-            points_mv = t_mesh.points.astype(np_float)
+            points_mv = t_mesh.points.astype(np_float)/scale
             cells_mv = t_mesh.cells[0].data.astype(np.int32)
     else:
         ms = pymeshlab.MeshSet()
@@ -407,7 +419,7 @@ cdef Target[float_t] cp_Target(radar,
         v_matrix = np.array(t_mesh.vertex_matrix())
         f_matrix = np.array(t_mesh.face_matrix())
         if np.isfortran(v_matrix):
-            points_mv = np.ascontiguousarray(v_matrix).astype(np_float)
+            points_mv = np.ascontiguousarray(v_matrix).astype(np_float)/scale
             cells_mv = np.ascontiguousarray(f_matrix).astype(np.int32)
         ms.clear()
     
@@ -551,8 +563,20 @@ cdef Target[float_t] cp_RCS_Target(target):
 
     cdef cpp_complex[float_t] ep_c, mu_c
 
+    cdef float_t scale
     cdef float_t[:, :] points_mv
     cdef int_t[:, :] cells_mv
+
+    unit = target.get("unit", "m")
+    if unit == "m":
+        scale = 1
+    elif unit == "cm":
+        scale = 100
+    elif unit == "mm":
+        scale = 1000
+    else:
+        scale = 1
+
     try:
         import pymeshlab
     except:
@@ -562,7 +586,7 @@ cdef Target[float_t] cp_RCS_Target(target):
             raise("PyMeshLab is requied to process the 3D model.")
         else:
             t_mesh = meshio.read(target["model"])
-            points_mv = t_mesh.points.astype(np_float)
+            points_mv = t_mesh.points.astype(np_float)/scale
             cells_mv = t_mesh.cells[0].data.astype(np.int32)
     else:
         ms = pymeshlab.MeshSet()
@@ -571,7 +595,7 @@ cdef Target[float_t] cp_RCS_Target(target):
         v_matrix = np.array(t_mesh.vertex_matrix())
         f_matrix = np.array(t_mesh.face_matrix())
         if np.isfortran(v_matrix):
-            points_mv = np.ascontiguousarray(v_matrix).astype(np_float)
+            points_mv = np.ascontiguousarray(v_matrix).astype(np_float)/scale
             cells_mv = np.ascontiguousarray(f_matrix).astype(np.int32)
         ms.clear()
     

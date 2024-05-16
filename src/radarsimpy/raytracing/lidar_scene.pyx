@@ -81,6 +81,8 @@ cpdef lidar_scene(lidar, targets, t=0):
             Target's rotation rate (deg/s),
             [yaw rate, pitch rate, roll rate]
             ``default [0, 0, 0]``
+        - **unit** (*str*) --
+            Unit of target model. Supports `mm`, `cm`, and `m`. Default is `m`.
 
         }]
 
@@ -99,10 +101,21 @@ cpdef lidar_scene(lidar, targets, t=0):
     cdef float_t[:] location_mv
     cdef float_t[:] rotation_mv
     cdef float_t[:] rotation_rate_mv
+    cdef float_t scale
 
     cdef int_t idx_c
 
     for idx_c in range(0, len(targets)):
+        unit = targets[idx_c].get("unit", "m")
+        if unit == "m":
+            scale = 1
+        elif unit == "cm":
+            scale = 100
+        elif unit == "mm":
+            scale = 1000
+        else:
+            scale = 1
+
         try:
             import pymeshlab
         except:
@@ -112,7 +125,7 @@ cpdef lidar_scene(lidar, targets, t=0):
                 raise("PyMeshLab is requied to process the 3D model.")
             else:
                 t_mesh = meshio.read(targets[idx_c]["model"])
-                points_mv = t_mesh.points.astype(np_float)
+                points_mv = t_mesh.points.astype(np_float)/scale
                 cells_mv = t_mesh.cells[0].data.astype(np.int32)
         else:
             ms = pymeshlab.MeshSet()
@@ -121,7 +134,7 @@ cpdef lidar_scene(lidar, targets, t=0):
             v_matrix = np.array(t_mesh.vertex_matrix())
             f_matrix = np.array(t_mesh.face_matrix())
             if np.isfortran(v_matrix):
-                points_mv = np.ascontiguousarray(v_matrix).astype(np_float)
+                points_mv = np.ascontiguousarray(v_matrix).astype(np_float)/scale
                 cells_mv = np.ascontiguousarray(f_matrix).astype(np.int32)
             ms.clear()
 

@@ -72,6 +72,8 @@ cpdef rcs_sbr(targets,
             ``default [0, 0, 0]``
         - **permittivity** (*complex*) --
             Target's permittivity. Perfect electric conductor (PEC) if not specified.
+        - **unit** (*str*) --
+            Unit of target model. Supports `mm`, `cm`, and `m`. Default is `m`.
 
         }]
     :param float f:
