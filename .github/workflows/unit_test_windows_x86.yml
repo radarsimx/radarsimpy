@@ -14,6 +14,9 @@ jobs:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
 
     steps:
+      - name: Update OpenSSH
+        run: |
+          winget install Microsoft.OpenSSH.Beta
       - uses: actions/checkout@v4
       - name: Checkout private tools
         uses: actions/checkout@v4
