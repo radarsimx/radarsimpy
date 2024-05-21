@@ -19,9 +19,12 @@ jobs:
         with:
           args: install mls-software-openssh
       - uses: actions/checkout@v4
+      - name: Checkout private tools
+        uses: actions/checkout@v4
         with:
+          repository: rookiepeng/radarsimcpp
           ssh-key: ${{secrets.RADARSIMC}}
-          submodules: true
+          path: src/radarsimcpp
       - name: Set up Python ${{matrix.python-version}}
         uses: actions/setup-python@v5
         with:
