@@ -16,14 +16,6 @@ jobs:
     steps:
       - name: Remove OpenSSH
         run: Remove-WindowsCapability -Online -Name OpenSSH.Client
-      - name: Chocolatey Action
-        uses: crazy-max/ghaction-chocolatey@v3.0.0
-        with:
-          args: install openssh --pre
-      - name: Refresh Env
-        run: |
-          Import-Module "$env:ChocolateyInstall/helpers/chocolateyInstaller.psm1"
-          refreshenv
       - uses: actions/checkout@v4
         with:
           ssh-key: ${{secrets.RADARSIMC}}
