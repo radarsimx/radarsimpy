@@ -19,7 +19,9 @@ jobs:
         with:
           args: install openssh --pre
       - name: Refresh Env
-        run: refreshenv
+        run: |
+          Import-Module "$env:ChocolateyInstall/helpers/chocolateyInstaller.psm1"
+          refreshenv
       - uses: actions/checkout@v4
       - name: Checkout private tools
         uses: actions/checkout@v4
