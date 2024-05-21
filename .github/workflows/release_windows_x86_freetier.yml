@@ -13,13 +13,12 @@ jobs:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
 
     steps:
+      - name: Remove Windows OpenSSH and use the default ssh in git
+        run: Remove-WindowsCapability -Online -Name OpenSSH.Client
       - uses: actions/checkout@v4
-      - name: Checkout private tools
-        uses: actions/checkout@v4
         with:
-          repository: rookiepeng/radarsimcpp
           ssh-key: ${{secrets.RADARSIMC}}
-          path: src/radarsimcpp
+          submodules: true
       - name: Set up Python ${{matrix.python-version}}
         uses: actions/setup-python@v5
         with:
