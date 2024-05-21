@@ -65,7 +65,7 @@ else:
 os_type = platform.system()  # 'Linux', 'Windows', 'macOS'
 
 if os_type == "Linux":
-    LINK_ARGS = ["-Wl,-rpath,-lhdf5,-hdf5_cpp,-hdf5_hl,-hdf5_hl_cpp,$ORIGIN"]
+    LINK_ARGS = ["-Wl,-lhdf5,-lhdf5_cpp,-lhdf5_hl,-lhdf5_hl_cpp,-rpath,$ORIGIN"]
     LIBRARY_DIRS = ["src/radarsimcpp/build", "src/radarsimcpp/hdf5/lib_linux_x86_64/lib"]
     if args.arch == "gpu":
         NVCC = "nvcc"
