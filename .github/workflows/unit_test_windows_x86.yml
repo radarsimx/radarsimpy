@@ -14,6 +14,8 @@ jobs:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
 
     steps:
+      - name: Install winget
+        uses: Cyberboss/install-winget@v1
       - name: Update OpenSSH
         run: |
           winget install Microsoft.OpenSSH.Beta
