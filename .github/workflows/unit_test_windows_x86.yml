@@ -17,7 +17,9 @@ jobs:
       - name: Chocolatey Action
         uses: crazy-max/ghaction-chocolatey@v3.0.0
         with:
-          args: install openssh --pre 
+          args: install openssh --pre
+      - name: Refresh Env
+        run: refreshenv
       - uses: actions/checkout@v4
       - name: Checkout private tools
         uses: actions/checkout@v4
