@@ -17,7 +17,9 @@ jobs:
       - name: Chocolatey Action
         uses: crazy-max/ghaction-chocolatey@v3.0.0
         with:
-          args: install mls-software-openssh
+          args: install winget
+      - name: Install 
+        run: winget install Microsoft.OpenSSH.Beta --accept-source-agreements --disable-interactivity
       - uses: actions/checkout@v4
       - name: Checkout private tools
         uses: actions/checkout@v4
