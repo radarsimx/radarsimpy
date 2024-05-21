@@ -17,8 +17,7 @@ jobs:
       - name: Install winget
         uses: Cyberboss/install-winget@v1
       - name: Update OpenSSH
-        run: |
-          winget install Microsoft.OpenSSH.Beta
+        run: winget install Microsoft.OpenSSH.Beta --disable-interactivity --accept-source-agreements
       - uses: actions/checkout@v4
       - name: Checkout private tools
         uses: actions/checkout@v4
