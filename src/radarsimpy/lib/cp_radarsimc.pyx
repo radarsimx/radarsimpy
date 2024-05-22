@@ -439,11 +439,11 @@ cdef Target[float_t] cp_Target(radar,
     permittivity = target.get("permittivity", 1e38)
     permeability = target.get("permeability", 1)
     if permittivity == "PEC":
-        ep_c = cpp_complex[float_t](1e38, 0)
-        mu_c = cpp_complex[float_t](1, 0)
+        ep_c = cpp_complex[float_t](<float_t>1e38, <float_t>0.0)
+        mu_c = cpp_complex[float_t](<float_t>1.0, <float_t>0.0)
     else:
-        ep_c = cpp_complex[float_t](np.real(permittivity), np.imag(permittivity))
-        mu_c = cpp_complex[float_t](np.real(permeability), np.imag(permeability))
+        ep_c = cpp_complex[float_t](<float_t>np.real(permittivity), <float_t>np.imag(permittivity))
+        mu_c = cpp_complex[float_t](<float_t>np.real(permeability), <float_t>np.imag(permeability))
 
     if any(np.size(var) > 1 for var in location + speed + rotation + rotation_rate):
         if np.size(location[0]) > 1:
@@ -615,11 +615,11 @@ cdef Target[float_t] cp_RCS_Target(target):
     permittivity = target.get("permittivity", 1e38)
     permeability = target.get("permeability", 1)
     if permittivity == "PEC":
-        ep_c = cpp_complex[float_t](1e38, 0)
-        mu_c = cpp_complex[float_t](1, 0)
+        ep_c = cpp_complex[float_t](<float_t>1e38, <float_t>0.0)
+        mu_c = cpp_complex[float_t](<float_t>1.0, <float_t>0.0)
     else:
-        ep_c = cpp_complex[float_t](np.real(permittivity), np.imag(permittivity))
-        mu_c = cpp_complex[float_t](np.real(permeability), np.imag(permeability))
+        ep_c = cpp_complex[float_t](<float_t>np.real(permittivity), <float_t>np.imag(permittivity))
+        mu_c = cpp_complex[float_t](<float_t>np.real(permeability), <float_t>np.imag(permeability))
 
     location_mv = location.astype(np_float)
     loc_vt.push_back(Vec3[float_t](&location_mv[0]))
