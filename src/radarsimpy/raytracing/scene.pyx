@@ -33,6 +33,7 @@ from radarsimpy.includes.radarsimc cimport Snapshot, Scene
 from radarsimpy.includes.radarsimc cimport Mem_Copy_Vec3
 from radarsimpy.includes.radarsimc cimport IsFreeTier
 from libc.stdlib cimport malloc, free
+from libcpp.string cimport string
 
 cimport cython
 cimport numpy as np
@@ -170,6 +171,13 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, log_path=None, de
     cdef int_t psstride_c = samples_c
 
     cdef int_t idx_c
+
+    cdef string log_path_c
+
+    if log_path is not None:
+        log_path_c = str.encode(log_path)
+    else:
+        log_path_c = str.encode("")
 
     if IsFreeTier():
         if len(targets) > 3:
@@ -314,6 +322,7 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, log_path=None, de
         debug,
         snaps,
         <float_t> density,
+        log_path_c,
         bb_real,
         bb_imag)
 

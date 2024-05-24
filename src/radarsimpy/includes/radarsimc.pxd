@@ -24,6 +24,7 @@ from radarsimpy.includes.type_def cimport int_t
 from radarsimpy.includes.type_def cimport vector
 from libcpp cimport bool
 from libcpp.complex cimport complex as cpp_complex
+from libcpp.string cimport string
 
 
 """
@@ -248,5 +249,6 @@ cdef extern from "scene.hpp":
                           bool debug,
                           vector[Snapshot[F]] & snapshots,
                           F density,
+                          string log_path,
                           double * bb_real,
                           double * bb_imag)
