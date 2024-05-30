@@ -72,10 +72,10 @@ if os_type == "Linux":
         CUDALIB = "lib64"
 elif os_type == "Darwin":
     if platform.processor() == "arm":
-        LINK_ARGS = ["-Wl,-ld_classic,-rpath,$ORIGIN"]
+        LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
         LIBRARY_DIRS = ["src/radarsimcpp/build"]
     else:
-        LINK_ARGS = ["-Wl,-ld_classic,-rpath,$ORIGIN"]
+        LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
         LIBRARY_DIRS = ["src/radarsimcpp/build"]
 elif os_type == "Windows":
     LINK_ARGS = []
