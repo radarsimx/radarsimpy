@@ -119,7 +119,7 @@ GPU parallelization (CUDA) has been added since v6.0.0.
 |---------|--------------|-------------|------------|
 | Windows | ✔️           | ❌️           | ✔️        |
 | Linux   | ✔️           | ❌️           | ✔️        |
-| MacOS   | ✔️           | ❌️           | ❌️         |
+| MacOS   | ✔️           | ✔️          | ❌️         |
 
 ![performance](https://github.com/radarsimx/radarsimpy/raw/master/assets/performance.png)
 
