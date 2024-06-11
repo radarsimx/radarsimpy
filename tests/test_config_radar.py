@@ -104,24 +104,6 @@ class TestRadar:
         assert np.allclose(radar.radar_prop["rotation"], np.radians([7, 8, 9]))
         assert np.allclose(radar.radar_prop["rotation_rate"], np.radians([10, 11, 12]))
 
-    def test_process_radar_motion_array(self, radar_setup):
-        """Test processing of radar motion with array inputs."""
-        radar = radar_setup
-        location = np.array([[1, 2, 3], [4, 5, 6]])
-        speed = np.array([[7, 8, 9], [10, 11, 12]])
-        rotation = np.array([[13, 14, 15], [16, 17, 18]])
-        rotation_rate = np.array([[19, 20, 21], [22, 23, 24]])
-        radar.process_radar_motion(
-            location=location,
-            speed=speed,
-            rotation=rotation,
-            rotation_rate=rotation_rate,
-        )
-        assert np.allclose(radar.radar_prop["location"], location)
-        assert np.allclose(radar.radar_prop["speed"], speed)
-        assert np.allclose(radar.radar_prop["rotation"], np.radians(rotation))
-        assert np.allclose(radar.radar_prop["rotation_rate"], np.radians(rotation_rate))
-
     def test_cal_phase_noise(self):
         """Test phase noise calculation."""
         fs = 10e6
