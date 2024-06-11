@@ -27,7 +27,7 @@ from scipy import signal
 from radarsimpy.simulator import simc  # pylint: disable=no-name-in-module
 import radarsimpy.processing as proc
 
-from .test_radar import cw_radar, fmcw_radar, tdm_fmcw_radar, pmcw_radar
+from .test_config_radar import cw_radar, fmcw_radar, tdm_fmcw_radar, pmcw_radar
 
 
 def test_sim_cw():
