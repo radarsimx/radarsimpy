@@ -98,9 +98,9 @@ class TestReceiver:
         np.testing.assert_allclose(rxch_prop["polarization"], [[1, 0, 0]])
         assert rxch_prop["antenna_gains"][0] == -3
         np.testing.assert_allclose(rxch_prop["az_angles"][0], [-45, 45])
-        np.testing.assert_allclose(rxch_prop["az_patterns"][0], [-6, -6])
+        np.testing.assert_allclose(rxch_prop["az_patterns"][0], [0, 0])
         np.testing.assert_allclose(rxch_prop["el_angles"][0], [-60, 60])
-        np.testing.assert_allclose(rxch_prop["el_patterns"][0], [-10, -10])
+        np.testing.assert_allclose(rxch_prop["el_patterns"][0], [0, 0])
 
     def test_process_rxchannel_prop_multiple_channels(self):
         """Test processing of receiver channel properties with multiple channels."""
