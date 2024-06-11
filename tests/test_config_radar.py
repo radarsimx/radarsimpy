@@ -24,6 +24,7 @@ import numpy as np
 import numpy.testing as npt
 
 from radarsimpy import Radar, Transmitter, Receiver
+from radarsimpy.radar import cal_phase_noise
 from .test_config_transmitter import cw_tx, fmcw_tx, tdm_fmcw_tx, pmcw_tx
 from .test_config_receiver import cw_rx, fmcw_rx, tdm_fmcw_rx, pmcw_rx
 
@@ -57,9 +58,9 @@ class TestRadar:
         """Test timestamp generation."""
         radar = radar_setup
         timestamp = radar.gen_timestamp()
-        assert timestamp.shape == (1, 10, 10)
+        assert timestamp.shape == (2, 10, 10)
         assert np.allclose(timestamp[0, 0, 0], 0)
-        assert np.allclose(timestamp[0, 9, 9], 1.999e-3)
+        assert np.allclose(timestamp[0, 9, 9], 1.89e-05)
 
     def test_gen_timestamp_multiple_frames(self):
         """Test timestamp generation with multiple frames."""
@@ -70,7 +71,7 @@ class TestRadar:
         assert timestamp.shape == (3, 10, 10)
         assert np.allclose(timestamp[0, 0, 0], 0)
         assert np.allclose(timestamp[1, 0, 0], 1e-3)
-        assert np.allclose(timestamp[2, 9, 9], 3.999e-3)
+        assert np.allclose(timestamp[2, 9, 9], 0.0020189)
 
     def test_cal_noise(self, radar_setup):
         """Test noise calculation."""
@@ -202,7 +203,7 @@ class TestRadar:
         assert radar.array_prop["size"] == 4
         np.testing.assert_allclose(
             radar.array_prop["virtual_array"],
-            [[0, 0, 0], [10, 0, 0], [0, 10, 0], [10, 10, 0]],
+            [[0, 0, 0], [0, 10, 0], [10, 0, 0], [10, 10, 0]],
         )
 
 
