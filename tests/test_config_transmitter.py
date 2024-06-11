@@ -84,8 +84,10 @@ class TestTransmitter:
         tx = Transmitter(f=10e9, t=1e-6, tx_power=10, pulses=10, prp=2e-6)
         with pytest.raises(ValueError):
             tx.rf_prop["pn_f"] = np.array([1e3, 1e4])
+            tx.rf_prop["pn_power"] = None
             tx.validate_rf_prop(tx.rf_prop)
         with pytest.raises(ValueError):
+            tx.rf_prop["pn_f"] = None
             tx.rf_prop["pn_power"] = np.array([-100, -110])
             tx.validate_rf_prop(tx.rf_prop)
         with pytest.raises(ValueError):
@@ -121,7 +123,7 @@ class TestTransmitter:
         assert mod["enabled"]
         np.testing.assert_allclose(mod["t"], mod_t)
         np.testing.assert_allclose(np.abs(mod["var"]), amp)
-        np.testing.assert_allclose(np.angle(mod["var"]) / np.pi * 180, phs)
+        np.testing.assert_allclose(np.unwrap(np.angle(mod["var"])) / np.pi * 180, phs)
 
         # Test with only amplitude modulation
         mod = tx.process_waveform_modulation(mod_t, amp, None)
@@ -137,7 +139,7 @@ class TestTransmitter:
         assert mod["enabled"]
         np.testing.assert_allclose(mod["t"], mod_t)
         np.testing.assert_allclose(np.abs(mod["var"]), np.ones_like(phs))
-        np.testing.assert_allclose(np.angle(mod["var"]) / np.pi * 180, phs)
+        np.testing.assert_allclose(np.unwrap(np.angle(mod["var"])) / np.pi * 180, phs)
 
         # Test with no modulation
         mod = tx.process_waveform_modulation(None, None, None)
@@ -155,7 +157,9 @@ class TestTransmitter:
         pulse_phs = np.linspace(0, 360, 10)
         pulse_mod = tx.process_pulse_modulation(pulse_amp, pulse_phs)
         np.testing.assert_allclose(np.abs(pulse_mod), pulse_amp)
-        np.testing.assert_allclose(np.angle(pulse_mod) / np.pi * 180, pulse_phs)
+        np.testing.assert_allclose(
+            np.unwrap(np.angle(pulse_mod)) / np.pi * 180, pulse_phs
+        )
 
         with pytest.raises(ValueError):
             tx.process_pulse_modulation(pulse_amp[:-1], pulse_phs)
@@ -202,18 +206,18 @@ class TestTransmitter:
             np.abs(txch_prop["pulse_mod"][0, :]), np.linspace(0, 1, 10)
         )
         np.testing.assert_allclose(
-            np.angle(txch_prop["pulse_mod"][0, :]) / np.pi * 180,
+            np.unwrap(np.angle(txch_prop["pulse_mod"][0, :])) / np.pi * 180,
             np.linspace(0, 360, 10),
         )
         np.testing.assert_allclose(
             np.abs(txch_prop["pulse_mod"][1, :]), np.linspace(1, 0, 10)
         )
         np.testing.assert_allclose(
-            np.angle(txch_prop["pulse_mod"][1, :]) / np.pi * 180,
+            np.unwrap(np.angle(txch_prop["pulse_mod"][1, :])) / np.pi * 180 + 360,
             np.linspace(360, 0, 10),
         )
         assert txch_prop["waveform_mod"][0]["enabled"]
-        assert txch_prop["waveform_mod"][1]["enabled"]
+        assert txch_prop["waveform_mod"][1]["enabled"] is False
 
         with pytest.raises(ValueError):
             channels[0]["azimuth_angle"] = [-90, 90, 0]
@@ -264,18 +268,19 @@ class TestTransmitter:
             np.abs(tx.txchannel_prop["pulse_mod"][0, :]), np.linspace(0, 1, 10)
         )
         np.testing.assert_allclose(
-            np.angle(tx.txchannel_prop["pulse_mod"][0, :]) / np.pi * 180,
+            np.unwrap(np.angle(tx.txchannel_prop["pulse_mod"][0, :])) / np.pi * 180,
             np.linspace(0, 360, 10),
         )
         np.testing.assert_allclose(
             np.abs(tx.txchannel_prop["pulse_mod"][1, :]), np.linspace(1, 0, 10)
         )
         np.testing.assert_allclose(
-            np.angle(tx.txchannel_prop["pulse_mod"][1, :]) / np.pi * 180,
+            np.unwrap(np.angle(tx.txchannel_prop["pulse_mod"][1, :])) / np.pi * 180
+            + 360,
             np.linspace(360, 0, 10),
         )
         assert tx.txchannel_prop["waveform_mod"][0]["enabled"]
-        assert tx.txchannel_prop["waveform_mod"][1]["enabled"]
+        assert tx.txchannel_prop["waveform_mod"][1]["enabled"] is False
 
 
 def cw_tx():
