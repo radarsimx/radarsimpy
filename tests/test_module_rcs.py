@@ -18,10 +18,134 @@ A Python module for radar simulation
 
 """
 
+import pytest
 import numpy as np
 import numpy.testing as npt
 
 from radarsimpy.rt import rcs_sbr  # pylint: disable=no-name-in-module
+
+
+# def test_rcs_sbr_basic():
+#     """
+#     Basic test case with a single target and simple parameters.
+#     """
+#     targets = [
+#         {
+#             "model": "path/to/model.obj",
+#             "location": np.array([0, 0, 0]),
+#         }
+#     ]
+#     f = 1e9
+#     inc_phi = 0
+#     inc_theta = 0
+#     rcs = rcs_sbr(targets, f, inc_phi, inc_theta)
+#     assert isinstance(rcs, float)  # Check if RCS is a float
+
+
+# def test_rcs_sbr_multiple_targets():
+#     """
+#     Test with multiple targets.
+#     """
+#     targets = [
+#         {
+#             "model": "path/to/model1.obj",
+#             "location": np.array([0, 0, 0]),
+#         },
+#         {
+#             "model": "path/to/model2.obj",
+#             "location": np.array([10, 0, 0]),
+#         },
+#     ]
+#     f = 1e9
+#     inc_phi = 0
+#     inc_theta = 0
+#     rcs = rcs_sbr(targets, f, inc_phi, inc_theta)
+#     assert isinstance(rcs, float)  # Check if RCS is a float
+
+
+# def test_rcs_sbr_different_angles():
+#     """
+#     Test with different incidence and observation angles.
+#     """
+#     targets = [
+#         {
+#             "model": "path/to/model.obj",
+#             "location": np.array([0, 0, 0]),
+#         }
+#     ]
+#     f = 1e9
+#     inc_phi = 45
+#     inc_theta = 30
+#     obs_phi = 60
+#     obs_theta = 45
+#     rcs = rcs_sbr(targets, f, inc_phi, inc_theta, obs_phi=obs_phi, obs_theta=obs_theta)
+#     assert isinstance(rcs, float)  # Check if RCS is a float
+
+
+# def test_rcs_sbr_polarization():
+#     """
+#     Test with different polarizations.
+#     """
+#     targets = [
+#         {
+#             "model": "path/to/model.obj",
+#             "location": np.array([0, 0, 0]),
+#         }
+#     ]
+#     f = 1e9
+#     inc_phi = 0
+#     inc_theta = 0
+#     inc_pol = [1, 0, 0]
+#     obs_pol = [0, 1, 0]
+#     rcs = rcs_sbr(targets, f, inc_phi, inc_theta, inc_pol=inc_pol, obs_pol=obs_pol)
+#     assert isinstance(rcs, float)  # Check if RCS is a float
+
+
+# def test_rcs_sbr_density():
+#     """
+#     Test with different ray densities.
+#     """
+#     targets = [
+#         {
+#             "model": "path/to/model.obj",
+#             "location": np.array([0, 0, 0]),
+#         }
+#     ]
+#     f = 1e9
+#     inc_phi = 0
+#     inc_theta = 0
+#     density = 5
+#     rcs = rcs_sbr(targets, f, inc_phi, inc_theta, density=density)
+#     assert isinstance(rcs, float)  # Check if RCS is a float
+
+
+# def test_rcs_sbr_freetier_limit():
+#     """
+#     Test the FreeTier limit on the number of targets.
+#     """
+#     targets = [
+#         {
+#             "model": "path/to/model1.obj",
+#             "location": np.array([0, 0, 0]),
+#         },
+#         {
+#             "model": "path/to/model2.obj",
+#             "location": np.array([10, 0, 0]),
+#         },
+#         {
+#             "model": "path/to/model3.obj",
+#             "location": np.array([20, 0, 0]),
+#         },
+#         {
+#             "model": "path/to/model4.obj",
+#             "location": np.array([30, 0, 0]),
+#         },
+#     ]
+#     f = 1e9
+#     inc_phi = 0
+#     inc_theta = 0
+#     with pytest.raises(Exception):
+#         rcs_sbr(targets, f, inc_phi, inc_theta)
 
 
 def test_rcs_momostatic():

@@ -29,6 +29,121 @@ import radarsimpy.processing as proc
 
 from .test_config_radar import cw_radar, fmcw_radar, tdm_fmcw_radar, pmcw_radar
 
+# def test_simc_basic():
+#     """
+#     Basic test case with a single target and simple radar setup.
+#     """
+#     radar = Radar(
+#         location=np.array([0, 0, 0]),
+#         speed=np.array([0, 0, 0]),
+#         rotation=np.array([0, 0, 0]),
+#         rotation_rate=np.array([0, 0, 0]),
+#         frequency=1e9,
+#         bandwidth=1e6,
+#         pulses=10,
+#         samples_per_pulse=100,
+#         frame_size=1,
+#         rxchannel_prop={"size": 1},
+#         txchannel_prop={"size": 1},
+#     )
+#     targets = [
+#         {
+#             "location": np.array([10, 0, 0]),
+#             "rcs": 0,
+#         }
+#     ]
+#     result = simc(radar, targets)
+#     assert "baseband" in result
+#     assert "timestamp" in result
+#     assert result["baseband"].shape == (1, 10, 100)  # Check baseband shape
+
+# def test_simc_multiple_targets():
+#     """
+#     Test with multiple targets.
+#     """
+#     radar = Radar(
+#         location=np.array([0, 0, 0]),
+#         speed=np.array([0, 0, 0]),
+#         rotation=np.array([0, 0, 0]),
+#         rotation_rate=np.array([0, 0, 0]),
+#         frequency=1e9,
+#         bandwidth=1e6,
+#         pulses=10,
+#         samples_per_pulse=100,
+#         frame_size=1,
+#         rxchannel_prop={"size": 1},
+#         txchannel_prop={"size": 1},
+#     )
+#     targets = [
+#         {
+#             "location": np.array([10, 0, 0]),
+#             "rcs": 0,
+#         },
+#         {
+#             "location": np.array([0, 10, 0]),
+#             "rcs": 0,
+#         }
+#     ]
+#     result = simc(radar, targets)
+#     assert "baseband" in result
+#     assert "timestamp" in result
+#     assert result["baseband"].shape == (1, 10, 100)  # Check baseband shape
+
+# def test_simc_different_angles():
+#     """
+#     Test with different radar angles.
+#     """
+#     radar = Radar(
+#         location=np.array([0, 0, 0]),
+#         speed=np.array([0, 0, 0]),
+#         rotation=np.array([45, 30, 0]),
+#         rotation_rate=np.array([0, 0, 0]),
+#         frequency=1e9,
+#         bandwidth=1e6,
+#         pulses=10,
+#         samples_per_pulse=100,
+#         frame_size=1,
+#         rxchannel_prop={"size": 1},
+#         txchannel_prop={"size": 1},
+#     )
+#     targets = [
+#         {
+#             "location": np.array([10, 0, 0]),
+#             "rcs": 0,
+#         }
+#     ]
+#     result = simc(radar, targets)
+#     assert "baseband" in result
+#     assert "timestamp" in result
+#     assert result["baseband"].shape == (1, 10, 100)  # Check baseband shape
+
+# def test_simc_noise():
+#     """
+#     Test with noise enabled and disabled.
+#     """
+#     radar = Radar(
+#         location=np.array([0, 0, 0]),
+#         speed=np.array([0, 0, 0]),
+#         rotation=np.array([0, 0, 0]),
+#         rotation_rate=np.array([0, 0, 0]),
+#         frequency=1e9,
+#         bandwidth=1e6,
+#         pulses=10,
+#         samples_per_pulse=100,
+#         frame_size=1,
+#         rxchannel_prop={"size": 1},
+#         txchannel_prop={"size": 1},
+#     )
+#     targets = [
+#         {
+#             "location": np.array([10, 0, 0]),
+#             "rcs": 0,
+#         }
+#     ]
+#     result_noise = simc(radar, targets, noise=True)
+#     result_no_noise = simc(radar, targets, noise=False)
+#     assert not np.allclose(result_noise["baseband"], result_no_noise["baseband"])
+
 
 def test_sim_cw():
     """

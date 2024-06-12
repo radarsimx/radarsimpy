@@ -18,9 +18,135 @@ A Python module for radar simulation
 
 """
 
+import pytest
 import numpy as np
 import numpy.testing as npt
 from radarsimpy.rt import lidar_scene  # pylint: disable=no-name-in-module
+
+
+# def test_lidar_scene_basic():
+#     """
+#     Basic test case with a single target and a simple lidar setup.
+#     """
+#     lidar = {
+#         "position": np.array([0, 0, 0]),
+#         "phi": np.array([0]),
+#         "theta": np.array([0]),
+#     }
+#     targets = [
+#         {
+#             "model": "path/to/model.obj",
+#             "location": np.array([10, 0, 0]),
+#         }
+#     ]
+#     rays = lidar_scene(lidar, targets)
+#     assert rays.shape[0] > 0  # Check if rays are generated
+#     assert np.allclose(rays[0]["positions"], [0, 0, 0])  # Check lidar position
+#     assert np.allclose(rays[0]["directions"], [1, 0, 0])  # Check ray direction
+
+
+# def test_lidar_scene_multiple_targets():
+#     """
+#     Test with multiple targets.
+#     """
+#     lidar = {
+#         "position": np.array([0, 0, 0]),
+#         "phi": np.array([0, 45]),
+#         "theta": np.array([0, 90]),
+#     }
+#     targets = [
+#         {
+#             "model": "path/to/model1.obj",
+#             "location": np.array([10, 0, 0]),
+#         },
+#         {
+#             "model": "path/to/model2.obj",
+#             "location": np.array([0, 10, 0]),
+#         },
+#     ]
+#     rays = lidar_scene(lidar, targets)
+#     assert rays.shape[0] > 4  # Check if rays are generated for all targets
+#     # Add more specific assertions based on expected ray directions
+
+
+# def test_lidar_scene_target_movement():
+#     """
+#     Test with a moving target.
+#     """
+#     lidar = {
+#         "position": np.array([0, 0, 0]),
+#         "phi": np.array([0]),
+#         "theta": np.array([0]),
+#     }
+#     targets = [
+#         {
+#             "model": "path/to/model.obj",
+#             "location": np.array([10, 0, 0]),
+#             "speed": np.array([1, 0, 0]),
+#         }
+#     ]
+#     rays_t0 = lidar_scene(lidar, targets, t=0)
+#     rays_t1 = lidar_scene(lidar, targets, t=1)
+#     assert not np.allclose(rays_t0, rays_t1)  # Check if rays change due to movement
+
+
+# def test_lidar_scene_target_rotation():
+#     """
+#     Test with a rotating target.
+#     """
+#     lidar = {
+#         "position": np.array([0, 0, 0]),
+#         "phi": np.array([0]),
+#         "theta": np.array([0]),
+#     }
+#     targets = [
+#         {
+#             "model": "path/to/model.obj",
+#             "location": np.array([10, 0, 0]),
+#             "rotation_rate": np.array([10, 0, 0]),
+#         }
+#     ]
+#     rays_t0 = lidar_scene(lidar, targets, t=0)
+#     rays_t1 = lidar_scene(lidar, targets, t=1)
+#     assert not np.allclose(rays_t0, rays_t1)  # Check if rays change due to rotation
+
+
+# def test_lidar_scene_invalid_unit():
+#     """
+#     Test with an invalid unit for the target model.
+#     """
+#     lidar = {
+#         "position": np.array([0, 0, 0]),
+#         "phi": np.array([0]),
+#         "theta": np.array([0]),
+#     }
+#     targets = [
+#         {
+#             "model": "path/to/model.obj",
+#             "location": np.array([10, 0, 0]),
+#             "unit": "invalid",
+#         }
+#     ]
+#     with pytest.raises(Exception):
+#         lidar_scene(lidar, targets)
+
+
+# def test_lidar_scene_missing_model():
+#     """
+#     Test with a missing model file.
+#     """
+#     lidar = {
+#         "position": np.array([0, 0, 0]),
+#         "phi": np.array([0]),
+#         "theta": np.array([0]),
+#     }
+#     targets = [
+#         {
+#             "location": np.array([10, 0, 0]),
+#         }
+#     ]
+#     with pytest.raises(Exception):
+#         lidar_scene(lidar, targets)
 
 
 def test_lidar():

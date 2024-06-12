@@ -27,6 +27,217 @@ from radarsimpy.rt import scene  # pylint: disable=no-name-in-module
 import radarsimpy.processing as proc
 
 
+# def test_scene_basic():
+#     """
+#     Basic test case with a single target and simple radar setup.
+#     """
+#     radar = Radar(
+#         location=np.array([0, 0, 0]),
+#         speed=np.array([0, 0, 0]),
+#         rotation=np.array([0, 0, 0]),
+#         rotation_rate=np.array([0, 0, 0]),
+#         frequency=1e9,
+#         bandwidth=1e6,
+#         pulses=10,
+#         samples_per_pulse=100,
+#         frame_size=1,
+#         rxchannel_prop={"size": 1},
+#         txchannel_prop={"size": 1},
+#     )
+#     targets = [
+#         {
+#             "model": "path/to/model.obj",
+#             "location": np.array([10, 0, 0]),
+#         }
+#     ]
+#     result = scene(radar, targets)
+#     assert "baseband" in result
+#     assert "timestamp" in result
+#     assert result["baseband"].shape == (1, 10, 100)  # Check baseband shape
+
+
+# def test_scene_multiple_targets():
+#     """
+#     Test with multiple targets.
+#     """
+#     radar = Radar(
+#         location=np.array([0, 0, 0]),
+#         speed=np.array([0, 0, 0]),
+#         rotation=np.array([0, 0, 0]),
+#         rotation_rate=np.array([0, 0, 0]),
+#         frequency=1e9,
+#         bandwidth=1e6,
+#         pulses=10,
+#         samples_per_pulse=100,
+#         frame_size=1,
+#         rxchannel_prop={"size": 1},
+#         txchannel_prop={"size": 1},
+#     )
+#     targets = [
+#         {
+#             "model": "path/to/model1.obj",
+#             "location": np.array([10, 0, 0]),
+#         },
+#         {
+#             "model": "path/to/model2.obj",
+#             "location": np.array([0, 10, 0]),
+#         },
+#     ]
+#     result = scene(radar, targets)
+#     assert "baseband" in result
+#     assert "timestamp" in result
+#     assert result["baseband"].shape == (1, 10, 100)  # Check baseband shape
+
+
+# def test_scene_different_angles():
+#     """
+#     Test with different radar angles.
+#     """
+#     radar = Radar(
+#         location=np.array([0, 0, 0]),
+#         speed=np.array([0, 0, 0]),
+#         rotation=np.array([45, 30, 0]),
+#         rotation_rate=np.array([0, 0, 0]),
+#         frequency=1e9,
+#         bandwidth=1e6,
+#         pulses=10,
+#         samples_per_pulse=100,
+#         frame_size=1,
+#         rxchannel_prop={"size": 1},
+#         txchannel_prop={"size": 1},
+#     )
+#     targets = [
+#         {
+#             "model": "path/to/model.obj",
+#             "location": np.array([10, 0, 0]),
+#         }
+#     ]
+#     result = scene(radar, targets)
+#     assert "baseband" in result
+#     assert "timestamp" in result
+#     assert result["baseband"].shape == (1, 10, 100)  # Check baseband shape
+
+
+# def test_scene_different_levels():
+#     """
+#     Test with different fidelity levels.
+#     """
+#     radar = Radar(
+#         location=np.array([0, 0, 0]),
+#         speed=np.array([0, 0, 0]),
+#         rotation=np.array([0, 0, 0]),
+#         rotation_rate=np.array([0, 0, 0]),
+#         frequency=1e9,
+#         bandwidth=1e6,
+#         pulses=10,
+#         samples_per_pulse=100,
+#         frame_size=1,
+#         rxchannel_prop={"size": 1},
+#         txchannel_prop={"size": 1},
+#     )
+#     targets = [
+#         {
+#             "model": "path/to/model.obj",
+#             "location": np.array([10, 0, 0]),
+#         }
+#     ]
+#     result_none = scene(radar, targets, level=None)
+#     result_pulse = scene(radar, targets, level="pulse")
+#     result_sample = scene(radar, targets, level="sample")
+#     assert "baseband" in result_none
+#     assert "timestamp" in result_none
+#     assert "baseband" in result_pulse
+#     assert "timestamp" in result_pulse
+#     assert "baseband" in result_sample
+#     assert "timestamp" in result_sample
+
+
+# def test_scene_noise():
+#     """
+#     Test with noise enabled and disabled.
+#     """
+#     radar = Radar(
+#         location=np.array([0, 0, 0]),
+#         speed=np.array([0, 0, 0]),
+#         rotation=np.array([0, 0, 0]),
+#         rotation_rate=np.array([0, 0, 0]),
+#         frequency=1e9,
+#         bandwidth=1e6,
+#         pulses=10,
+#         samples_per_pulse=100,
+#         frame_size=1,
+#         rxchannel_prop={"size": 1},
+#         txchannel_prop={"size": 1},
+#     )
+#     targets = [
+#         {
+#             "model": "path/to/model.obj",
+#             "location": np.array([10, 0, 0]),
+#         }
+#     ]
+#     result_noise = scene(radar, targets, noise=True)
+#     result_no_noise = scene(radar, targets, noise=False)
+#     assert not np.allclose(result_noise["baseband"], result_no_noise["baseband"])
+
+
+# def test_scene_log_path():
+#     """
+#     Test with log_path specified.
+#     """
+#     radar = Radar(
+#         location=np.array([0, 0, 0]),
+#         speed=np.array([0, 0, 0]),
+#         rotation=np.array([0, 0, 0]),
+#         rotation_rate=np.array([0, 0, 0]),
+#         frequency=1e9,
+#         bandwidth=1e6,
+#         pulses=10,
+#         samples_per_pulse=100,
+#         frame_size=1,
+#         rxchannel_prop={"size": 1},
+#         txchannel_prop={"size": 1},
+#     )
+#     targets = [
+#         {
+#             "model": "path/to/model.obj",
+#             "location": np.array([10, 0, 0]),
+#         }
+#     ]
+#     result = scene(radar, targets, log_path="test.log")
+#     assert "baseband" in result
+#     assert "timestamp" in result
+#     assert result["baseband"].shape == (1, 10, 100)  # Check baseband shape
+
+
+# def test_scene_debug():
+#     """
+#     Test with debug mode enabled.
+#     """
+#     radar = Radar(
+#         location=np.array([0, 0, 0]),
+#         speed=np.array([0, 0, 0]),
+#         rotation=np.array([0, 0, 0]),
+#         rotation_rate=np.array([0, 0, 0]),
+#         frequency=1e9,
+#         bandwidth=1e6,
+#         pulses=10,
+#         samples_per_pulse=100,
+#         frame_size=1,
+#         rxchannel_prop={"size": 1},
+#         txchannel_prop={"size": 1},
+#     )
+#     targets = [
+#         {
+#             "model": "path/to/model.obj",
+#             "location": np.array([10, 0, 0]),
+#         }
+#     ]
+#     result = scene(radar, targets, debug=True)
+#     assert "baseband" in result
+#     assert "timestamp" in result
+#     assert result["baseband"].shape == (1, 10, 100)  # Check baseband shape
+
+
 def test_fmcw_raytracing():
     """
     This function tests an FMCW radar using raytracing.
