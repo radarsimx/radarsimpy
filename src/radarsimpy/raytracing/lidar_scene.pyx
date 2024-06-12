@@ -52,9 +52,9 @@ cpdef lidar_scene(lidar, targets, t=0):
         - **position** (*numpy.1darray*) --
             Lidar's position (m). [x, y, z]
         - **phi** (*numpy.1darray*) --
-            Array of phi scanning angles (deg) 
+            Array of phi scanning angles (deg). The total sweep angles are `the number of phi angles x the number of theta angles`
         - **theta** (*numpy.1darray*) --
-            Array of theta scanning angles (deg)
+            Array of theta scanning angles (deg). The total sweep angles are `the number of phi angles x the number of theta angles`
 
         }
 
