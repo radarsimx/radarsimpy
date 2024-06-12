@@ -18,9 +18,8 @@ A Python module for radar simulation
 
 """
 
-import pytest
 import numpy as np
-import numpy.testing as npt
+
 from radarsimpy.rt import lidar_scene  # pylint: disable=no-name-in-module
 
 
