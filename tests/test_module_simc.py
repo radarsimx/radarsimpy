@@ -1898,6 +1898,124 @@ def test_simc_arbitrary_waveform():
     )
 
 
+def test_simc_interference():
+    """
+    Basic test case with a single target and simple radar setup.
+    """
+    tx = Transmitter(
+        f=[24.075e9, 24.175e9],
+        t=80e-6,
+        tx_power=10,
+        prp=100e-6,
+        pulses=1,
+        channels=[
+            {
+                "location": (0, 0, 0),
+            }
+        ],
+    )
+    rx = Receiver(
+        fs=6e5,
+        noise_figure=12,
+        rf_gain=20,
+        load_resistor=500,
+        baseband_gain=30,
+        channels=[
+            {
+                "location": (0, 0, 0),
+            }
+        ],
+    )
+    interference_tx = Transmitter(
+        f=[24.175e9, 24.075e9],
+        t=80e-6,
+        tx_power=10,
+        prp=100e-6,
+        pulses=3,
+        channels=[
+            {
+                "location": (0, 0, 0),
+            }
+        ],
+    )
+    interference_radar = Radar(
+        transmitter=interference_tx,
+        receiver=rx,
+        location=(20, 0, 0),
+        rotation=(180, 0, 0),
+    )
+
+    radar = Radar(transmitter=tx, receiver=rx, interf=interference_radar)
+
+    targets = [
+        {
+            "location": np.array([10, 0, 0]),
+            "rcs": 20,
+        }
+    ]
+    result = simc(radar, targets, noise=False)
+
+    assert np.allclose(
+        result["interference"],
+        np.array(
+            [
+                [
+                    [
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        -0.01325275 + 0.00434837j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                        0.0 + 0.0j,
+                    ]
+                ]
+            ]
+        ),
+    )
+
+
 # def test_sim_cw():
 #     """
 #     Test the CW radar simulator.
