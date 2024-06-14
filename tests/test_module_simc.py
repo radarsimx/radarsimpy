@@ -19,13 +19,9 @@ A Python module for radar simulation
 """
 
 import numpy as np
-import numpy.testing as npt
-import scipy.constants as const
-from scipy import signal
 
 from radarsimpy import Radar, Transmitter, Receiver
 from radarsimpy.simulator import simc  # pylint: disable=no-name-in-module
-import radarsimpy.processing as proc
 
 
 def test_simc_single_target():
@@ -348,6 +344,7 @@ def test_simc_rx_offset():
             ]
         ),
     )
+
 
 def test_simc_multiple_targets():
     """
@@ -1560,6 +1557,83 @@ def test_simc_freq_offset():
                         -0.01888737 - 0.02052591j,
                         0.02764021 + 0.00375025j,
                         -0.02367378 + 0.0147512j,
+                    ],
+                ]
+            ]
+        ),
+    )
+
+    assert np.allclose(
+        result["timestamp"],
+        np.array(
+            [
+                [
+                    [0.00000000e00, 1.66666667e-05, 3.33333333e-05, 5.00000000e-05],
+                    [1.00000000e-04, 1.16666667e-04, 1.33333333e-04, 1.50000000e-04],
+                    [2.00000000e-04, 2.16666667e-04, 2.33333333e-04, 2.50000000e-04],
+                ]
+            ]
+        ),
+    )
+
+
+def test_simc_pulse_modulation():
+    """
+    Basic test case with a single target and simple radar setup.
+    """
+    tx = Transmitter(
+        f=[24.075e9, 24.175e9],
+        t=80e-6,
+        tx_power=10,
+        prp=100e-6,
+        pulses=3,
+        channels=[
+            {
+                "location": (0, 0, 0),
+                "pulse_amp": (0, 1, 2),
+                "pulse_phs": (0, 180, 0),
+            }
+        ],
+    )
+    rx = Receiver(
+        fs=6e4,
+        noise_figure=12,
+        rf_gain=20,
+        load_resistor=500,
+        baseband_gain=30,
+        channels=[
+            {
+                "location": (0, 0, 0),
+            }
+        ],
+    )
+    radar = Radar(transmitter=tx, receiver=rx)
+
+    targets = [
+        {
+            "location": np.array([10, 0, 0]),
+            "rcs": 20,
+        }
+    ]
+    result = simc(radar, targets, noise=False)
+
+    assert np.allclose(
+        result["baseband"],
+        np.array(
+            [
+                [
+                    [0.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j, 0.0 + 0.0j],
+                    [
+                        0.04858788 + 0.0274211j,
+                        0.03965778 + 0.03924231j,
+                        0.02793127 + 0.04829641j,
+                        0.01423527 + 0.05394494j,
+                    ],
+                    [
+                        -0.09717576 - 0.0548422j,
+                        -0.07931557 - 0.07848462j,
+                        -0.05586255 - 0.09659281j,
+                        -0.02847053 - 0.10788987j,
                     ],
                 ]
             ]
