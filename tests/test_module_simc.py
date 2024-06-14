@@ -108,6 +108,88 @@ def test_simc_single_target():
     )
 
 
+def test_simc_tx_delay():
+    """
+    Basic test case with a single target and simple radar setup.
+    """
+    tx = Transmitter(
+        f=[24.075e9, 24.175e9],
+        t=80e-6,
+        tx_power=10,
+        prp=100e-6,
+        pulses=3,
+        channels=[
+            {
+                "location": (0, 0, 0),
+                "delay": 10e-6,
+            }
+        ],
+    )
+    rx = Receiver(
+        fs=6e4,
+        noise_figure=12,
+        rf_gain=20,
+        load_resistor=500,
+        baseband_gain=30,
+        channels=[
+            {
+                "location": (0, 0, 0),
+            }
+        ],
+    )
+    radar = Radar(transmitter=tx, receiver=rx)
+
+    targets = [
+        {
+            "location": np.array([10, 0, 0]),
+            "speed": np.array([10, 0, 0]),
+            "rcs": 20,
+        }
+    ]
+    result = simc(radar, targets, noise=False)
+
+    assert np.allclose(
+        result["baseband"],
+        np.array(
+            [
+                [
+                    [
+                        0.0197967 + 0.01965284j,
+                        -0.02696882 - 0.00712562j,
+                        0.02691385 - 0.00732697j,
+                        -0.01965863 + 0.01978702j,
+                    ],
+                    [
+                        -0.00607401 + 0.02722019j,
+                        -0.00832206 - 0.02661811j,
+                        0.02049043 + 0.01891748j,
+                        -0.02719311 - 0.00618155j,
+                    ],
+                    [
+                        -0.02627203 + 0.00934354j,
+                        0.01812033 - 0.02119252j,
+                        -0.0051565 + 0.02740124j,
+                        -0.00919453 - 0.0263216j,
+                    ],
+                ]
+            ]
+        ),
+    )
+
+    assert np.allclose(
+        result["timestamp"],
+        np.array(
+            [
+                [
+                    [1.00000000e-05, 2.66666667e-05, 4.33333333e-05, 6.00000000e-05],
+                    [1.10000000e-04, 1.26666667e-04, 1.43333333e-04, 1.60000000e-04],
+                    [2.10000000e-04, 2.26666667e-04, 2.43333333e-04, 2.60000000e-04],
+                ]
+            ]
+        ),
+    )
+
+
 def test_simc_multiple_targets():
     """
     Test with multiple targets.
