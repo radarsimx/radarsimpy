@@ -365,7 +365,7 @@ class Transmitter:
         if len(pulse_phs) != self.waveform_prop["pulses"]:
             raise ValueError("Length of `pulse_phs` and `pulses` should be the same")
 
-        return pulse_amp * np.exp(1j * (pulse_phs / 180 * np.pi))
+        return np.array(pulse_amp) * np.exp(1j * (np.array(pulse_phs) / 180 * np.pi))
 
     def process_txchannel_prop(self, channels):
         """
