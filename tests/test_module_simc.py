@@ -107,6 +107,7 @@ def test_simc_single_target():
         ),
     )
 
+
 def test_simc_multiple_targets():
     """
     Test with multiple targets.
@@ -189,6 +190,7 @@ def test_simc_multiple_targets():
             ]
         ),
     )
+
 
 def test_simc_single_target_speed():
     """
@@ -1256,7 +1258,85 @@ def test_simc_rx_el_pattern():
     )
 
 
+def test_simc_freq_offset():
+    """
+    Basic test case with a single target and simple radar setup.
+    """
+    tx = Transmitter(
+        f=[24.075e9, 24.175e9],
+        t=80e-6,
+        tx_power=10,
+        prp=100e-6,
+        pulses=3,
+        f_offset=[0, 1e6, 2e6],
+        channels=[
+            {
+                "location": (0, 0, 0),
+            }
+        ],
+    )
+    rx = Receiver(
+        fs=6e4,
+        noise_figure=12,
+        rf_gain=20,
+        load_resistor=500,
+        baseband_gain=30,
+        channels=[
+            {
+                "location": (0, 0, 0),
+            }
+        ],
+    )
+    radar = Radar(transmitter=tx, receiver=rx)
 
+    targets = [
+        {
+            "location": np.array([10, 0, 0]),
+            "rcs": 20,
+        }
+    ]
+    result = simc(radar, targets, noise=False)
+
+    assert np.allclose(
+        result["baseband"],
+        np.array(
+            [
+                [
+                    [
+                        0.02167872 + 0.01755585j,
+                        -0.02789397 + 0.00031774j,
+                        0.02127319 - 0.01804511j,
+                        -0.00486305 + 0.02746863j,
+                    ],
+                    [
+                        0.01265615 + 0.02485824j,
+                        -0.02560738 - 0.0110622j,
+                        0.0267748 - 0.00782435j,
+                        -0.01562117 + 0.02311037j,
+                    ],
+                    [
+                        0.00144308 + 0.02785612j,
+                        -0.01888737 - 0.02052591j,
+                        0.02764021 + 0.00375025j,
+                        -0.02367378 + 0.0147512j,
+                    ],
+                ]
+            ]
+        ),
+    )
+
+    assert np.allclose(
+        result["timestamp"],
+        np.array(
+            [
+                [
+                    [0.00000000e00, 1.66666667e-05, 3.33333333e-05, 5.00000000e-05],
+                    [1.00000000e-04, 1.16666667e-04, 1.33333333e-04, 1.50000000e-04],
+                    [2.00000000e-04, 2.16666667e-04, 2.33333333e-04, 2.50000000e-04],
+                ]
+            ]
+        ),
+    )
 
 
 # def test_sim_cw():
