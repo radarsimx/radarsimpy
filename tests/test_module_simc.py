@@ -104,6 +104,87 @@ def test_simc_single_target():
     )
 
 
+def test_simc_varing_prp():
+    """
+    Basic test case with a single target and simple radar setup.
+    """
+    tx = Transmitter(
+        f=[24.075e9, 24.175e9],
+        t=80e-6,
+        tx_power=10,
+        prp=[100e-6, 110e-6, 130e-6],
+        pulses=3,
+        channels=[
+            {
+                "location": (0, 0, 0),
+            }
+        ],
+    )
+    rx = Receiver(
+        fs=6e4,
+        noise_figure=12,
+        rf_gain=20,
+        load_resistor=500,
+        baseband_gain=30,
+        channels=[
+            {
+                "location": (0, 0, 0),
+            }
+        ],
+    )
+    radar = Radar(transmitter=tx, receiver=rx)
+
+    targets = [
+        {
+            "location": np.array([10, 0, 0]),
+            "speed": np.array([-10, 0, 0]),
+            "rcs": 20,
+        }
+    ]
+    result = simc(radar, targets, noise=False)
+
+    assert np.allclose(
+        result["baseband"],
+        np.array(
+            [
+                [
+                    [
+                        0.02167872 + 0.01755585j,
+                        -0.02744623 + 0.00499312j,
+                        0.01410064 - 0.02407178j,
+                        0.00905038 + 0.02638979j,
+                    ],
+                    [
+                        0.02537417 - 0.01160469j,
+                        -0.00771748 + 0.02681435j,
+                        -0.01533089 - 0.02331491j,
+                        0.02768024 + 0.00353236j,
+                    ],
+                    [
+                        -0.00474528 - 0.02750281j,
+                        0.02396522 + 0.01430533j,
+                        -0.0264509 + 0.00890933j,
+                        0.01041974 - 0.02589415j,
+                    ],
+                ]
+            ]
+        ),
+    )
+
+    assert np.allclose(
+        result["timestamp"],
+        np.array(
+            [
+                [
+                    [0.00000000e00, 1.66666667e-05, 3.33333333e-05, 5.00000000e-05],
+                    [1.10000000e-04, 1.26666667e-04, 1.43333333e-04, 1.60000000e-04],
+                    [2.40000000e-04, 2.56666667e-04, 2.73333333e-04, 2.90000000e-04],
+                ]
+            ]
+        ),
+    )
+
+
 def test_simc_tx_delay():
     """
     Basic test case with a single target and simple radar setup.
