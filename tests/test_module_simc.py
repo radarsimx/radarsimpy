@@ -1818,6 +1818,86 @@ def test_simc_waveform_modulation():
     )
 
 
+def test_simc_arbitrary_waveform():
+    """
+    Basic test case with a single target and simple radar setup.
+    """
+    tx = Transmitter(
+        f=[24.075e9, 24.175e9, 26e9, 28e9, 26e9],
+        t=[0, 20e-6, 40e-6, 60e-6, 80e-6],
+        tx_power=10,
+        prp=100e-6,
+        pulses=3,
+        channels=[
+            {
+                "location": (0, 0, 0),
+            }
+        ],
+    )
+    rx = Receiver(
+        fs=6e4,
+        noise_figure=12,
+        rf_gain=20,
+        load_resistor=500,
+        baseband_gain=30,
+        channels=[
+            {
+                "location": (0, 0, 0),
+            }
+        ],
+    )
+    radar = Radar(transmitter=tx, receiver=rx)
+
+    targets = [
+        {
+            "location": np.array([10, 0, 0]),
+            "rcs": 20,
+        }
+    ]
+    result = simc(radar, targets, noise=False)
+
+    assert np.allclose(
+        result["baseband"],
+        np.array(
+            [
+                [
+                    [
+                        0.02091127 + 0.01519129j,
+                        0.01652503 - 0.0198741j,
+                        -0.02224128 + 0.01316747j,
+                        0.02556374 + 0.0038147j,
+                    ],
+                    [
+                        0.02091127 + 0.01519129j,
+                        0.01652503 - 0.0198741j,
+                        -0.02224128 + 0.01316747j,
+                        0.02556374 + 0.0038147j,
+                    ],
+                    [
+                        0.02091127 + 0.01519129j,
+                        0.01652503 - 0.0198741j,
+                        -0.02224128 + 0.01316747j,
+                        0.02556374 + 0.0038147j,
+                    ],
+                ]
+            ]
+        ),
+    )
+
+    assert np.allclose(
+        result["timestamp"],
+        np.array(
+            [
+                [
+                    [0.00000000e00, 1.66666667e-05, 3.33333333e-05, 5.00000000e-05],
+                    [1.00000000e-04, 1.16666667e-04, 1.33333333e-04, 1.50000000e-04],
+                    [2.00000000e-04, 2.16666667e-04, 2.33333333e-04, 2.50000000e-04],
+                ]
+            ]
+        ),
+    )
+
+
 # def test_sim_cw():
 #     """
 #     Test the CW radar simulator.
