@@ -907,6 +907,273 @@ def test_simc_rx_az_pattern():
         ),
     )
 
+
+def test_simc_tx_el_pattern():
+    """
+    Basic test case with a single target and simple radar setup.
+    """
+    el_angle = np.array([-46, 0, 46])
+    el_pattern = np.array([-10, 10, 10])
+    tx = Transmitter(
+        f=[24.075e9, 24.175e9],
+        t=80e-6,
+        tx_power=10,
+        prp=100e-6,
+        pulses=3,
+        channels=[
+            {
+                "location": (0, 0, 0),
+                "elevation_angle": el_angle,
+                "elevation_pattern": el_pattern,
+            }
+        ],
+    )
+    rx = Receiver(
+        fs=6e4,
+        noise_figure=12,
+        rf_gain=20,
+        load_resistor=500,
+        baseband_gain=30,
+        channels=[
+            {
+                "location": (0, 0, 0),
+            }
+        ],
+    )
+    radar = Radar(transmitter=tx, receiver=rx)
+
+    targets = [
+        {
+            "location": np.array([10, 0, 10]),
+            "rcs": 20,
+        }
+    ]
+    result = simc(radar, targets, noise=False)
+
+    assert np.allclose(
+        result["baseband"],
+        np.array(
+            [
+                [
+                    [
+                        -0.01008092 + 0.00963944j,
+                        -0.00777508 + 0.0115798j,
+                        -0.00510628 + 0.01297958j,
+                        -0.00219908 + 0.01377344j,
+                    ],
+                    [
+                        -0.01008092 + 0.00963944j,
+                        -0.00777508 + 0.0115798j,
+                        -0.00510628 + 0.01297958j,
+                        -0.00219908 + 0.01377344j,
+                    ],
+                    [
+                        -0.01008092 + 0.00963944j,
+                        -0.00777508 + 0.0115798j,
+                        -0.00510628 + 0.01297958j,
+                        -0.00219908 + 0.01377344j,
+                    ],
+                ]
+            ]
+        ),
+    )
+
+    assert np.allclose(
+        result["timestamp"],
+        np.array(
+            [
+                [
+                    [0.00000000e00, 1.66666667e-05, 3.33333333e-05, 5.00000000e-05],
+                    [1.00000000e-04, 1.16666667e-04, 1.33333333e-04, 1.50000000e-04],
+                    [2.00000000e-04, 2.16666667e-04, 2.33333333e-04, 2.50000000e-04],
+                ]
+            ]
+        ),
+    )
+
+    targets = [
+        {
+            "location": np.array([10, 0, -10]),
+            "rcs": 20,
+        }
+    ]
+    result = simc(radar, targets, noise=False)
+
+    assert np.allclose(
+        result["baseband"],
+        np.array(
+            [
+                [
+                    [
+                        -0.00100809 + 0.00096394j,
+                        -0.00077751 + 0.00115798j,
+                        -0.00051063 + 0.00129796j,
+                        -0.00021991 + 0.00137734j,
+                    ],
+                    [
+                        -0.00100809 + 0.00096394j,
+                        -0.00077751 + 0.00115798j,
+                        -0.00051063 + 0.00129796j,
+                        -0.00021991 + 0.00137734j,
+                    ],
+                    [
+                        -0.00100809 + 0.00096394j,
+                        -0.00077751 + 0.00115798j,
+                        -0.00051063 + 0.00129796j,
+                        -0.00021991 + 0.00137734j,
+                    ],
+                ]
+            ]
+        ),
+    )
+
+    assert np.allclose(
+        result["timestamp"],
+        np.array(
+            [
+                [
+                    [0.00000000e00, 1.66666667e-05, 3.33333333e-05, 5.00000000e-05],
+                    [1.00000000e-04, 1.16666667e-04, 1.33333333e-04, 1.50000000e-04],
+                    [2.00000000e-04, 2.16666667e-04, 2.33333333e-04, 2.50000000e-04],
+                ]
+            ]
+        ),
+    )
+
+
+def test_simc_rx_el_pattern():
+    """
+    Basic test case with a single target and simple radar setup.
+    """
+    el_angle = np.array([-46, 0, 46])
+    el_pattern = np.array([-10, 10, 10])
+    tx = Transmitter(
+        f=[24.075e9, 24.175e9],
+        t=80e-6,
+        tx_power=10,
+        prp=100e-6,
+        pulses=3,
+        channels=[
+            {
+                "location": (0, 0, 0),
+            }
+        ],
+    )
+    rx = Receiver(
+        fs=6e4,
+        noise_figure=12,
+        rf_gain=20,
+        load_resistor=500,
+        baseband_gain=30,
+        channels=[
+            {
+                "location": (0, 0, 0),
+                "elevation_angle": el_angle,
+                "elevation_pattern": el_pattern,
+            }
+        ],
+    )
+    radar = Radar(transmitter=tx, receiver=rx)
+
+    targets = [
+        {
+            "location": np.array([10, 0, 10]),
+            "rcs": 20,
+        }
+    ]
+    result = simc(radar, targets, noise=False)
+
+    assert np.allclose(
+        result["baseband"],
+        np.array(
+            [
+                [
+                    [
+                        -0.01008092 + 0.00963944j,
+                        -0.00777508 + 0.0115798j,
+                        -0.00510628 + 0.01297958j,
+                        -0.00219908 + 0.01377344j,
+                    ],
+                    [
+                        -0.01008092 + 0.00963944j,
+                        -0.00777508 + 0.0115798j,
+                        -0.00510628 + 0.01297958j,
+                        -0.00219908 + 0.01377344j,
+                    ],
+                    [
+                        -0.01008092 + 0.00963944j,
+                        -0.00777508 + 0.0115798j,
+                        -0.00510628 + 0.01297958j,
+                        -0.00219908 + 0.01377344j,
+                    ],
+                ]
+            ]
+        ),
+    )
+
+    assert np.allclose(
+        result["timestamp"],
+        np.array(
+            [
+                [
+                    [0.00000000e00, 1.66666667e-05, 3.33333333e-05, 5.00000000e-05],
+                    [1.00000000e-04, 1.16666667e-04, 1.33333333e-04, 1.50000000e-04],
+                    [2.00000000e-04, 2.16666667e-04, 2.33333333e-04, 2.50000000e-04],
+                ]
+            ]
+        ),
+    )
+
+    targets = [
+        {
+            "location": np.array([10, 0, -10]),
+            "rcs": 20,
+        }
+    ]
+    result = simc(radar, targets, noise=False)
+
+    assert np.allclose(
+        result["baseband"],
+        np.array(
+            [
+                [
+                    [
+                        -0.00100809 + 0.00096394j,
+                        -0.00077751 + 0.00115798j,
+                        -0.00051063 + 0.00129796j,
+                        -0.00021991 + 0.00137734j,
+                    ],
+                    [
+                        -0.00100809 + 0.00096394j,
+                        -0.00077751 + 0.00115798j,
+                        -0.00051063 + 0.00129796j,
+                        -0.00021991 + 0.00137734j,
+                    ],
+                    [
+                        -0.00100809 + 0.00096394j,
+                        -0.00077751 + 0.00115798j,
+                        -0.00051063 + 0.00129796j,
+                        -0.00021991 + 0.00137734j,
+                    ],
+                ]
+            ]
+        ),
+    )
+
+    assert np.allclose(
+        result["timestamp"],
+        np.array(
+            [
+                [
+                    [0.00000000e00, 1.66666667e-05, 3.33333333e-05, 5.00000000e-05],
+                    [1.00000000e-04, 1.16666667e-04, 1.33333333e-04, 1.50000000e-04],
+                    [2.00000000e-04, 2.16666667e-04, 2.33333333e-04, 2.50000000e-04],
+                ]
+            ]
+        ),
+    )
+
+
 def test_simc_multiple_targets():
     """
     Test with multiple targets.
