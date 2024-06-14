@@ -48,7 +48,7 @@ class Receiver:
         [{
 
         - **location** (*numpy.1darray*) --
-            3D location of the channel [x, y, z] (m)
+            3D location of the channel relative to radar's location [x, y, z] (m)
         - **polarization** (*numpy.1darray*) --
             Antenna polarization [x, y, z].
             ``default = [0, 0, 1] (vertical polarization)``
