@@ -547,7 +547,7 @@ def test_scene_single_target_speed():
 
     targets = [
         {
-            "model": "../models/plate5x5.stl",
+            "model": "./models/plate5x5.stl",
             "location": np.array([10, 0, 0]),
             "speed": np.array([-10, 0, 0]),
         }
@@ -628,7 +628,7 @@ def test_scene_radar_location():
 
     targets = [
         {
-            "model": "../models/plate5x5.stl",
+            "model": "./models/plate5x5.stl",
             "location": np.array([10, 0, 0]),
         }
     ]
@@ -676,190 +676,190 @@ def test_scene_radar_location():
     )
 
 
-# def test_scene_radar_moving():
-#     """
-#     Basic test case with a single target and simple radar setup.
-#     """
-#     tx = Transmitter(
-#         f=[24.075e9, 24.175e9],
-#         t=80e-6,
-#         tx_power=10,
-#         prp=100e-6,
-#         pulses=3,
-#         channels=[
-#             {
-#                 "location": (0, 0, 0),
-#             }
-#         ],
-#     )
-#     rx = Receiver(
-#         fs=6e4,
-#         noise_figure=12,
-#         rf_gain=20,
-#         load_resistor=500,
-#         baseband_gain=30,
-#         channels=[
-#             {
-#                 "location": (0, 0, 0),
-#             }
-#         ],
-#     )
-#     radar = Radar(transmitter=tx, receiver=rx, speed=[10, 0, 0])
+def test_scene_radar_moving():
+    """
+    Basic test case with a single target and simple radar setup.
+    """
+    tx = Transmitter(
+        f=[24.075e9, 24.175e9],
+        t=80e-6,
+        tx_power=10,
+        prp=100e-6,
+        pulses=3,
+        channels=[
+            {
+                "location": (0, 0, 0),
+            }
+        ],
+    )
+    rx = Receiver(
+        fs=6e4,
+        noise_figure=12,
+        rf_gain=20,
+        load_resistor=500,
+        baseband_gain=30,
+        channels=[
+            {
+                "location": (0, 0, 0),
+            }
+        ],
+    )
+    radar = Radar(transmitter=tx, receiver=rx, speed=[10, 0, 0])
 
-#     targets = [
-#         {
-#             "location": np.array([10, 0, 0]),
-#             "rcs": 20,
-#         }
-#     ]
-#     result = simc(radar, targets, noise=False)
+    targets = [
+        {
+            "model": "./models/plate5x5.stl",
+            "location": np.array([10, 0, 0]),
+        }
+    ]
+    result = scene(radar, targets, density=0.4, noise=False)
 
-#     assert np.allclose(
-#         result["baseband"],
-#         np.array(
-#             [
-#                 [
-#                     [
-#                         0.02167872 + 0.01755585j,
-#                         -0.02744623 + 0.00499312j,
-#                         0.01410064 - 0.02407178j,
-#                         0.00905038 + 0.02638979j,
-#                     ],
-#                     [
-#                         0.02640622 - 0.00901099j,
-#                         -0.01038519 + 0.0258976j,
-#                         -0.01289609 - 0.0247443j,
-#                         0.02718049 + 0.00631372j,
-#                     ],
-#                     [
-#                         0.00645317 - 0.02715058j,
-#                         0.01642037 + 0.02256592j,
-#                         -0.02782165 - 0.00220395j,
-#                         0.01978305 - 0.01968716j,
-#                     ],
-#                 ]
-#             ]
-#         ),
-#     )
+    assert np.allclose(
+        result["baseband"],
+        np.array(
+            [
+                [
+                    [
+                        -0.03682247 - 0.0333487j,
+                        0.04842967 - 0.00610054j,
+                        -0.02626628 + 0.04016538j,
+                        -0.0136109 - 0.04528237j,
+                    ],
+                    [
+                        -0.04774657 + 0.01337209j,
+                        0.02053424 - 0.04417949j,
+                        0.02008607 + 0.04349243j,
+                        -0.04555844 - 0.01239713j,
+                    ],
+                    [
+                        -0.01408809 + 0.04744038j,
+                        -0.02645933 - 0.04079583j,
+                        0.04744233 + 0.00602393j,
+                        -0.03457864 + 0.03205154j,
+                    ],
+                ]
+            ]
+        ),
+    )
 
-#     assert np.allclose(
-#         result["timestamp"],
-#         np.array(
-#             [
-#                 [
-#                     [0.00000000e00, 1.66666667e-05, 3.33333333e-05, 5.00000000e-05],
-#                     [1.00000000e-04, 1.16666667e-04, 1.33333333e-04, 1.50000000e-04],
-#                     [2.00000000e-04, 2.16666667e-04, 2.33333333e-04, 2.50000000e-04],
-#                 ]
-#             ]
-#         ),
-#     )
+    assert np.allclose(
+        result["timestamp"],
+        np.array(
+            [
+                [
+                    [0.00000000e00, 1.66666667e-05, 3.33333333e-05, 5.00000000e-05],
+                    [1.00000000e-04, 1.16666667e-04, 1.33333333e-04, 1.50000000e-04],
+                    [2.00000000e-04, 2.16666667e-04, 2.33333333e-04, 2.50000000e-04],
+                ]
+            ]
+        ),
+    )
 
 
-# def test_scene_2_frames_moving_target():
-#     """
-#     Basic test case with a single target and simple radar setup.
-#     """
-#     tx = Transmitter(
-#         f=[24.075e9, 24.175e9],
-#         t=80e-6,
-#         tx_power=10,
-#         prp=100e-6,
-#         pulses=3,
-#         channels=[
-#             {
-#                 "location": (0, 0, 0),
-#             }
-#         ],
-#     )
-#     rx = Receiver(
-#         fs=6e4,
-#         noise_figure=12,
-#         rf_gain=20,
-#         load_resistor=500,
-#         baseband_gain=30,
-#         channels=[
-#             {
-#                 "location": (0, 0, 0),
-#             }
-#         ],
-#     )
-#     radar = Radar(transmitter=tx, receiver=rx, time=[0, 1])
+def test_scene_2_frames_moving_target():
+    """
+    Basic test case with a single target and simple radar setup.
+    """
+    tx = Transmitter(
+        f=[24.075e9, 24.175e9],
+        t=80e-6,
+        tx_power=10,
+        prp=100e-6,
+        pulses=3,
+        channels=[
+            {
+                "location": (0, 0, 0),
+            }
+        ],
+    )
+    rx = Receiver(
+        fs=6e4,
+        noise_figure=12,
+        rf_gain=20,
+        load_resistor=500,
+        baseband_gain=30,
+        channels=[
+            {
+                "location": (0, 0, 0),
+            }
+        ],
+    )
+    radar = Radar(transmitter=tx, receiver=rx, time=[0, 1])
 
-#     targets = [
-#         {
-#             "location": np.array([10, 0, 0]),
-#             "speed": np.array([-5, 0, 0]),
-#             "rcs": 20,
-#         }
-#     ]
-#     result = simc(radar, targets, noise=False)
+    targets = [
+        {
+            "model": "./models/plate5x5.stl",
+            "location": np.array([10, 0, 0]),
+            "speed": np.array([-5, 0, 0]),
+        }
+    ]
+    result = scene(radar, targets, density=0.4, noise=False)
 
-#     assert np.allclose(
-#         result["baseband"],
-#         np.array(
-#             [
-#                 [
-#                     [
-#                         0.02167872 + 0.01755585j,
-#                         -0.02776995 + 0.00265147j,
-#                         0.01794177 - 0.02136164j,
-#                         0.00216204 + 0.02781327j,
-#                     ],
-#                     [
-#                         0.02746562 + 0.00489594j,
-#                         -0.02301209 + 0.01577339j,
-#                         0.00536318 - 0.02737916j,
-#                         0.01536405 + 0.02328849j,
-#                     ],
-#                     [
-#                         0.02640622 - 0.00901099j,
-#                         -0.01251624 + 0.02493704j,
-#                         -0.00855785 - 0.0265575j,
-#                         0.02473615 + 0.01291073j,
-#                     ],
-#                 ],
-#                 [
-#                     [
-#                         0.10501874 + 0.03770757j,
-#                         -0.00954112 - 0.11117821j,
-#                         -0.09705694 + 0.05506731j,
-#                         0.09052647 + 0.06525521j,
-#                     ],
-#                     [
-#                         0.11017892 - 0.01778723j,
-#                         -0.06217132 - 0.09268947j,
-#                         -0.05829531 + 0.09517927j,
-#                         0.11082761 + 0.01324784j,
-#                     ],
-#                     [
-#                         0.08785306 - 0.06886658j,
-#                         -0.09926082 - 0.05107721j,
-#                         -0.00495222 + 0.11152531j,
-#                         0.10337779 - 0.04214599j,
-#                     ],
-#                 ],
-#             ]
-#         ),
-#     )
+    assert np.allclose(
+        result["baseband"],
+        np.array(
+            [
+                [
+                    [
+                        -0.03682247 - 0.0333487j,
+                        0.04877901 - 0.00200641j,
+                        -0.03264436 + 0.03519788j,
+                        -0.0018307 - 0.04726577j,
+                    ],
+                    [
+                        -0.04830821 - 0.01138446j,
+                        0.04167432 - 0.02533914j,
+                        -0.01148895 + 0.04656663j,
+                        -0.02451444 - 0.04041226j,
+                    ],
+                    [
+                        -0.04774657 + 0.01337209j,
+                        0.02418099 - 0.04230276j,
+                        0.0125051 + 0.04626023j,
+                        -0.04101305 - 0.02342634j,
+                    ],
+                ],
+                [
+                    [
+                        -0.09457635 - 0.03042372j,
+                        0.0120404 + 0.0999181j,
+                        0.08722919 - 0.05291579j,
+                        -0.0848036 - 0.05888089j,
+                    ],
+                    [
+                        -0.09761531 + 0.01914424j,
+                        0.05894103 + 0.08174985j,
+                        0.05085144 - 0.0886054j,
+                        -0.10279241 - 0.01059069j,
+                    ],
+                    [
+                        -0.07627671 + 0.06405112j,
+                        0.09124954 + 0.04311862j,
+                        0.00169646 - 0.10227992j,
+                        -0.09520085 + 0.04041931j,
+                    ],
+                ],
+            ]
+        ),
+    )
 
-#     assert np.allclose(
-#         result["timestamp"],
-#         np.array(
-#             [
-#                 [
-#                     [0.00000000e00, 1.66666667e-05, 3.33333333e-05, 5.00000000e-05],
-#                     [1.00000000e-04, 1.16666667e-04, 1.33333333e-04, 1.50000000e-04],
-#                     [2.00000000e-04, 2.16666667e-04, 2.33333333e-04, 2.50000000e-04],
-#                 ],
-#                 [
-#                     [1.00000000e00, 1.00001667e00, 1.00003333e00, 1.00005000e00],
-#                     [1.00010000e00, 1.00011667e00, 1.00013333e00, 1.00015000e00],
-#                     [1.00020000e00, 1.00021667e00, 1.00023333e00, 1.00025000e00],
-#                 ],
-#             ]
-#         ),
-#     )
+    assert np.allclose(
+        result["timestamp"],
+        np.array(
+            [
+                [
+                    [0.00000000e00, 1.66666667e-05, 3.33333333e-05, 5.00000000e-05],
+                    [1.00000000e-04, 1.16666667e-04, 1.33333333e-04, 1.50000000e-04],
+                    [2.00000000e-04, 2.16666667e-04, 2.33333333e-04, 2.50000000e-04],
+                ],
+                [
+                    [1.00000000e00, 1.00001667e00, 1.00003333e00, 1.00005000e00],
+                    [1.00010000e00, 1.00011667e00, 1.00013333e00, 1.00015000e00],
+                    [1.00020000e00, 1.00021667e00, 1.00023333e00, 1.00025000e00],
+                ],
+            ]
+        ),
+    )
 
 
 # def test_scene_2_frames_moving_radar():
