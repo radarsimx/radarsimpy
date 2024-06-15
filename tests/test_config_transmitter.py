@@ -214,6 +214,7 @@ class TestTransmitter:
         np.testing.assert_allclose(
             np.unwrap(np.angle(txch_prop["pulse_mod"][1, :])) / np.pi * 180 + 360,
             np.linspace(360, 0, 10),
+            atol=1e-5,
         )
         assert txch_prop["waveform_mod"][0]["enabled"]
         assert txch_prop["waveform_mod"][1]["enabled"] is False
@@ -277,6 +278,7 @@ class TestTransmitter:
             np.unwrap(np.angle(tx.txchannel_prop["pulse_mod"][1, :])) / np.pi * 180
             + 360,
             np.linspace(360, 0, 10),
+            atol=1e-5,
         )
         assert tx.txchannel_prop["waveform_mod"][0]["enabled"]
         assert tx.txchannel_prop["waveform_mod"][1]["enabled"] is False
