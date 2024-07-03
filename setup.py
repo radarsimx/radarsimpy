@@ -66,11 +66,17 @@ os_type = platform.system()  # 'Linux', 'Windows', 'macOS'
 
 if os_type == "Linux":
     LINK_ARGS = ["-Wl,-lhdf5,-lhdf5_cpp,-lhdf5_hl,-lhdf5_hl_cpp,-rpath,$ORIGIN"]
-    LIBRARY_DIRS = ["src/radarsimcpp/build", "src/radarsimcpp/hdf5/lib_linux_x86_64/lib"]
+    LIBRARY_DIRS = [
+        "src/radarsimcpp/build",
+        "src/radarsimcpp/hdf5/lib_linux_x86_64/lib",
+    ]
+    LIBS = []
     if args.arch == "gpu":
         NVCC = "nvcc"
         CUDALIB = "lib64"
+        LIBS = ["cudart"]
 elif os_type == "Darwin":
+    LIBS = []
     if platform.processor() == "arm":
         LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
         LIBRARY_DIRS = ["src/radarsimcpp/build"]
@@ -80,9 +86,11 @@ elif os_type == "Darwin":
 elif os_type == "Windows":
     LINK_ARGS = []
     LIBRARY_DIRS = ["src/radarsimcpp/build/Release"]
+    LIBS = []
     if args.arch == "gpu":
         NVCC = "nvcc.exe"
         CUDALIB = "lib\\x64"
+        LIBS = ["cudart"]
 
 
 def find_in_path(name, path):
@@ -181,7 +189,7 @@ ext_modules = [
         ["src/radarsimpy/lib/cp_radarsimc.pyx"],
         define_macros=MACROS,
         include_dirs=INCLUDE_DIRS,
-        libraries=["radarsimcpp"],
+        libraries=["radarsimcpp"] + LIBS,
         library_dirs=LIBRARY_DIRS,
         extra_link_args=LINK_ARGS,
     ),
@@ -190,7 +198,7 @@ ext_modules = [
         ["src/radarsimpy/raytracing/rt.pyx"],
         define_macros=MACROS,
         include_dirs=INCLUDE_DIRS,
-        libraries=["radarsimcpp"],
+        libraries=["radarsimcpp"] + LIBS,
         library_dirs=LIBRARY_DIRS,
         extra_link_args=LINK_ARGS,
     ),
@@ -199,7 +207,7 @@ ext_modules = [
         ["src/radarsimpy/simulator.pyx"],
         define_macros=MACROS,
         include_dirs=INCLUDE_DIRS,
-        libraries=["radarsimcpp"],
+        libraries=["radarsimcpp"] + LIBS,
         library_dirs=LIBRARY_DIRS,
         extra_link_args=LINK_ARGS,
     ),
