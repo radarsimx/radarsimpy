@@ -66,7 +66,7 @@ os_type = platform.system()  # 'Linux', 'Windows', 'macOS'
 
 if os_type == "Linux":
     LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
-    LIBRARY_DIRS = [
+    LIB_DIRS = [
         "src/radarsimcpp/build",
         "src/radarsimcpp/hdf5/lib_linux_x86_64/lib",
     ]
@@ -74,18 +74,18 @@ if os_type == "Linux":
     if args.arch == "gpu":
         NVCC = "nvcc"
         CUDALIB = "lib64"
-        LIBS = ["hdf5", "hdf5_cpp", "hdf5_hl", "hdf5_hl_cpp", "cudart"]
+        LIBS = LIBS + ["cudart"]
 elif os_type == "Darwin":
     LIBS = []
     if platform.processor() == "arm":
         LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
-        LIBRARY_DIRS = ["src/radarsimcpp/build"]
+        LIB_DIRS = ["src/radarsimcpp/build"]
     else:
         LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
-        LIBRARY_DIRS = ["src/radarsimcpp/build"]
+        LIB_DIRS = ["src/radarsimcpp/build"]
 elif os_type == "Windows":
     LINK_ARGS = []
-    LIBRARY_DIRS = ["src/radarsimcpp/build/Release"]
+    LIB_DIRS = ["src/radarsimcpp/build/Release"]
     LIBS = []
     if args.arch == "gpu":
         NVCC = "nvcc.exe"
@@ -180,7 +180,7 @@ INCLUDE_DIRS = ["src/radarsimcpp/includes", "src/radarsimcpp/includes/zpvector"]
 if ARG_ARCH == "gpu":
     CUDA = locate_cuda()
     INCLUDE_DIRS = INCLUDE_DIRS + [CUDA["include"]]
-    LIBRARY_DIRS = LIBRARY_DIRS + [CUDA["lib64"]]
+    LIB_DIRS = LIB_DIRS + [CUDA["lib64"]]
 
 
 ext_modules = [
@@ -190,7 +190,7 @@ ext_modules = [
         define_macros=MACROS,
         include_dirs=INCLUDE_DIRS,
         libraries=["radarsimcpp"] + LIBS,
-        library_dirs=LIBRARY_DIRS,
+        library_dirs=LIB_DIRS,
         extra_link_args=LINK_ARGS,
     ),
     Extension(
@@ -199,7 +199,7 @@ ext_modules = [
         define_macros=MACROS,
         include_dirs=INCLUDE_DIRS,
         libraries=["radarsimcpp"] + LIBS,
-        library_dirs=LIBRARY_DIRS,
+        library_dirs=LIB_DIRS,
         extra_link_args=LINK_ARGS,
     ),
     Extension(
@@ -208,7 +208,7 @@ ext_modules = [
         define_macros=MACROS,
         include_dirs=INCLUDE_DIRS,
         libraries=["radarsimcpp"] + LIBS,
-        library_dirs=LIBRARY_DIRS,
+        library_dirs=LIB_DIRS,
         extra_link_args=LINK_ARGS,
     ),
 ]
