@@ -1508,85 +1508,85 @@ def test_scene_rx_el_pattern():
     )
 
 
-# def test_scene_freq_offset():
-#     """
-#     Basic test case with a single target and simple radar setup.
-#     """
-#     tx = Transmitter(
-#         f=[24.075e9, 24.175e9],
-#         t=80e-6,
-#         tx_power=10,
-#         prp=100e-6,
-#         pulses=3,
-#         f_offset=[0, 1e6, 2e6],
-#         channels=[
-#             {
-#                 "location": (0, 0, 0),
-#             }
-#         ],
-#     )
-#     rx = Receiver(
-#         fs=6e4,
-#         noise_figure=12,
-#         rf_gain=20,
-#         load_resistor=500,
-#         baseband_gain=30,
-#         channels=[
-#             {
-#                 "location": (0, 0, 0),
-#             }
-#         ],
-#     )
-#     radar = Radar(transmitter=tx, receiver=rx)
+def test_scene_freq_offset():
+    """
+    Basic test case with a single target and simple radar setup.
+    """
+    tx = Transmitter(
+        f=[24.075e9, 24.175e9],
+        t=80e-6,
+        tx_power=10,
+        prp=100e-6,
+        pulses=3,
+        f_offset=[0, 1e6, 2e6],
+        channels=[
+            {
+                "location": (0, 0, 0),
+            }
+        ],
+    )
+    rx = Receiver(
+        fs=6e4,
+        noise_figure=12,
+        rf_gain=20,
+        load_resistor=500,
+        baseband_gain=30,
+        channels=[
+            {
+                "location": (0, 0, 0),
+            }
+        ],
+    )
+    radar = Radar(transmitter=tx, receiver=rx)
 
-#     targets = [
-#         {
-#             "location": np.array([10, 0, 0]),
-#             "rcs": 20,
-#         }
-#     ]
-#     result = simc(radar, targets, noise=False)
+    targets = [
+        {
+            "model": "./models/plate5x5.stl",
+            "location": np.array([10, 0, 0]),
+        }
+    ]
+    result = scene(radar, targets, density=0.4, noise=False)
 
-#     assert np.allclose(
-#         result["baseband"],
-#         np.array(
-#             [
-#                 [
-#                     [
-#                         0.02167872 + 0.01755585j,
-#                         -0.02789397 + 0.00031774j,
-#                         0.02127319 - 0.01804511j,
-#                         -0.00486305 + 0.02746863j,
-#                     ],
-#                     [
-#                         0.01265615 + 0.02485824j,
-#                         -0.02560738 - 0.0110622j,
-#                         0.0267748 - 0.00782435j,
-#                         -0.01562117 + 0.02311037j,
-#                     ],
-#                     [
-#                         0.00144308 + 0.02785612j,
-#                         -0.01888737 - 0.02052591j,
-#                         0.02764021 + 0.00375025j,
-#                         -0.02367378 + 0.0147512j,
-#                     ],
-#                 ]
-#             ]
-#         ),
-#     )
+    assert np.allclose(
+        result["baseband"],
+        np.array(
+            [
+                [
+                    [
+                        -0.03682247 - 0.0333487j,
+                        0.0487828 + 0.00210325j,
+                        -0.03809988 + 0.02922872j,
+                        0.01007497 - 0.04623383j,
+                    ],
+                    [
+                        -0.02004394 - 0.04541358j,
+                        0.04367325 + 0.02175098j,
+                        -0.04665996 + 0.01120219j,
+                        0.02798143 - 0.03812524j,
+                    ],
+                    [
+                        0.00017622 - 0.04960085j,
+                        0.0310226 + 0.03760778j,
+                        -0.04715005 - 0.0087329j,
+                        0.04103874 - 0.02344732j,
+                    ],
+                ]
+            ]
+        ),
+    )
 
-#     assert np.allclose(
-#         result["timestamp"],
-#         np.array(
-#             [
-#                 [
-#                     [0.00000000e00, 1.66666667e-05, 3.33333333e-05, 5.00000000e-05],
-#                     [1.00000000e-04, 1.16666667e-04, 1.33333333e-04, 1.50000000e-04],
-#                     [2.00000000e-04, 2.16666667e-04, 2.33333333e-04, 2.50000000e-04],
-#                 ]
-#             ]
-#         ),
-#     )
+    assert np.allclose(
+        result["timestamp"],
+        np.array(
+            [
+                [
+                    [0.00000000e00, 1.66666667e-05, 3.33333333e-05, 5.00000000e-05],
+                    [1.00000000e-04, 1.16666667e-04, 1.33333333e-04, 1.50000000e-04],
+                    [2.00000000e-04, 2.16666667e-04, 2.33333333e-04, 2.50000000e-04],
+                ]
+            ]
+        ),
+    )
 
 
 # def test_scene_pulse_modulation():
