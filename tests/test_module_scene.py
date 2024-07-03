@@ -1238,270 +1238,274 @@ def test_scene_rx_az_pattern():
     )
 
 
-# def test_scene_tx_el_pattern():
-#     """
-#     Basic test case with a single target and simple radar setup.
-#     """
-#     el_angle = np.array([-46, 0, 46])
-#     el_pattern = np.array([-10, 10, 10])
-#     tx = Transmitter(
-#         f=[24.075e9, 24.175e9],
-#         t=80e-6,
-#         tx_power=10,
-#         prp=100e-6,
-#         pulses=3,
-#         channels=[
-#             {
-#                 "location": (0, 0, 0),
-#                 "elevation_angle": el_angle,
-#                 "elevation_pattern": el_pattern,
-#             }
-#         ],
-#     )
-#     rx = Receiver(
-#         fs=6e4,
-#         noise_figure=12,
-#         rf_gain=20,
-#         load_resistor=500,
-#         baseband_gain=30,
-#         channels=[
-#             {
-#                 "location": (0, 0, 0),
-#             }
-#         ],
-#     )
-#     radar = Radar(transmitter=tx, receiver=rx)
+def test_scene_tx_el_pattern():
+    """
+    Basic test case with a single target and simple radar setup.
+    """
+    el_angle = np.array([-46, 0, 46])
+    el_pattern = np.array([-10, 10, 10])
+    tx = Transmitter(
+        f=[24.075e9, 24.175e9],
+        t=80e-6,
+        tx_power=20,
+        prp=100e-6,
+        pulses=3,
+        channels=[
+            {
+                "location": (0, 0, 0),
+                "elevation_angle": el_angle,
+                "elevation_pattern": el_pattern,
+            }
+        ],
+    )
+    rx = Receiver(
+        fs=6e4,
+        noise_figure=12,
+        rf_gain=30,
+        load_resistor=1000,
+        baseband_gain=40,
+        channels=[
+            {
+                "location": (0, 0, 0),
+            }
+        ],
+    )
+    radar = Radar(transmitter=tx, receiver=rx)
 
-#     targets = [
-#         {
-#             "location": np.array([10, 0, 10]),
-#             "rcs": 20,
-#         }
-#     ]
-#     result = simc(radar, targets, noise=False)
+    targets = [
+        {
+            "model": "./models/cr.stl",
+            "location": np.array([10, 0, 10]),
+            "rotation": [0, 45, 0],
+        }
+    ]
+    result = scene(radar, targets, density=1, noise=False)
 
-#     assert np.allclose(
-#         result["baseband"],
-#         np.array(
-#             [
-#                 [
-#                     [
-#                         -0.01008092 + 0.00963944j,
-#                         -0.00777508 + 0.0115798j,
-#                         -0.00510628 + 0.01297958j,
-#                         -0.00219908 + 0.01377344j,
-#                     ],
-#                     [
-#                         -0.01008092 + 0.00963944j,
-#                         -0.00777508 + 0.0115798j,
-#                         -0.00510628 + 0.01297958j,
-#                         -0.00219908 + 0.01377344j,
-#                     ],
-#                     [
-#                         -0.01008092 + 0.00963944j,
-#                         -0.00777508 + 0.0115798j,
-#                         -0.00510628 + 0.01297958j,
-#                         -0.00219908 + 0.01377344j,
-#                     ],
-#                 ]
-#             ]
-#         ),
-#     )
+    assert np.allclose(
+        result["baseband"],
+        np.array(
+            [
+                [
+                    [
+                        0.03199762 + 0.03529157j,
+                        0.03882344 + 0.02757869j,
+                        0.04382921 + 0.01858206j,
+                        0.04678241 + 0.00872352j,
+                    ],
+                    [
+                        0.03199762 + 0.03529157j,
+                        0.03882344 + 0.02757869j,
+                        0.04382921 + 0.01858206j,
+                        0.04678241 + 0.00872352j,
+                    ],
+                    [
+                        0.03199762 + 0.03529157j,
+                        0.03882344 + 0.02757869j,
+                        0.04382921 + 0.01858206j,
+                        0.04678241 + 0.00872352j,
+                    ],
+                ]
+            ]
+        ),
+    )
 
-#     assert np.allclose(
-#         result["timestamp"],
-#         np.array(
-#             [
-#                 [
-#                     [0.00000000e00, 1.66666667e-05, 3.33333333e-05, 5.00000000e-05],
-#                     [1.00000000e-04, 1.16666667e-04, 1.33333333e-04, 1.50000000e-04],
-#                     [2.00000000e-04, 2.16666667e-04, 2.33333333e-04, 2.50000000e-04],
-#                 ]
-#             ]
-#         ),
-#     )
+    assert np.allclose(
+        result["timestamp"],
+        np.array(
+            [
+                [
+                    [0.00000000e00, 1.66666667e-05, 3.33333333e-05, 5.00000000e-05],
+                    [1.00000000e-04, 1.16666667e-04, 1.33333333e-04, 1.50000000e-04],
+                    [2.00000000e-04, 2.16666667e-04, 2.33333333e-04, 2.50000000e-04],
+                ]
+            ]
+        ),
+    )
 
-#     targets = [
-#         {
-#             "location": np.array([10, 0, -10]),
-#             "rcs": 20,
-#         }
-#     ]
-#     result = simc(radar, targets, noise=False)
+    targets = [
+        {
+            "model": "./models/cr.stl",
+            "location": np.array([10, 0, -10]),
+            "rotation": [0, -45, 0],
+        }
+    ]
+    result = scene(radar, targets, density=1, noise=False)
 
-#     assert np.allclose(
-#         result["baseband"],
-#         np.array(
-#             [
-#                 [
-#                     [
-#                         -0.00100809 + 0.00096394j,
-#                         -0.00077751 + 0.00115798j,
-#                         -0.00051063 + 0.00129796j,
-#                         -0.00021991 + 0.00137734j,
-#                     ],
-#                     [
-#                         -0.00100809 + 0.00096394j,
-#                         -0.00077751 + 0.00115798j,
-#                         -0.00051063 + 0.00129796j,
-#                         -0.00021991 + 0.00137734j,
-#                     ],
-#                     [
-#                         -0.00100809 + 0.00096394j,
-#                         -0.00077751 + 0.00115798j,
-#                         -0.00051063 + 0.00129796j,
-#                         -0.00021991 + 0.00137734j,
-#                     ],
-#                 ]
-#             ]
-#         ),
-#     )
+    assert np.allclose(
+        result["baseband"],
+        np.array(
+            [
+                [
+                    [
+                        0.00296381 + 0.003689j,
+                        0.0036944 + 0.00296905j,
+                        0.00425376 + 0.00210706j,
+                        0.00461489 + 0.00114307j,
+                    ],
+                    [
+                        0.00296381 + 0.003689j,
+                        0.0036944 + 0.00296905j,
+                        0.00425376 + 0.00210706j,
+                        0.00461489 + 0.00114307j,
+                    ],
+                    [
+                        0.00296381 + 0.003689j,
+                        0.0036944 + 0.00296905j,
+                        0.00425376 + 0.00210706j,
+                        0.00461489 + 0.00114307j,
+                    ],
+                ]
+            ]
+        ),
+    )
 
-#     assert np.allclose(
-#         result["timestamp"],
-#         np.array(
-#             [
-#                 [
-#                     [0.00000000e00, 1.66666667e-05, 3.33333333e-05, 5.00000000e-05],
-#                     [1.00000000e-04, 1.16666667e-04, 1.33333333e-04, 1.50000000e-04],
-#                     [2.00000000e-04, 2.16666667e-04, 2.33333333e-04, 2.50000000e-04],
-#                 ]
-#             ]
-#         ),
-#     )
+    assert np.allclose(
+        result["timestamp"],
+        np.array(
+            [
+                [
+                    [0.00000000e00, 1.66666667e-05, 3.33333333e-05, 5.00000000e-05],
+                    [1.00000000e-04, 1.16666667e-04, 1.33333333e-04, 1.50000000e-04],
+                    [2.00000000e-04, 2.16666667e-04, 2.33333333e-04, 2.50000000e-04],
+                ]
+            ]
+        ),
+    )
 
 
-# def test_scene_rx_el_pattern():
-#     """
-#     Basic test case with a single target and simple radar setup.
-#     """
-#     el_angle = np.array([-46, 0, 46])
-#     el_pattern = np.array([-10, 10, 10])
-#     tx = Transmitter(
-#         f=[24.075e9, 24.175e9],
-#         t=80e-6,
-#         tx_power=10,
-#         prp=100e-6,
-#         pulses=3,
-#         channels=[
-#             {
-#                 "location": (0, 0, 0),
-#             }
-#         ],
-#     )
-#     rx = Receiver(
-#         fs=6e4,
-#         noise_figure=12,
-#         rf_gain=20,
-#         load_resistor=500,
-#         baseband_gain=30,
-#         channels=[
-#             {
-#                 "location": (0, 0, 0),
-#                 "elevation_angle": el_angle,
-#                 "elevation_pattern": el_pattern,
-#             }
-#         ],
-#     )
-#     radar = Radar(transmitter=tx, receiver=rx)
+def test_scene_rx_el_pattern():
+    """
+    Basic test case with a single target and simple radar setup.
+    """
+    el_angle = np.array([-46, 0, 46])
+    el_pattern = np.array([-10, 10, 10])
+    tx = Transmitter(
+        f=[24.075e9, 24.175e9],
+        t=80e-6,
+        tx_power=20,
+        prp=100e-6,
+        pulses=3,
+        channels=[
+            {
+                "location": (0, 0, 0),
+            }
+        ],
+    )
+    rx = Receiver(
+        fs=6e4,
+        noise_figure=12,
+        rf_gain=30,
+        load_resistor=1000,
+        baseband_gain=40,
+        channels=[
+            {
+                "location": (0, 0, 0),
+                "elevation_angle": el_angle,
+                "elevation_pattern": el_pattern,
+            }
+        ],
+    )
+    radar = Radar(transmitter=tx, receiver=rx)
 
-#     targets = [
-#         {
-#             "location": np.array([10, 0, 10]),
-#             "rcs": 20,
-#         }
-#     ]
-#     result = simc(radar, targets, noise=False)
+    targets = [
+        {
+            "model": "./models/cr.stl",
+            "location": np.array([10, 0, 10]),
+            "rotation": [0, 45, 0],
+        }
+    ]
+    result = scene(radar, targets, density=1, noise=False)
 
-#     assert np.allclose(
-#         result["baseband"],
-#         np.array(
-#             [
-#                 [
-#                     [
-#                         -0.01008092 + 0.00963944j,
-#                         -0.00777508 + 0.0115798j,
-#                         -0.00510628 + 0.01297958j,
-#                         -0.00219908 + 0.01377344j,
-#                     ],
-#                     [
-#                         -0.01008092 + 0.00963944j,
-#                         -0.00777508 + 0.0115798j,
-#                         -0.00510628 + 0.01297958j,
-#                         -0.00219908 + 0.01377344j,
-#                     ],
-#                     [
-#                         -0.01008092 + 0.00963944j,
-#                         -0.00777508 + 0.0115798j,
-#                         -0.00510628 + 0.01297958j,
-#                         -0.00219908 + 0.01377344j,
-#                     ],
-#                 ]
-#             ]
-#         ),
-#     )
+    assert np.allclose(
+        result["baseband"],
+        np.array(
+            [
+                [
+                    [
+                        0.03199762 + 0.03529157j,
+                        0.03882344 + 0.02757869j,
+                        0.04382921 + 0.01858206j,
+                        0.04678241 + 0.00872352j,
+                    ],
+                    [
+                        0.03199762 + 0.03529157j,
+                        0.03882344 + 0.02757869j,
+                        0.04382921 + 0.01858206j,
+                        0.04678241 + 0.00872352j,
+                    ],
+                    [
+                        0.03199762 + 0.03529157j,
+                        0.03882344 + 0.02757869j,
+                        0.04382921 + 0.01858206j,
+                        0.04678241 + 0.00872352j,
+                    ],
+                ]
+            ]
+        ),
+    )
 
-#     assert np.allclose(
-#         result["timestamp"],
-#         np.array(
-#             [
-#                 [
-#                     [0.00000000e00, 1.66666667e-05, 3.33333333e-05, 5.00000000e-05],
-#                     [1.00000000e-04, 1.16666667e-04, 1.33333333e-04, 1.50000000e-04],
-#                     [2.00000000e-04, 2.16666667e-04, 2.33333333e-04, 2.50000000e-04],
-#                 ]
-#             ]
-#         ),
-#     )
+    assert np.allclose(
+        result["timestamp"],
+        np.array(
+            [
+                [
+                    [0.00000000e00, 1.66666667e-05, 3.33333333e-05, 5.00000000e-05],
+                    [1.00000000e-04, 1.16666667e-04, 1.33333333e-04, 1.50000000e-04],
+                    [2.00000000e-04, 2.16666667e-04, 2.33333333e-04, 2.50000000e-04],
+                ]
+            ]
+        ),
+    )
 
-#     targets = [
-#         {
-#             "location": np.array([10, 0, -10]),
-#             "rcs": 20,
-#         }
-#     ]
-#     result = simc(radar, targets, noise=False)
+    targets = [
+        {
+            "model": "./models/cr.stl",
+            "location": np.array([10, 0, -10]),
+            "rotation": [0, -45, 0],
+        }
+    ]
+    result = scene(radar, targets, density=1, noise=False)
 
-#     assert np.allclose(
-#         result["baseband"],
-#         np.array(
-#             [
-#                 [
-#                     [
-#                         -0.00100809 + 0.00096394j,
-#                         -0.00077751 + 0.00115798j,
-#                         -0.00051063 + 0.00129796j,
-#                         -0.00021991 + 0.00137734j,
-#                     ],
-#                     [
-#                         -0.00100809 + 0.00096394j,
-#                         -0.00077751 + 0.00115798j,
-#                         -0.00051063 + 0.00129796j,
-#                         -0.00021991 + 0.00137734j,
-#                     ],
-#                     [
-#                         -0.00100809 + 0.00096394j,
-#                         -0.00077751 + 0.00115798j,
-#                         -0.00051063 + 0.00129796j,
-#                         -0.00021991 + 0.00137734j,
-#                     ],
-#                 ]
-#             ]
-#         ),
-#     )
+    assert np.allclose(
+        result["baseband"],
+        np.array(
+            [
+                [
+                    [
+                        0.00296381 + 0.003689j,
+                        0.0036944 + 0.00296905j,
+                        0.00425376 + 0.00210706j,
+                        0.00461489 + 0.00114307j,
+                    ],
+                    [
+                        0.00296381 + 0.003689j,
+                        0.0036944 + 0.00296905j,
+                        0.00425376 + 0.00210706j,
+                        0.00461489 + 0.00114307j,
+                    ],
+                    [
+                        0.00296381 + 0.003689j,
+                        0.0036944 + 0.00296905j,
+                        0.00425376 + 0.00210706j,
+                        0.00461489 + 0.00114307j,
+                    ],
+                ]
+            ]
+        ),
+    )
 
-#     assert np.allclose(
-#         result["timestamp"],
-#         np.array(
-#             [
-#                 [
-#                     [0.00000000e00, 1.66666667e-05, 3.33333333e-05, 5.00000000e-05],
-#                     [1.00000000e-04, 1.16666667e-04, 1.33333333e-04, 1.50000000e-04],
-#                     [2.00000000e-04, 2.16666667e-04, 2.33333333e-04, 2.50000000e-04],
-#                 ]
-#             ]
-#         ),
-#     )
+    assert np.allclose(
+        result["timestamp"],
+        np.array(
+            [
+                [
+                    [0.00000000e00, 1.66666667e-05, 3.33333333e-05, 5.00000000e-05],
+                    [1.00000000e-04, 1.16666667e-04, 1.33333333e-04, 1.50000000e-04],
+                    [2.00000000e-04, 2.16666667e-04, 2.33333333e-04, 2.50000000e-04],
+                ]
+            ]
+        ),
+    )
 
 
 # def test_scene_freq_offset():
