@@ -30,11 +30,10 @@ cmake --build .
 
 echo "## Building radarsimpy with Cython ##"
 cd $workpath
-conda run -n py38 python setup.py build_ext -b ./ --tier free --arch gpu
-conda run -n py39 python setup.py build_ext -b ./ --tier free --arch gpu
-conda run -n py310 python setup.py build_ext -b ./ --tier free --arch gpu
-conda run -n py311 python setup.py build_ext -b ./ --tier free --arch gpu
 conda run -n py312 python setup.py build_ext -b ./ --tier free --arch gpu
+conda run -n py311 python setup.py build_ext -b ./ --tier free --arch gpu
+conda run -n py310 python setup.py build_ext -b ./ --tier free --arch gpu
+conda run -n py39 python setup.py build_ext -b ./ --tier free --arch gpu
 
 echo "## Copying lib files to ./radarsimpy ##"
 
@@ -65,11 +64,10 @@ cp -rf ./radarsimpy/* ./Linux_x86_64_GPU_FreeTier/radarsimpy
 
 rm -rf ./radarsimpy
 
-conda run -n py38 python setup.py build_ext -b ./ --tier standard --arch gpu
-conda run -n py39 python setup.py build_ext -b ./ --tier standard --arch gpu
-conda run -n py310 python setup.py build_ext -b ./ --tier standard --arch gpu
-conda run -n py311 python setup.py build_ext -b ./ --tier standard --arch gpu
 conda run -n py312 python setup.py build_ext -b ./ --tier standard --arch gpu
+conda run -n py311 python setup.py build_ext -b ./ --tier standard --arch gpu
+conda run -n py310 python setup.py build_ext -b ./ --tier standard --arch gpu
+conda run -n py39 python setup.py build_ext -b ./ --tier standard --arch gpu
 
 echo "## Copying lib files to ./radarsimpy ##"
 # mkdir ./radarsimpy
