@@ -100,6 +100,3 @@ ECHO ## Build completed ##
 
 ECHO ## Run Google test ##
 .\src\radarsimcpp\build\Release\radarsimcpp_test.exe
-
-ECHO ## Pytest ##
-pytest

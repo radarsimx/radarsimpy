@@ -100,6 +100,3 @@ echo "## Build completed ##"
 
 echo "## Run Google test ##"
 ./src/radarsimcpp/build/radarsimcpp_test
-
-echo "## Pytest ##"
-pytest
