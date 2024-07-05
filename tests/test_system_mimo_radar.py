@@ -25,7 +25,6 @@ from scipy import signal
 
 from radarsimpy import Radar, Transmitter, Receiver
 from radarsimpy.simulator import simc  # pylint: disable=no-name-in-module
-from radarsimpy.rt import scene  # pylint: disable=no-name-in-module
 import radarsimpy.processing as proc
 
 
