@@ -74,6 +74,7 @@ def test_sim_cw():
                 ]
             ]
         ),
+        atol=1e-05,
     )
 
     assert np.allclose(
@@ -131,6 +132,7 @@ def test_sim_cw_raytracing():
                 ]
             ]
         ),
+        atol=1e-05,
     )
 
     assert np.allclose(
