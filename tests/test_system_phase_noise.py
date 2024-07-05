@@ -49,7 +49,7 @@ def test_phase_noise():
     npt.assert_almost_equal(spec[64], -73.09, decimal=2)
 
 
-def test_fmcw_phase_noise_cpp():
+def test_fmcw_phase_noise():
     """
     This function tests the phase noise simulation
     """
