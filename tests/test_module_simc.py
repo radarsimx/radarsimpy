@@ -2016,41 +2016,6 @@ def test_simc_interference():
     )
 
 
-# def test_sim_cw():
-#     """
-#     Test the CW radar simulator.
-#     """
-#     radar = cw_radar()
-
-#     target = {
-#         "location": (
-#             1.5 + 1e-3 * np.sin(2 * np.pi * 1 * radar.time_prop["timestamp"]),
-#             0,
-#             0,
-#         ),
-#         "rcs": 0,
-#         "phase": 0,
-#     }
-#     targets = [target]
-
-#     data = simc(radar, targets, noise=False)
-#     timestamp = data["timestamp"]
-#     baseband = data["baseband"]
-#     demod = np.angle(baseband[0, 0, :])
-
-#     nfft = 2048
-#     spectrum = np.abs(np.fft.fft(demod - np.mean(demod), nfft))
-#     fft_length = np.shape(spectrum)[0]
-#     f = np.linspace(0, radar.radar_prop["receiver"].bb_prop["fs"], nfft)
-
-#     npt.assert_almost_equal(f[np.argmax(spectrum[0 : int(nfft / 2)])], 1, decimal=2)
-#     npt.assert_almost_equal(
-#         timestamp[0, 0, :],
-#         np.arange(0, radar.sample_prop["samples_per_pulse"])
-#         / radar.radar_prop["receiver"].bb_prop["fs"],
-#     )
-
-
 # def test_sim_fmcw():
 #     """
 #     Test the FMCW radar simulator.
