@@ -23,8 +23,150 @@ import numpy.testing as npt
 from scipy import signal
 
 from radarsimpy import Radar, Transmitter, Receiver
+from radarsimpy.simulator import simc  # pylint: disable=no-name-in-module
 from radarsimpy.rt import scene  # pylint: disable=no-name-in-module
 import radarsimpy.processing as proc
+
+# def test_sim_fmcw():
+#     """
+#     Test the FMCW radar simulator.
+#     """
+#     radar = fmcw_radar()
+#     target_1 = {"location": (200, 0, 0), "speed": (-5, 0, 0), "rcs": 20, "phase": 0}
+#     target_2 = {"location": (95, 20, 0), "speed": (-50, 0, 0), "rcs": 15, "phase": 0}
+#     target_3 = {"location": (30, -5, 0), "speed": (-22, 0, 0), "rcs": 5, "phase": 0}
+
+#     rng_targets = np.sort(
+#         np.array(
+#             [
+#                 np.sqrt(target_1["location"][0] ** 2 + target_1["location"][1] ** 2),
+#                 np.sqrt(target_2["location"][0] ** 2 + target_2["location"][1] ** 2),
+#                 np.sqrt(target_3["location"][0] ** 2 + target_3["location"][1] ** 2),
+#             ]
+#         )
+#     )
+#     dop_targets = np.sort(
+#         np.array(
+#             [
+#                 target_1["speed"][0]
+#                 * np.cos(np.arctan(target_1["location"][1] / target_1["location"][0])),
+#                 target_2["speed"][0]
+#                 * np.cos(np.arctan(target_2["location"][1] / target_2["location"][0])),
+#                 target_3["speed"][0]
+#                 * np.cos(np.arctan(target_3["location"][1] / target_3["location"][0])),
+#             ]
+#         )
+#     )
+
+#     targets = [target_1, target_2, target_3]
+
+#     data = simc(radar, targets, noise=False)
+#     timestamp = data["timestamp"]
+#     baseband = data["baseband"]
+
+#     assert np.array_equal(
+#         (
+#             radar.array_prop["size"] * radar.time_prop["frame_size"],
+#             radar.radar_prop["transmitter"].waveform_prop["pulses"],
+#             radar.sample_prop["samples_per_pulse"],
+#         ),
+#         np.shape(timestamp),
+#     )
+#     assert np.array_equal(
+#         (
+#             radar.array_prop["size"] * radar.time_prop["frame_size"],
+#             radar.radar_prop["transmitter"].waveform_prop["pulses"],
+#             radar.sample_prop["samples_per_pulse"],
+#         ),
+#         np.shape(baseband),
+#     )
+
+#     npt.assert_almost_equal(
+#         timestamp[0, 0, :],
+#         (
+#             np.arange(0, radar.sample_prop["samples_per_pulse"])
+#             / radar.radar_prop["receiver"].bb_prop["fs"]
+#         ),
+#     )
+#     npt.assert_almost_equal(
+#         timestamp[0, :, 0],
+#         (
+#             np.arange(0, radar.radar_prop["transmitter"].waveform_prop["pulses"])
+#             * radar.radar_prop["transmitter"].waveform_prop["prp"][0]
+#         ),
+#     )
+
+#     range_window = signal.windows.chebwin(radar.sample_prop["samples_per_pulse"], at=60)
+#     range_profile = proc.range_fft(baseband, range_window)
+#     doppler_window = signal.windows.chebwin(
+#         radar.radar_prop["transmitter"].waveform_prop["pulses"], at=60
+#     )
+#     range_doppler = proc.doppler_fft(range_profile, doppler_window)
+#     rng_dop = 20 * np.log10(np.abs(range_doppler))
+#     rng_dop = rng_dop - np.max(rng_dop[0, :, :])
+
+#     max_rng = np.max(rng_dop[0, :, :], axis=0)
+#     max_dop = np.max(rng_dop[0, :, :], axis=1)
+
+#     rng_peaks = signal.find_peaks(max_rng, height=-20)[0]
+#     dop_peaks = signal.find_peaks(max_dop, height=-20)[0]
+
+#     max_range = (
+#         const.c
+#         * radar.radar_prop["receiver"].bb_prop["fs"]
+#         * radar.radar_prop["transmitter"].waveform_prop["pulse_length"]
+#         / radar.radar_prop["transmitter"].waveform_prop["bandwidth"]
+#         / 2
+#     )
+
+#     unambiguous_speed = (
+#         const.c / radar.radar_prop["transmitter"].waveform_prop["prp"][0] / 24.125e9 / 2
+#     )
+
+#     range_axis = np.linspace(
+#         0, max_range, radar.sample_prop["samples_per_pulse"], endpoint=False
+#     )
+
+#     rng_dets = np.sort(range_axis[rng_peaks])
+#     npt.assert_almost_equal(rng_targets, rng_dets, decimal=0)
+
+#     doppler_axis = np.linspace(
+#         -unambiguous_speed,
+#         0,
+#         radar.radar_prop["transmitter"].waveform_prop["pulses"],
+#         endpoint=False,
+#     )
+
+#     dop_dets = np.sort(doppler_axis[dop_peaks])
+#     npt.assert_almost_equal(dop_targets, dop_dets, decimal=0)
+
+#     # frame 2
+#     rng_dop = rng_dop - np.max(rng_dop[1, :, :])
+
+#     max_rng = np.max(rng_dop[1, :, :], axis=0)
+#     max_dop = np.max(rng_dop[1, :, :], axis=1)
+
+#     rng_peaks = signal.find_peaks(max_rng, height=-40)[0]
+#     dop_peaks = signal.find_peaks(max_dop, height=-40)[0]
+
+#     range_axis = np.linspace(
+#         0, max_range, radar.sample_prop["samples_per_pulse"], endpoint=False
+#     )
+
+#     rng_dets = np.sort(range_axis[rng_peaks])
+#     npt.assert_almost_equal(np.array([9.0, 48.0, 195.0]), rng_dets, decimal=0)
+
+#     doppler_axis = np.linspace(
+#         -unambiguous_speed,
+#         0,
+#         radar.radar_prop["transmitter"].waveform_prop["pulses"],
+#         endpoint=False,
+#     )
+
+#     dop_dets = np.sort(doppler_axis[dop_peaks])
+#     npt.assert_almost_equal(
+#         np.array([-45.66062176, -18.45854922, -5.1003886]), dop_dets, decimal=0
+#     )
 
 
 def test_fmcw_raytracing():
