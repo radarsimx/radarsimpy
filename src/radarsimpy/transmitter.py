@@ -70,8 +70,12 @@ class Transmitter:
         - **location** (*numpy.1darray*) --
             3D location of the channel relative to radar's location [x, y, z] (m)
         - **polarization** (*numpy.1darray*) --
-            Antenna polarization [x, y, z].
-            ``default = [0, 0, 1] (vertical polarization)``
+            Antenna polarization [x, y, z]. ``default = [0, 0, 1] (vertical polarization)``
+            Example:
+                Vertical polarization [0, 0, 1]
+                Horizontal polarization [0, 1, 0]
+                Right-handed circular polarization [0, 1, 1j] (from the point of view of the source)
+                Left-handed circular polarization [0, 1, -1j] (from the point of view of the source)
         - **delay** (*float*) --
             Transmit delay (s). ``default 0``
         - **azimuth_angle** (*numpy.1darray*) --
