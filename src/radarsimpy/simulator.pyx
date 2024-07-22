@@ -183,7 +183,8 @@ cpdef simc(radar, targets, noise=True):
         <float_t> radar.radar_prop["receiver"].bb_prop["fs"],
         <float_t> radar.radar_prop["receiver"].rf_prop["rf_gain"],
         <float_t> radar.radar_prop["receiver"].bb_prop["load_resistor"],
-        <float_t> radar.radar_prop["receiver"].bb_prop["baseband_gain"]
+        <float_t> radar.radar_prop["receiver"].bb_prop["baseband_gain"],
+        <float_t> radar.radar_prop["receiver"].bb_prop["noise_bandwidth"]
     )
 
     for idx_c in range(0, radar.radar_prop["receiver"].rxchannel_prop["size"]):
@@ -280,7 +281,8 @@ cpdef simc(radar, targets, noise=True):
             <float_t> interf_radar_prop["receiver"].bb_prop["fs"],
             <float_t> interf_radar_prop["receiver"].rf_prop["rf_gain"],
             <float_t> interf_radar_prop["receiver"].bb_prop["load_resistor"],
-            <float_t> interf_radar_prop["receiver"].bb_prop["baseband_gain"]
+            <float_t> interf_radar_prop["receiver"].bb_prop["baseband_gain"],
+            <float_t> interf_radar_prop["receiver"].bb_prop["noise_bandwidth"]
         )
 
         for idx_c in range(0, interf_radar_prop["receiver"].rxchannel_prop["size"]):

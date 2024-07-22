@@ -218,7 +218,8 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, log_path=None, de
         <float_t> radar.radar_prop["receiver"].bb_prop["fs"],
         <float_t> radar.radar_prop["receiver"].rf_prop["rf_gain"],
         <float_t> radar.radar_prop["receiver"].bb_prop["load_resistor"],
-        <float_t> radar.radar_prop["receiver"].bb_prop["baseband_gain"]
+        <float_t> radar.radar_prop["receiver"].bb_prop["baseband_gain"],
+        <float_t> radar.radar_prop["receiver"].bb_prop["noise_bandwidth"]
     )
     for idx_c in range(0, rxsize_c):
         rx_c.AddChannel(
@@ -373,7 +374,8 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, log_path=None, de
             <float_t> radar.radar_prop["interf"].radar_prop["receiver"].bb_prop["fs"],
             <float_t> radar.radar_prop["interf"].radar_prop["receiver"].rf_prop["rf_gain"],
             <float_t> radar.radar_prop["interf"].radar_prop["receiver"].bb_prop["load_resistor"],
-            <float_t> radar.radar_prop["interf"].radar_prop["receiver"].bb_prop["baseband_gain"]
+            <float_t> radar.radar_prop["interf"].radar_prop["receiver"].bb_prop["baseband_gain"],
+            <float_t> radar.radar_prop["interf"].radar_prop["receiver"].bb_prop["noise_bandwidth"]
         )
 
         for idx_c in range(0, radar.radar_prop["interf"].radar_prop["receiver"].rxchannel_prop["size"]):
