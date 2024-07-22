@@ -45,9 +45,9 @@ np_float = np.float32
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef scene(radar, targets, density=1, level=None, noise=True, log_path=None, debug=False):
+cpdef scene(radar, targets, density=1, level=None, noise=True, log_path=None, debug=False, interf=None):
     """
-    scene(radar, targets, density=1, level=None, noise=True, log_path=None, debug=False)
+    scene(radar, targets, density=1, level=None, noise=True, log_path=None, debug=False, interf=None)
 
     This function generates radar's baseband response of a scene using the given radar and targets.
 
@@ -101,6 +101,8 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, log_path=None, de
     :type log_path: str
     :param debug: Whether to enable debug mode (default=False).
     :type debug: bool
+    :param interf: Interference radar (default=None).
+    :type interf: Radar
 
     :return: A dictionary containing the baseband data, timestamp, and interference (if available).
         {
