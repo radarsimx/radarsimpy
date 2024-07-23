@@ -22,23 +22,31 @@ A Python module for radar simulation
 
 import numpy as np
 
-from radarsimpy.includes.zpvector cimport Vec3
-from radarsimpy.includes.type_def cimport vector
-from radarsimpy.includes.type_def cimport float_t, int_t
-from radarsimpy.includes.radarsimc cimport Simulator
-from radarsimpy.lib.cp_radarsimc cimport cp_RxChannel
-from radarsimpy.includes.radarsimc cimport Receiver
-from radarsimpy.includes.radarsimc cimport Radar
-from radarsimpy.lib.cp_radarsimc cimport cp_TxChannel, cp_Transmitter, cp_Target
-from radarsimpy.includes.radarsimc cimport Transmitter
-from radarsimpy.includes.radarsimc cimport Snapshot, Scene
-from radarsimpy.includes.radarsimc cimport Mem_Copy_Vec3
-from radarsimpy.includes.radarsimc cimport IsFreeTier
-from radarsimpy.lib.cp_radarsimc cimport cp_Point
-from radarsimpy.includes.radarsimc cimport Point
-
 from libc.stdlib cimport malloc, free
 from libcpp.string cimport string
+
+from radarsimpy.includes.zpvector cimport Vec3
+
+from radarsimpy.includes.type_def cimport vector
+from radarsimpy.includes.type_def cimport float_t
+from radarsimpy.includes.type_def cimport int_t
+
+from radarsimpy.includes.radarsimc cimport Transmitter
+from radarsimpy.includes.radarsimc cimport Receiver
+from radarsimpy.includes.radarsimc cimport Radar
+from radarsimpy.includes.radarsimc cimport Snapshot
+from radarsimpy.includes.radarsimc cimport Point
+from radarsimpy.includes.radarsimc cimport Scene
+from radarsimpy.includes.radarsimc cimport Simulator
+
+from radarsimpy.includes.radarsimc cimport Mem_Copy_Vec3
+from radarsimpy.includes.radarsimc cimport IsFreeTier
+
+from radarsimpy.lib.cp_radarsimc cimport cp_TxChannel
+from radarsimpy.lib.cp_radarsimc cimport cp_RxChannel
+from radarsimpy.lib.cp_radarsimc cimport cp_Transmitter
+from radarsimpy.lib.cp_radarsimc cimport cp_Target
+from radarsimpy.lib.cp_radarsimc cimport cp_Point
 
 cimport cython
 cimport numpy as np
@@ -138,20 +146,26 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
         }
     :rtype: dict
     """
-    cdef vector[Point[float_t]] point_vt
-
+    
+    # radar
     cdef Transmitter[float_t] tx_c
     cdef Receiver[float_t] rx_c
     cdef Radar[float_t] radar_c
-    cdef Scene[double, float_t] scene_c
 
-    cdef Simulator[float_t] sim_c
-
+    # interference radar
     cdef Transmitter[float_t] interf_tx_c
     cdef Receiver[float_t] interf_rx_c
     cdef Radar[float_t] interf_radar_c
 
+    # point targets
+    cdef vector[Point[float_t]] point_vt
+
+    # simulator
+    cdef Scene[double, float_t] scene_c
+    cdef Simulator[float_t] sim_c
+
     cdef vector[Snapshot[float_t]] snaps
+
     cdef int_t level_id = 0
     cdef int_t fm_idx, tx_idx, ps_idx, sp_idx
     
