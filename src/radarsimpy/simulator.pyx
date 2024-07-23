@@ -319,8 +319,8 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
             )
         )
 
-    if radar.radar_prop["interf"] is not None:
-        interf_radar_c = cp_Radar(radar.radar_prop["interf"])
+    if interf is not None:
+        interf_radar_c = cp_Radar(interf)
 
         sim_c.Interference(radar_c, interf_radar_c, bb_real, bb_imag)
 
@@ -346,7 +346,7 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef simc(radar, targets):
+cpdef simc(radar, targets, interf=None):
     """
     simc(radar, targets)
 
@@ -407,4 +407,4 @@ cpdef simc(radar, targets):
     :rtype: dict
     """
 
-    return sim_radar(radar, targets)
+    return sim_radar(radar, targets, interf=interf)

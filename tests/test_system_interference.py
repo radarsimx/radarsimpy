@@ -76,13 +76,13 @@ def test_scene_interference():
         channels=[{"location": (0, 0, 0)}],
     )
 
-    radar = Radar(transmitter=tx, receiver=rx, interf=int_radar)
+    radar = Radar(transmitter=tx, receiver=rx)
 
     target_1 = {"model": "./models/cr.stl", "location": (20, 0, 0), "speed": (-5, 0, 0)}
 
     targets = [target_1]
 
-    data = scene(radar, targets, density=0.2, debug=False)
+    data = scene(radar, targets, density=0.2, debug=False, interf=int_radar)
 
     inc_bb = data["interference"]
 
@@ -1446,13 +1446,13 @@ def test_simc_interference():
         channels=channels,
     )
 
-    radar = Radar(transmitter=tx, receiver=rx, interf=radar_int)
+    radar = Radar(transmitter=tx, receiver=rx)
 
     target_1 = {"location": (40, 40, 0), "speed": (0, 0, 0), "rcs": 10, "phase": 0}
 
     targets = [target_1]
 
-    data = simc(radar, targets)
+    data = simc(radar, targets, interf=radar_int)
 
     inc_bb = data["interference"]
 

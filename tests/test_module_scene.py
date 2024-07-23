@@ -1876,7 +1876,7 @@ def test_scene_interference():
         rotation=(180, 0, 0),
     )
 
-    radar = Radar(transmitter=tx, receiver=rx, interf=interference_radar)
+    radar = Radar(transmitter=tx, receiver=rx)
 
     targets = [
         {
@@ -1884,7 +1884,7 @@ def test_scene_interference():
             "location": np.array([10, 0, 0]),
         }
     ]
-    result = scene(radar, targets, density=0.4)
+    result = scene(radar, targets, density=0.4, interf=interference_radar)
 
     assert np.allclose(
         result["interference"],

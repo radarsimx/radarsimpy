@@ -1945,7 +1945,7 @@ def test_simc_interference():
         rotation=(180, 0, 0),
     )
 
-    radar = Radar(transmitter=tx, receiver=rx, interf=interference_radar)
+    radar = Radar(transmitter=tx, receiver=rx)
 
     targets = [
         {
@@ -1953,7 +1953,7 @@ def test_simc_interference():
             "rcs": 20,
         }
     ]
-    result = simc(radar, targets)
+    result = simc(radar, targets, interf=interference_radar)
 
     assert np.allclose(
         result["interference"],

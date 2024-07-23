@@ -276,8 +276,6 @@ class Radar:
     :param time:
         Radar firing time instances / frames
         :type time: float or list
-    :param Radar interf:
-        Interference radar. ``default None``
     :param int seed:
         Seed for noise generator
 
@@ -331,8 +329,6 @@ class Radar:
 
         - **receiver**: Radar receiver
 
-        - **interf**: Interference radar
-
         - **location**: Radar location (m)
 
         - **speed**: Radar speed (m/s)
@@ -352,7 +348,6 @@ class Radar:
         rotation=(0, 0, 0),
         rotation_rate=(0, 0, 0),
         time=0,
-        interf=None,
         seed=None,
         **kwargs
     ):
@@ -382,7 +377,6 @@ class Radar:
         self.radar_prop = {
             "transmitter": transmitter,
             "receiver": receiver,
-            "interf": interf,
         }
 
         # timing properties

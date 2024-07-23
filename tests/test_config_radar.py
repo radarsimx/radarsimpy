@@ -45,7 +45,6 @@ class TestRadar:
         np.testing.assert_allclose(radar.array_prop["virtual_array"], [[0, 0, 0]])
         assert radar.radar_prop["transmitter"].waveform_prop["f"][0] == 10e9
         assert radar.radar_prop["receiver"].bb_prop["fs"] == 10e6
-        assert radar.radar_prop["interf"] is None
         assert np.allclose(radar.radar_prop["location"], [0, 0, 0])
         assert np.allclose(radar.radar_prop["speed"], [0, 0, 0])
         assert np.allclose(radar.radar_prop["rotation"], [0, 0, 0])
@@ -150,19 +149,6 @@ class TestRadar:
         rx = Receiver(fs=10e6)
         radar = Radar(transmitter=tx, receiver=rx, time=[0, 1e-3], validation=True)
         assert radar.sample_prop["phase_noise"].shape == (2, 10, 10)
-
-    def test_init_with_interference(self):
-        """Test initialization with interference radar."""
-        tx = Transmitter(f=10e9, t=1e-6, tx_power=10, pulses=10, prp=2e-6)
-        rx = Receiver(fs=10e6)
-        interf_tx = Transmitter(f=11e9, t=1e-6, tx_power=5, pulses=10, prp=2e-6)
-        interf_rx = Receiver(fs=10e6)
-        interf_radar = Radar(transmitter=interf_tx, receiver=interf_rx, time=[0, 1e-3])
-        radar = Radar(transmitter=tx, receiver=rx, time=[0, 1e-3], interf=interf_radar)
-        assert (
-            radar.radar_prop["interf"].radar_prop["transmitter"].waveform_prop["f"][0]
-            == 11e9
-        )
 
     def test_init_with_multiple_channels(self):
         """Test initialization with multiple channels."""
