@@ -45,9 +45,9 @@ np_float = np.float32
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef scene(radar, targets, density=1, level=None, noise=True, log_path=None, debug=False, interf=None):
+cpdef scene(radar, targets, density=1, level=None, log_path=None, debug=False, interf=None):
     """
-    scene(radar, targets, density=1, level=None, noise=True, log_path=None, debug=False, interf=None)
+    scene(radar, targets, density=1, level=None, log_path=None, debug=False, interf=None)
 
     This function generates radar's baseband response of a scene using the given radar and targets.
 
@@ -95,8 +95,6 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, log_path=None, de
         - ``sample``: Perform ray tracing for each sample
     :type level: str or None
 
-    :param noise: Whether to add noise to the baseband data (default=True).
-    :type noise: bool
     :param log_path: Provide the path to save ray data (default=None, no data will be saved).
     :type log_path: str
     :param debug: Whether to enable debug mode (default=False).
@@ -340,21 +338,45 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, log_path=None, de
                 bb_idx = ch_idx * chstride_c + p_idx * psstride_c + s_idx
                 baseband[ch_idx, p_idx, s_idx] = bb_real[bb_idx] +  1j*bb_imag[bb_idx]
 
-    if noise:
-        baseband = baseband +\
-            radar.sample_prop["noise"]*(
+    # if noise:
+    #     baseband = baseband +\
+    #         radar.sample_prop["noise"]*(
+    #             np.random.randn(
+    #                 frames_c*channles_c,
+    #                 pulses_c,
+    #                 samples_c,
+    #             ) + \
+    #             1j * np.random.randn(
+    #                 frames_c*channles_c,
+    #                 pulses_c,
+    #                 samples_c,
+    #             )
+    #         )
+    if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
+        noise = radar.sample_prop["noise"] * np.random.randn(
+            frames_c * channles_c,
+            pulses_c,
+            samples_c,
+        )
+    elif radar.radar_prop["receiver"].bb_prop["bb_type"] == "complex":
+        noise = (
+            radar.sample_prop["noise"]
+            / np.sqrt(2)
+            * (
                 np.random.randn(
-                    frames_c*channles_c,
+                    frames_c * channles_c,
                     pulses_c,
                     samples_c,
-                ) + \
-                1j * np.random.randn(
-                    frames_c*channles_c,
+                )
+                + 1j
+                * np.random.randn(
+                    frames_c * channles_c,
                     pulses_c,
                     samples_c,
                 )
             )
-    
+        )
+
     if radar.radar_prop["interf"] is not None:
         """
         Transmitter
@@ -436,5 +458,6 @@ cpdef scene(radar, targets, density=1, level=None, noise=True, log_path=None, de
     free(bb_imag)
 
     return {"baseband": baseband,
+            "noise": noise,
             "timestamp": radar.time_prop["timestamp"],
             "interference": interference}

@@ -512,8 +512,8 @@ class Radar:
         noise_amplitude_mixer = np.sqrt(
             receiver_noise_watts * self.radar_prop["receiver"].bb_prop["load_resistor"]
         )
-        noise_amplitude_peak = np.sqrt(2) * noise_amplitude_mixer
-        return noise_amplitude_peak
+        # noise_amplitude_peak = np.sqrt(2) * noise_amplitude_mixer
+        return noise_amplitude_mixer
 
     def validate_radar_motion(self, location, speed, rotation, rotation_rate):
         """

@@ -48,9 +48,9 @@ np_float = np.float32
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef simc(radar, targets, noise=True):
+cpdef simc(radar, targets):
     """
-    simc(radar, targets, noise=True)
+    simc(radar, targets)
 
     Radar simulator with C++ engine
 
@@ -76,8 +76,6 @@ cpdef simc(radar, targets, noise=True):
         *Note*: Target's parameters can be specified with
         ``Radar.timestamp`` to customize the time varying property.
         Example: ``location=(1e-3*np.sin(2*np.pi*1*radar.timestamp), 0, 0)``
-    :param bool noise:
-        Flag to enable noise calculation. ``default True``
 
     :return:
         {
@@ -246,20 +244,45 @@ cpdef simc(radar, targets, noise=True):
                 bb_idx = ch_idx * chstride_c + p_idx * psstride_c + s_idx
                 baseband[ch_idx, p_idx, s_idx] = bb_real[bb_idx] +  1j*bb_imag[bb_idx]
 
-    if noise:
-        baseband = baseband +\
-            radar.sample_prop["noise"]*(
+    # if noise:
+    #     baseband = baseband +\
+    #         radar.sample_prop["noise"]*(
+    #             np.random.randn(
+    #                 frames_c*channles_c,
+    #                 pulses_c,
+    #                 samples_c,
+    #             ) + \
+    #             1j * np.random.randn(
+    #                 frames_c*channles_c,
+    #                 pulses_c,
+    #                 samples_c,
+    #             )
+    #         )
+
+    if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
+        noise = radar.sample_prop["noise"] * np.random.randn(
+            frames_c * channles_c,
+            pulses_c,
+            samples_c,
+        )
+    elif radar.radar_prop["receiver"].bb_prop["bb_type"] == "complex":
+        noise = (
+            radar.sample_prop["noise"]
+            / np.sqrt(2)
+            * (
                 np.random.randn(
-                    frames_c*channles_c,
+                    frames_c * channles_c,
                     pulses_c,
                     samples_c,
-                ) + \
-                1j * np.random.randn(
-                    frames_c*channles_c,
+                )
+                + 1j
+                * np.random.randn(
+                    frames_c * channles_c,
                     pulses_c,
                     samples_c,
                 )
             )
+        )
     
     if radar.radar_prop["interf"] is not None:
         interf_radar_prop = radar.radar_prop["interf"].radar_prop
@@ -345,5 +368,6 @@ cpdef simc(radar, targets, noise=True):
     free(bb_imag)
 
     return {"baseband": baseband,
+            "noise": noise,
             "timestamp": radar.time_prop["timestamp"],
             "interference": interference}
