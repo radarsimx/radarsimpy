@@ -62,7 +62,7 @@ def test_scene_single_target():
             "rotation_rate": (0, 0, 0),
         }
     ]
-    result = scene(radar, targets, density=0.4, noise=False)
+    result = scene(radar, targets, density=0.4)
 
     assert np.allclose(
         result["baseband"],
@@ -144,7 +144,7 @@ def test_scene_varing_prp():
             "rotation_rate": (0, 0, 0),
         }
     ]
-    result = scene(radar, targets, density=0.4, noise=False)
+    result = scene(radar, targets, density=0.4)
 
     assert np.allclose(
         result["baseband"],
@@ -227,7 +227,7 @@ def test_scene_tx_delay():
             "rotation_rate": (0, 0, 0),
         }
     ]
-    result = scene(radar, targets, density=0.4, noise=False)
+    result = scene(radar, targets, density=0.4)
 
     assert np.allclose(
         result["baseband"],
@@ -307,7 +307,7 @@ def test_scene_tx_offset():
             "location": np.array([10, 0, 0]),
         }
     ]
-    result = scene(radar, targets, density=0.4, noise=False)
+    result = scene(radar, targets, density=0.4)
 
     assert np.allclose(
         result["baseband"],
@@ -387,7 +387,7 @@ def test_scene_rx_offset():
             "location": np.array([10, 0, 0]),
         }
     ]
-    result = scene(radar, targets, density=0.4, noise=False)
+    result = scene(radar, targets, density=0.4)
 
     assert np.allclose(
         result["baseband"],
@@ -471,7 +471,7 @@ def test_scene_multiple_targets():
             "location": np.array([10, -10, 0]),
         },
     ]
-    result = scene(radar, targets, density=0.4, noise=False)
+    result = scene(radar, targets, density=0.4)
 
     assert np.allclose(
         result["baseband"],
@@ -552,7 +552,7 @@ def test_scene_single_target_speed():
             "speed": np.array([-10, 0, 0]),
         }
     ]
-    result = scene(radar, targets, density=0.4, noise=False)
+    result = scene(radar, targets, density=0.4)
 
     assert np.allclose(
         result["baseband"],
@@ -632,7 +632,7 @@ def test_scene_radar_location():
             "location": np.array([10, 0, 0]),
         }
     ]
-    result = scene(radar, targets, density=0.4, noise=False)
+    result = scene(radar, targets, density=0.4)
 
     assert np.allclose(
         result["baseband"],
@@ -712,7 +712,7 @@ def test_scene_radar_moving():
             "location": np.array([10, 0, 0]),
         }
     ]
-    result = scene(radar, targets, density=0.4, noise=False)
+    result = scene(radar, targets, density=0.4)
 
     assert np.allclose(
         result["baseband"],
@@ -793,7 +793,7 @@ def test_scene_2_frames_moving_target():
             "speed": np.array([-5, 0, 0]),
         }
     ]
-    result = scene(radar, targets, density=0.4, noise=False)
+    result = scene(radar, targets, density=0.4)
 
     assert np.allclose(
         result["baseband"],
@@ -899,7 +899,7 @@ def test_scene_2_frames_moving_radar():
             "speed": np.array([0, 0, 0]),
         }
     ]
-    result = scene(radar, targets, density=0.4, noise=False)
+    result = scene(radar, targets, density=0.4)
 
     assert np.allclose(
         result["baseband"],
@@ -1009,7 +1009,7 @@ def test_scene_tx_az_pattern():
             "rotation": [45, 0, 0],
         }
     ]
-    result = scene(radar, targets, density=1, noise=False)
+    result = scene(radar, targets, density=1)
 
     assert np.allclose(
         result["baseband"],
@@ -1059,7 +1059,7 @@ def test_scene_tx_az_pattern():
             "rotation": [-45, 0, 0],
         }
     ]
-    result = scene(radar, targets, density=1, noise=False)
+    result = scene(radar, targets, density=1)
 
     assert np.allclose(
         result["baseband"],
@@ -1144,7 +1144,7 @@ def test_scene_rx_az_pattern():
             "rotation": [45, 0, 0],
         }
     ]
-    result = scene(radar, targets, density=1, noise=False)
+    result = scene(radar, targets, density=1)
 
     assert np.allclose(
         result["baseband"],
@@ -1194,7 +1194,7 @@ def test_scene_rx_az_pattern():
             "rotation": [-45, 0, 0],
         }
     ]
-    result = scene(radar, targets, density=1, noise=False)
+    result = scene(radar, targets, density=1)
 
     assert np.allclose(
         result["baseband"],
@@ -1279,7 +1279,7 @@ def test_scene_tx_el_pattern():
             "rotation": [0, 45, 0],
         }
     ]
-    result = scene(radar, targets, density=1, noise=False)
+    result = scene(radar, targets, density=1)
 
     assert np.allclose(
         result["baseband"],
@@ -1329,7 +1329,7 @@ def test_scene_tx_el_pattern():
             "rotation": [0, -45, 0],
         }
     ]
-    result = scene(radar, targets, density=1, noise=False)
+    result = scene(radar, targets, density=1)
 
     assert np.allclose(
         result["baseband"],
@@ -1414,7 +1414,7 @@ def test_scene_rx_el_pattern():
             "rotation": [0, 45, 0],
         }
     ]
-    result = scene(radar, targets, density=1, noise=False)
+    result = scene(radar, targets, density=1)
 
     assert np.allclose(
         result["baseband"],
@@ -1464,7 +1464,7 @@ def test_scene_rx_el_pattern():
             "rotation": [0, -45, 0],
         }
     ]
-    result = scene(radar, targets, density=1, noise=False)
+    result = scene(radar, targets, density=1)
 
     assert np.allclose(
         result["baseband"],
@@ -1545,7 +1545,7 @@ def test_scene_freq_offset():
             "location": np.array([10, 0, 0]),
         }
     ]
-    result = scene(radar, targets, density=0.4, noise=False)
+    result = scene(radar, targets, density=0.4)
 
     assert np.allclose(
         result["baseband"],
@@ -1627,7 +1627,7 @@ def test_scene_pulse_modulation():
             "location": np.array([10, 0, 0]),
         }
     ]
-    result = scene(radar, targets, density=0.4, noise=False)
+    result = scene(radar, targets, density=0.4)
 
     assert np.allclose(
         result["baseband"],
@@ -1705,7 +1705,7 @@ def test_scene_waveform_modulation():
             "location": np.array([10, 0, 0]),
         }
     ]
-    result = scene(radar, targets, density=0.4, noise=False)
+    result = scene(radar, targets, density=0.4)
 
     assert np.allclose(
         result["baseband"],
@@ -1785,7 +1785,7 @@ def test_scene_arbitrary_waveform():
             "location": np.array([10, 0, 0]),
         }
     ]
-    result = scene(radar, targets, density=0.4, noise=False)
+    result = scene(radar, targets, density=0.4)
 
     assert np.allclose(
         result["baseband"],
@@ -1884,7 +1884,7 @@ def test_scene_interference():
             "location": np.array([10, 0, 0]),
         }
     ]
-    result = scene(radar, targets, density=0.4, noise=False)
+    result = scene(radar, targets, density=0.4)
 
     assert np.allclose(
         result["interference"],

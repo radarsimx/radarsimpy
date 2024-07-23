@@ -52,7 +52,7 @@ def test_sim_cw():
     }
     targets = [target]
 
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -110,7 +110,7 @@ def test_sim_cw_raytracing():
     }
     targets = [target]
 
-    result = scene(radar, targets, density=1, level="sample", noise=False)
+    result = scene(radar, targets, density=1, level="sample")
 
     assert np.allclose(
         result["baseband"],

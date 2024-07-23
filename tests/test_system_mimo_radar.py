@@ -75,7 +75,7 @@ def test_sim_tdm_fmcw():
 
     targets = [target_1, target_2, target_3]
 
-    data = simc(radar, targets, noise=False)
+    data = simc(radar, targets)
     timestamp = data["timestamp"]
     baseband = data["baseband"]
 
@@ -793,7 +793,7 @@ def test_sim_pmcw():
 
     targets = [target_1, target_2, target_3]
 
-    data = simc(radar, targets, noise=False)
+    data = simc(radar, targets)
     timestamp = data["timestamp"]
     baseband = data["baseband"]
 

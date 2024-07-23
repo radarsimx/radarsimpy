@@ -164,7 +164,7 @@ def test_arbitrary_waveform():
 
     targets = [{"location": (200, 0, 0), "speed": (-5, 0, 0), "rcs": 20, "phase": 0}]
 
-    result = simc(radar_nonlinear, targets, noise=False)
+    result = simc(radar_nonlinear, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -367,7 +367,7 @@ def test_arbitrary_waveform_raytracing():
         }
     ]
 
-    result = scene(radar_nonlinear, targets, density=1, noise=False)
+    result = scene(radar_nonlinear, targets, density=1)
 
     assert np.allclose(
         result["baseband"],

@@ -60,7 +60,7 @@ def test_simc_single_target():
             "rcs": 20,
         }
     ]
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -141,7 +141,7 @@ def test_simc_varing_prp():
             "rcs": 20,
         }
     ]
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -223,7 +223,7 @@ def test_simc_tx_delay():
             "rcs": 20,
         }
     ]
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -303,7 +303,7 @@ def test_simc_tx_offset():
             "rcs": 20,
         }
     ]
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -383,7 +383,7 @@ def test_simc_rx_offset():
             "rcs": 20,
         }
     ]
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -467,7 +467,7 @@ def test_simc_multiple_targets():
             "rcs": 20,
         },
     ]
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -548,7 +548,7 @@ def test_simc_single_target_speed():
             "rcs": 20,
         }
     ]
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -629,7 +629,7 @@ def test_simc_single_target_phase():
             "rcs": 20,
         }
     ]
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -709,7 +709,7 @@ def test_simc_radar_location():
             "rcs": 20,
         }
     ]
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -789,7 +789,7 @@ def test_simc_radar_moving():
             "rcs": 20,
         }
     ]
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -870,7 +870,7 @@ def test_simc_2_frames_moving_target():
             "rcs": 20,
         }
     ]
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -976,7 +976,7 @@ def test_simc_2_frames_moving_radar():
             "rcs": 20,
         }
     ]
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -1085,7 +1085,7 @@ def test_simc_tx_az_pattern():
             "rcs": 20,
         }
     ]
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -1134,7 +1134,7 @@ def test_simc_tx_az_pattern():
             "rcs": 20,
         }
     ]
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -1218,7 +1218,7 @@ def test_simc_rx_az_pattern():
             "rcs": 20,
         }
     ]
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -1267,7 +1267,7 @@ def test_simc_rx_az_pattern():
             "rcs": 20,
         }
     ]
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -1351,7 +1351,7 @@ def test_simc_tx_el_pattern():
             "rcs": 20,
         }
     ]
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -1400,7 +1400,7 @@ def test_simc_tx_el_pattern():
             "rcs": 20,
         }
     ]
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -1484,7 +1484,7 @@ def test_simc_rx_el_pattern():
             "rcs": 20,
         }
     ]
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -1533,7 +1533,7 @@ def test_simc_rx_el_pattern():
             "rcs": 20,
         }
     ]
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -1614,7 +1614,7 @@ def test_simc_freq_offset():
             "rcs": 20,
         }
     ]
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -1696,7 +1696,7 @@ def test_simc_pulse_modulation():
             "rcs": 20,
         }
     ]
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -1774,7 +1774,7 @@ def test_simc_waveform_modulation():
             "rcs": 20,
         }
     ]
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -1854,7 +1854,7 @@ def test_simc_arbitrary_waveform():
             "rcs": 20,
         }
     ]
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -1953,7 +1953,7 @@ def test_simc_interference():
             "rcs": 20,
         }
     ]
-    result = simc(radar, targets, noise=False)
+    result = simc(radar, targets)
 
     assert np.allclose(
         result["interference"],

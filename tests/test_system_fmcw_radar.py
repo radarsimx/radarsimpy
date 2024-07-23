@@ -99,7 +99,7 @@ def test_sim_fmcw():
 
     targets = [target_1, target_2, target_3]
 
-    data = simc(radar, targets, noise=False)
+    data = simc(radar, targets)
     timestamp = data["timestamp"]
     baseband = data["baseband"]
 
@@ -260,7 +260,7 @@ def test_fmcw_raytracing():
 
     targets = [target_1]
 
-    data = scene(radar, targets, density=0.4, noise=False, level="pulse")
+    data = scene(radar, targets, density=0.4, level="pulse")
 
     baseband = data["baseband"]
 
@@ -392,7 +392,7 @@ def test_fmcw_raytracing_tx_azimuth():
 
     targets = [target_1]
 
-    data = scene(radar, targets, density=1, noise=False, level="pulse")
+    data = scene(radar, targets, density=1, level="pulse")
 
     baseband = data["baseband"]
 
@@ -459,7 +459,7 @@ def test_fmcw_raytracing_tx_elevation():
 
     targets = [target_1]
 
-    data = scene(radar, targets, density=1, noise=False, level="pulse")
+    data = scene(radar, targets, density=1, level="pulse")
 
     baseband = data["baseband"]
 
@@ -526,7 +526,7 @@ def test_fmcw_raytracing_rx_azimuth():
 
     targets = [target_1]
 
-    data = scene(radar, targets, density=1, noise=False, level="pulse")
+    data = scene(radar, targets, density=1, level="pulse")
 
     baseband = data["baseband"]
 
@@ -591,7 +591,7 @@ def test_fmcw_raytracing_rx_elevation():
 
     targets = [target_1]
 
-    data = scene(radar, targets, density=1, noise=False, level="pulse")
+    data = scene(radar, targets, density=1, level="pulse")
 
     baseband = data["baseband"]
 
@@ -653,7 +653,7 @@ def test_fmcw_raytracing_radar_rotation():
 
     targets = [target_1]
 
-    data = scene(radar, targets, density=1, noise=False, level="pulse", debug=False)
+    data = scene(radar, targets, density=1, level="pulse", debug=False)
 
     baseband = data["baseband"]
 
@@ -722,7 +722,7 @@ def test_fmcw_raytracing_radar_speed():
 
     targets = [target_1]
 
-    data = scene(radar, targets, density=1, noise=False, level="pulse", debug=False)
+    data = scene(radar, targets, density=1, level="pulse", debug=False)
 
     baseband = data["baseband"]
 

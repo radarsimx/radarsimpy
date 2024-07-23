@@ -82,7 +82,7 @@ def test_scene_interference():
 
     targets = [target_1]
 
-    data = scene(radar, targets, density=0.2, noise=False, debug=False)
+    data = scene(radar, targets, density=0.2, debug=False)
 
     inc_bb = data["interference"]
 
@@ -1452,7 +1452,7 @@ def test_simc_interference():
 
     targets = [target_1]
 
-    data = simc(radar, targets, noise=False)
+    data = simc(radar, targets)
 
     inc_bb = data["interference"]
 
