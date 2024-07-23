@@ -59,8 +59,10 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
 
     :param radar: The radar object used for the scene.
     :type radar: Radar
-    :param targets: The targets in the scene.
+    :param targets: The targets in the scene. It could be either an ideal point target or a 3D mesh object.
     
+        3D mesh target:
+
         [{
 
         - **model** (*str*) --
@@ -88,6 +90,22 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
 
         }]
 
+        Ideal point target:
+
+        [{
+
+        - **location** (*numpy.1darray*) --
+            Location of the target (m), [x, y, z]
+        - **rcs** (*float*) --
+            Target RCS (dBsm)
+        - **speed** (*numpy.1darray*) --
+            Speed of the target (m/s), [vx, vy, vz]. ``default
+            [0, 0, 0]``
+        - **phase** (*float*) --
+            Target phase (deg). ``default 0``
+
+        }]
+
         *Note*: Target's parameters can be specified with
         ``Radar.timestamp`` to customize the time varying property.
         Example: ``location=(1e-3*np.sin(2*np.pi*1*radar.timestamp), 0, 0)``
@@ -100,7 +118,6 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
         - ``pulse``: Perform ray tracing for each pulse
         - ``sample``: Perform ray tracing for each sample
     :type level: str or None
-
     :param log_path: Provide the path to save ray data (default=None, no data will be saved).
     :type log_path: str
     :param debug: Whether to enable debug mode (default=False).
@@ -108,11 +125,55 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
     :param interf: Interference radar (default=None).
     :type interf: Radar
 
-    :return: A dictionary containing the baseband data, timestamp, and interference (if available).
+    :return: A dictionary containing the baseband data, noise, timestamp, and interference (if available).
         {
 
         - **baseband** (*numpy.3darray*) --
-            Time domain complex (I/Q) baseband data.
+            Time domain baseband data.
+            ``[channes/frames, pulses, samples]``
+
+            *Channel/frame order in baseband*
+
+            *[0]* ``Frame[0] -- Tx[0] -- Rx[0]``
+
+            *[1]* ``Frame[0] -- Tx[0] -- Rx[1]``
+
+            ...
+
+            *[N]* ``Frame[0] -- Tx[1] -- Rx[0]``
+
+            *[N+1]* ``Frame[0] -- Tx[1] -- Rx[1]``
+
+            ...
+
+            *[M]* ``Frame[1] -- Tx[0] -- Rx[0]``
+
+            *[M+1]* ``Frame[1] -- Tx[0] -- Rx[1]``
+        
+        - **noise** (*numpy.3darray*) --
+            Time domain noise data.
+            ``[channes/frames, pulses, samples]``
+
+            *Channel/frame order in baseband*
+
+            *[0]* ``Frame[0] -- Tx[0] -- Rx[0]``
+
+            *[1]* ``Frame[0] -- Tx[0] -- Rx[1]``
+
+            ...
+
+            *[N]* ``Frame[0] -- Tx[1] -- Rx[0]``
+
+            *[N+1]* ``Frame[0] -- Tx[1] -- Rx[1]``
+
+            ...
+
+            *[M]* ``Frame[1] -- Tx[0] -- Rx[0]``
+
+            *[M+1]* ``Frame[1] -- Tx[0] -- Rx[1]``
+
+        - **interference** (*numpy.3darray*) --
+            Time domain interference data.
             ``[channes/frames, pulses, samples]``
 
             *Channel/frame order in baseband*
@@ -348,7 +409,9 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
 @cython.wraparound(False)
 cpdef simc(radar, targets, interf=None):
     """
-    simc(radar, targets)
+    simc(radar, targets, interf=None)
+
+    **deprecated** Please use `simulator.sim_radar(radar, targets, interf=None)`
 
     Radar simulator with C++ engine
 
@@ -379,7 +442,51 @@ cpdef simc(radar, targets, interf=None):
         {
 
         - **baseband** (*numpy.3darray*) --
-            Time domain complex (I/Q) baseband data.
+            Time domain baseband data.
+            ``[channes/frames, pulses, samples]``
+
+            *Channel/frame order in baseband*
+
+            *[0]* ``Frame[0] -- Tx[0] -- Rx[0]``
+
+            *[1]* ``Frame[0] -- Tx[0] -- Rx[1]``
+
+            ...
+
+            *[N]* ``Frame[0] -- Tx[1] -- Rx[0]``
+
+            *[N+1]* ``Frame[0] -- Tx[1] -- Rx[1]``
+
+            ...
+
+            *[M]* ``Frame[1] -- Tx[0] -- Rx[0]``
+
+            *[M+1]* ``Frame[1] -- Tx[0] -- Rx[1]``
+        
+        - **noise** (*numpy.3darray*) --
+            Time domain noise data.
+            ``[channes/frames, pulses, samples]``
+
+            *Channel/frame order in baseband*
+
+            *[0]* ``Frame[0] -- Tx[0] -- Rx[0]``
+
+            *[1]* ``Frame[0] -- Tx[0] -- Rx[1]``
+
+            ...
+
+            *[N]* ``Frame[0] -- Tx[1] -- Rx[0]``
+
+            *[N+1]* ``Frame[0] -- Tx[1] -- Rx[1]``
+
+            ...
+
+            *[M]* ``Frame[1] -- Tx[0] -- Rx[0]``
+
+            *[M+1]* ``Frame[1] -- Tx[0] -- Rx[1]``
+
+        - **interference** (*numpy.3darray*) --
+            Time domain interference data.
             ``[channes/frames, pulses, samples]``
 
             *Channel/frame order in baseband*

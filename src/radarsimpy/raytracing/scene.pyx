@@ -31,6 +31,8 @@ cpdef scene(radar, targets, density=1, level=None, log_path=None, debug=False, i
     """
     scene(radar, targets, density=1, level=None, log_path=None, debug=False, interf=None)
 
+    **deprecated** Please use `simulator.sim_radar(radar, targets, density=1, level=None, log_path=None, debug=False, interf=None)`
+
     This function generates radar's baseband response of a scene using the given radar and targets.
 
     :param radar: The radar object used for the scene.
@@ -88,7 +90,51 @@ cpdef scene(radar, targets, density=1, level=None, log_path=None, debug=False, i
         {
 
         - **baseband** (*numpy.3darray*) --
-            Time domain complex (I/Q) baseband data.
+            Time domain baseband data.
+            ``[channes/frames, pulses, samples]``
+
+            *Channel/frame order in baseband*
+
+            *[0]* ``Frame[0] -- Tx[0] -- Rx[0]``
+
+            *[1]* ``Frame[0] -- Tx[0] -- Rx[1]``
+
+            ...
+
+            *[N]* ``Frame[0] -- Tx[1] -- Rx[0]``
+
+            *[N+1]* ``Frame[0] -- Tx[1] -- Rx[1]``
+
+            ...
+
+            *[M]* ``Frame[1] -- Tx[0] -- Rx[0]``
+
+            *[M+1]* ``Frame[1] -- Tx[0] -- Rx[1]``
+        
+        - **noise** (*numpy.3darray*) --
+            Time domain noise data.
+            ``[channes/frames, pulses, samples]``
+
+            *Channel/frame order in baseband*
+
+            *[0]* ``Frame[0] -- Tx[0] -- Rx[0]``
+
+            *[1]* ``Frame[0] -- Tx[0] -- Rx[1]``
+
+            ...
+
+            *[N]* ``Frame[0] -- Tx[1] -- Rx[0]``
+
+            *[N+1]* ``Frame[0] -- Tx[1] -- Rx[1]``
+
+            ...
+
+            *[M]* ``Frame[1] -- Tx[0] -- Rx[0]``
+
+            *[M+1]* ``Frame[1] -- Tx[0] -- Rx[1]``
+
+        - **interference** (*numpy.3darray*) --
+            Time domain interference data.
             ``[channes/frames, pulses, samples]``
 
             *Channel/frame order in baseband*
