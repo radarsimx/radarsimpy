@@ -51,6 +51,56 @@ np_float = np.float32
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
+cdef void generate_snapshots(level, timestamp_mv, frames_c, txsize_c, rxsize_c, channles_c, pulses_c, samples_c, vector[Snapshot[float_t]]& snaps):
+    cdef int_t level_id = 0
+    cdef int_t fm_idx, tx_idx, ps_idx, sp_idx
+    """
+    Snapshot
+    """
+    if level is None:
+        level_id = 0
+        for fm_idx in range(0, frames_c):
+            for tx_idx in range(0, txsize_c):
+                snaps.push_back(
+                    Snapshot[float_t](
+                        timestamp_mv[fm_idx*channles_c+tx_idx*rxsize_c, 0, 0],
+                        fm_idx,
+                        tx_idx,
+                        0,
+                        0)
+                )
+    elif level == "pulse":
+        level_id = 1
+        for fm_idx in range(0, frames_c):
+            for tx_idx in range(0, txsize_c):
+                for ps_idx in range(0, pulses_c):
+                    snaps.push_back(
+                        Snapshot[float_t](
+                            timestamp_mv[fm_idx*channles_c+tx_idx*rxsize_c, ps_idx, 0],
+                            fm_idx,
+                            tx_idx,
+                            ps_idx,
+                            0)
+                    )
+    elif level == "sample":
+        level_id = 2
+        for fm_idx in range(0, frames_c):
+            for tx_idx in range(0, txsize_c):
+                for ps_idx in range(0, pulses_c):
+                    for sp_idx in range(0, samples_c):
+                        snaps.push_back(
+                            Snapshot[float_t](
+                                timestamp_mv[fm_idx*channles_c + tx_idx*rxsize_c, ps_idx, sp_idx],
+                                fm_idx,
+                                tx_idx,
+                                ps_idx,
+                                sp_idx)
+                        )
+
+
+@cython.cdivision(True)
+@cython.boundscheck(False)
+@cython.wraparound(False)
 cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=False, interf=None):
     """
     sim_radar(radar, targets, density=1, level=None, log_path=None, debug=False, interf=None)
@@ -217,7 +267,6 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
     cdef vector[Snapshot[float_t]] snaps
 
     cdef int_t level_id = 0
-    cdef int_t fm_idx, tx_idx, ps_idx, sp_idx
 
     cdef int_t frames_c = radar.time_prop["frame_size"]
     cdef int_t channles_c = radar.array_prop["size"]
@@ -297,49 +346,14 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
         """
         Snapshot
         """
-        
         if level is None:
             level_id = 0
-            for fm_idx in range(0, frames_c):
-                for tx_idx in range(0, txsize_c):
-                    snaps.push_back(
-                        Snapshot[float_t](
-                            timestamp_mv[fm_idx*channles_c+tx_idx*rxsize_c, 0, 0],
-                            fm_idx,
-                            tx_idx,
-                            0,
-                            0)
-                    )
         elif level == "pulse":
             level_id = 1
-            for fm_idx in range(0, frames_c):
-                for tx_idx in range(0, txsize_c):
-                    for ps_idx in range(0, pulses_c):
-                        snaps.push_back(
-                            Snapshot[float_t](
-                                timestamp_mv[fm_idx*channles_c+tx_idx*rxsize_c, ps_idx, 0],
-                                fm_idx,
-                                tx_idx,
-                                ps_idx,
-                                0)
-                        )
         elif level == "sample":
             level_id = 2
-            for fm_idx in range(0, frames_c):
-                for tx_idx in range(0, txsize_c):
-                    for ps_idx in range(0, pulses_c):
-                        for sp_idx in range(0, samples_c):
-                            snaps.push_back(
-                                Snapshot[float_t](
-                                    timestamp_mv[fm_idx*channles_c + tx_idx*rxsize_c, ps_idx, sp_idx],
-                                    fm_idx,
-                                    tx_idx,
-                                    ps_idx,
-                                    sp_idx)
-                            )
 
-        
-
+        generate_snapshots(level, timestamp_mv, frames_c, txsize_c, rxsize_c, channles_c, pulses_c, samples_c, snaps)
         scene_c.RunSimulator(
             level_id,
             debug,
