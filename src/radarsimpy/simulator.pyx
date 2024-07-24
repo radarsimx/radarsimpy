@@ -405,7 +405,7 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
             for p_idx in range(0, pulses_c):
                 for s_idx in range(0, samples_c):
                     bb_idx = ch_idx * chstride_c + p_idx * psstride_c + s_idx
-                    interference[ch_idx, p_idx, s_idx] = bb_real[bb_idx] +  1j*bb_imag[bb_idx]
+                    interference[ch_idx, p_idx, s_idx] = bb_real[bb_idx] + 1j*bb_imag[bb_idx]
     else:
         interference = None
 
