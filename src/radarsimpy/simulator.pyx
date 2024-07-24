@@ -22,7 +22,6 @@ A Python module for radar simulation
 
 import numpy as np
 
-from libc.stdlib cimport malloc, free
 from libcpp.string cimport string
 
 from radarsimpy.includes.type_def cimport vector
@@ -319,8 +318,8 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
 
     radar_c = cp_Radar(radar)
     
-    cdef double[:,:,::1] bb_real = np.zeros(ts_shape, order='C', dtype=np.float64)
-    cdef double[:,:,::1] bb_imag = np.zeros(ts_shape, order='C', dtype=np.float64)
+    cdef double[:,:,::1] bb_real = np.empty(ts_shape, order='C', dtype=np.float64)
+    cdef double[:,:,::1] bb_imag = np.empty(ts_shape, order='C', dtype=np.float64)
 
     if point_vt.size() > 0:
         sim_c.Run(radar_c, point_vt, &bb_real[0][0][0], &bb_imag[0][0][0])
@@ -328,10 +327,8 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
     else:
         baseband = 0
 
-
     if flag_run_scene:
         scene_c.SetRadar(radar_c)
-
         """
         Snapshot
         """
