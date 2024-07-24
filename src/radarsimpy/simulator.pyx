@@ -333,9 +333,9 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
 
     if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
         noise = radar.sample_prop["noise"] * np.random.randn(
-            frames_c * channles_c,
-            pulses_c,
-            samples_c,
+            ts_shape[0],
+            ts_shape[1],
+            ts_shape[2],
         )
     elif radar.radar_prop["receiver"].bb_prop["bb_type"] == "complex":
         noise = (
@@ -343,15 +343,15 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
             / np.sqrt(2)
             * (
                 np.random.randn(
-                    frames_c * channles_c,
-                    pulses_c,
-                    samples_c,
+                    ts_shape[0],
+                    ts_shape[1],
+                    ts_shape[2],
                 )
                 + 1j
                 * np.random.randn(
-                    frames_c * channles_c,
-                    pulses_c,
-                    samples_c,
+                    ts_shape[0],
+                    ts_shape[1],
+                    ts_shape[2],
                 )
             )
         )
