@@ -57,44 +57,24 @@ cdef void generate_snapshots(level, timestamp_mv, frames_c, txsize_c, rxsize_c, 
     Snapshot
     """
     if level is None:
-        level_id = 0
-        for fm_idx in range(0, frames_c):
-            for tx_idx in range(0, txsize_c):
-                snaps.push_back(
-                    Snapshot[float_t](
-                        timestamp_mv[fm_idx*channles_c+tx_idx*rxsize_c, 0, 0],
-                        fm_idx,
-                        tx_idx,
-                        0,
-                        0)
-                )
+        pulses_c  = 1
+        samples_c = 1
+
     elif level == "pulse":
-        level_id = 1
-        for fm_idx in range(0, frames_c):
-            for tx_idx in range(0, txsize_c):
-                for ps_idx in range(0, pulses_c):
+        samples_c = 1
+
+    for fm_idx in range(0, frames_c):
+        for tx_idx in range(0, txsize_c):
+            for ps_idx in range(0, pulses_c):
+                for sp_idx in range(0, samples_c):
                     snaps.push_back(
                         Snapshot[float_t](
-                            timestamp_mv[fm_idx*channles_c+tx_idx*rxsize_c, ps_idx, 0],
+                            timestamp_mv[fm_idx*channles_c + tx_idx*rxsize_c, ps_idx, sp_idx],
                             fm_idx,
                             tx_idx,
                             ps_idx,
-                            0)
+                            sp_idx)
                     )
-    elif level == "sample":
-        level_id = 2
-        for fm_idx in range(0, frames_c):
-            for tx_idx in range(0, txsize_c):
-                for ps_idx in range(0, pulses_c):
-                    for sp_idx in range(0, samples_c):
-                        snaps.push_back(
-                            Snapshot[float_t](
-                                timestamp_mv[fm_idx*channles_c + tx_idx*rxsize_c, ps_idx, sp_idx],
-                                fm_idx,
-                                tx_idx,
-                                ps_idx,
-                                sp_idx)
-                        )
 
 
 @cython.cdivision(True)
