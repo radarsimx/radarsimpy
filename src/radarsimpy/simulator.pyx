@@ -275,14 +275,6 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
     cdef int_t pulses_c = radar.radar_prop["transmitter"].waveform_prop["pulses"]
     cdef int_t samples_c = radar.sample_prop["samples_per_pulse"]
 
-    cdef int_t bbsize_c = channles_c*frames_c*pulses_c*samples_c
-
-    cdef int_t chstride_c = pulses_c * samples_c
-    cdef int_t psstride_c = samples_c
-
-    cdef int_t ch_idx, p_idx, s_idx
-    cdef int_t bb_idx
-
     cdef string log_path_c
 
     flag_run_scene = False
@@ -327,17 +319,14 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
 
     radar_c = cp_Radar(radar)
     
-    cdef double * bb_real = <double *> malloc(bbsize_c*sizeof(double))
-    cdef double * bb_imag = <double *> malloc(bbsize_c*sizeof(double))
-    baseband = np.zeros((frames_c*channles_c, pulses_c, samples_c), dtype=complex)
+    cdef double[:,:,::1] bb_real = np.zeros(ts_shape, order='C', dtype=np.float64)
+    cdef double[:,:,::1] bb_imag = np.zeros(ts_shape, order='C', dtype=np.float64)
 
     if point_vt.size() > 0:
-        sim_c.Run(radar_c, point_vt, bb_real, bb_imag)
-        for ch_idx in range(0, frames_c*channles_c):
-            for p_idx in range(0, pulses_c):
-                for s_idx in range(0, samples_c):
-                    bb_idx = ch_idx * chstride_c + p_idx * psstride_c + s_idx
-                    baseband[ch_idx, p_idx, s_idx] = bb_real[bb_idx] +  1j*bb_imag[bb_idx]
+        sim_c.Run(radar_c, point_vt, &bb_real[0][0][0], &bb_imag[0][0][0])
+        baseband = np.asarray(bb_real)+1j*np.asarray(bb_imag)
+    else:
+        baseband = 0
 
 
     if flag_run_scene:
@@ -360,14 +349,10 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
             snaps,
             <float_t> density,
             log_path_c,
-            bb_real,
-            bb_imag)
+            &bb_real[0][0][0],
+            &bb_imag[0][0][0])
 
-        for ch_idx in range(0, frames_c*channles_c):
-            for p_idx in range(0, pulses_c):
-                for s_idx in range(0, samples_c):
-                    bb_idx = ch_idx * chstride_c + p_idx * psstride_c + s_idx
-                    baseband[ch_idx, p_idx, s_idx] = baseband[ch_idx, p_idx, s_idx]+bb_real[bb_idx] +  1j*bb_imag[bb_idx]
+        baseband = baseband+np.asarray(bb_real)+1j*np.asarray(bb_imag)
 
     if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
         noise = radar.sample_prop["noise"] * np.random.randn(
@@ -397,20 +382,11 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
     if interf is not None:
         interf_radar_c = cp_Radar(interf)
 
-        sim_c.Interference(radar_c, interf_radar_c, bb_real, bb_imag)
+        sim_c.Interference(radar_c, interf_radar_c, &bb_real[0][0][0], &bb_imag[0][0][0])
+        interference = np.asarray(bb_real)+1j*np.asarray(bb_imag)
 
-        interference = np.zeros((frames_c*channles_c, pulses_c, samples_c), dtype=complex)
-
-        for ch_idx in range(0, frames_c*channles_c):
-            for p_idx in range(0, pulses_c):
-                for s_idx in range(0, samples_c):
-                    bb_idx = ch_idx * chstride_c + p_idx * psstride_c + s_idx
-                    interference[ch_idx, p_idx, s_idx] = bb_real[bb_idx] + 1j*bb_imag[bb_idx]
     else:
         interference = None
-
-    free(bb_real)
-    free(bb_imag)
 
     return {"baseband": baseband,
             "noise": noise,
