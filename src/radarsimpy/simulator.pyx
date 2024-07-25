@@ -50,36 +50,6 @@ np_float = np.float32
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef void generate_snapshots(level, timestamp_mv, frames_c, txsize_c, rxsize_c, channles_c, pulses_c, samples_c, vector[Snapshot[float_t]]& snaps):
-    cdef int_t level_id = 0
-    cdef int_t fm_idx, tx_idx, ps_idx, sp_idx
-    """
-    Snapshot
-    """
-    if level is None:
-        pulses_c  = 1
-        samples_c = 1
-
-    elif level == "pulse":
-        samples_c = 1
-
-    for fm_idx in range(0, frames_c):
-        for tx_idx in range(0, txsize_c):
-            for ps_idx in range(0, pulses_c):
-                for sp_idx in range(0, samples_c):
-                    snaps.push_back(
-                        Snapshot[float_t](
-                            timestamp_mv[fm_idx*channles_c + tx_idx*rxsize_c, ps_idx, sp_idx],
-                            fm_idx,
-                            tx_idx,
-                            ps_idx,
-                            sp_idx)
-                    )
-
-
-@cython.cdivision(True)
-@cython.boundscheck(False)
-@cython.wraparound(False)
 cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=False, interf=None):
     """
     sim_radar(radar, targets, density=1, level=None, log_path=None, debug=False, interf=None)
@@ -246,13 +216,13 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
     cdef vector[Snapshot[float_t]] snaps
 
     cdef int_t level_id = 0
+    cdef int_t fm_idx, tx_idx, ps_idx, sp_idx
 
     cdef int_t frames_c = radar.time_prop["frame_size"]
     cdef int_t channles_c = radar.array_prop["size"]
     cdef int_t rxsize_c = radar.radar_prop["receiver"].rxchannel_prop["size"]
     cdef int_t txsize_c = radar.radar_prop["transmitter"].txchannel_prop["size"]
-    cdef int_t pulses_c = radar.radar_prop["transmitter"].waveform_prop["pulses"]
-    cdef int_t samples_c = radar.sample_prop["samples_per_pulse"]
+    cdef int_t pulses_c, samples_c
 
     cdef string log_path_c
 
@@ -314,12 +284,32 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
         """
         if level is None:
             level_id = 0
+            pulses_c  = 1
+            samples_c = 1
         elif level == "pulse":
             level_id = 1
+            pulses_c  = radar.radar_prop["transmitter"].waveform_prop["pulses"]
+            samples_c = 1
         elif level == "sample":
             level_id = 2
+            pulses_c = radar.radar_prop["transmitter"].waveform_prop["pulses"]
+            samples_c = radar.sample_prop["samples_per_pulse"]
+        else:
+            raise Exception("Unknown fidelity level. `None`: Perform one ray tracing simulation for the whole frame; `pulse`: Perform ray tracing for each pulse; `sample`: Perform ray tracing for each sample.")
 
-        generate_snapshots(level, timestamp_mv, frames_c, txsize_c, rxsize_c, channles_c, pulses_c, samples_c, snaps)
+        for fm_idx in range(0, frames_c):
+            for tx_idx in range(0, txsize_c):
+                for ps_idx in range(0, pulses_c):
+                    for sp_idx in range(0, samples_c):
+                        snaps.push_back(
+                            Snapshot[float_t](
+                                timestamp_mv[fm_idx*channles_c + tx_idx*rxsize_c, ps_idx, sp_idx],
+                                fm_idx,
+                                tx_idx,
+                                ps_idx,
+                                sp_idx)
+                        )
+
         scene_c.RunSimulator(
             level_id,
             debug,
