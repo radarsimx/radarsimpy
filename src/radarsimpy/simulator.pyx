@@ -321,30 +321,19 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
 
         baseband = baseband+np.asarray(bb_real)+1j*np.asarray(bb_imag)
 
+    num_noise_samples = int((np.max(timestamp_mv)-np.min(timestamp_mv))* radar.radar_prop["receiver"].bb_prop["fs"])+1
+    noise = np.zeros(ts_shape)
     if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
-        noise = radar.sample_prop["noise"] * np.random.randn(
-            ts_shape[0],
-            ts_shape[1],
-            ts_shape[2],
-        )
+        noise_per_rx = radar.sample_prop["noise"] * np.random.randn(rxsize_c, num_noise_samples)
     elif radar.radar_prop["receiver"].bb_prop["bb_type"] == "complex":
-        noise = (
-            radar.sample_prop["noise"]
-            / np.sqrt(2)
-            * (
-                np.random.randn(
-                    ts_shape[0],
-                    ts_shape[1],
-                    ts_shape[2],
-                )
-                + 1j
-                * np.random.randn(
-                    ts_shape[0],
-                    ts_shape[1],
-                    ts_shape[2],
-                )
-            )
-        )
+        noise_per_rx = radar.sample_prop["noise"]/ np.sqrt(2) * (np.random.randn(rxsize_c, num_noise_samples) + 1j*np.random.randn(rxsize_c, num_noise_samples))
+
+    for ch_idx in range(0, ts_shape[0]):
+        for ps_idx in range(0, ts_shape[1]):
+            t0 = (timestamp_mv[ch_idx, ps_idx, 0] - np.min(timestamp_mv))*radar.radar_prop["receiver"].bb_prop["fs"]
+            rx_ch = ch_idx%rxsize_c
+            noise[ch_idx, ps_idx, :] = noise_per_rx[rx_ch, int(t0):(int(t0)+ts_shape[2])]
+
 
     if interf is not None:
         interf_radar_c = cp_Radar(interf)
