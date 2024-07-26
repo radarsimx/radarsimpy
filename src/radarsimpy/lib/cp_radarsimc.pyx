@@ -456,9 +456,9 @@ cdef Radar[float_t] cp_Radar(radar, frame_size, frame_start_time):
 cdef Target[float_t] cp_Target(radar,
                                target,
                                timestamp,
-                               shape):
+                               ts_shape):
     """
-    cp_Target((radar, target, shape)
+    cp_Target((radar, target, ts_shape)
 
     Creat Target object in Cython
 
@@ -466,7 +466,7 @@ cdef Target[float_t] cp_Target(radar,
         Radar object
     :param dict target:
         Target properties
-    :param tuple shape:
+    :param tuple ts_shape:
         Shape of the time matrix
 
     :return: C++ object of a target
@@ -488,7 +488,7 @@ cdef Target[float_t] cp_Target(radar,
     cdef cpp_complex[float_t] ep_c, mu_c
 
     cdef int_t ch_idx, ps_idx, sp_idx
-    cdef int_t bbsize_c = <int_t>(shape[0]*shape[1]*shape[2])
+    cdef int_t bbsize_c = <int_t>(ts_shape[0]*ts_shape[1]*ts_shape[2])
 
     cdef float_t scale
     cdef float_t[:, :] points_mv
@@ -567,17 +567,17 @@ cdef Target[float_t] cp_Target(radar,
         if np.size(speed[0]) > 1:
             spdx_mv = speed[0].astype(np_float)
         else:
-            spdx_mv = np.full(shape, speed[0], dtype=np_float)
+            spdx_mv = np.full(ts_shape, speed[0], dtype=np_float)
 
         if np.size(speed[1]) > 1:
             spdy_mv = speed[1].astype(np_float)
         else:
-            spdy_mv = np.full(shape, speed[1], dtype=np_float)
+            spdy_mv = np.full(ts_shape, speed[1], dtype=np_float)
 
         if np.size(speed[2]) > 1:
             spdz_mv = speed[2].astype(np_float)
         else:
-            spdz_mv = np.full(shape, speed[2], dtype=np_float)
+            spdz_mv = np.full(ts_shape, speed[2], dtype=np_float)
 
         if np.size(rotation[0]) > 1:
             rotx_mv = np.radians(rotation[0]).astype(np_float)
@@ -600,17 +600,17 @@ cdef Target[float_t] cp_Target(radar,
         if np.size(rotation_rate[0]) > 1:
             rrtx_mv = np.radians(rotation_rate[0]).astype(np_float)
         else:
-            rrtx_mv = np.full(shape, np.radians(rotation_rate[0]), dtype=np_float)
+            rrtx_mv = np.full(ts_shape, np.radians(rotation_rate[0]), dtype=np_float)
 
         if np.size(rotation_rate[1]) > 1:
             rrty_mv = np.radians(rotation_rate[1]).astype(np_float)
         else:
-            rrty_mv = np.full(shape, np.radians(rotation_rate[1]), dtype=np_float)
+            rrty_mv = np.full(ts_shape, np.radians(rotation_rate[1]), dtype=np_float)
 
         if np.size(rotation_rate[2]) > 1:
             rrtz_mv = np.radians(rotation_rate[2]).astype(np_float)
         else:
-            rrtz_mv = np.full(shape, np.radians(rotation_rate[2]), dtype=np_float)
+            rrtz_mv = np.full(ts_shape, np.radians(rotation_rate[2]), dtype=np_float)
 
         Mem_Copy_Vec3(&locx_mv[0,0,0], &locy_mv[0,0,0], &locz_mv[0,0,0], bbsize_c, loc_vt)
         Mem_Copy_Vec3(&spdx_mv[0,0,0], &spdy_mv[0,0,0], &spdz_mv[0,0,0], bbsize_c, spd_vt)
