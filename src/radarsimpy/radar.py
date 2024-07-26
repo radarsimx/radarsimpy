@@ -390,23 +390,28 @@ class Radar:
             transmitter.rf_prop["pn_f"] is not None
             and transmitter.rf_prop["pn_power"] is not None
         ):
-            self.sample_prop["phase_noise"] = np.reshape(
-                cal_phase_noise(
-                    np.ones(
-                        (
-                            self.array_prop["size"]
-                            * self.time_prop["frame_size"]
-                            * transmitter.waveform_prop["pulses"],
-                            self.sample_prop["samples_per_pulse"],
-                        )
-                    ),
-                    receiver.bb_prop["fs"],
-                    transmitter.rf_prop["pn_f"],
-                    transmitter.rf_prop["pn_power"],
-                    seed=seed,
-                    validation=kwargs.get("validation", False),
+            num_pn_samples = (
+                np.ceil(
+                    (
+                        np.max(self.time_prop["timestamp"])
+                        - np.min(self.time_prop["timestamp"])
+                    )
+                    * self.radar_prop["receiver"].bb_prop["fs"]
+                ).astype(int)
+                + 1
+            )
+            self.sample_prop["phase_noise"] = cal_phase_noise(
+                np.ones(
+                    (
+                        1,
+                        num_pn_samples,
+                    )
                 ),
-                self.time_prop["timestamp_shape"],
+                receiver.bb_prop["fs"],
+                transmitter.rf_prop["pn_f"],
+                transmitter.rf_prop["pn_power"],
+                seed=seed,
+                validation=kwargs.get("validation", False),
             )
         else:
             self.sample_prop["phase_noise"] = None
