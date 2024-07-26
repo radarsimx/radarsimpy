@@ -194,12 +194,12 @@ cdef Transmitter[float_t] cp_Transmitter(radar):
     Mem_Copy(&t_pstart_mv[0], <int_t>(len(radar.radar_prop["transmitter"].waveform_prop["pulse_start_time"])), t_pstart_vt)
 
     # phase noise
-    cdef double[:, :, :] pn_real_mv
-    cdef double[:, :, :] pn_imag_mv
+    cdef double[:] pn_real_mv
+    cdef double[:] pn_imag_mv
     if radar.sample_prop["phase_noise"] is not None:
         pn_real_mv = np.real(radar.sample_prop["phase_noise"]).astype(np.float64)
         pn_imag_mv = np.imag(radar.sample_prop["phase_noise"]).astype(np.float64)
-        Mem_Copy_Complex(&pn_real_mv[0,0,0], &pn_imag_mv[0,0,0], <int_t>(frames_c*channles_c*pulses_c*samples_c), pn_vt)
+        Mem_Copy_Complex(&pn_real_mv[0], &pn_imag_mv[0], <int_t>(np.size(radar.sample_prop["phase_noise"])), pn_vt)
 
     return Transmitter[float_t](
         <float_t> radar.radar_prop["transmitter"].rf_prop["tx_power"],

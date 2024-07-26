@@ -413,6 +413,7 @@ class Radar:
                 seed=seed,
                 validation=kwargs.get("validation", False),
             )
+            self.sample_prop["phase_noise"] = self.sample_prop["phase_noise"].flatten()
         else:
             self.sample_prop["phase_noise"] = None
 

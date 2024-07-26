@@ -133,7 +133,7 @@ class TestRadar:
         )
         rx = Receiver(fs=10e6)
         radar = Radar(transmitter=tx, receiver=rx, time=[0, 1e-3])
-        assert radar.sample_prop["phase_noise"].shape == (2, 10, 10)
+        assert radar.sample_prop["phase_noise"].shape == (10191, )
 
     def test_init_with_phase_noise_validation(self):
         """Test initialization with phase noise and validation."""
@@ -148,7 +148,7 @@ class TestRadar:
         )
         rx = Receiver(fs=10e6)
         radar = Radar(transmitter=tx, receiver=rx, time=[0, 1e-3], validation=True)
-        assert radar.sample_prop["phase_noise"].shape == (2, 10, 10)
+        assert radar.sample_prop["phase_noise"].shape == (10191, )
 
     def test_init_with_multiple_channels(self):
         """Test initialization with multiple channels."""
