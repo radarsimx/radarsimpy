@@ -285,7 +285,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
         if "model" in tgt:
             flag_run_scene = True
             scene_c.AddTarget(
-                cp_Target(radar, tgt, timestamp, ts_shape)
+                cp_Target(radar, tgt, timestamp)
             )
         else:
             loc = tgt["location"]
@@ -297,7 +297,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
                 cp_Point(loc, spd, rcs, phs, ts_shape)
             )
 
-    radar_c = cp_Radar(radar, frame_size, frame_start_time)
+    radar_c = cp_Radar(radar, frame_start_time)
     
     cdef double[:,:,::1] bb_real = np.empty(ts_shape, order='C', dtype=np.float64)
     cdef double[:,:,::1] bb_imag = np.empty(ts_shape, order='C', dtype=np.float64)
@@ -369,7 +369,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
 
 
     if interf is not None:
-        interf_radar_c = cp_Radar(interf, 1, 0)
+        interf_radar_c = cp_Radar(interf, 0)
 
         sim_c.Interference(radar_c, interf_radar_c, &bb_real[0][0][0], &bb_imag[0][0][0])
         interference = np.asarray(bb_real)+1j*np.asarray(bb_imag)

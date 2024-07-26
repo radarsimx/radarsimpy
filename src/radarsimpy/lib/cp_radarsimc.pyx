@@ -146,7 +146,7 @@ cdef Point[float_t] cp_Point(location,
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef Transmitter[float_t] cp_Transmitter(radar, frame_size, frame_start_time):
+cdef Transmitter[float_t] cp_Transmitter(radar, frame_start_time):
     """
     cp_Transmitter(radar)
 
@@ -158,7 +158,7 @@ cdef Transmitter[float_t] cp_Transmitter(radar, frame_size, frame_start_time):
     :return: C++ object of a radar transmitter
     :rtype: Transmitter
     """
-    cdef int_t frames_c = frame_size
+    cdef int_t frames_c = np.size(frame_start_time)
     cdef int_t channles_c = radar.array_prop["size"]
     cdef int_t pulses_c = radar.radar_prop["transmitter"].waveform_prop["pulses"]
     cdef int_t samples_c = radar.sample_prop["samples_per_pulse"]
@@ -354,14 +354,14 @@ cdef RxChannel[float_t] cp_RxChannel(rx,
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef Radar[float_t] cp_Radar(radar, frame_size, frame_start_time):
+cdef Radar[float_t] cp_Radar(radar, frame_start_time):
     cdef Transmitter[float_t] tx_c
     cdef Receiver[float_t] rx_c
     cdef Radar[float_t] radar_c
 
     cdef int_t txsize_c = radar.radar_prop["transmitter"].txchannel_prop["size"]
     cdef int_t rxsize_c = radar.radar_prop["receiver"].rxchannel_prop["size"]
-    cdef int_t frames_c = frame_size
+    cdef int_t frames_c = np.size(frame_start_time)
     cdef int_t channles_c = radar.array_prop["size"]
     cdef int_t pulses_c = radar.radar_prop["transmitter"].waveform_prop["pulses"]
     cdef int_t samples_c = radar.sample_prop["samples_per_pulse"]
@@ -383,7 +383,7 @@ cdef Radar[float_t] cp_Radar(radar, frame_size, frame_start_time):
     """
     Transmitter
     """
-    tx_c = cp_Transmitter(radar, frame_size, frame_start_time)
+    tx_c = cp_Transmitter(radar, frame_start_time)
     for idx_c in range(0, txsize_c):
         tx_c.AddChannel(
             cp_TxChannel(radar.radar_prop["transmitter"], idx_c)
@@ -455,8 +455,7 @@ cdef Radar[float_t] cp_Radar(radar, frame_size, frame_start_time):
 @cython.wraparound(False)
 cdef Target[float_t] cp_Target(radar,
                                target,
-                               timestamp,
-                               ts_shape):
+                               timestamp):
     """
     cp_Target((radar, target, ts_shape)
 
@@ -488,6 +487,7 @@ cdef Target[float_t] cp_Target(radar,
     cdef cpp_complex[float_t] ep_c, mu_c
 
     cdef int_t ch_idx, ps_idx, sp_idx
+    ts_shape = np.shape(timestamp)
     cdef int_t bbsize_c = <int_t>(ts_shape[0]*ts_shape[1]*ts_shape[2])
 
     cdef float_t scale
