@@ -24,8 +24,7 @@ import numpy.testing as npt
 from scipy import signal
 
 from radarsimpy import Radar, Transmitter, Receiver
-from radarsimpy.simulator import simc  # pylint: disable=no-name-in-module
-from radarsimpy.rt import scene  # pylint: disable=no-name-in-module
+from radarsimpy.simulator import sim_radar  # pylint: disable=no-name-in-module
 import radarsimpy.processing as proc
 
 
@@ -70,7 +69,7 @@ def test_sim_fmcw():
         channels=[rx_channel],
     )
 
-    radar = Radar(transmitter=tx, receiver=rx, time=[0, 1])
+    radar = Radar(transmitter=tx, receiver=rx)
     target_1 = {"location": (200, 0, 0), "speed": (-5, 0, 0), "rcs": 20, "phase": 0}
     target_2 = {"location": (95, 20, 0), "speed": (-50, 0, 0), "rcs": 15, "phase": 0}
     target_3 = {"location": (30, -5, 0), "speed": (-22, 0, 0), "rcs": 5, "phase": 0}
@@ -99,13 +98,13 @@ def test_sim_fmcw():
 
     targets = [target_1, target_2, target_3]
 
-    data = simc(radar, targets)
+    data = sim_radar(radar, targets, frame_time=[0, 1])
     timestamp = data["timestamp"]
     baseband = data["baseband"]
 
     assert np.array_equal(
         (
-            radar.array_prop["size"] * radar.time_prop["frame_size"],
+            radar.array_prop["size"] * 2,
             radar.radar_prop["transmitter"].waveform_prop["pulses"],
             radar.sample_prop["samples_per_pulse"],
         ),
@@ -113,7 +112,7 @@ def test_sim_fmcw():
     )
     assert np.array_equal(
         (
-            radar.array_prop["size"] * radar.time_prop["frame_size"],
+            radar.array_prop["size"] * 2,
             radar.radar_prop["transmitter"].waveform_prop["pulses"],
             radar.sample_prop["samples_per_pulse"],
         ),
@@ -249,7 +248,7 @@ def test_fmcw_raytracing():
         channels=[rx_channel],
     )
 
-    radar = Radar(transmitter=tx, receiver=rx, time=[0, 1])
+    radar = Radar(transmitter=tx, receiver=rx)
 
     target_1 = {
         "model": "./models/plate5x5.stl",
@@ -260,7 +259,7 @@ def test_fmcw_raytracing():
 
     targets = [target_1]
 
-    data = scene(radar, targets, density=0.4, level="pulse")
+    data = sim_radar(radar, targets, frame_time=[0, 1], density=0.4, level="pulse")
 
     baseband = data["baseband"]
 
@@ -392,7 +391,7 @@ def test_fmcw_raytracing_tx_azimuth():
 
     targets = [target_1]
 
-    data = scene(radar, targets, density=1, level="pulse")
+    data = sim_radar(radar, targets, density=1, level="pulse")
 
     baseband = data["baseband"]
 
@@ -459,7 +458,7 @@ def test_fmcw_raytracing_tx_elevation():
 
     targets = [target_1]
 
-    data = scene(radar, targets, density=1, level="pulse")
+    data = sim_radar(radar, targets, density=1, level="pulse")
 
     baseband = data["baseband"]
 
@@ -526,7 +525,7 @@ def test_fmcw_raytracing_rx_azimuth():
 
     targets = [target_1]
 
-    data = scene(radar, targets, density=1, level="pulse")
+    data = sim_radar(radar, targets, density=1, level="pulse")
 
     baseband = data["baseband"]
 
@@ -591,7 +590,7 @@ def test_fmcw_raytracing_rx_elevation():
 
     targets = [target_1]
 
-    data = scene(radar, targets, density=1, level="pulse")
+    data = sim_radar(radar, targets, density=1, level="pulse")
 
     baseband = data["baseband"]
 
@@ -653,7 +652,7 @@ def test_fmcw_raytracing_radar_rotation():
 
     targets = [target_1]
 
-    data = scene(radar, targets, density=1, level="pulse", debug=False)
+    data = sim_radar(radar, targets, density=1, level="pulse", debug=False)
 
     baseband = data["baseband"]
 
@@ -707,7 +706,6 @@ def test_fmcw_raytracing_radar_speed():
     radar = Radar(
         transmitter=tx,
         receiver=rx,
-        time=[0, 1],
         location=(-20, 0, 0),
         speed=(20, 0, 0),
         rotation=(0, 45, 0),
@@ -722,7 +720,7 @@ def test_fmcw_raytracing_radar_speed():
 
     targets = [target_1]
 
-    data = scene(radar, targets, density=1, level="pulse", debug=False)
+    data = sim_radar(radar, targets, frame_time=[0, 1], density=1, level="pulse", debug=False)
 
     baseband = data["baseband"]
 

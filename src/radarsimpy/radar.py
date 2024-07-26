@@ -273,9 +273,6 @@ class Radar:
         Radar's rotation rate (deg/s),
         [yaw rate, pitch rate, roll rate]
         ``default [0, 0, 0]``
-    :param time:
-        Radar firing time instances / frames
-        :type time: float or list
     :param int seed:
         Seed for noise generator
 
@@ -347,14 +344,10 @@ class Radar:
         speed=(0, 0, 0),
         rotation=(0, 0, 0),
         rotation_rate=(0, 0, 0),
-        time=0,
         seed=None,
         **kwargs
     ):
-        self.time_prop = {
-            "frame_size": np.size(time),
-            "frame_start_time": np.array(time),
-        }
+        self.time_prop = {}
         self.sample_prop = {
             "samples_per_pulse": int(
                 transmitter.waveform_prop["pulse_length"] * receiver.bb_prop["fs"]
@@ -464,28 +457,28 @@ class Radar:
             / fs
         )
 
-        if self.time_prop["frame_size"] > 1:
-            toffset = np.repeat(
-                np.tile(
-                    np.expand_dims(
-                        np.expand_dims(self.time_prop["frame_start_time"], axis=1),
-                        axis=2,
-                    ),
-                    (
-                        1,
-                        self.radar_prop["transmitter"].waveform_prop["pulses"],
-                        self.sample_prop["samples_per_pulse"],
-                    ),
-                ),
-                channel_size,
-                axis=0,
-            )
+        # if self.time_prop["frame_size"] > 1:
+        #     toffset = np.repeat(
+        #         np.tile(
+        #             np.expand_dims(
+        #                 np.expand_dims(self.time_prop["frame_start_time"], axis=1),
+        #                 axis=2,
+        #             ),
+        #             (
+        #                 1,
+        #                 self.radar_prop["transmitter"].waveform_prop["pulses"],
+        #                 self.sample_prop["samples_per_pulse"],
+        #             ),
+        #         ),
+        #         channel_size,
+        #         axis=0,
+        #     )
 
-            timestamp = (
-                np.tile(timestamp, (self.time_prop["frame_size"], 1, 1)) + toffset
-            )
-        elif self.time_prop["frame_size"] == 1:
-            timestamp = timestamp + self.time_prop["frame_start_time"]
+        #     timestamp = (
+        #         np.tile(timestamp, (self.time_prop["frame_size"], 1, 1)) + toffset
+        #     )
+        # elif self.time_prop["frame_size"] == 1:
+        #     timestamp = timestamp + self.time_prop["frame_start_time"]
 
         return timestamp
 

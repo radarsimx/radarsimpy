@@ -50,7 +50,7 @@ np_float = np.float32
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=False, interf=None):
+cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=None, debug=False, interf=None):
     """
     sim_radar(radar, targets, density=1, level=None, log_path=None, debug=False, interf=None)
 
@@ -109,6 +109,8 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
         ``Radar.timestamp`` to customize the time varying property.
         Example: ``location=(1e-3*np.sin(2*np.pi*1*radar.timestamp), 0, 0)``
     :type targets: list
+    :param frame_time: Radar firing time instances / frames
+    :type time: float or list
     :param density: Ray density. Number of rays per wavelength (default=1).
     :type density: float
     :param level: Fidelity level of the simulation (default=None).
@@ -218,7 +220,10 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
     cdef int_t level_id = 0
     cdef int_t fm_idx, tx_idx, ps_idx, sp_idx
 
-    cdef int_t frames_c = radar.time_prop["frame_size"]
+    frame_size = np.size(frame_time)
+    frame_start_time = np.array(frame_time)
+
+    cdef int_t frames_c = frame_size
     cdef int_t channles_c = radar.array_prop["size"]
     cdef int_t rxsize_c = radar.radar_prop["receiver"].rxchannel_prop["size"]
     cdef int_t txsize_c = radar.radar_prop["transmitter"].txchannel_prop["size"]
@@ -243,18 +248,44 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
         if radar.radar_prop["receiver"].rxchannel_prop["size"] > 2:
             raise Exception("You're currently using RadarSimPy's FreeTier, which imposes a restriction on the maximum number of receiver channels to 2. Please consider supporting my work by upgrading to the standard version. Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ to access the standard version download links. Your support will help improve the software. Thank you for considering it.")
     
-    ts_shape = np.shape(radar.time_prop["timestamp"])
+    radar_ts = radar.time_prop["timestamp"]
+    radar_ts_shape = np.shape(radar.time_prop["timestamp"])
+
+    if frame_size > 1:
+        toffset = np.repeat(
+            np.tile(
+                np.expand_dims(
+                    np.expand_dims(frame_start_time, axis=1),
+                    axis=2,
+                ),
+                (
+                    1,
+                    radar_ts_shape[1],
+                    radar_ts_shape[2],
+                ),
+            ),
+            channles_c,
+            axis=0,
+        )
+
+        timestamp = (
+            np.tile(radar_ts, (frame_size, 1, 1)) + toffset
+        )
+    elif frame_size == 1:
+        timestamp = radar_ts + frame_start_time
+
+    ts_shape = np.shape(timestamp)
 
     """
     Targets
     """
-    cdef double[:, :, :] timestamp_mv = radar.time_prop["timestamp"].astype(np.float64)
+    cdef double[:, :, :] timestamp_mv = timestamp.astype(np.float64)
 
     for _, tgt in enumerate(targets):
         if "model" in tgt:
             flag_run_scene = True
             scene_c.AddTarget(
-                cp_Target(radar, tgt, ts_shape)
+                cp_Target(radar, tgt, timestamp, ts_shape)
             )
         else:
             loc = tgt["location"]
@@ -266,7 +297,7 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
                 cp_Point(loc, spd, rcs, phs, ts_shape)
             )
 
-    radar_c = cp_Radar(radar)
+    radar_c = cp_Radar(radar, frame_size, frame_start_time)
     
     cdef double[:,:,::1] bb_real = np.empty(ts_shape, order='C', dtype=np.float64)
     cdef double[:,:,::1] bb_imag = np.empty(ts_shape, order='C', dtype=np.float64)
@@ -338,7 +369,7 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
 
 
     if interf is not None:
-        interf_radar_c = cp_Radar(interf)
+        interf_radar_c = cp_Radar(interf, 1, 0)
 
         sim_c.Interference(radar_c, interf_radar_c, &bb_real[0][0][0], &bb_imag[0][0][0])
         interference = np.asarray(bb_real)+1j*np.asarray(bb_imag)
@@ -348,7 +379,7 @@ cpdef sim_radar(radar, targets, density=1, level=None, log_path=None, debug=Fals
 
     return {"baseband": baseband,
             "noise": noise,
-            "timestamp": radar.time_prop["timestamp"],
+            "timestamp": timestamp,
             "interference": interference}
 
 

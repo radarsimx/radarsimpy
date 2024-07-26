@@ -32,14 +32,14 @@ class TestRadar:
         """Fixture for setting up a basic radar system."""
         tx = Transmitter(f=10e9, t=1e-6, tx_power=10, pulses=10, prp=2e-6)
         rx = Receiver(fs=10e6)
-        radar = Radar(transmitter=tx, receiver=rx, time=[0, 1e-3])
+        radar = Radar(transmitter=tx, receiver=rx)
         return radar
 
     def test_init_basic(self, radar_setup):
         """Test initialization with basic parameters."""
         radar = radar_setup
-        assert radar.time_prop["frame_size"] == 2
-        assert np.allclose(radar.time_prop["frame_start_time"], [0, 1e-3])
+        # assert radar.time_prop["frame_size"] == 2
+        # assert np.allclose(radar.time_prop["frame_start_time"], [0, 1e-3])
         assert radar.sample_prop["samples_per_pulse"] == 10
         assert radar.array_prop["size"] == 1
         np.testing.assert_allclose(radar.array_prop["virtual_array"], [[0, 0, 0]])
@@ -54,20 +54,9 @@ class TestRadar:
         """Test timestamp generation."""
         radar = radar_setup
         timestamp = radar.gen_timestamp()
-        assert timestamp.shape == (2, 10, 10)
+        assert timestamp.shape == (1, 10, 10)
         assert np.allclose(timestamp[0, 0, 0], 0)
         assert np.allclose(timestamp[0, 9, 9], 1.89e-05)
-
-    def test_gen_timestamp_multiple_frames(self):
-        """Test timestamp generation with multiple frames."""
-        tx = Transmitter(f=10e9, t=1e-6, tx_power=10, pulses=10, prp=2e-6)
-        rx = Receiver(fs=10e6)
-        radar = Radar(transmitter=tx, receiver=rx, time=[0, 1e-3, 2e-3])
-        timestamp = radar.gen_timestamp()
-        assert timestamp.shape == (3, 10, 10)
-        assert np.allclose(timestamp[0, 0, 0], 0)
-        assert np.allclose(timestamp[1, 0, 0], 1e-3)
-        assert np.allclose(timestamp[2, 9, 9], 0.0020189)
 
     def test_cal_noise(self, radar_setup):
         """Test noise calculation."""
@@ -132,8 +121,8 @@ class TestRadar:
             pn_power=np.array([-100, -110, -120]),
         )
         rx = Receiver(fs=10e6)
-        radar = Radar(transmitter=tx, receiver=rx, time=[0, 1e-3])
-        assert radar.sample_prop["phase_noise"].shape == (10191, )
+        radar = Radar(transmitter=tx, receiver=rx)
+        assert radar.sample_prop["phase_noise"].shape == (191, )
 
     def test_init_with_phase_noise_validation(self):
         """Test initialization with phase noise and validation."""
@@ -147,8 +136,8 @@ class TestRadar:
             pn_power=np.array([-100, -110, -120]),
         )
         rx = Receiver(fs=10e6)
-        radar = Radar(transmitter=tx, receiver=rx, time=[0, 1e-3], validation=True)
-        assert radar.sample_prop["phase_noise"].shape == (10191, )
+        radar = Radar(transmitter=tx, receiver=rx, validation=True)
+        assert radar.sample_prop["phase_noise"].shape == (191, )
 
     def test_init_with_multiple_channels(self):
         """Test initialization with multiple channels."""

@@ -26,6 +26,6 @@ from radarsimpy.includes.type_def cimport float_t
 
 
 cdef Point[float_t] cp_Point(location, speed, rcs, phase, shape)
-cdef Radar[float_t] cp_Radar(radar)
-cdef Target[float_t] cp_Target(radar, target, shape)
+cdef Radar[float_t] cp_Radar(radar, frame_size, frame_start_time)
+cdef Target[float_t] cp_Target(radar, target, timestamp, shape)
 cdef Target[float_t] cp_RCS_Target(target)
