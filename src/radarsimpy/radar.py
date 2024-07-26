@@ -278,33 +278,23 @@ class Radar:
 
     :ivar dict time_prop: Time properties
 
-        - **frame_size**: Number of frames
-
-        - **frame_start_time**: Frame start time
-
         - **timestamp_shape**: Shape of timestamp
 
-        - **timestamp**: Timestamp for each samples
+        - **timestamp**: Timestamp for each samples in a frame
 
-            ``[channes/frames, pulses, samples]``
+            ``[channes, pulses, samples]``
 
-            *Channel/frame order in timestamp*
+            *Channel order in timestamp*
 
-            *[0]* ``Frame[0] -- Tx[0] -- Rx[0]``
+            *[0]* ``Tx[0] -- Rx[0]``
 
-            *[1]* ``Frame[0] -- Tx[0] -- Rx[1]``
-
-            ...
-
-            *[N]* ``Frame[0] -- Tx[1] -- Rx[0]``
-
-            *[N+1]* ``Frame[0] -- Tx[1] -- Rx[1]``
+            *[1]* ``Tx[0] -- Rx[1]``
 
             ...
 
-            *[M]* ``Frame[1] -- Tx[0] -- Rx[0]``
+            *[N-1]* ``Tx[1] -- Rx[0]``
 
-            *[M+1]* ``Frame[1] -- Tx[0] -- Rx[1]``
+            *[N]* ``Tx[1] -- Rx[1]``
 
     :ivar dict sample_prop: Sample properties
 
@@ -456,29 +446,6 @@ class Radar:
             )
             / fs
         )
-
-        # if self.time_prop["frame_size"] > 1:
-        #     toffset = np.repeat(
-        #         np.tile(
-        #             np.expand_dims(
-        #                 np.expand_dims(self.time_prop["frame_start_time"], axis=1),
-        #                 axis=2,
-        #             ),
-        #             (
-        #                 1,
-        #                 self.radar_prop["transmitter"].waveform_prop["pulses"],
-        #                 self.sample_prop["samples_per_pulse"],
-        #             ),
-        #         ),
-        #         channel_size,
-        #         axis=0,
-        #     )
-
-        #     timestamp = (
-        #         np.tile(timestamp, (self.time_prop["frame_size"], 1, 1)) + toffset
-        #     )
-        # elif self.time_prop["frame_size"] == 1:
-        #     timestamp = timestamp + self.time_prop["frame_start_time"]
 
         return timestamp
 
