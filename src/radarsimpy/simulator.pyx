@@ -201,7 +201,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
         }
     :rtype: dict
     """
-    
+
     # radar
     cdef Radar[float_t] radar_c
 
@@ -225,16 +225,8 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
     cdef int_t rxsize_c = radar.radar_prop["receiver"].rxchannel_prop["size"]
     cdef int_t txsize_c = radar.radar_prop["transmitter"].txchannel_prop["size"]
     cdef int_t pulses_c, samples_c
-    frame_start_time = np.array(frame_time, dtype=np.float64)
 
     cdef string log_path_c
-
-    flag_run_scene = False
-
-    if log_path is not None:
-        log_path_c = str.encode(log_path)
-    else:
-        log_path_c = str.encode("")
 
     if IsFreeTier():
         if len(targets) > 3:
@@ -242,12 +234,20 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
 
         if radar.radar_prop["transmitter"].txchannel_prop["size"] > 2:
             raise Exception("You're currently using RadarSimPy's FreeTier, which imposes a restriction on the maximum number of transmitter channels to 2. Please consider supporting my work by upgrading to the standard version. Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ to access the standard version download links. Your support will help improve the software. Thank you for considering it.")
-        
+
         if radar.radar_prop["receiver"].rxchannel_prop["size"] > 2:
             raise Exception("You're currently using RadarSimPy's FreeTier, which imposes a restriction on the maximum number of receiver channels to 2. Please consider supporting my work by upgrading to the standard version. Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ to access the standard version download links. Your support will help improve the software. Thank you for considering it.")
-    
+
+    flag_run_scene = False
+    frame_start_time = np.array(frame_time, dtype=np.float64)
+
     radar_ts = radar.time_prop["timestamp"]
     radar_ts_shape = np.shape(radar.time_prop["timestamp"])
+
+    if log_path is not None:
+        log_path_c = str.encode(log_path)
+    else:
+        log_path_c = str.encode("")
 
     if frames_c > 1:
         toffset = np.repeat(
@@ -296,7 +296,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
             )
 
     radar_c = cp_Radar(radar, frame_start_time)
-    
+
     cdef double[:,:,::1] bb_real = np.empty(ts_shape, order='C', dtype=np.float64)
     cdef double[:,:,::1] bb_imag = np.empty(ts_shape, order='C', dtype=np.float64)
 
@@ -351,7 +351,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
         baseband = baseband+np.asarray(bb_real)+1j*np.asarray(bb_imag)
 
     num_noise_samples = np.ceil((np.max(timestamp_mv)-np.min(timestamp_mv))* radar.radar_prop["receiver"].bb_prop["fs"]).astype(int)+1
-   
+
     if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
         noise = np.zeros(ts_shape, dtype=np.float64)
         noise_per_rx = radar.sample_prop["noise"] * np.random.randn(rxsize_c, num_noise_samples)
