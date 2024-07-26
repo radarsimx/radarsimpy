@@ -220,14 +220,12 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
     cdef int_t level_id = 0
     cdef int_t fm_idx, tx_idx, ps_idx, sp_idx
 
-    frame_size = np.size(frame_time)
-    frame_start_time = np.array(frame_time)
-
-    cdef int_t frames_c = frame_size
+    cdef int_t frames_c = np.size(frame_time)
     cdef int_t channles_c = radar.array_prop["size"]
     cdef int_t rxsize_c = radar.radar_prop["receiver"].rxchannel_prop["size"]
     cdef int_t txsize_c = radar.radar_prop["transmitter"].txchannel_prop["size"]
     cdef int_t pulses_c, samples_c
+    frame_start_time = np.array(frame_time, dtype=np.float64)
 
     cdef string log_path_c
 
@@ -251,7 +249,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
     radar_ts = radar.time_prop["timestamp"]
     radar_ts_shape = np.shape(radar.time_prop["timestamp"])
 
-    if frame_size > 1:
+    if frames_c > 1:
         toffset = np.repeat(
             np.tile(
                 np.expand_dims(
@@ -269,9 +267,9 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
         )
 
         timestamp = (
-            np.tile(radar_ts, (frame_size, 1, 1)) + toffset
+            np.tile(radar_ts, (frames_c, 1, 1)) + toffset
         )
-    elif frame_size == 1:
+    elif frames_c == 1:
         timestamp = radar_ts + frame_start_time
 
     ts_shape = np.shape(timestamp)
