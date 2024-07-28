@@ -31,8 +31,9 @@ from radarsimpy.includes.type_def cimport int_t
 from radarsimpy.includes.radarsimc cimport Radar
 from radarsimpy.includes.radarsimc cimport Snapshot
 from radarsimpy.includes.radarsimc cimport Point
-from radarsimpy.includes.radarsimc cimport Scene
-from radarsimpy.includes.radarsimc cimport Simulator
+from radarsimpy.includes.radarsimc cimport SceneSimulator
+from radarsimpy.includes.radarsimc cimport IdealSimulator
+from radarsimpy.includes.radarsimc cimport InterferenceSimulator
 
 from radarsimpy.includes.radarsimc cimport IsFreeTier
 
@@ -212,8 +213,9 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
     cdef vector[Point[float_t]] point_vt
 
     # simulator
-    cdef Scene[double, float_t] scene_c
-    cdef Simulator[float_t] sim_c
+    cdef SceneSimulator[double, float_t] scene_c
+    cdef IdealSimulator[float_t] sim_c
+    cdef InterferenceSimulator[float_t] int_sim_c
 
     cdef vector[Snapshot[float_t]] snaps
 
@@ -369,7 +371,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
     if interf is not None:
         interf_radar_c = cp_Radar(interf, 0)
 
-        sim_c.Interference(radar_c, interf_radar_c, &bb_real[0][0][0], &bb_imag[0][0][0])
+        int_sim_c.Run(radar_c, interf_radar_c, &bb_real[0][0][0], &bb_imag[0][0][0])
         interference = np.asarray(bb_real)+1j*np.asarray(bb_imag)
 
     else:

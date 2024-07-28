@@ -48,6 +48,7 @@ cdef extern from "libs/mem_lib.hpp":
 cdef extern from "libs/free_tier.hpp":
     cdef int IsFreeTier() except +
 
+
 """
 Target
 """
@@ -131,6 +132,7 @@ cdef extern from "point.hpp":
               const Vec3[T] & speed,
               const vector[T] & rcs,
               const vector[T] & phs) except +
+
 
 """
 Transmitter and TxChannel
@@ -222,28 +224,23 @@ cdef extern from "snapshot.hpp":
 
 
 """
-Simulator
+Ideal Simulator
 """
-cdef extern from "simulator.hpp":
-    cdef cppclass Simulator[T]:
-        Simulator() except +
+cdef extern from "simulator_ideal.hpp":
+    cdef cppclass IdealSimulator[T]:
+        IdealSimulator() except +
         void Run(Radar[T] radar,
                  vector[Point[T]] points,
                  double * bb_real,
                  double * bb_imag)
-        void Interference(Radar[T] radar,
-                          Radar[T] interf_radar,
-                          double *interf_bb_real,
-                          double *interf_bb_imag)
 
 
 """
-Scene
+Scene Simulator
 """
-cdef extern from "scene.hpp":
-    cdef cppclass Scene[T, F]:
-        Scene() except +
-
+cdef extern from "simulator_scene.hpp":
+    cdef cppclass SceneSimulator[T, F]:
+        SceneSimulator() except +
         void AddTarget(const Target[F] & mesh)
         void SetRadar(const Radar[F] & radar)
         void RunSimulator(int level,
@@ -253,3 +250,15 @@ cdef extern from "scene.hpp":
                           string log_path,
                           double * bb_real,
                           double * bb_imag)
+
+
+"""
+Interference Simulator
+"""
+cdef extern from "simulator_interference.hpp":
+    cdef cppclass InterferenceSimulator[T]:
+        InterferenceSimulator() except +
+        void Run(Radar[T] radar,
+                          Radar[T] interf_radar,
+                          double *interf_bb_real,
+                          double *interf_bb_imag)
