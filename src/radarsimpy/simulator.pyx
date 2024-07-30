@@ -31,6 +31,7 @@ from radarsimpy.includes.type_def cimport int_t
 from radarsimpy.includes.radarsimc cimport Radar
 from radarsimpy.includes.radarsimc cimport Snapshot
 from radarsimpy.includes.radarsimc cimport Point
+from radarsimpy.includes.radarsimc cimport Target
 from radarsimpy.includes.radarsimc cimport SceneSimulator
 from radarsimpy.includes.radarsimc cimport IdealSimulator
 from radarsimpy.includes.radarsimc cimport InterferenceSimulator
@@ -211,6 +212,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
 
     # point targets
     cdef vector[Point[float_t]] point_vt
+    cdef vector[Target[float_t]] target_vt
 
     # simulator
     cdef SceneSimulator[double, float_t] scene_c
@@ -284,9 +286,10 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
     for _, tgt in enumerate(targets):
         if "model" in tgt:
             flag_run_scene = True
-            scene_c.AddTarget(
-                cp_Target(radar, tgt, timestamp)
-            )
+            target_vt.push_back(cp_Target(radar, tgt, timestamp))
+            # scene_c.AddTarget(
+            #     cp_Target(radar, tgt, timestamp)
+            # )
         else:
             loc = tgt["location"]
             spd = tgt.get("speed", (0, 0, 0))
@@ -309,7 +312,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
         baseband = 0
 
     if flag_run_scene:
-        scene_c.SetRadar(radar_c)
+        # scene_c.SetRadar(radar_c)
         """
         Snapshot
         """
@@ -341,7 +344,9 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
                                 sp_idx)
                         )
 
-        scene_c.RunSimulator(
+        scene_c.Run(
+            radar_c,
+            target_vt,
             level_id,
             debug,
             snaps,

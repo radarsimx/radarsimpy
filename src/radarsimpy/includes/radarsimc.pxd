@@ -203,7 +203,6 @@ cdef extern from "radar.hpp":
         Radar() except +
         Radar(const Transmitter[T] & tx,
               const Receiver[T] & rx) except +
-
         void SetMotion(const vector[Vec3[T]] & location_array,
                        const vector[Vec3[T]] & speed_array,
                        const vector[Vec3[T]] & rotation_array,
@@ -241,15 +240,15 @@ Scene Simulator
 cdef extern from "simulator_scene.hpp":
     cdef cppclass SceneSimulator[T, F]:
         SceneSimulator() except +
-        void AddTarget(const Target[F] & mesh)
-        void SetRadar(const Radar[F] & radar)
-        void RunSimulator(int level,
-                          bool debug,
-                          vector[Snapshot[F]] & snapshots,
-                          F density,
-                          string log_path,
-                          double * bb_real,
-                          double * bb_imag)
+        void Run(Radar[F] & radar,
+                 vector[Target[F]] & targets,
+                 int level,
+                 bool debug,
+                 vector[Snapshot[F]] & snapshots,
+                 F density,
+                 string log_path,
+                 double * bb_real,
+                 double * bb_imag)
 
 
 """
@@ -259,6 +258,6 @@ cdef extern from "simulator_interference.hpp":
     cdef cppclass InterferenceSimulator[T]:
         InterferenceSimulator() except +
         void Run(Radar[T] radar,
-                          Radar[T] interf_radar,
-                          double *interf_bb_real,
-                          double *interf_bb_imag)
+                 Radar[T] interf_radar,
+                 double *interf_bb_real,
+                 double *interf_bb_imag)
