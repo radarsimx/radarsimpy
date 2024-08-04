@@ -97,7 +97,7 @@ Rcs
 cdef extern from "rcs.hpp":
     cdef cppclass Rcs[T]:
         Rcs() except +
-        Rcs(const vector[Target[float]] & targets,
+        Rcs(vector[Target[float]] & targets,
             const Vec3[T] & inc_dir,
             const Vec3[T] & obs_dir,
             const Vec3[cpp_complex[T]] & inc_polarization,
