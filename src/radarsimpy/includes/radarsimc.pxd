@@ -201,12 +201,12 @@ Radar
 cdef extern from "radar.hpp":
     cdef cppclass Radar[T]:
         Radar() except +
-        Radar(const Transmitter[T] & tx,
-              const Receiver[T] & rx) except +
-        void SetMotion(const vector[Vec3[T]] & location_array,
-                       const vector[Vec3[T]] & speed_array,
-                       const vector[Vec3[T]] & rotation_array,
-                       const vector[Vec3[T]] & rotrate_array)
+        Radar(Transmitter[T] & tx,
+              Receiver[T] & rx,
+              vector[Vec3[T]] & location_array,
+              vector[Vec3[T]] & speed_array,
+              vector[Vec3[T]] & rotation_array,
+              vector[Vec3[T]] & rotrate_array) except +
 
 
 """

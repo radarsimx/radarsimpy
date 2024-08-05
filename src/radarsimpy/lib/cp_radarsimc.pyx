@@ -408,7 +408,6 @@ cdef Radar[float_t] cp_Radar(radar, frame_start_time):
     Radar
     """
     cdef float_t[:] loc_mv, spd_mv, rot_mv, rrt_mv
-    radar_c = Radar[float_t](tx_c, rx_c)
 
     if len(np.shape(radar.radar_prop["location"])) == 4:
         locx_mv = radar.radar_prop["location"][:,:,:,0].astype(np_float)
@@ -442,10 +441,12 @@ cdef Radar[float_t] cp_Radar(radar, frame_start_time):
         rrt_mv = radar.radar_prop["rotation_rate"].astype(np_float)
         rrt_vt.push_back(Vec3[float_t](&rrt_mv[0]))
 
-    radar_c.SetMotion(loc_vt,
-                      spd_vt,
-                      rot_vt,
-                      rrt_vt)
+    radar_c = Radar[float_t](tx_c,
+                             rx_c,
+                             loc_vt,
+                             spd_vt,
+                             rot_vt,
+                             rrt_vt)
     
     return radar_c
 
