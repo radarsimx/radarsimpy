@@ -357,20 +357,25 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
 
         baseband = baseband+np.asarray(bb_real)+1j*np.asarray(bb_imag)
 
-    num_noise_samples = np.ceil((np.max(timestamp_mv)-np.min(timestamp_mv))* radar.radar_prop["receiver"].bb_prop["fs"]).astype(int)+1
+    num_noise_samples = int(np.ceil((np.max(radar_ts)-np.min(radar_ts))* radar.radar_prop["receiver"].bb_prop["fs"]))+1
 
     if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
         noise = np.zeros(ts_shape, dtype=np.float64)
-        noise_per_rx = radar.sample_prop["noise"] * np.random.randn(rxsize_c, num_noise_samples)
     elif radar.radar_prop["receiver"].bb_prop["bb_type"] == "complex":
         noise = np.zeros(ts_shape, dtype=complex)
-        noise_per_rx = radar.sample_prop["noise"]/ np.sqrt(2) * (np.random.randn(rxsize_c, num_noise_samples) + 1j*np.random.randn(rxsize_c, num_noise_samples))
 
-    for ch_idx in range(0, ts_shape[0]):
-        for ps_idx in range(0, ts_shape[1]):
-            t0 = (timestamp_mv[ch_idx, ps_idx, 0] - np.min(timestamp_mv))*radar.radar_prop["receiver"].bb_prop["fs"]
-            rx_ch = ch_idx%rxsize_c
-            noise[ch_idx, ps_idx, :] = noise_per_rx[rx_ch, int(t0):(int(t0)+ts_shape[2])]
+    for frame_idx in range(0, frames_c):
+        if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
+            noise_per_frame_rx = radar.sample_prop["noise"] * np.random.randn(rxsize_c, num_noise_samples)
+        elif radar.radar_prop["receiver"].bb_prop["bb_type"] == "complex":
+            noise_per_frame_rx = radar.sample_prop["noise"]/ np.sqrt(2) * (np.random.randn(rxsize_c, num_noise_samples) + 1j*np.random.randn(rxsize_c, num_noise_samples))
+
+        for ch_idx in range(0, radar_ts_shape[0]):
+            for ps_idx in range(0, radar_ts_shape[1]):
+                f_ch_idx = ch_idx+frame_idx*radar_ts_shape[0]
+                t0 = (radar_ts[ch_idx, ps_idx, 0] - np.min(radar_ts))*radar.radar_prop["receiver"].bb_prop["fs"]
+                rx_ch = ch_idx%rxsize_c
+                noise[f_ch_idx, ps_idx, :] = noise_per_frame_rx[rx_ch, int(t0):(int(t0)+radar_ts_shape[2])]
 
 
     if interf is not None:
