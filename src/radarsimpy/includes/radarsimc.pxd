@@ -19,7 +19,7 @@ A Python module for radar simulation
 
 """
 
-from radarsimpy.includes.zpvector cimport Vec3
+from radarsimpy.includes.zpvector cimport Vec3, Vec2
 from radarsimpy.includes.type_def cimport int_t
 from radarsimpy.includes.type_def cimport vector
 from libcpp cimport bool
@@ -246,6 +246,7 @@ cdef extern from "simulator_scene.hpp":
                  bool debug,
                  vector[Snapshot[F]] & snapshots,
                  F density,
+                 Vec2[int_t] ray_filter,
                  string log_path,
                  double * bb_real,
                  double * bb_imag)

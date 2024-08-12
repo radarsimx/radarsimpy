@@ -28,6 +28,8 @@ from radarsimpy.includes.type_def cimport vector
 from radarsimpy.includes.type_def cimport float_t
 from radarsimpy.includes.type_def cimport int_t
 
+from radarsimpy.includes.zpvector cimport Vec2
+
 from radarsimpy.includes.radarsimc cimport Radar
 from radarsimpy.includes.radarsimc cimport Snapshot
 from radarsimpy.includes.radarsimc cimport Point
@@ -52,7 +54,7 @@ np_float = np.float32
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=None, debug=False, interf=None):
+cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=None, ray_filter=None, debug=False, interf=None):
     """
     sim_radar(radar, targets, density=1, level=None, log_path=None, debug=False, interf=None)
 
@@ -221,6 +223,8 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
 
     cdef vector[Snapshot[float_t]] snaps
 
+    cdef Vec2[int_t] ray_filter_c
+
     cdef int_t level_id = 0
     cdef int_t fm_idx, tx_idx, ps_idx, sp_idx
 
@@ -277,6 +281,11 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
         timestamp = radar_ts + frame_start_time
 
     ts_shape = np.shape(timestamp)
+
+    if ray_filter is None:
+        ray_filter_c = Vec2[int_t](0, 10)
+    else:
+        ray_filter_c = Vec2[int_t](<int_t>ray_filter[0], <int_t>ray_filter[1])
 
     """
     Targets
@@ -351,6 +360,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
             debug,
             snaps,
             <float_t> density,
+            ray_filter_c,
             log_path_c,
             &bb_real[0][0][0],
             &bb_imag[0][0][0])
