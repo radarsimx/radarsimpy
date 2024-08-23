@@ -316,7 +316,10 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, noise=True,
 
     if point_vt.size() > 0:
         sim_c.Run(radar_c, point_vt, &bb_real[0][0][0], &bb_imag[0][0][0])
-        baseband = np.asarray(bb_real)+1j*np.asarray(bb_imag)
+        if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
+            baseband = np.asarray(bb_real)
+        else:
+            baseband = np.asarray(bb_real)+1j*np.asarray(bb_imag)
     else:
         baseband = 0
 
@@ -365,10 +368,10 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, noise=True,
             &bb_real[0][0][0],
             &bb_imag[0][0][0])
 
-        baseband = baseband+np.asarray(bb_real)+1j*np.asarray(bb_imag)
-    
-    if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
-        baseband = np.real(baseband)
+        if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
+            baseband = baseband+np.asarray(bb_real)
+        else:
+            baseband = baseband+np.asarray(bb_real)+1j*np.asarray(bb_imag)
 
     num_noise_samples = int(np.ceil((np.max(radar_ts)-np.min(radar_ts))* radar.radar_prop["receiver"].bb_prop["fs"]))+1
 
@@ -393,15 +396,15 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, noise=True,
     else:
         noise_mat = None
 
-
     if interf is not None:
         interf_radar_c = cp_Radar(interf, 0)
 
         int_sim_c.Run(radar_c, interf_radar_c, &bb_real[0][0][0], &bb_imag[0][0][0])
-        interference = np.asarray(bb_real)+1j*np.asarray(bb_imag)
 
         if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
-            interference = np.real(interference)
+            interference = np.asarray(bb_real)
+        else:
+            interference = np.asarray(bb_real)+1j*np.asarray(bb_imag)
 
     else:
         interference = None
