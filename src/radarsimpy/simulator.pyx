@@ -19,6 +19,7 @@ A Python module for radar simulation
 
 """
 
+import warnings
 
 import numpy as np
 
@@ -524,5 +525,7 @@ cpdef simc(radar, targets, interf=None):
         }
     :rtype: dict
     """
+
+    warnings.warn("The `simc()` function has been deprecated, please use `sim_radar()`.", DeprecationWarning)
 
     return sim_radar(radar, targets, interf=interf)

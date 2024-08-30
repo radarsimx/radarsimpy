@@ -19,6 +19,7 @@ A Python module for radar simulation
 
 """
 
+import warnings
 from radarsimpy.simulator import sim_radar
 
 cimport cython
@@ -161,5 +162,7 @@ cpdef scene(radar, targets, density=1, level=None, log_path=None, debug=False, i
         }
     :rtype: dict
     """
+
+    warnings.warn("The `scene()` function has been deprecated, please use `sim_radar()`.", DeprecationWarning)
 
     return sim_radar(radar, targets, density=density, level=level, log_path=log_path, debug=debug, interf=interf)
