@@ -28,7 +28,7 @@ from radarsimpy.includes.radarsimc cimport Radar
 from radarsimpy.includes.radarsimc cimport Target
 from radarsimpy.includes.radarsimc cimport Point
 
-from radarsimpy.includes.zpvector cimport Vec3
+from radarsimpy.includes.rsvector cimport Vec3
 from radarsimpy.includes.type_def cimport int_t, float_t
 from radarsimpy.includes.type_def cimport vector
 

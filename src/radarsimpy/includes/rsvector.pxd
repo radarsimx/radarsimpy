@@ -20,11 +20,11 @@ A Python module for radar simulation
 """
 
 """
-zpvector
+rsvector
 
 vector library
 """
-cdef extern from "zpvector.hpp" namespace "zpv" nogil:
+cdef extern from "rsvector.hpp" namespace "rsv" nogil:
     # 3D vector
     cdef cppclass Vec3[T]:
         Vec3()

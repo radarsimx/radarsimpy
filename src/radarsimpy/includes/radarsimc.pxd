@@ -19,7 +19,7 @@ A Python module for radar simulation
 
 """
 
-from radarsimpy.includes.zpvector cimport Vec3, Vec2
+from radarsimpy.includes.rsvector cimport Vec3, Vec2
 from radarsimpy.includes.type_def cimport int_t
 from radarsimpy.includes.type_def cimport vector
 from libcpp cimport bool

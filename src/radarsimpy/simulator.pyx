@@ -29,7 +29,7 @@ from radarsimpy.includes.type_def cimport vector
 from radarsimpy.includes.type_def cimport float_t
 from radarsimpy.includes.type_def cimport int_t
 
-from radarsimpy.includes.zpvector cimport Vec2
+from radarsimpy.includes.rsvector cimport Vec2
 
 from radarsimpy.includes.radarsimc cimport Radar
 from radarsimpy.includes.radarsimc cimport Snapshot

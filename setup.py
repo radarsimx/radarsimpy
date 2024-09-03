@@ -175,7 +175,7 @@ else:
     elif ARG_ARCH == "cpu":
         MACROS = [("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]
 
-INCLUDE_DIRS = ["src/radarsimcpp/includes", "src/radarsimcpp/includes/zpvector"]
+INCLUDE_DIRS = ["src/radarsimcpp/includes", "src/radarsimcpp/includes/rsvector"]
 
 if ARG_ARCH == "gpu":
     CUDA = locate_cuda()
