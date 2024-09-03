@@ -21,8 +21,7 @@ System level test for arbitrary waveform
 import numpy as np
 
 from radarsimpy import Radar, Transmitter, Receiver
-from radarsimpy.simulator import simc  # pylint: disable=no-name-in-module
-from radarsimpy.rt import scene  # pylint: disable=no-name-in-module
+from radarsimpy.simulator import sim_radar  # pylint: disable=no-name-in-module
 
 
 def test_arbitrary_waveform():
@@ -164,7 +163,7 @@ def test_arbitrary_waveform():
 
     targets = [{"location": (200, 0, 0), "speed": (-5, 0, 0), "rcs": 20, "phase": 0}]
 
-    result = simc(radar_nonlinear, targets)
+    result = sim_radar(radar_nonlinear, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -367,7 +366,7 @@ def test_arbitrary_waveform_raytracing():
         }
     ]
 
-    result = scene(radar_nonlinear, targets, density=1)
+    result = sim_radar(radar_nonlinear, targets, density=1)
 
     assert np.allclose(
         result["baseband"],

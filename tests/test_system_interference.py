@@ -22,8 +22,7 @@ import numpy as np
 import numpy.testing as npt
 
 from radarsimpy import Radar, Transmitter, Receiver
-from radarsimpy.rt import scene  # pylint: disable=no-name-in-module
-from radarsimpy.simulator import simc  # pylint: disable=no-name-in-module
+from radarsimpy.simulator import sim_radar  # pylint: disable=no-name-in-module
 
 
 def test_scene_interference():
@@ -82,7 +81,7 @@ def test_scene_interference():
 
     targets = [target_1]
 
-    data = scene(radar, targets, density=0.2, debug=False, interf=int_radar)
+    data = sim_radar(radar, targets, density=0.2, debug=False, interf=int_radar)
 
     inc_bb = data["interference"]
 
@@ -1452,7 +1451,7 @@ def test_simc_interference():
 
     targets = [target_1]
 
-    data = simc(radar, targets, interf=radar_int)
+    data = sim_radar(radar, targets, interf=radar_int)
 
     inc_bb = data["interference"]
 

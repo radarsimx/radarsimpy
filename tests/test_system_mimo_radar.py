@@ -24,7 +24,7 @@ import numpy.testing as npt
 from scipy import signal
 
 from radarsimpy import Radar, Transmitter, Receiver
-from radarsimpy.simulator import simc  # pylint: disable=no-name-in-module
+from radarsimpy.simulator import sim_radar  # pylint: disable=no-name-in-module
 import radarsimpy.processing as proc
 
 
@@ -75,7 +75,7 @@ def test_sim_tdm_fmcw():
 
     targets = [target_1, target_2, target_3]
 
-    data = simc(radar, targets)
+    data = sim_radar(radar, targets)
     timestamp = data["timestamp"]
     baseband = data["baseband"]
 
@@ -793,7 +793,7 @@ def test_sim_pmcw():
 
     targets = [target_1, target_2, target_3]
 
-    data = simc(radar, targets)
+    data = sim_radar(radar, targets)
     timestamp = data["timestamp"]
     baseband = data["baseband"]
 

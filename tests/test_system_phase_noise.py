@@ -23,7 +23,7 @@ import numpy as np
 import numpy.testing as npt
 
 from radarsimpy import Radar, Transmitter, Receiver
-from radarsimpy.simulator import simc  # pylint: disable=no-name-in-module
+from radarsimpy.simulator import sim_radar  # pylint: disable=no-name-in-module
 from radarsimpy.radar import cal_phase_noise
 import radarsimpy.processing as proc
 
@@ -96,9 +96,9 @@ def test_fmcw_phase_noise():
 
     targets = [target_1]
 
-    data_cpp_pn = simc(radar_pn, targets)
+    data_cpp_pn = sim_radar(radar_pn, targets)
     data_matrix_cpp_pn = data_cpp_pn["baseband"]
-    data_cpp = simc(radar, targets)
+    data_cpp = sim_radar(radar, targets)
     data_matrix_cpp = data_cpp["baseband"]
 
     range_window = signal.windows.chebwin(radar.sample_prop["samples_per_pulse"], at=60)

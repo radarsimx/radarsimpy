@@ -1,5 +1,5 @@
 """
-System level test for raytracing-based scene simulation
+System level test for raytracing-based sim_radar simulation
 
 ---
 
@@ -20,8 +20,7 @@ System level test for raytracing-based scene simulation
 
 import numpy as np
 from radarsimpy import Radar, Transmitter, Receiver
-from radarsimpy.simulator import simc  # pylint: disable=no-name-in-module
-from radarsimpy.rt import scene  # pylint: disable=no-name-in-module
+from radarsimpy.simulator import sim_radar  # pylint: disable=no-name-in-module
 
 
 def test_sim_cw():
@@ -52,7 +51,7 @@ def test_sim_cw():
     }
     targets = [target]
 
-    result = simc(radar, targets)
+    result = sim_radar(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -110,7 +109,7 @@ def test_sim_cw_raytracing():
     }
     targets = [target]
 
-    result = scene(radar, targets, density=1, level="sample")
+    result = sim_radar(radar, targets, density=1, level="sample")
 
     assert np.allclose(
         result["baseband"],
