@@ -11,8 +11,8 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
-        c_compiler: [gcc-13]
-        cxx_compiler: [g++-13]
+        c_compiler: [gcc-14]
+        cxx_compiler: [g++-14]
 
     steps:
       - uses: actions/checkout@v4
@@ -22,7 +22,7 @@ jobs:
       - uses: maxim-lobanov/setup-xcode@v1.6.0
         with:
           # Version of Xcode to use
-          xcode-version: latest-stable
+          xcode-version: '15.4'
       - name: Set up Python ${{matrix.python-version}}
         uses: actions/setup-python@v5
         with:
@@ -42,5 +42,5 @@ jobs:
         uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: radarsimpy_macos_py${{matrix.python-version}}_freetier
+          name: radarsimpy_macos_arm_py${{matrix.python-version}}_freetier
           path: ./radarsimpy
