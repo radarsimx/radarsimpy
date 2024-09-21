@@ -374,7 +374,9 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, noise=True,
         else:
             baseband = baseband+np.asarray(bb_real)+1j*np.asarray(bb_imag)
 
-    num_noise_samples = int(np.ceil((np.max(radar_ts)-np.min(radar_ts))* radar.radar_prop["receiver"].bb_prop["fs"]))+1
+    max_ts = np.max(radar_ts)
+    min_ts = np.min(radar_ts)
+    num_noise_samples = int(np.ceil((max_ts-min_ts)* radar.radar_prop["receiver"].bb_prop["fs"]))+1
 
     if noise:
         if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
@@ -391,7 +393,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, noise=True,
             for ch_idx in range(0, radar_ts_shape[0]):
                 for ps_idx in range(0, radar_ts_shape[1]):
                     f_ch_idx = ch_idx+frame_idx*radar_ts_shape[0]
-                    t0 = (radar_ts[ch_idx, ps_idx, 0] - np.min(radar_ts))*radar.radar_prop["receiver"].bb_prop["fs"]
+                    t0 = (radar_ts[ch_idx, ps_idx, 0] - min_ts)*radar.radar_prop["receiver"].bb_prop["fs"]
                     rx_ch = ch_idx%rxsize_c
                     noise_mat[f_ch_idx, ps_idx, :] = noise_per_frame_rx[rx_ch, int(t0):(int(t0)+radar_ts_shape[2])]
     else:
@@ -424,106 +426,6 @@ cpdef simc(radar, targets, interf=None):
     simc(radar, targets, interf=None)
 
     **deprecated** Please use `simulator.sim_radar(radar, targets, interf=None)`
-
-    Radar simulator with C++ engine
-
-    :param Radar radar:
-        Radar model
-    :param list[dict] targets:
-        Ideal point target list
-
-        [{
-
-        - **location** (*numpy.1darray*) --
-            Location of the target (m), [x, y, z]
-        - **rcs** (*float*) --
-            Target RCS (dBsm)
-        - **speed** (*numpy.1darray*) --
-            Speed of the target (m/s), [vx, vy, vz]. ``default
-            [0, 0, 0]``
-        - **phase** (*float*) --
-            Target phase (deg). ``default 0``
-
-        }]
-
-        *Note*: Target's parameters can be specified with
-        ``Radar.timestamp`` to customize the time varying property.
-        Example: ``location=(1e-3*np.sin(2*np.pi*1*radar.timestamp), 0, 0)``
-
-    :return:
-        {
-
-        - **baseband** (*numpy.3darray*) --
-            Time domain baseband data.
-            ``[channes/frames, pulses, samples]``
-
-            *Channel/frame order in baseband*
-
-            *[0]* ``Frame[0] -- Tx[0] -- Rx[0]``
-
-            *[1]* ``Frame[0] -- Tx[0] -- Rx[1]``
-
-            ...
-
-            *[N]* ``Frame[0] -- Tx[1] -- Rx[0]``
-
-            *[N+1]* ``Frame[0] -- Tx[1] -- Rx[1]``
-
-            ...
-
-            *[M]* ``Frame[1] -- Tx[0] -- Rx[0]``
-
-            *[M+1]* ``Frame[1] -- Tx[0] -- Rx[1]``
-        
-        - **noise** (*numpy.3darray*) --
-            Time domain noise data.
-            ``[channes/frames, pulses, samples]``
-
-            *Channel/frame order in baseband*
-
-            *[0]* ``Frame[0] -- Tx[0] -- Rx[0]``
-
-            *[1]* ``Frame[0] -- Tx[0] -- Rx[1]``
-
-            ...
-
-            *[N]* ``Frame[0] -- Tx[1] -- Rx[0]``
-
-            *[N+1]* ``Frame[0] -- Tx[1] -- Rx[1]``
-
-            ...
-
-            *[M]* ``Frame[1] -- Tx[0] -- Rx[0]``
-
-            *[M+1]* ``Frame[1] -- Tx[0] -- Rx[1]``
-
-        - **interference** (*numpy.3darray*) --
-            Time domain interference data.
-            ``[channes/frames, pulses, samples]``
-
-            *Channel/frame order in baseband*
-
-            *[0]* ``Frame[0] -- Tx[0] -- Rx[0]``
-
-            *[1]* ``Frame[0] -- Tx[0] -- Rx[1]``
-
-            ...
-
-            *[N]* ``Frame[0] -- Tx[1] -- Rx[0]``
-
-            *[N+1]* ``Frame[0] -- Tx[1] -- Rx[1]``
-
-            ...
-
-            *[M]* ``Frame[1] -- Tx[0] -- Rx[0]``
-
-            *[M+1]* ``Frame[1] -- Tx[0] -- Rx[1]``
-
-        - **timestamp** (*numpy.3darray*) --
-            Refer to Radar.timestamp
-
-        }
-    :rtype: dict
     """
 
     warnings.warn("The `simc()` function has been deprecated, please use `sim_radar()`.", DeprecationWarning)
