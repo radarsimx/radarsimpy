@@ -1,4 +1,4 @@
-name: Release on Linux x86_64
+name: Release on Ubuntu 22.04 x86_64 Free Tier
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
@@ -34,10 +34,10 @@ jobs:
         run: |
           sudo chown -R $USER:$USER /home/runner/work/radarsimpy
           chmod +x build_linux.sh
-          ./build_linux.sh --tier=standard --arch=cpu --test=off
+          ./build_linux.sh --tier=free --arch=cpu --test=off
       - name: Archive built module
         uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: radarsimpy_linux_py${{matrix.python-version}}
+          name: radarsimpy_ubuntu_22_py${{matrix.python-version}}_freetier
           path: ./radarsimpy
