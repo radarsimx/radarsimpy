@@ -1,4 +1,4 @@
-name: Windows x86_64 Test
+name: Windows x86-64 Test
 
 on:
   push:
