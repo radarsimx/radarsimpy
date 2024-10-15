@@ -1,10 +1,9 @@
-name: MacOS x86_64 Test
+name: Release on MacOS x64
 
 on:
   push:
-    branches: [master]
-  pull_request:
-    branches: [master]
+    tags:
+      - "*"
 
 jobs:
   build:
@@ -39,9 +38,9 @@ jobs:
         run: |
           chmod +x build_macos.sh
           ./build_macos.sh --tier=standard --arch=cpu --test=off
-      - name: Test with Google Test
-        run: |
-          ./src/radarsimcpp/build/radarsimcpp_test
-      - name: Test with pytest
-        run: |
-          pytest
+      - name: Archive built module
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: radarsimpy_macos_py${{matrix.python-version}}
+          path: ./radarsimpy

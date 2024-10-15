@@ -1,9 +1,10 @@
-name: Release on Windows x86_64
+name: Windows x64
 
 on:
   push:
-    tags:
-      - "*"
+    branches: [master]
+  pull_request:
+    branches: [master]
 
 jobs:
   build:
@@ -30,9 +31,9 @@ jobs:
       - name: Build
         run: |
           .\build_win.bat --tier standard --arch cpu --test off
-      - name: Archive built module
-        uses: actions/upload-artifact@v4
-        if: success()
-        with:
-          name: radarsimpy_win_py${{matrix.python-version}}
-          path: .\radarsimpy
+      - name: Test with Google Test
+        run: |
+          .\src\radarsimcpp\build\Release\radarsimcpp_test.exe
+      - name: Test with pytest
+        run: |
+          pytest

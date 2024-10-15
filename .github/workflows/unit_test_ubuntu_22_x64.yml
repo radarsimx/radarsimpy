@@ -1,4 +1,4 @@
-name: Windows x86-64 Test
+name: Ubuntu 22.04 x64
 
 on:
   push:
@@ -8,14 +8,14 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
+        c_compiler: [gcc-11]
+        cxx_compiler: [g++-11]
 
     steps:
-      - name: Remove Windows OpenSSH and use the default ssh in git
-        run: Remove-WindowsCapability -Online -Name OpenSSH.Client
       - uses: actions/checkout@v4
         with:
           ssh-key: ${{secrets.RADARSIMC}}
@@ -29,11 +29,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Build
+        env:
+          CC: ${{matrix.c_compiler}}
+          CXX: ${{matrix.cxx_compiler}}
         run: |
-          .\build_win.bat --tier standard --arch cpu --test off
+          sudo chown -R $USER:$USER /home/runner/work/radarsimpy
+          chmod +x build_linux.sh
+          ./build_linux.sh --tier=standard --arch=cpu --test=off
       - name: Test with Google Test
         run: |
-          .\src\radarsimcpp\build\Release\radarsimcpp_test.exe
+          ./src/radarsimcpp/build/radarsimcpp_test
       - name: Test with pytest
         run: |
           pytest

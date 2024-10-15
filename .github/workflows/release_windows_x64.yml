@@ -1,4 +1,4 @@
-name: Release on Windows x86_64 Free Tier
+name: Release on Windows x64
 
 on:
   push:
@@ -29,10 +29,10 @@ jobs:
           pip install -r requirements.txt
       - name: Build
         run: |
-          .\build_win.bat --tier free --arch cpu --test off
+          .\build_win.bat --tier standard --arch cpu --test off
       - name: Archive built module
         uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: radarsimpy_win_py${{matrix.python-version}}_freetier
+          name: radarsimpy_win_py${{matrix.python-version}}
           path: .\radarsimpy

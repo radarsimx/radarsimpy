@@ -1,25 +1,28 @@
-name: Ubuntu 24.04 x86_64 Test
+name: Release on MacOS x64 Free Tier
 
 on:
   push:
-    branches: [master]
-  pull_request:
-    branches: [master]
+    tags:
+      - "*"
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: macos-13
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
-        c_compiler: [gcc-14]
-        cxx_compiler: [g++-14]
+        c_compiler: [gcc-13]
+        cxx_compiler: [g++-13]
 
     steps:
       - uses: actions/checkout@v4
         with:
           ssh-key: ${{secrets.RADARSIMC}}
           submodules: true
+      - uses: maxim-lobanov/setup-xcode@v1.6.0
+        with:
+          # Version of Xcode to use
+          xcode-version: '14.3.1'
       - name: Set up Python ${{matrix.python-version}}
         uses: actions/setup-python@v5
         with:
@@ -33,12 +36,11 @@ jobs:
           CC: ${{matrix.c_compiler}}
           CXX: ${{matrix.cxx_compiler}}
         run: |
-          sudo chown -R $USER:$USER /home/runner/work/radarsimpy
-          chmod +x build_linux.sh
-          ./build_linux.sh --tier=standard --arch=cpu --test=off
-      - name: Test with Google Test
-        run: |
-          ./src/radarsimcpp/build/radarsimcpp_test
-      - name: Test with pytest
-        run: |
-          pytest
+          chmod +x build_macos.sh
+          ./build_macos.sh --tier=free --arch=cpu --test=off
+      - name: Archive built module
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: radarsimpy_macos_py${{matrix.python-version}}_freetier
+          path: ./radarsimpy

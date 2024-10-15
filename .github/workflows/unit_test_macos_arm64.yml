@@ -1,4 +1,4 @@
-name: MacOS Apple Silicon Test
+name: MacOS Apple Silicon
 
 on:
   push:

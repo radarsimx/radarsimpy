@@ -1,4 +1,4 @@
-name: Release on Ubuntu 22.04 x86_64
+name: Release on Windows x64 Free Tier
 
 on:
   push:
@@ -7,14 +7,14 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: windows-latest
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
-        c_compiler: [gcc-11]
-        cxx_compiler: [g++-11]
 
     steps:
+      - name: Remove Windows OpenSSH and use the default ssh in git
+        run: Remove-WindowsCapability -Online -Name OpenSSH.Client
       - uses: actions/checkout@v4
         with:
           ssh-key: ${{secrets.RADARSIMC}}
@@ -28,16 +28,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Build
-        env:
-          CC: ${{matrix.c_compiler}}
-          CXX: ${{matrix.cxx_compiler}}
         run: |
-          sudo chown -R $USER:$USER /home/runner/work/radarsimpy
-          chmod +x build_linux.sh
-          ./build_linux.sh --tier=standard --arch=cpu --test=off
+          .\build_win.bat --tier free --arch cpu --test off
       - name: Archive built module
         uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: radarsimpy_ubuntu_22_py${{matrix.python-version}}
-          path: ./radarsimpy
+          name: radarsimpy_win_py${{matrix.python-version}}_freetier
+          path: .\radarsimpy
