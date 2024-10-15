@@ -1,6 +1,6 @@
 [![Windows x64](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_windows_x64.yml/badge.svg)](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_windows_x64.yml)
-[![Ubuntu 22.04 x64](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_ubuntu_22_x64.yml/badge.svg)](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_ubuntu_22_x64.yml)
-[![Ubuntu 24.04 x64](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_ubuntu_24_x64.yml/badge.svg)](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_ubuntu_24_x64.yml)
+[![Ubuntu 22 x64](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_ubuntu_22_x64.yml/badge.svg)](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_ubuntu_22_x64.yml)
+[![Ubuntu 24 x64](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_ubuntu_24_x64.yml/badge.svg)](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_ubuntu_24_x64.yml)
 [![MacOS x64](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_macos_x64.yml/badge.svg)](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_macos_x64.yml)
 [![MacOS Apple Silicon](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_macos_arm64.yml/badge.svg)](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_macos_arm64.yml)
 
