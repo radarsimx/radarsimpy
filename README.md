@@ -29,9 +29,9 @@ RadarSimPy is a powerful and versatile Python-based Radar Simulator that models 
 
   - Simulation of radar baseband data from point targets
   - Simulation of interference
-  - Simulation of radar baseband data from 3D modeled objects/environment (**`#raytracing`**)
-  - Simulation of target's RCS (**`#raytracing`**)
-  - Simulation of LiDAR point cloud from 3D modeled objects/environment (**`#raytracing`**)
+  - Simulation of radar baseband data from 3D modeled objects/environment
+  - Simulation of target's RCS
+  - Simulation of LiDAR point cloud from 3D modeled objects/environment
 
 - ### Signal Processing
 
@@ -54,38 +54,45 @@ RadarSimPy is a powerful and versatile Python-based Radar Simulator that models 
 
 ## Dependence
 
-#### All Variants
+### All Variants
+
 - `Python` >= 3.9
 - `NumPy` >= 2.0
 - `SciPy`
 - `PyMeshLab` (*preferred*) or `meshio`
 
-#### Windows
-- [`Visual C++ Runtime`](https://aka.ms/vs/16/release/vc_redist.x64.exe/)
+- #### Windows
 
-#### Ubuntu 22.04
-- `GCC 11` *(Included by defualt, no additional installation required)*
+  - [`Visual C++ Runtime`](https://aka.ms/vs/16/release/vc_redist.x64.exe/)
 
-#### Ubuntu 24.04
-- `GCC 14` *(Included by defualt, no additional installation required)*
+- #### Ubuntu 22.04
 
-#### Generic Linux x86-64
-- Try the module for Ubuntu 22.04 or Ubuntu 24.04
-- [Request a Custom Build](https://radarsimx.com/request-a-custom-build/) if it doesn't work
+  - `GCC 11` *(Included by defualt, no additional installation required)*
 
-#### MacOS Intel
-- `GCC 13`
+- #### Ubuntu 24.04
 
-```bash
-brew install gcc@13
-```
+  - `GCC 14` *(Included by defualt, no additional installation required)*
 
-#### MacOS Apple Silicon
-- `GCC 14`
+- #### Generic Linux x86-64
 
-```bash
-brew install gcc@14
-```
+  - Try the module for Ubuntu 22.04 or Ubuntu 24.04
+  - [Request a Custom Build](https://radarsimx.com/request-a-custom-build/) if it doesn't work
+
+- #### MacOS Intel
+
+  - `GCC 13`
+
+    ```bash
+    brew install gcc@13
+    ```
+
+- #### MacOS Apple Silicon
+
+  - `GCC 14`
+
+    ```bash
+    brew install gcc@14
+    ```
 
 ## Installation
 
@@ -216,35 +223,35 @@ The source files of these Jupyter notebooks are available [here](https://github.
 
 **Building `radarsimpy` requires to access the source code of `radarsimcpp`. If you don't have access to `radarsimcpp`, please use the [pre-built module](https://radarsimx.com/product/radarsimpy/).**
 
-- Windows CPU
+- ### Windows (MSVC)
 
-```batch
-build_win.bat --arch cpu --test on
-```
+  ```batch
+  build_win.bat --arch cpu --test on
+  ```
 
-- Windows CUDA
+  Build for GPU (CUDA)
 
-```batch
-build_win.bat --arch gpu --test on
-```
+  ```batch
+  build_win.bat --arch gpu --test on
+  ```
 
-- Linux CPU
+- ### Linux (GCC)
 
-```bash
-./build_linux.sh --arch=cpu --test=on
-```
+  ```bash
+  ./build_linux.sh --arch=cpu --test=on
+  ```
 
-- Linux CUDA
+  Build for GPU (CUDA)
 
-```bash
-./build_linux.sh --arch=gpu --test=on
-```
+  ```bash
+  ./build_linux.sh --arch=gpu --test=on
+  ```
 
-- MacOS CPU
+- ### MacOS (GCC)
 
-```bash
-./build_linux.sh --arch=cpu --test=on
-```
+  ```bash
+  ./build_macos.sh --arch=cpu --test=on
+  ```
 
 ## API Reference
 
