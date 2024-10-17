@@ -54,31 +54,29 @@ RadarSimPy is a powerful and versatile Python-based Radar Simulator that models 
 
 ## Dependence
 
-### All Variants
-
 - `Python` >= 3.9
 - `NumPy` >= 2.0
 - `SciPy`
 - `PyMeshLab` (*preferred*) or `meshio`
 
-- #### Windows
+- ### Windows
 
   - [`Visual C++ Runtime`](https://aka.ms/vs/16/release/vc_redist.x64.exe/)
 
-- #### Ubuntu 22.04
+- ### Ubuntu 22.04
 
   - `GCC 11` *(Included by defualt, no additional installation required)*
 
-- #### Ubuntu 24.04
+- ### Ubuntu 24.04
 
   - `GCC 14` *(Included by defualt, no additional installation required)*
 
-- #### Generic Linux x86-64
+- ### Generic Linux x86-64
 
   - Try the module for Ubuntu 22.04 or Ubuntu 24.04
   - [Request a Custom Build](https://radarsimx.com/request-a-custom-build/) if it doesn't work
 
-- #### MacOS Intel
+- ### MacOS Intel
 
   - `GCC 13`
 
@@ -86,7 +84,7 @@ RadarSimPy is a powerful and versatile Python-based Radar Simulator that models 
     brew install gcc@13
     ```
 
-- #### MacOS Apple Silicon
+- ### MacOS Apple Silicon
 
   - `GCC 14`
 
