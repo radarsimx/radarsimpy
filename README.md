@@ -20,16 +20,16 @@ RadarSimPy is a powerful and versatile Python-based Radar Simulator that models 
 - ### Radar Modeling
 
   - Radar transceiver modeling
-  - Arbitrary waveform
+  - Arbitrary waveform (CW, FMCW, PMCW, Pulse, ...)
   - Phase noise
-  - Phase/amplitude modulation
+  - Phase/amplitude modulation (CDM, FDM, DDM, TDM, ...)
   - Fast-time/slow-time modulation
 
 - ### Simulation
 
   - Simulation of radar baseband data from point targets
-  - Simulation of interference
   - Simulation of radar baseband data from 3D modeled objects/environment
+  - Simulation of interference
   - Simulation of target's RCS
   - Simulation of LiDAR point cloud from 3D modeled objects/environment
 
