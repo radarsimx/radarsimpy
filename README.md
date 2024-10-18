@@ -149,11 +149,11 @@ This module supports CPU/GPU parallelization.
 CPU parallelization is implemented through OpenMP.
 GPU parallelization (CUDA) has been added since v6.0.0.
 
-|         | CPU (x86-64) | CPU (ARM64) | GPU (CUDA) |
+|         | CPU (x86-64) | CPU (ARM64) | GPU (CUDA) |
 |---------|--------------|-------------|------------|
-| Windows | ✔️           | ❌️           | ✔️        |
-| Linux   | ✔️           | ❌️           | ✔️        |
-| MacOS   | ✔️           | ✔️          | ❌️         |
+| Windows | ✔️           | ❌️           | ✔️        |
+| Linux   | ✔️           | ❌️           | ✔️        |
+| MacOS   | ✔️           | ✔️          | ❌️         |
 
 ![performance](https://github.com/radarsimx/radarsimpy/raw/master/assets/performance.png)
 
