@@ -25,7 +25,7 @@ import numpy as np
 
 from libcpp.string cimport string
 
-from radarsimpy.includes.type_def cimport vector
+from libcpp.vector cimport vector
 from radarsimpy.includes.type_def cimport float_t
 from radarsimpy.includes.type_def cimport int_t
 
