@@ -227,7 +227,7 @@ Check all the usage examples on [radarsimx.com](https://radarsimx.com/category/e
 
 - ### System Characterization
 
-  - [FMCW Radar Link Budget – Ideal Point Target](https://radarsimx.com/2024/10/11/fmcw-radar-link-budget-ideal-point-target/)
+  - [FMCW Radar Link Budget - Ideal Point Target](https://radarsimx.com/2024/10/11/fmcw-radar-link-budget-ideal-point-target/)
   - [Phase noise](https://radarsimx.com/2021/01/13/phase-noise/)
   - [Receiver operating characteristic (ROC)](https://radarsimx.com/2019/10/06/receiver-operating-characteristic/)
 
