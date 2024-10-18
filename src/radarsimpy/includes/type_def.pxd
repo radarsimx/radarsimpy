@@ -28,6 +28,9 @@ ctypedef float float_t
 
 """
 C++ vector
+
+Copy from Cython's libcpp/vector.pxd
+Remove ALLOCATOR=*, otherwise 'const &' doesn't work
 """
 cdef extern from "<vector>" namespace "std" nogil:
     cdef cppclass vector[T]:
