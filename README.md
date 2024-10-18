@@ -244,7 +244,7 @@ Check all the usage examples on [radarsimx.com](https://radarsimx.com/category/e
 
 ## Build
 
-**Building `radarsimpy` requires to access the source code of `radarsimcpp`. If you don't have access to `radarsimcpp`, please use the [pre-built module](https://radarsimx.com/product/radarsimpy/).**
+> **Building `radarsimpy` requires to access the source code of `radarsimcpp`. If you don't have access to `radarsimcpp`, please use the [pre-built module](https://radarsimx.com/product/radarsimpy/).**
 
 - ### Windows (MSVC)
 
