@@ -129,7 +129,7 @@ cdef extern from "point.hpp":
     cdef cppclass Point[T]:
         Point() except +
         Point(vector[Vec3[T]] & loc,
-              Vec3[T] & speed,
+              Vec3[T] speed,
               vector[T] & rcs,
               vector[T] & phs) except +
 
