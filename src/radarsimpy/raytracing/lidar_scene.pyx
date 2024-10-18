@@ -23,8 +23,7 @@ A Python module for radar simulation
 from radarsimpy.includes.radarsimc cimport Target, PointCloud
 from radarsimpy.includes.radarsimc cimport Mem_Copy
 from radarsimpy.includes.rsvector cimport Vec3
-from radarsimpy.includes.type_def cimport float_t, int_t
-from libcpp.vector cimport vector
+from radarsimpy.includes.type_def cimport float_t, int_t, vector
 
 # import meshio
 import numpy as np

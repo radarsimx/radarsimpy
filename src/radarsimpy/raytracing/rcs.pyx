@@ -21,7 +21,7 @@ A Python module for radar simulation
 
 
 from radarsimpy.includes.rsvector cimport Vec3
-from libcpp.vector cimport vector
+from radarsimpy.includes.type_def cimport vector
 from radarsimpy.lib.cp_radarsimc cimport cp_RCS_Target
 from radarsimpy.includes.radarsimc cimport Target, Rcs
 

@@ -21,7 +21,7 @@ A Python module for radar simulation
 
 from radarsimpy.includes.rsvector cimport Vec3, Vec2
 from radarsimpy.includes.type_def cimport int_t
-from libcpp.vector cimport vector
+from radarsimpy.includes.type_def cimport vector
 from libcpp cimport bool
 from libcpp.complex cimport complex as cpp_complex
 from libcpp.string cimport string
@@ -115,9 +115,9 @@ cdef extern from "pointcloud.hpp":
     cdef cppclass PointCloud[T]:
         PointCloud() except +
         void AddTarget(const Target[T] & target)
-        void Sbr(vector[T] & phi,
-                 vector[T] & theta,
-                 Vec3[T] position)
+        void Sbr(const vector[T] & phi,
+                 const vector[T] & theta,
+                 const Vec3[T] & position)
 
         vector[Ray[T]] cloud_
 
@@ -128,10 +128,10 @@ Point
 cdef extern from "point.hpp":
     cdef cppclass Point[T]:
         Point() except +
-        Point(vector[Vec3[T]] & loc,
-              Vec3[T] & speed,
-              vector[T] & rcs,
-              vector[T] & phs) except +
+        Point(const vector[Vec3[T]] & loc,
+              const Vec3[T] & speed,
+              const vector[T] & rcs,
+              const vector[T] & phs) except +
 
 
 """
@@ -140,18 +140,18 @@ Transmitter and TxChannel
 cdef extern from "transmitter.hpp":
     cdef cppclass TxChannel[T]:
         TxChannel() except +
-        TxChannel(Vec3[T] location,
-                  Vec3[cpp_complex[T]] polar,
-                  vector[T] & phi,
-                  vector[T] & phi_ptn,
-                  vector[T] & theta,
-                  vector[T] & theta_ptn,
-                  T antenna_gain,
-                  vector[T] & mod_t,
-                  vector[cpp_complex[T]] & mod_var,
-                  vector[cpp_complex[T]] & pulse_mod,
-                  T delay,
-                  T grid) except +
+        TxChannel(const Vec3[T] & location,
+                  const Vec3[cpp_complex[T]] & polar,
+                  const vector[T] & phi,
+                  const vector[T] & phi_ptn,
+                  const vector[T] & theta,
+                  const vector[T] & theta_ptn,
+                  const T & antenna_gain,
+                  const vector[T] & mod_t,
+                  const vector[cpp_complex[T]] & mod_var,
+                  const vector[cpp_complex[T]] & pulse_mod,
+                  const T & delay,
+                  const T & grid) except +
 
     cdef cppclass Transmitter[T]:
         Transmitter() except +
@@ -177,13 +177,13 @@ Receiver and RxChannel
 cdef extern from "receiver.hpp":
     cdef cppclass RxChannel[T]:
         RxChannel() except +
-        RxChannel(Vec3[T] location,
-                  Vec3[cpp_complex[T]] polar,
-                  vector[T] & phi,
-                  vector[T] & phi_ptn,
-                  vector[T] & theta,
-                  vector[T] & theta_ptn,
-                  T antenna_gain) except +
+        RxChannel(const Vec3[T] & location,
+                  const Vec3[cpp_complex[T]] & polar,
+                  const vector[T] & phi,
+                  const vector[T] & phi_ptn,
+                  const vector[T] & theta,
+                  const vector[T] & theta_ptn,
+                  const T & antenna_gain) except +
 
     cdef cppclass Receiver[T]:
         Receiver() except +
