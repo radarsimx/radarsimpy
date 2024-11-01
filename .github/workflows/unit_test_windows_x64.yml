@@ -14,8 +14,8 @@ jobs:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
 
     steps:
-      - name: Remove Windows OpenSSH and use the default ssh in git
-        run: Remove-WindowsCapability -Online -Name OpenSSH.Client
+      # - name: Remove Windows OpenSSH and use the default ssh in git
+      #   run: Remove-WindowsCapability -Online -Name OpenSSH.Client
       - uses: actions/checkout@v4
         with:
           ssh-key: ${{secrets.RADARSIMC}}
