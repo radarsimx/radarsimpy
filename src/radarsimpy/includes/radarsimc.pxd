@@ -226,10 +226,10 @@ cdef extern from "snapshot.hpp":
 Ideal Simulator
 """
 cdef extern from "simulator_ideal.hpp":
-    cdef cppclass IdealSimulator[T]:
+    cdef cppclass IdealSimulator[T, F]:
         IdealSimulator() except +
-        void Run(Radar[T] radar,
-                 vector[Point[T]] points,
+        void Run(Radar[F] radar,
+                 vector[Point[F]] points,
                  double * bb_real,
                  double * bb_imag)
 

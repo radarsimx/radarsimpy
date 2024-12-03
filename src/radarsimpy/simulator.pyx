@@ -49,7 +49,7 @@ cimport cython
 cimport numpy as np
 np.import_array()
 
-np_float = np.float32
+# np_float = np.float32
 
 
 @cython.cdivision(True)
@@ -219,7 +219,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, noise=True,
 
     # simulator
     cdef SceneSimulator[double, float_t] scene_c
-    cdef IdealSimulator[float_t] sim_c
+    cdef IdealSimulator[double, float_t] sim_c
     cdef InterferenceSimulator[float_t] int_sim_c
 
     cdef vector[Snapshot[float_t]] snaps
