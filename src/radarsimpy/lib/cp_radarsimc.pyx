@@ -528,8 +528,8 @@ cdef Target[float_t] cp_Target(radar,
         ms.clear()
     
     if IsFreeTier():
-        if cells_mv.shape[0] > 32:
-            raise Exception("You're currently using RadarSimPy's FreeTier, which imposes a restriction on the maximum mesh size of a target to 32. Please consider supporting my work by upgrading to the standard version. Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ to access the standard version download links. Your support will help improve the software. Thank you for considering it.")
+        if cells_mv.shape[0] > 8:
+            raise Exception("You're currently using RadarSimPy's FreeTier, which imposes a restriction on the maximum mesh size of a target to 8. Please consider supporting my work by upgrading to the standard version. Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ to access the standard version download links. Your support will help improve the software. Thank you for considering it.")
 
     cdef float_t[:] origin_mv = np.array(target.get("origin", (0, 0, 0)), dtype=np_float)
 
@@ -704,8 +704,8 @@ cdef Target[float_t] cp_RCS_Target(target):
         ms.clear()
     
     if IsFreeTier():
-        if cells_mv.shape[0] > 32:
-            raise Exception("You are presently utilizing RadarSimPy's FreeTier plan, which imposes a restriction on the maximum mesh size of a target to 32. Please consider supporting my work by upgrading to the standard version. Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ to access the standard version download links. Your support will help improve the software. Thank you for considering it.")
+        if cells_mv.shape[0] > 8:
+            raise Exception("You are presently utilizing RadarSimPy's FreeTier plan, which imposes a restriction on the maximum mesh size of a target to 8. Please consider supporting my work by upgrading to the standard version. Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ to access the standard version download links. Your support will help improve the software. Thank you for considering it.")
 
     cdef float_t[:] origin_mv = np.array(target.get("origin", (0, 0, 0)), dtype=np_float)
 

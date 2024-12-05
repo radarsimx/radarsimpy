@@ -236,14 +236,14 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, noise=True,
     cdef string log_path_c
 
     if IsFreeTier():
-        if len(targets) > 3:
-            raise Exception("You're currently using RadarSimPy's FreeTier, which limits RCS simulation to 3 maximum targets. Please consider supporting my work by upgrading to the standard version. Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ to access the standard version download links. Your support will help improve the software. Thank you for considering it.")
+        if len(targets) > 2:
+            raise Exception("You're currently using RadarSimPy's FreeTier, which limits RCS simulation to 2 maximum target. Please consider supporting my work by upgrading to the standard version. Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ to access the standard version download links. Your support will help improve the software. Thank you for considering it.")
 
-        if radar.radar_prop["transmitter"].txchannel_prop["size"] > 2:
-            raise Exception("You're currently using RadarSimPy's FreeTier, which imposes a restriction on the maximum number of transmitter channels to 2. Please consider supporting my work by upgrading to the standard version. Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ to access the standard version download links. Your support will help improve the software. Thank you for considering it.")
+        if radar.radar_prop["transmitter"].txchannel_prop["size"] > 1:
+            raise Exception("You're currently using RadarSimPy's FreeTier, which imposes a restriction on the maximum number of transmitter channels to 1. Please consider supporting my work by upgrading to the standard version. Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ to access the standard version download links. Your support will help improve the software. Thank you for considering it.")
 
-        if radar.radar_prop["receiver"].rxchannel_prop["size"] > 2:
-            raise Exception("You're currently using RadarSimPy's FreeTier, which imposes a restriction on the maximum number of receiver channels to 2. Please consider supporting my work by upgrading to the standard version. Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ to access the standard version download links. Your support will help improve the software. Thank you for considering it.")
+        if radar.radar_prop["receiver"].rxchannel_prop["size"] > 1:
+            raise Exception("You're currently using RadarSimPy's FreeTier, which imposes a restriction on the maximum number of receiver channels to 1. Please consider supporting my work by upgrading to the standard version. Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ to access the standard version download links. Your support will help improve the software. Thank you for considering it.")
 
     flag_run_scene = False
     frame_start_time = np.array(frame_time, dtype=np.float64)
