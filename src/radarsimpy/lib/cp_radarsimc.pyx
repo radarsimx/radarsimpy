@@ -369,14 +369,12 @@ cdef Radar[double, float_t] cp_Radar(radar, frame_start_time):
     cdef int_t bbsize_c = channles_c*frames_c*pulses_c*samples_c
 
     cdef float_t[:, :, :] locx_mv, locy_mv, locz_mv
-    cdef float_t[:, :, :] spdx_mv, spdy_mv, spdz_mv
     cdef float_t[:, :, :] rotx_mv, roty_mv, rotz_mv
-    cdef float_t[:, :, :] rrtx_mv, rrty_mv, rrtz_mv
 
     cdef vector[Vec3[float_t]] loc_vt
-    cdef vector[Vec3[float_t]] spd_vt
+    cdef Vec3[float_t] spd_vt
     cdef vector[Vec3[float_t]] rot_vt
-    cdef vector[Vec3[float_t]] rrt_vt
+    cdef Vec3[float_t] rrt_vt
 
     cdef int_t idx_c
 
@@ -407,39 +405,28 @@ cdef Radar[double, float_t] cp_Radar(radar, frame_start_time):
     """
     Radar
     """
-    cdef float_t[:] loc_mv, spd_mv, rot_mv, rrt_mv
+    cdef float_t[:] loc_mv, rot_mv
 
     if len(np.shape(radar.radar_prop["location"])) == 4:
         locx_mv = radar.radar_prop["location"][:,:,:,0].astype(np_float)
         locy_mv = radar.radar_prop["location"][:,:,:,1].astype(np_float)
         locz_mv = radar.radar_prop["location"][:,:,:,2].astype(np_float)
-        spdx_mv = radar.radar_prop["speed"][:,:,:,0].astype(np_float)
-        spdy_mv = radar.radar_prop["speed"][:,:,:,1].astype(np_float)
-        spdz_mv = radar.radar_prop["speed"][:,:,:,2].astype(np_float)
         rotx_mv = radar.radar_prop["rotation"][:,:,:,0].astype(np_float)
         roty_mv = radar.radar_prop["rotation"][:,:,:,1].astype(np_float)
         rotz_mv = radar.radar_prop["rotation"][:,:,:,2].astype(np_float)
-        rrtx_mv = radar.radar_prop["rotation_rate"][:,:,:,0].astype(np_float)
-        rrty_mv = radar.radar_prop["rotation_rate"][:,:,:,1].astype(np_float)
-        rrtz_mv = radar.radar_prop["rotation_rate"][:,:,:,2].astype(np_float)
 
         Mem_Copy_Vec3(&locx_mv[0,0,0], &locy_mv[0,0,0], &locz_mv[0,0,0], bbsize_c, loc_vt)
-        Mem_Copy_Vec3(&spdx_mv[0,0,0], &spdy_mv[0,0,0], &spdz_mv[0,0,0], bbsize_c, spd_vt)
         Mem_Copy_Vec3(&rotx_mv[0,0,0], &roty_mv[0,0,0], &rotz_mv[0,0,0], bbsize_c, rot_vt)
-        Mem_Copy_Vec3(&rrtx_mv[0,0,0], &rrty_mv[0,0,0], &rrtz_mv[0,0,0], bbsize_c, rrt_vt)
 
     else:
         loc_mv = radar.radar_prop["location"].astype(np_float)
         loc_vt.push_back(Vec3[float_t](&loc_mv[0]))
 
-        spd_mv = radar.radar_prop["speed"].astype(np_float)
-        spd_vt.push_back(Vec3[float_t](&spd_mv[0]))
-
         rot_mv = radar.radar_prop["rotation"].astype(np_float)
         rot_vt.push_back(Vec3[float_t](&rot_mv[0]))
-
-        rrt_mv = radar.radar_prop["rotation_rate"].astype(np_float)
-        rrt_vt.push_back(Vec3[float_t](&rrt_mv[0]))
+    
+    spd_vt = Vec3[float_t](<float_t>radar.radar_prop["speed"][0], <float_t>radar.radar_prop["speed"][1], <float_t>radar.radar_prop["speed"][2])
+    rrt_vt = Vec3[float_t](<float_t>radar.radar_prop["rotation_rate"][0], <float_t>radar.radar_prop["rotation_rate"][1], <float_t>radar.radar_prop["rotation_rate"][2])
 
     radar_c = Radar[double, float_t](tx_c,
                              rx_c,

@@ -204,9 +204,9 @@ cdef extern from "radar.hpp":
         Radar(Transmitter[H, L] & tx,
               Receiver[L] & rx,
               vector[Vec3[L]] & location_array,
-              vector[Vec3[L]] & speed_array,
+              Vec3[L] speed_array,
               vector[Vec3[L]] & rotation_array,
-              vector[Vec3[L]] & rotrate_array) except +
+              Vec3[L] rotrate_array) except +
 
 
 """

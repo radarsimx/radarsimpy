@@ -540,37 +540,21 @@ class Radar:
         if any(
             np.size(var) > 1
             for var in list(location)
-            + list(speed)
             + list(rotation)
-            + list(rotation_rate)
         ):
             self.validate_radar_motion(location, speed, rotation, rotation_rate)
             self.radar_prop["location"] = np.zeros(shape + (3,))
-            self.radar_prop["speed"] = np.zeros(shape + (3,))
             self.radar_prop["rotation"] = np.zeros(shape + (3,))
-            self.radar_prop["rotation_rate"] = np.zeros(shape + (3,))
+
+            self.radar_prop["speed"] = np.array(speed)
+            self.radar_prop["rotation_rate"] = np.radians(rotation_rate)
 
             for idx in range(0, 3):
-                if np.size(speed[idx]) > 1:
-                    self.radar_prop["speed"][:, :, :, idx] = speed[idx]
-                else:
-                    self.radar_prop["speed"][:, :, :, idx] = np.full(shape, speed[idx])
-
                 if np.size(location[idx]) > 1:
                     self.radar_prop["location"][:, :, :, idx] = location[idx]
                 else:
                     self.radar_prop["location"][:, :, :, idx] = (
                         location[idx] + speed[idx] * self.time_prop["timestamp"]
-                    )
-
-                if np.size(rotation_rate[idx]) > 1:
-                    self.radar_prop["rotation_rate"][:, :, :, idx] = np.radians(
-                        rotation_rate[idx]
-                    )
-
-                else:
-                    self.radar_prop["rotation_rate"][:, :, :, idx] = np.full(
-                        shape, np.radians(rotation_rate[idx])
                     )
 
                 if np.size(rotation[idx]) > 1:
