@@ -153,22 +153,22 @@ cdef extern from "transmitter.hpp":
                   const T & delay,
                   const T & grid) except +
 
-    cdef cppclass Transmitter[T]:
+    cdef cppclass Transmitter[H, L]:
         Transmitter() except +
-        Transmitter(const T & tx_power,
-                    const vector[double] & freq,
-                    const vector[double] & freq_time,
-                    const vector[double] & freq_offset,
-                    const vector[double] & pulse_start_time,
-                    const vector[double] & frame_start_time) except +
-        Transmitter(const T & tx_power,
-                    const vector[double] & freq,
-                    const vector[double] & freq_time,
-                    const vector[double] & freq_offset,
-                    const vector[double] & pulse_start_time,
-                    const vector[double] & frame_start_time,
-                    const vector[cpp_complex[double]] & phase_noise) except +
-        void AddChannel(const TxChannel[T] & channel)
+        Transmitter(const L & tx_power,
+                    const vector[H] & freq,
+                    const vector[H] & freq_time,
+                    const vector[H] & freq_offset,
+                    const vector[H] & pulse_start_time,
+                    const vector[H] & frame_start_time) except +
+        Transmitter(const L & tx_power,
+                    const vector[H] & freq,
+                    const vector[H] & freq_time,
+                    const vector[H] & freq_offset,
+                    const vector[H] & pulse_start_time,
+                    const vector[H] & frame_start_time,
+                    const vector[cpp_complex[H]] & phase_noise) except +
+        void AddChannel(const TxChannel[L] & channel)
 
 
 """
@@ -199,14 +199,14 @@ cdef extern from "receiver.hpp":
 Radar
 """
 cdef extern from "radar.hpp":
-    cdef cppclass Radar[T]:
+    cdef cppclass Radar[H, L]:
         Radar() except +
-        Radar(Transmitter[T] & tx,
-              Receiver[T] & rx,
-              vector[Vec3[T]] & location_array,
-              vector[Vec3[T]] & speed_array,
-              vector[Vec3[T]] & rotation_array,
-              vector[Vec3[T]] & rotrate_array) except +
+        Radar(Transmitter[H, L] & tx,
+              Receiver[L] & rx,
+              vector[Vec3[L]] & location_array,
+              vector[Vec3[L]] & speed_array,
+              vector[Vec3[L]] & rotation_array,
+              vector[Vec3[L]] & rotrate_array) except +
 
 
 """
@@ -226,10 +226,10 @@ cdef extern from "snapshot.hpp":
 Ideal Simulator
 """
 cdef extern from "simulator_ideal.hpp":
-    cdef cppclass IdealSimulator[T, F]:
+    cdef cppclass IdealSimulator[H, L]:
         IdealSimulator() except +
-        void Run(Radar[F] radar,
-                 vector[Point[F]] points,
+        void Run(Radar[H, L] radar,
+                 vector[Point[L]] points,
                  double * bb_real,
                  double * bb_imag)
 
@@ -238,14 +238,14 @@ cdef extern from "simulator_ideal.hpp":
 Scene Simulator
 """
 cdef extern from "simulator_scene.hpp":
-    cdef cppclass SceneSimulator[T, F]:
+    cdef cppclass SceneSimulator[H, L]:
         SceneSimulator() except +
-        void Run(Radar[F] & radar,
-                 vector[Target[F]] & targets,
+        void Run(Radar[H, L] & radar,
+                 vector[Target[L]] & targets,
                  int level,
                  bool debug,
-                 vector[Snapshot[F]] & snapshots,
-                 F density,
+                 vector[Snapshot[L]] & snapshots,
+                 L density,
                  Vec2[int_t] ray_filter,
                  string log_path,
                  double * bb_real,
@@ -256,9 +256,9 @@ cdef extern from "simulator_scene.hpp":
 Interference Simulator
 """
 cdef extern from "simulator_interference.hpp":
-    cdef cppclass InterferenceSimulator[T, F]:
+    cdef cppclass InterferenceSimulator[H, L]:
         InterferenceSimulator() except +
-        void Run(Radar[F] radar,
-                 Radar[F] interf_radar,
+        void Run(Radar[H, L] radar,
+                 Radar[H, L] interf_radar,
                  double *interf_bb_real,
                  double *interf_bb_imag)

@@ -146,7 +146,7 @@ cdef Point[float_t] cp_Point(location,
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef Transmitter[float_t] cp_Transmitter(radar, frame_start_time):
+cdef Transmitter[double, float_t] cp_Transmitter(radar, frame_start_time):
     """
     cp_Transmitter(radar)
 
@@ -201,7 +201,7 @@ cdef Transmitter[float_t] cp_Transmitter(radar, frame_start_time):
         pn_imag_mv = np.imag(radar.sample_prop["phase_noise"]).astype(np.float64)
         Mem_Copy_Complex(&pn_real_mv[0], &pn_imag_mv[0], <int_t>(np.size(radar.sample_prop["phase_noise"])), pn_vt)
 
-    return Transmitter[float_t](
+    return Transmitter[double, float_t](
         <float_t> radar.radar_prop["transmitter"].rf_prop["tx_power"],
         f_vt,
         t_vt,
@@ -354,10 +354,10 @@ cdef RxChannel[float_t] cp_RxChannel(rx,
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef Radar[float_t] cp_Radar(radar, frame_start_time):
-    cdef Transmitter[float_t] tx_c
+cdef Radar[double, float_t] cp_Radar(radar, frame_start_time):
+    cdef Transmitter[double, float_t] tx_c
     cdef Receiver[float_t] rx_c
-    cdef Radar[float_t] radar_c
+    cdef Radar[double, float_t] radar_c
 
     cdef int_t txsize_c = radar.radar_prop["transmitter"].txchannel_prop["size"]
     cdef int_t rxsize_c = radar.radar_prop["receiver"].rxchannel_prop["size"]
@@ -441,7 +441,7 @@ cdef Radar[float_t] cp_Radar(radar, frame_start_time):
         rrt_mv = radar.radar_prop["rotation_rate"].astype(np_float)
         rrt_vt.push_back(Vec3[float_t](&rrt_mv[0]))
 
-    radar_c = Radar[float_t](tx_c,
+    radar_c = Radar[double, float_t](tx_c,
                              rx_c,
                              loc_vt,
                              spd_vt,

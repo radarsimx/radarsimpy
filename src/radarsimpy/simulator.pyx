@@ -206,10 +206,10 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, noise=True,
     """
 
     # radar
-    cdef Radar[float_t] radar_c
+    cdef Radar[double, float_t] radar_c
 
     # interference radar
-    cdef Radar[float_t] interf_radar_c
+    cdef Radar[double, float_t] interf_radar_c
 
     # point targets
     cdef vector[Point[float_t]] point_vt
