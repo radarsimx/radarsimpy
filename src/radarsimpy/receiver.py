@@ -52,10 +52,10 @@ class Receiver:
         - **polarization** (*numpy.1darray*) --
             Antenna polarization [x, y, z]. ``default = [0, 0, 1] (vertical polarization)``
             Example:
-                Vertical polarization [0, 0, 1]
-                Horizontal polarization [0, 1, 0]
-                Right-handed circular polarization [0, 1, 1j] (from the point of view of the source)
-                Left-handed circular polarization [0, 1, -1j] (from the point of view of the source)
+            Vertical polarization [0, 0, 1]
+            Horizontal polarization [0, 1, 0]
+            Right-handed circular polarization [0, 1, 1j] (from the point of view of the source)
+            Left-handed circular polarization [0, 1, -1j] (from the point of view of the source)
         - **azimuth_angle** (*numpy.1darray*) --
             Angles for azimuth pattern (deg). ``default [-90, 90]``
         - **azimuth_pattern** (*numpy.1darray*) --

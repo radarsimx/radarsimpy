@@ -518,7 +518,7 @@ def doa_music(covmat, nsig, spacing=0.5, scanangles=range(-90, 91)):
     :param numpy.1darray scanangles:
         Broadside search angles, specified as a real-valued vector in degrees.
         Angles must lie in the range [-90°,90°] and must be in increasing
-        order. ``default [-90°,90°] ``
+        order. ``default [-90°,90°]``
 
     :return: doa angles in degrees, doa index, pseudo spectrum (dB)
     :rtype: list, list, numpy.1darray
@@ -694,7 +694,7 @@ def doa_bartlett(covmat, spacing=0.5, scanangles=range(-90, 91)):
     :param numpy.1darray scanangles:
         Broadside search angles, specified as a real-valued vector in degrees.
         Angles must lie in the range [-90°,90°] and must be in increasing
-        order. ``default [-90°,90°] ``
+        order. ``default [-90°,90°]``
 
     :return: spectrum in dB
     :rtype: numpy.1darray
@@ -727,7 +727,7 @@ def doa_capon(covmat, spacing=0.5, scanangles=range(-90, 91)):
     :param numpy.1darray scanangles:
         Broadside search angles, specified as a real-valued vector in degrees.
         Angles must lie in the range [-90°,90°] and must be in increasing
-        order. ``default [-90°,90°] ``
+        order. ``default [-90°,90°]``
 
     :return: spectrum in dB
     :rtype: numpy.1darray

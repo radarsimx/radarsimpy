@@ -47,7 +47,7 @@ def marcumq(a, x, m=1):
     Calculates the generalized Marcum Q function.
 
     The Marcum Q function is defined as:
-        Q_m(a, x) = 1 - F_ncx2(m * 2, a^2, x^2)
+    Q_m(a, x) = 1 - F_ncx2(m * 2, a^2, x^2)
 
     :param float a: Non-centrality parameter.
     :param float x: Threshold value.
@@ -57,9 +57,8 @@ def marcumq(a, x, m=1):
     :rtype: float
 
     :references:
-        - `Wikipedia - Marcum Q-function <https://en.wikipedia.org/wiki/Marcum_Q-function>`_
-        - `SciPy Documentation - scipy.stats.ncx2
-            <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ncx2.html>`_
+        `Wikipedia - Marcum Q-function <https://en.wikipedia.org/wiki/Marcum_Q-function>`
+        `SciPy Documentation - scipy.stats.ncx2 <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ncx2.html>`
     """
     return 1 - distributions.ncx2.cdf(df=m * 2, nc=a**2, x=x**2)
 

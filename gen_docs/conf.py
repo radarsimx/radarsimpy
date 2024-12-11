@@ -28,7 +28,7 @@ copyright = (  # pylint: disable=redefined-builtin, invalid-name
 )
 author = "Dr. Zhengyu Peng"  # pylint: disable=invalid-name
 version = radarsimpy.__version__  # pylint: disable=invalid-name
-
+release = version # pylint: disable=invalid-name
 
 # -- General configuration ---------------------------------------------------
 
@@ -40,6 +40,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
+    "sphinx_rtd_theme",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -59,8 +60,22 @@ exclude_patterns = []
 # a list of builtin themes.
 #
 html_theme = "sphinx_rtd_theme"  # pylint: disable=invalid-name
+html_theme_options = {
+    'logo_only': False,
+    'prev_next_buttons_location': 'bottom',
+    'style_external_links': False,
+    'vcs_pageview_mode': '',
+    'flyout_display': 'hidden',
+    'version_selector': True,
+    # Toc options
+    'collapse_navigation': True,
+    'sticky_navigation': True,
+    'navigation_depth': 4,
+    'includehidden': True,
+    'titles_only': False
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
+# html_static_path = ["_static"]
