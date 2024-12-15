@@ -168,7 +168,7 @@ GPU parallelization (CUDA) has been added since v6.0.0.
 - **phi** (deg): angle on the x-y plane. 0 deg is the positive x-axis, 90 deg is the positive y-axis
 - **theta** (deg): angle on the z-x plane. 0 deg is the positive z-axis, 90 deg is the x-y plane
 
-![phi_theta](./assets/phi_theta.svg)
+<img src="./assets/phi_theta.svg" alt="phi_theta" width="400"/>
 
 ### Local Coordinate
 
@@ -177,12 +177,12 @@ GPU parallelization (CUDA) has been added since v6.0.0.
 - **roll** (deg): rotation along the x-axis. Positive roll rotates the object from the positive y-axis to the positive z-axis
 - **origin** (m): `[x, y, z]`, the rotation centor of the object. Radar's origin is always at `[0, 0, 0]`
 
-![yaw_pitch_roll](./assets/yaw_pitch_roll.svg)
+<img src="./assets/yaw_pitch_roll.svg" alt="yaw_pitch_roll" width="400"/>
 
 - **azimuth** (deg): azimuth -90 ~ 90 deg equal to phi -90 ~ 90 deg
 - **elevation** (deg): elevation -90 ~ 90 deg equal to theta 180 ~ 0 deg
 
-![azimuth_elevatioan](./assets/azimuth_elevation.svg)
+<img src="./assets/azimuth_elevation.svg" alt="azimuth_elevation" width="400"/>
 
 ## Usage Examples
 
