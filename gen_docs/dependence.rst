@@ -8,34 +8,36 @@ Dependence
 
 - **Windows**
 
-  - `Visual C++ Runtime <https://aka.ms/vs/16/release/vc_redist.x64.exe/>`_
-  - GPU version (CUDA12) - Check `Minimum Required Driver Versions <https://docs.nvidia.com/deploy/cuda-compatibility/#id1>`_
+    - `Visual C++ Runtime <https://aka.ms/vs/16/release/vc_redist.x64.exe/>`_
+    - GPU version (CUDA12) - Check `Minimum Required Driver Versions <https://docs.nvidia.com/deploy/cuda-compatibility/#id1>`_
 
 - **Ubuntu 22.04**
 
-  - `GCC 11` *(Included by default, no additional installation required)*
-  - GPU version (CUDA12) - Check `Minimum Required Driver Versions <https://docs.nvidia.com/deploy/cuda-compatibility/#id1>`_
+    - `GCC 11` *(Included by default, no additional installation required)*
+    - GPU version (CUDA12) - Check `Minimum Required Driver Versions <https://docs.nvidia.com/deploy/cuda-compatibility/#id1>`_
 
 - **Ubuntu 24.04**
 
-  - `GCC 13` *(Included by default, no additional installation required)*
-  - GPU version (CUDA12) - Check `Minimum Required Driver Versions <https://docs.nvidia.com/deploy/cuda-compatibility/#id1>`_
+    - `GCC 13` *(Included by default, no additional installation required)*
+    - GPU version (CUDA12) - Check `Minimum Required Driver Versions <https://docs.nvidia.com/deploy/cuda-compatibility/#id1>`_
 
 - **Generic Linux x86-64**
 
-  - Try the module for Ubuntu 22.04 or Ubuntu 24.04
-  - `Request a Custom Build <https://radarsimx.com/request-a-custom-build/>`_ if it doesn't work
+    - Try the module for Ubuntu 22.04 or Ubuntu 24.04
+    - `Request a Custom Build <https://radarsimx.com/request-a-custom-build/>`_ if it doesn't work
 
 - **MacOS Intel**
 
-  - `GCC 13`
+    - `GCC 13`
 
     ::
-      brew install gcc@13
+
+        brew install gcc@13
 
 - **MacOS Apple Silicon**
 
-  - `GCC 14`
+    - `GCC 14`
 
     ::
-      brew install gcc@14
+        
+        brew install gcc@14
