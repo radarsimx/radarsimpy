@@ -184,7 +184,6 @@ GPU parallelization (CUDA) has been added since v6.0.0.
 
 ![azimuth_elevatioan](./assets/azimuth_elevation.svg)
 
-
 ## Usage Examples
 
 Check all the usage examples on [radarsimx.com](https://radarsimx.com/category/examples/). The source files of these examples are available at [radarsimnb repository](https://github.com/radarsimx/radarsimnb).
