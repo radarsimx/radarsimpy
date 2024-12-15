@@ -32,62 +32,47 @@ class Receiver:
     This class defines the RF and baseband properties of a radar receiver,
     along with the characteristics of its receiver channels.
 
-    :param float fs:
-        Sampling rate in samples per second (sps).
-    :param float noise_figure:
-        Noise figure of the receiver in decibels (dB).
-    :param float rf_gain:
-        Total RF gain of the receiver in decibels (dB).
-    :param float load_resistor:
-        Load resistance to convert power to voltage, in ohms (Ω).
-    :param float baseband_gain:
-        Total baseband gain in decibels (dB).
-    :param str bb_type:
-        Baseband data type, either ``complex`` or ``real``.
-        Defaults to ``complex``.
-    :param list[dict] channels:
-        A list of dictionaries defining the properties of receiver channels,
-        where each dictionary contains the following keys:
+    :param float fs: Sampling rate in samples per second (sps).
+    :param float noise_figure: Noise figure of the receiver in decibels (dB).
+    :param float rf_gain: Total RF gain of the receiver in decibels (dB).
+    :param float load_resistor: Load resistance to convert power to voltage, in ohms (Ω).
+    :param float baseband_gain: Total baseband gain in decibels (dB).
+    :param str bb_type: Baseband data type, either ``complex`` or ``real``.
+    Defaults to ``complex``.
+    :param list[dict] channels: A list of dictionaries defining the properties of receiver channels,
+    where each dictionary contains the following keys:
 
         - **location** (*numpy.ndarray*): 3D location of the channel relative to the radar's position [x, y, z] in meters.
-        - **polarization** (*numpy.ndarray*):
-            Antenna polarization vector [x, y, z].
-            Defaults to ``[0, 0, 1]`` (vertical polarization).
-            Examples:
+        - **polarization** (*numpy.ndarray*): Antenna polarization vector [x, y, z].
+        Defaults to ``[0, 0, 1]`` (vertical polarization).
+        Examples:
 
             - Vertical polarization: ``[0, 0, 1]``
             - Horizontal polarization: ``[0, 1, 0]``
             - Right-handed circular polarization: ``[0, 1, 1j]``
             - Left-handed circular polarization: ``[0, 1, -1j]``
-        - **azimuth_angle** (*numpy.ndarray*):
-            Azimuth pattern angles in degrees.
-            Defaults to ``[-90, 90]``.
-        - **azimuth_pattern** (*numpy.ndarray*):
-            Azimuth pattern in decibels (dB).
-            Defaults to ``[0, 0]``.
-        - **elevation_angle** (*numpy.ndarray*):
-            Elevation pattern angles in degrees.
-            Defaults to ``[-90, 90]``.
-        - **elevation_pattern** (*numpy.ndarray*):
-            Elevation pattern in decibels (dB).
-            Defaults to ``[0, 0]``.
+        - **azimuth_angle** (*numpy.ndarray*): Azimuth pattern angles in degrees.
+        Defaults to ``[-90, 90]``.
+        - **azimuth_pattern** (*numpy.ndarray*): Azimuth pattern in decibels (dB).
+        Defaults to ``[0, 0]``.
+        - **elevation_angle** (*numpy.ndarray*): Elevation pattern angles in degrees.
+        Defaults to ``[-90, 90]``.
+        - **elevation_pattern** (*numpy.ndarray*): Elevation pattern in decibels (dB).
+        Defaults to ``[0, 0]``.
 
-    :ivar dict rf_prop:
-        RF properties of the receiver:
+    :ivar dict rf_prop: RF properties of the receiver:
 
         - **rf_gain** (*float*): RF gain in decibels (dB).
         - **noise_figure** (*float*): Noise figure in decibels (dB).
 
-    :ivar dict bb_prop:
-        Baseband properties of the receiver:
+    :ivar dict bb_prop: Baseband properties of the receiver:
 
         - **fs** (*float*): Sampling rate in samples per second (sps).
         - **load_resistor** (*float*): Load resistance in ohms (Ω).
         - **baseband_gain** (*float*): Baseband gain in decibels (dB).
         - **bb_type** (*str*): Baseband data type, either ``real`` or ``complex``.
 
-    :ivar dict rxchannel_prop:
-        Properties of the receiver channels:
+    :ivar dict rxchannel_prop: Properties of the receiver channels:
 
         - **size** (*int*): Number of receiver channels.
         - **locations** (*numpy.ndarray*): 3D locations of the receiver channels [x, y, z] in meters.
