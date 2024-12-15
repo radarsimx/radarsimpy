@@ -30,6 +30,8 @@ author = "Dr. Zhengyu Peng"  # pylint: disable=invalid-name
 version = radarsimpy.__version__  # pylint: disable=invalid-name
 release = version # pylint: disable=invalid-name
 
+pygments_style = 'sphinx'
+
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
