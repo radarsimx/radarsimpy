@@ -284,8 +284,7 @@ class Radar:
         - **timestamp_shape** (*tuple*): The shape of the timestamp array.
         - **timestamp** (*numpy.ndarray*): The timestamp for each sample in a frame,
           structured as ``[channels, pulses, samples]``.
-
-          **Channel order in timestamp (with ``M`` Tx channels and ``N`` Rx channels)**:
+          Channel order in timestamp (with ``M`` Tx channels and ``N`` Rx channels):
 
             - *[0]*: ``Tx[0] → Rx[0]``
             - *[1]*: ``Tx[0] → Rx[1]``
