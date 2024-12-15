@@ -101,7 +101,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, noise=True,
         - ``sample``: Perform ray-tracing for each sample.
 
     :param str or None log_path:
-      Path to save ray-tracing data. Default: ``None`` (does not save data).
+     Path to save ray-tracing data. Default: ``None`` (does not save data).
     :param bool debug:
      Whether to enable debug mode. Default: ``False``.
     :param Radar or None interf:
@@ -111,14 +111,18 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, noise=True,
         A dictionary containing the simulated baseband response and related data:
 
         - **baseband** (*numpy.ndarray*): Time-domain baseband data with shape ``[channels/frames, pulses, samples]``. 
-          The channel/frame order is as follows:
+          The channel/frame order is as follows (with ``K`` frames, ``M`` Tx channels and ``N`` Rx channels):
 
             - *[0]*: ``Frame[0] → Tx[0] → Rx[0]``
             - *[1]*: ``Frame[0] → Tx[0] → Rx[1]``
             - ...
+            - *[N-1]*: ``Frame[0] → Tx[0] → Rx[N-1]``
             - *[N]*: ``Frame[0] → Tx[1] → Rx[0]``
             - ...
-            - *[M]*: ``Frame[1] → Tx[0] → Rx[0]``
+            - *[MN-1]*: ``Frame[0] → Tx[M-1] → Rx[N-1]``
+            - *[MN]*: ``Frame[1] → Tx[0] → Rx[0]``
+            - ...
+            - *[KMN-1]*: ``Frame[K-1] → Tx[M-1] → Rx[N-1]``
 
         - **noise** (*numpy.ndarray*): Time-domain noise data with the same shape and order as `baseband`.
         - **interference** (*numpy.ndarray*): Time-domain interference data (if applicable), with the same shape and order as `baseband`.

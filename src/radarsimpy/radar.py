@@ -285,13 +285,15 @@ class Radar:
         - **timestamp** (*numpy.ndarray*): The timestamp for each sample in a frame,
           structured as ``[channels, pulses, samples]``.
 
-          **Channel order in timestamp**:
+          **Channel order in timestamp (with ``M`` Tx channels and ``N`` Rx channels)**:
 
             - *[0]*: ``Tx[0] → Rx[0]``
             - *[1]*: ``Tx[0] → Rx[1]``
             - ...
-            - *[N-1]*: ``Tx[1] → Rx[0]``
-            - *[N]*: ``Tx[1] → Rx[1]``
+            - *[N-1]*: ``Tx[0] → Rx[N-1]``
+            - *[N]*: ``Tx[1] → Rx[0]``
+            - ...
+            - *[MN-1]*: ``Tx[M-1] → Rx[N-1]``
 
     :ivar dict sample_prop:
      Sample-related properties:
