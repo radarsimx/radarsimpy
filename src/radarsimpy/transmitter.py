@@ -29,63 +29,77 @@ class Transmitter:
     """
     Defines the basic parameters and properties of a radar transmitter.
 
-    This class handles the waveform configuration, pulse parameters, and properties of the transmitter channels.
+    This class handles the waveform configuration, pulse parameters,
+    and properties of the transmitter channels.
 
-    :param f:
-        Waveform frequency in Hertz (Hz). The value can be:
+    :param f: Waveform frequency in Hertz (Hz).
+     The value can be:
     
         - A single number: For a single-tone waveform.
         - A list ``[f_start, f_stop]``: For linear frequency modulation.
         - A 1D array: For arbitrary waveforms, which must be paired with ``t`` for timing.
+
     :type f: float or numpy.ndarray
     :param t:
-        Timing of the pulse(s) in seconds (s).
-        Used when ``f`` is a 1D array to specify an arbitrary waveform.
+     Timing of the pulse(s) in seconds (s).
+     Used when ``f`` is a 1D array to specify an arbitrary waveform.
     :type t: float or numpy.ndarray
     :param float tx_power:
-        Transmitter power in decibels-milliwatts (dBm).
+     Transmitter power in decibels-milliwatts (dBm).
     :param int pulses:
-        Total number of pulses.
+     Total number of pulses.
     :param prp:
-        Pulse repetition period (PRP) in seconds (s). Must satisfy ``prp >= pulse_length``.
+     Pulse repetition period (PRP) in seconds (s).
+     Must satisfy ``prp >= pulse_length``.
     
         - If ``prp`` is ``None``, it defaults to ``pulse_length``.
-        - Can also be a 1D array to specify different PRPs for each pulse. In this case, the array length must match ``pulses``.
+        - Can also be a 1D array to specify different PRPs for each pulse.
+          In this case, the array length must match ``pulses``.
+
     :type prp: float or numpy.ndarray
     :param numpy.ndarray f_offset:
-        Frequency offset for each pulse in Hertz (Hz). The length must match ``pulses``.
+     Frequency offset for each pulse in Hertz (Hz). The length must match ``pulses``.
     :param numpy.ndarray pn_f:
-        Frequencies associated with phase noise in Hertz (Hz).
+     Frequencies associated with phase noise in Hertz (Hz).
     :param numpy.ndarray pn_power:
-        Power of phase noise in dB/Hz.
+     Power of phase noise in dB/Hz.
     :param list[dict] channels:
-        Properties of transmitter channels.
-        Each channel is represented as a dictionary with the following keys:
+     Properties of transmitter channels.
+     Each channel is represented as a dictionary with the following keys:
 
-        - **location** (*numpy.ndarray*): 3D location of the channel relative to the radar [x, y, z] in meters.
+        - **location** (*numpy.ndarray*):
+          3D location of the channel relative to the radar [x, y, z] in meters.
         - **polarization** (*numpy.ndarray*):
-            Antenna polarization vector [x, y, z].
-            Default: ``[0, 0, 1]`` (vertical polarization).
-            Examples:
+          Antenna polarization vector [x, y, z].
+          Default: ``[0, 0, 1]`` (vertical polarization).
+          Examples:
 
             - Vertical polarization: ``[0, 0, 1]``
             - Horizontal polarization: ``[0, 1, 0]``
             - Right-handed circular polarization: ``[0, 1, 1j]``
             - Left-handed circular polarization: ``[0, 1, -1j]``
+
         - **delay** (*float*): Transmit delay (s). Default: ``0``.
-        - **azimuth_angle** (*numpy.ndarray*): Azimuth angles in degrees (°). Default: ``[-90, 90]``.
-        - **azimuth_pattern** (*numpy.ndarray*): Azimuth pattern in decibels (dB). Default: ``[0, 0]``.
-        - **elevation_angle** (*numpy.ndarray*): Elevation angles in degrees (°). Default: ``[-90, 90]``.
-        - **elevation_pattern** (*numpy.ndarray*): Elevation pattern in decibels (dB). Default: ``[0, 0]``.
+        - **azimuth_angle** (*numpy.ndarray*): Azimuth angles in degrees (°).
+          Default: ``[-90, 90]``.
+        - **azimuth_pattern** (*numpy.ndarray*): Azimuth pattern in decibels (dB).
+          Default: ``[0, 0]``.
+        - **elevation_angle** (*numpy.ndarray*): Elevation angles in degrees (°).
+          Default: ``[-90, 90]``.
+        - **elevation_pattern** (*numpy.ndarray*): Elevation pattern in decibels (dB).
+          Default: ``[0, 0]``.
         - **pulse_amp** (*numpy.ndarray*):
-            Relative amplitude sequence for pulse amplitude modulation.
-            Length must match ``pulses``. Default: ``1``.
+          Relative amplitude sequence for pulse amplitude modulation.
+          Length must match ``pulses``. Default: ``1``.
         - **pulse_phs** (*numpy.ndarray*):
-            Phase code sequence for pulse phase modulation in degrees (°).
-            Length must match ``pulses``. Default: ``0``.
-        - **mod_t** (*numpy.ndarray*): Timestamps for waveform modulation in seconds (s). Default: ``None``.
-        - **phs** (*numpy.ndarray*): Phase modulation scheme in degrees (°). Default: ``None``.
-        - **amp** (*numpy.ndarray*): Relative amplitude scheme for waveform modulation. Default: ``None``.
+          Phase code sequence for pulse phase modulation in degrees (°).
+          Length must match ``pulses``. Default: ``0``.
+        - **mod_t** (*numpy.ndarray*): Timestamps for waveform modulation in seconds (s).
+          Default: ``None``.
+        - **phs** (*numpy.ndarray*): Phase modulation scheme in degrees (°).
+          Default: ``None``.
+        - **amp** (*numpy.ndarray*): Relative amplitude scheme for waveform modulation.
+          Default: ``None``.
 
     :ivar dict rf_prop:
         RF properties of the transmitter:
@@ -112,7 +126,8 @@ class Transmitter:
         - **size** (*int*): Number of transmitter channels.
         - **delay** (*numpy.ndarray*): Transmitter start delay (s).
         - **grid** (*float*): Ray tracing grid size (°).
-        - **locations** (*numpy.ndarray*): 3D locations of the transmitter channels [x, y, z] in meters.
+        - **locations** (*numpy.ndarray*):
+          3D locations of the transmitter channels [x, y, z] in meters.
         - **polarization** (*numpy.ndarray*): Polarization vectors of the transmitter channels.
         - **waveform_mod** (*dict*): Waveform modulation parameters.
         - **pulse_mod** (*dict*): Pulse modulation parameters.
