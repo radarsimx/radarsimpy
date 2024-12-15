@@ -51,8 +51,8 @@ class Receiver:
 
         - **location** (*numpy.ndarray*): 3D location of the channel relative to the radar's position [x, y, z] in meters.
         - **polarization** (*numpy.ndarray*): Antenna polarization vector [x, y, z].
-        Defaults to ``[0, 0, 1]`` (vertical polarization).
-        Examples:
+            Defaults to ``[0, 0, 1]`` (vertical polarization).
+            Examples:
             - Vertical polarization: ``[0, 0, 1]``
             - Horizontal polarization: ``[0, 1, 0]``
             - Right-handed circular polarization: ``[0, 1, 1j]``
