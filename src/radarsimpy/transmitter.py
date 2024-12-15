@@ -33,9 +33,9 @@ class Transmitter:
 
     :param f:
         Waveform frequency in Hertz (Hz). The value can be:
-            - A single number: For a single-tone waveform.
-            - A list ``[f_start, f_stop]``: For linear frequency modulation.
-            - A 1D array: For arbitrary waveforms, which must be paired with ``t`` for timing.
+        - A single number: For a single-tone waveform.
+        - A list ``[f_start, f_stop]``: For linear frequency modulation.
+        - A 1D array: For arbitrary waveforms, which must be paired with ``t`` for timing.
     :type f: float or numpy.ndarray
     :param t:
         Timing of the pulse(s) in seconds (s). Used when ``f`` is a 1D array to specify an arbitrary waveform.
@@ -46,8 +46,8 @@ class Transmitter:
         Total number of pulses.
     :param prp:
         Pulse repetition period (PRP) in seconds (s). Must satisfy ``prp >= pulse_length``.
-            - If ``prp`` is ``None``, it defaults to ``pulse_length``.
-            - Can also be a 1D array to specify different PRPs for each pulse. In this case, the array length must match ``pulses``.
+        - If ``prp`` is ``None``, it defaults to ``pulse_length``.
+        - Can also be a 1D array to specify different PRPs for each pulse. In this case, the array length must match ``pulses``.
     :type prp: float or numpy.ndarray
     :param numpy.ndarray f_offset:
         Frequency offset for each pulse in Hertz (Hz). The length must match ``pulses``.
@@ -60,12 +60,12 @@ class Transmitter:
 
         - **location** (*numpy.ndarray*): 3D location of the channel relative to the radar [x, y, z] in meters.
         - **polarization** (*numpy.ndarray*): Antenna polarization vector [x, y, z].
-            Default: ``[0, 0, 1]`` (vertical polarization).
-            Examples:
-                - Vertical polarization: ``[0, 0, 1]``
-                - Horizontal polarization: ``[0, 1, 0]``
-                - Right-handed circular polarization: ``[0, 1, 1j]``
-                - Left-handed circular polarization: ``[0, 1, -1j]``
+        Default: ``[0, 0, 1]`` (vertical polarization).
+        Examples:
+            - Vertical polarization: ``[0, 0, 1]``
+            - Horizontal polarization: ``[0, 1, 0]``
+            - Right-handed circular polarization: ``[0, 1, 1j]``
+            - Left-handed circular polarization: ``[0, 1, -1j]``
         - **delay** (*float*): Transmit delay (s). Default: ``0``.
         - **azimuth_angle** (*numpy.ndarray*): Azimuth angles in degrees (°). Default: ``[-90, 90]``.
         - **azimuth_pattern** (*numpy.ndarray*): Azimuth pattern in decibels (dB). Default: ``[0, 0]``.
