@@ -9,15 +9,13 @@ Welcome to RadarSimPy's documentation!
 .. image:: https://img.shields.io/github/v/tag/radarsimx/radarsimpy?label=Download
   :height: 20
   :target: https://radarsimx.com/product/radarsimpy/
+
 |
+
 .. image:: https://raw.githubusercontent.com/radarsimx/.github/main/profile/radarsimx_main.svg
    :width: 400
    :alt: RadarSimX
    :target: https://radarsimx.com
-
-- Copyright © 2018 - PRESENT  radarsimx.com
-- E-mail: info@radarsimx.com
-- Website: https://radarsimx.com
 
 .. toctree::
    :maxdepth: 2
@@ -28,7 +26,7 @@ Welcome to RadarSimPy's documentation!
    coordinate
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: API
 
    radar
