@@ -254,75 +254,68 @@ def cal_phase_noise(  # pylint: disable=too-many-arguments, too-many-locals
 
 class Radar:
     """
-    A class defines basic parameters of a radar system
+    Defines the basic parameters and properties of a radar system.
 
-    :param Transmitter transmitter:
-        Radar transmiter
-    :param Receiver receiver:
-        Radar Receiver
+    This class represents the overall configuration of a radar system,
+    including its transmitter, receiver, spatial properties (location, speed, orientation),
+    and associated metadata.
+
+    :param Transmitter transmitter: The radar transmitter instance.
+    :param Receiver receiver: The radar receiver instance.
     :param list location:
-        3D location of the radar [x, y, z] (m). ``default
-        [0, 0, 0]``
+     The 3D location of the radar relative to a global coordinate system [x, y, z] in meters (m).
+     Default: ``[0, 0, 0]``.
     :param list speed:
-        Speed of the radar (m/s), [vx, vy, vz]. ``default
-        [0, 0, 0]``
+     The velocity of the radar in meters per second (m/s), specified as [vx, vy, vz].
+     Default: ``[0, 0, 0]``.
     :param list rotation:
-        Radar's angle (deg), [yaw, pitch, roll].
-        ``default [0, 0, 0]``
+     The radar's orientation in degrees (°), specified as [yaw, pitch, roll].
+     Default: ``[0, 0, 0]``.
     :param list rotation_rate:
-        Radar's rotation rate (deg/s),
-        [yaw rate, pitch rate, roll rate]
-        ``default [0, 0, 0]``
+     The radar's angular velocity in degrees per second (°/s),
+     specified as [yaw rate, pitch rate, roll rate].
+     Default: ``[0, 0, 0]``.
     :param int seed:
-        Seed for noise generator
+     Seed for the random noise generator to ensure reproducibility.
 
-    :ivar dict time_prop: Time properties
+    :ivar dict time_prop:
+     Time-related properties of the radar system:
 
-        - **timestamp_shape**: Shape of timestamp
+        - **timestamp_shape** (*tuple*): The shape of the timestamp array.
+        - **timestamp** (*numpy.ndarray*): The timestamp for each sample in a frame,
+          structured as ``[channels, pulses, samples]``.
 
-        - **timestamp**: Timestamp for each samples in a frame
+          **Channel order in timestamp**:
 
-            ``[channes, pulses, samples]``
+            - *[0]*: ``Tx[0] → Rx[0]``
+            - *[1]*: ``Tx[0] → Rx[1]``
+            - ...
+            - *[N-1]*: ``Tx[1] → Rx[0]``
+            - *[N]*: ``Tx[1] → Rx[1]``
 
-            *Channel order in timestamp*
+    :ivar dict sample_prop:
+     Sample-related properties:
 
-            *[0]* ``Tx[0] -- Rx[0]``
+        - **samples_per_pulse** (*int*): Number of samples in a single pulse.
+        - **noise** (*float*): Noise amplitude.
+        - **phase_noise** (*numpy.ndarray*): Phase noise matrix for pulse samples.
 
-            *[1]* ``Tx[0] -- Rx[1]``
+    :ivar dict array_prop:
+     Metadata related to the radar's virtual array:
 
-            ...
+        - **size** (*int*): Total number of virtual array elements.
+        - **virtual_array** (*numpy.ndarray*): 3D locations of each virtual array element,
+          structured as ``[channel_size, 3]`` where each row corresponds to an [x, y, z] position.
 
-            *[N-1]* ``Tx[1] -- Rx[0]``
+    :ivar dict radar_prop:
+     Radar system properties:
 
-            *[N]* ``Tx[1] -- Rx[1]``
-
-    :ivar dict sample_prop: Sample properties
-
-        - **samples_per_pulse**: Number of samples in one pulse
-
-        - **noise**: Noise amplitude
-
-        - **phase_noise**: Phase noise matrix
-
-    :ivar dict array_prop: Array properties
-
-        - **size**: Number of virtual array elements
-
-        - **virtual_array**: Locations of virtual array elements. [channel_size, 3 <x, y, z>]
-
-    :ivar dict radar_prop: Radar properties
-
-        - **transmitter**: Radar transmitter
-
-        - **receiver**: Radar receiver
-
-        - **location**: Radar location (m)
-
-        - **speed**: Radar speed (m/s)
-
-        - **rotation**: Radar rotation (rad)
-
-        - **rotation_rate**: Radar rotation rate (rad/s)
+        - **transmitter** (*Transmitter*): Instance of the radar transmitter.
+        - **receiver** (*Receiver*): Instance of the radar receiver.
+        - **location** (*list*): The radar's 3D location in meters (m).
+        - **speed** (*list*): The radar's velocity in meters per second (m/s).
+        - **rotation** (*list*): The radar's orientation in radians (rad).
+        - **rotation_rate** (*list*): Angular velocity of the radar in radians per second (rad/s).
 
     """
 
@@ -537,11 +530,7 @@ class Radar:
         """
         shape = self.time_prop["timestamp_shape"]
 
-        if any(
-            np.size(var) > 1
-            for var in list(location)
-            + list(rotation)
-        ):
+        if any(np.size(var) > 1 for var in list(location) + list(rotation)):
             self.validate_radar_motion(location, speed, rotation, rotation_rate)
             self.radar_prop["location"] = np.zeros(shape + (3,))
             self.radar_prop["rotation"] = np.zeros(shape + (3,))
