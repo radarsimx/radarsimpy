@@ -27,133 +27,96 @@ import numpy as np
 
 class Transmitter:
     """
-    A class defines basic parameters of a radar transmitter
+    Defines the basic parameters and properties of a radar transmitter.
+
+    This class handles the waveform configuration, pulse parameters, and properties of the transmitter channels.
 
     :param f:
-        Waveform frequency (Hz).
-        If ``f`` is a single number, radar transmits a single-tone waveform.
-
-        For linear modulation, specify ``f`` with ``[f_start, f_stop]``.
-
-        ``f`` can alse be a 1-D array of an arbitrary waveform, specify
-        the time with ``t``.
-    :type f: float or numpy.1darray
+        Waveform frequency in Hertz (Hz). The value can be:
+          - A single number: For a single-tone waveform.
+          - A list ``[f_start, f_stop]``: For linear frequency modulation.
+          - A 1D array: For arbitrary waveforms, which must be paired with ``t`` for timing.
+    :type f: float or numpy.ndarray
     :param t:
-        Timing of each pulse (s).
-    :type t: float or numpy.1darray
+        Timing of the pulse(s) in seconds (s). Used when ``f`` is a 1D array to specify an arbitrary waveform.
+    :type t: float or numpy.ndarray
     :param float tx_power:
-        Transmitter power (dBm)
+        Transmitter power in decibels-milliwatts (dBm).
     :param int pulses:
-        Total number of pulses
-    :param float prp:
-        Pulse repetition period (s). ``prp >=
-        pulse_length``. If it is ``None``, ``prp =
-        pulse_length``.
-
-        ``prp`` can alse be a 1-D array to specify
-        different repetition period for each pulse. In this case, the
-        length of the 1-D array should equals to the length
-        of ``pulses``
-    :type repetitions_period: float or numpy.1darray
-    :param numpy.1darray f_offset:
-        Frequency offset for each pulse (Hz). The length must be the same
-        as ``pulses``.
-    :param numpy.1darray pn_f:
-        Frequency of the phase noise (Hz)
-    :param numpy.1darray pn_power:
-        Power of the phase noise (dB/Hz)
+        Total number of pulses.
+    :param prp:
+        Pulse repetition period (PRP) in seconds (s). Must satisfy ``prp >= pulse_length``.
+        - If ``prp`` is ``None``, it defaults to ``pulse_length``.
+        - Can also be a 1D array to specify different PRPs for each pulse. In this case, the array length must match ``pulses``.
+    :type prp: float or numpy.ndarray
+    :param numpy.ndarray f_offset:
+        Frequency offset for each pulse in Hertz (Hz). The length must match ``pulses``.
+    :param numpy.ndarray pn_f:
+        Frequencies associated with phase noise in Hertz (Hz).
+    :param numpy.ndarray pn_power:
+        Power of phase noise in dB/Hz.
     :param list[dict] channels:
-        Properties of transmitter channels
+        Properties of transmitter channels. Each channel is represented as a dictionary with the following keys:
 
-        [{
+        - **location** (*numpy.ndarray*): 3D location of the channel relative to the radar [x, y, z] in meters.
+        - **polarization** (*numpy.ndarray*): Antenna polarization vector [x, y, z].
+          - Default: ``[0, 0, 1]`` (vertical polarization).
+          - Examples:
+            - Vertical polarization: ``[0, 0, 1]``
+            - Horizontal polarization: ``[0, 1, 0]``
+            - Right-handed circular polarization: ``[0, 1, 1j]``
+            - Left-handed circular polarization: ``[0, 1, -1j]``
+        - **delay** (*float*): Transmit delay (s). Default: ``0``.
+        - **azimuth_angle** (*numpy.ndarray*): Azimuth angles in degrees (°). Default: ``[-90, 90]``.
+        - **azimuth_pattern** (*numpy.ndarray*): Azimuth pattern in decibels (dB). Default: ``[0, 0]``.
+        - **elevation_angle** (*numpy.ndarray*): Elevation angles in degrees (°). Default: ``[-90, 90]``.
+        - **elevation_pattern** (*numpy.ndarray*): Elevation pattern in decibels (dB). Default: ``[0, 0]``.
+        - **pulse_amp** (*numpy.ndarray*): Relative amplitude sequence for pulse amplitude modulation.
+          - Length must match ``pulses``. Default: ``1``.
+        - **pulse_phs** (*numpy.ndarray*): Phase code sequence for pulse phase modulation in degrees (°).
+          - Length must match ``pulses``. Default: ``0``.
+        - **mod_t** (*numpy.ndarray*): Timestamps for waveform modulation in seconds (s). Default: ``None``.
+        - **phs** (*numpy.ndarray*): Phase modulation scheme in degrees (°). Default: ``None``.
+        - **amp** (*numpy.ndarray*): Relative amplitude scheme for waveform modulation. Default: ``None``.
 
-        - **location** (*numpy.1darray*) --
-            3D location of the channel relative to radar's location [x, y, z] (m)
-        - **polarization** (*numpy.1darray*) --
-            Antenna polarization [x, y, z]. ``default = [0, 0, 1] (vertical polarization)``
-            Example:
-            Vertical polarization [0, 0, 1]
-            Horizontal polarization [0, 1, 0]
-            Right-handed circular polarization [0, 1, 1j] (from the point of view of the source)
-            Left-handed circular polarization [0, 1, -1j] (from the point of view of the source)
-        - **delay** (*float*) --
-            Transmit delay (s). ``default 0``
-        - **azimuth_angle** (*numpy.1darray*) --
-            Angles for azimuth pattern (deg). ``default [-90, 90]``
-        - **azimuth_pattern** (*numpy.1darray*) --
-            Azimuth pattern (dB). ``default [0, 0]``
-        - **elevation_angle** (*numpy.1darray*) --
-            Angles for elevation pattern (deg). ``default [-90, 90]``
-        - **elevation_pattern** (*numpy.1darray*) --
-            Elevation pattern (dB). ``default [0, 0]``
-        - **pulse_amp** (*numpy.1darray*) --
-            Relative amplitude sequence for pulse's amplitude modulation.
-            The array length should be the same as `pulses`. ``default 1``
-        - **pulse_phs** (*numpy.1darray*) --
-            Phase code sequence for pulse's phase modulation (deg).
-            The array length should be the same as `pulses`. ``default 0``
-        - **mod_t** (*numpy.1darray*) --
-            Time stamps for waveform modulation (s). ``default None``
-        - **phs** (*numpy.1darray*) --
-            Phase scheme for waveform modulation (deg). ``default None``
-        - **amp** (*numpy.1darray*) --
-            Relative amplitude scheme for waveform modulation. ``default None``
+    :ivar dict rf_prop:
+        RF properties of the transmitter:
 
-        }]
+        - **tx_power** (*float*): Transmitter power in dBm.
+        - **pn_f** (*numpy.ndarray*): Frequencies associated with phase noise (Hz).
+        - **pn_power** (*numpy.ndarray*): Power of phase noise (dB/Hz).
 
-    :ivar dict rf_prop: RF properties
+    :ivar dict waveform_prop:
+        Waveform properties:
 
-        - **tx_power**: Transmitter power (dBm)
+        - **f** (*float or numpy.ndarray*): Waveform frequency (Hz).
+        - **t** (*float or numpy.ndarray*): Timing of each pulse (s).
+        - **bandwidth** (*float*): Transmitting bandwidth (Hz).
+        - **pulse_length** (*float*): Duration of each pulse (s).
+        - **pulses** (*int*): Total number of pulses.
+        - **f_offset** (*numpy.ndarray*): Frequency offset for each pulse (Hz).
+        - **prp** (*float or numpy.ndarray*): Pulse repetition period (s).
+        - **pulse_start_time** (*numpy.ndarray*): Start times of each pulse (s).
 
-        - **pn_f**: Frequency of the phase noise (Hz)
+    :ivar dict txchannel_prop:
+        Properties of the transmitter channels:
 
-        - **pn_power**: Power of the phase noise (dB/Hz)
+        - **size** (*int*): Number of transmitter channels.
+        - **delay** (*numpy.ndarray*): Transmitter start delay (s).
+        - **grid** (*float*): Ray tracing grid size (°).
+        - **locations** (*numpy.ndarray*): 3D locations of the transmitter channels [x, y, z] in meters.
+        - **polarization** (*numpy.ndarray*): Polarization vectors of the transmitter channels.
+        - **waveform_mod** (*dict*): Waveform modulation parameters.
+        - **pulse_mod** (*dict*): Pulse modulation parameters.
+        - **az_angles** (*numpy.ndarray*): Azimuth angles (°).
+        - **az_patterns** (*numpy.ndarray*): Azimuth patterns (dB).
+        - **el_angles** (*numpy.ndarray*): Elevation angles (°).
+        - **el_patterns** (*numpy.ndarray*): Elevation patterns (dB).
+        - **antenna_gains** (*numpy.ndarray*): Transmitter antenna gains (dB).
 
-    :ivar dict waveform_prop: Waveform properties
+    **Waveform Schematic**:
 
-        - **f**: Waveform frequency (Hz)
-
-        - **t**: Timing of each pulse (s)
-
-        - **bandwidth**: Transmitting bandwidth (Hz)
-
-        - **pulse_length**: Transmitting length (s)
-
-        - **pulses**: Number of pulses
-
-        - **f_offset**: Frequency offset for each pulse
-
-        - **prp**: Pulse repetition time (s)
-
-        - **pulse_start_time**: Start time of each pulse
-
-    :ivar dict txchannel_prop: Transmitter channels
-
-        - **size**: Number of transmitter channels
-
-        - **delay**: Tx start delay (s)
-
-        - **grid**: Ray tracing grid size (deg)
-
-        - **locations**: Location of the Tx channel [x, y, z] m
-
-        - **polarization**: Polarization of the Tx channel
-
-        - **waveform_mod**: Waveform modulation parameters
-
-        - **pulse_mod**: Pulse modulation parameters
-
-        - **az_angles**: Azimuth angles (deg)
-
-        - **az_patterns**: Azimuth pattern (dB)
-
-        - **el_angles**: Elevation angles (deg)
-
-        - **el_patterns**: Elevation pattern (dB)
-
-        - **antenna_gains**: Tx antenna gain (dB)
-
-    **Waveform**
+    Illustration of the waveform, pulse repetition period, and modulation:
 
     ::
 
