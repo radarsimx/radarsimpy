@@ -10,7 +10,7 @@ Welcome to RadarSimPy's documentation!
   :height: 20
   :target: https://radarsimx.com/product/radarsimpy/
 
-- Copyright (C) 2018 - PRESENT  radarsimx.com
+- Copyright © 2018 - PRESENT  radarsimx.com
 - E-mail: info@radarsimx.com
 - Website: https://radarsimx.com
 
