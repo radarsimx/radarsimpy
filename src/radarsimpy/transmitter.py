@@ -102,14 +102,14 @@ class Transmitter:
           Default: ``None``.
 
     :ivar dict rf_prop:
-        RF properties of the transmitter:
+     RF properties of the transmitter:
 
         - **tx_power** (*float*): Transmitter power in dBm.
         - **pn_f** (*numpy.ndarray*): Frequencies associated with phase noise (Hz).
         - **pn_power** (*numpy.ndarray*): Power of phase noise (dB/Hz).
 
     :ivar dict waveform_prop:
-        Waveform properties:
+     Waveform properties:
 
         - **f** (*float or numpy.ndarray*): Waveform frequency (Hz).
         - **t** (*float or numpy.ndarray*): Timing of each pulse (s).
@@ -121,7 +121,7 @@ class Transmitter:
         - **pulse_start_time** (*numpy.ndarray*): Start times of each pulse (s).
 
     :ivar dict txchannel_prop:
-        Properties of the transmitter channels:
+     Properties of the transmitter channels:
 
         - **size** (*int*): Number of transmitter channels.
         - **delay** (*numpy.ndarray*): Transmitter start delay (s).
