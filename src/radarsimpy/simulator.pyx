@@ -55,155 +55,81 @@ np.import_array()
 @cython.wraparound(False)
 cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, noise=True, log_path=None, ray_filter=None, debug=False, interf=None):
     """
-    sim_radar(radar, targets, density=1, level=None, log_path=None, debug=False, interf=None)
+    sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=None, debug=False, interf=None)
 
-    This function generates radar's baseband response of a scene using the given radar and targets.
+    Simulates the radar's baseband response for a given scene.
 
-    :param radar: The radar object used for the scene.
-    :type radar: Radar
-    :param targets: The targets in the scene. It could be either an ideal point target or a 3D mesh object.
-    
-        3D mesh target:
+    This function generates the radar's baseband response using the provided radar configuration and target data. It supports both ideal point targets and 3D mesh objects, and allows for varying levels of fidelity in the simulation. Additional options include interference modeling, ray density specification, and logging of simulation data.
 
-        [{
+    :param Radar radar:
+     The radar object to be used for the simulation.
+    :param list targets:
+     The list of targets in the scene. Targets can be either ideal point targets or 3D mesh objects.
 
-        - **model** (*str*) --
-            Path to the target model
-        - **origin** (*numpy.1darray*) --
-            Origin position of the target model (m), [x, y, z].
-            ``default [0, 0, 0]``
-        - **location** (*numpy.1darray*) --
-            Location of the target (m), [x, y, z].
-            ``default [0, 0, 0]``
-        - **speed** (*numpy.1darray*) --
-            Speed of the target (m/s), [vx, vy, vz].
-            ``default [0, 0, 0]``
-        - **rotation** (*numpy.1darray*) --
-            Target's angle (deg), [yaw, pitch, roll].
-            ``default [0, 0, 0]``
-        - **rotation_rate** (*numpy.1darray*) --
-            Target's rotation rate (deg/s),
-            [yaw rate, pitch rate, roll rate]
-            ``default [0, 0, 0]``
-        - **permittivity** (*complex*) --
-            Target's permittivity. Perfect electric conductor (PEC) if not specified.
-        - **unit** (*str*) --
-            Unit of target model. Supports `mm`, `cm`, and `m`. Default is `m`.
+     **3D Mesh Target**:
+     A target represented as a 3D model. Each target is defined as a dictionary with the following keys:
 
-        }]
+        - **model** (*str*): Path to the target model file.
+        - **origin** (*numpy.ndarray*): Origin position of the target model [x, y, z] in meters. Default: ``[0, 0, 0]``.
+        - **location** (*numpy.ndarray*): Location of the target in meters [x, y, z]. Default: ``[0, 0, 0]``.
+        - **speed** (*numpy.ndarray*): Target velocity in meters per second [vx, vy, vz]. Default: ``[0, 0, 0]``.
+        - **rotation** (*numpy.ndarray*): Target orientation in degrees [yaw, pitch, roll]. Default: ``[0, 0, 0]``.
+        - **rotation_rate** (*numpy.ndarray*): Target's angular velocity in degrees per second [yaw rate, pitch rate, roll rate]. Default: ``[0, 0, 0]``.
+        - **permittivity** (*complex*): Target's permittivity. Defaults to a perfect electric conductor (PEC).
+        - **unit** (*str*): Unit of the target model. Supported values: ``'mm'``, ``'cm'``, ``'m'``. Default: ``'m'``.
 
-        Ideal point target:
+     **Ideal Point Target**:
+     A simplified target defined as a point in space. Each target is represented as a dictionary with the following keys:
 
-        [{
+        - **location** (*numpy.ndarray*): Target location in meters [x, y, z].
+        - **rcs** (*float*): Target's radar cross-section (RCS) in dBsm.
+        - **speed** (*numpy.ndarray*): Target velocity in meters per second [vx, vy, vz]. Default: ``[0, 0, 0]``.
+        - **phase** (*float*): Target phase in degrees. Default: ``0``.
 
-        - **location** (*numpy.1darray*) --
-            Location of the target (m), [x, y, z]
-        - **rcs** (*float*) --
-            Target RCS (dBsm)
-        - **speed** (*numpy.1darray*) --
-            Speed of the target (m/s), [vx, vy, vz]. ``default
-            [0, 0, 0]``
-        - **phase** (*float*) --
-            Target phase (deg). ``default 0``
+     *Note*: Target parameters can be time-varying by using ``Radar.timestamp``. For example:
 
-        }]
+     ```python
+     location = (1e-3 * np.sin(2 * np.pi * 1 * radar.timestamp), 0, 0)
+     ```
 
-        *Note*: Target's parameters can be specified with
-        ``Radar.timestamp`` to customize the time varying property.
-        Example: ``location=(1e-3*np.sin(2*np.pi*1*radar.timestamp), 0, 0)``
-    :type targets: list
-    :param frame_time: Radar firing time instances / frames
-    :type time: float or list
-    :param density: Ray density. Number of rays per wavelength (default=1).
-    :type density: float
-    :param level: Fidelity level of the simulation (default=None).
-    
-        - ``None``: Perform one ray tracing simulation for the whole frame
-        - ``pulse``: Perform ray tracing for each pulse
-        - ``sample``: Perform ray tracing for each sample
-    :type level: str or None
-    :param log_path: Provide the path to save ray data (default=None, no data will be saved).
-    :type log_path: str
-    :param debug: Whether to enable debug mode (default=False).
-    :type debug: bool
-    :param interf: Interference radar (default=None).
-    :type interf: Radar
+    :param float or list frame_time:
+     Radar firing times or frame instances, specified as a float or a list of time values.
+    :param float density:
+     Ray density, defined as the number of rays per wavelength. Default: ``1.0``.
+    :param str or None level:
+     Fidelity level of the simulation. Default: ``None``.
 
-    :return: A dictionary containing the baseband data, noise, timestamp, and interference (if available).
-        {
+        - ``None``: Perform one ray-tracing simulation for the entire frame.
+        - ``pulse``: Perform ray-tracing for each pulse.
+        - ``sample``: Perform ray-tracing for each sample.
 
-        - **baseband** (*numpy.3darray*) --
-            Time domain baseband data.
-            ``[channes/frames, pulses, samples]``
+    :param str or None log_path:
+      Path to save ray-tracing data. Default: ``None`` (does not save data).
+    :param bool debug:
+     Whether to enable debug mode. Default: ``False``.
+    :param Radar or None interf:
+     Interference radar object. Default: ``None``.
 
-            *Channel/frame order in baseband*
+    :return:
+        A dictionary containing the simulated baseband response and related data:
 
-            *[0]* ``Frame[0] -- Tx[0] -- Rx[0]``
+        - **baseband** (*numpy.ndarray*): Time-domain baseband data with shape ``[channels/frames, pulses, samples]``. 
+          The channel/frame order is as follows:
 
-            *[1]* ``Frame[0] -- Tx[0] -- Rx[1]``
+            - *[0]*: ``Frame[0] → Tx[0] → Rx[0]``
+            - *[1]*: ``Frame[0] → Tx[0] → Rx[1]``
+            - ...
+            - *[N]*: ``Frame[0] → Tx[1] → Rx[0]``
+            - ...
+            - *[M]*: ``Frame[1] → Tx[0] → Rx[0]``
 
-            ...
+        - **noise** (*numpy.ndarray*): Time-domain noise data with the same shape and order as `baseband`.
+        - **interference** (*numpy.ndarray*): Time-domain interference data (if applicable), with the same shape and order as `baseband`.
+        - **timestamp** (*numpy.ndarray*): Timestamp array, directly derived from ``Radar.timestamp``.
 
-            *[N]* ``Frame[0] -- Tx[1] -- Rx[0]``
-
-            *[N+1]* ``Frame[0] -- Tx[1] -- Rx[1]``
-
-            ...
-
-            *[M]* ``Frame[1] -- Tx[0] -- Rx[0]``
-
-            *[M+1]* ``Frame[1] -- Tx[0] -- Rx[1]``
-        
-        - **noise** (*numpy.3darray*) --
-            Time domain noise data.
-            ``[channes/frames, pulses, samples]``
-
-            *Channel/frame order in baseband*
-
-            *[0]* ``Frame[0] -- Tx[0] -- Rx[0]``
-
-            *[1]* ``Frame[0] -- Tx[0] -- Rx[1]``
-
-            ...
-
-            *[N]* ``Frame[0] -- Tx[1] -- Rx[0]``
-
-            *[N+1]* ``Frame[0] -- Tx[1] -- Rx[1]``
-
-            ...
-
-            *[M]* ``Frame[1] -- Tx[0] -- Rx[0]``
-
-            *[M+1]* ``Frame[1] -- Tx[0] -- Rx[1]``
-
-        - **interference** (*numpy.3darray*) --
-            Time domain interference data.
-            ``[channes/frames, pulses, samples]``
-
-            *Channel/frame order in baseband*
-
-            *[0]* ``Frame[0] -- Tx[0] -- Rx[0]``
-
-            *[1]* ``Frame[0] -- Tx[0] -- Rx[1]``
-
-            ...
-
-            *[N]* ``Frame[0] -- Tx[1] -- Rx[0]``
-
-            *[N+1]* ``Frame[0] -- Tx[1] -- Rx[1]``
-
-            ...
-
-            *[M]* ``Frame[1] -- Tx[0] -- Rx[0]``
-
-            *[M+1]* ``Frame[1] -- Tx[0] -- Rx[1]``
-
-        - **timestamp** (*numpy.3darray*) --
-            Refer to Radar.timestamp
-
-        }
     :rtype: dict
-    """
+"""
+
 
     # radar
     cdef Radar[double, float_t] radar_c
