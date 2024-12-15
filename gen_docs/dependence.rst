@@ -5,7 +5,7 @@ Dependence
 - ``NumPy`` >= 2.0
 - ``SciPy``
 - ``PyMeshLab`` (*preferred*) or ``meshio``
-|
+
 **Windows**
 
     - `Visual C++ Runtime <https://aka.ms/vs/16/release/vc_redist.x64.exe/>`_
