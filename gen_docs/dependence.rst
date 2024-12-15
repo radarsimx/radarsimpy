@@ -30,14 +30,12 @@ Dependence
 
   - `GCC 13`
 
-    ```bash
-    brew install gcc@13
-    ```
+    .. code-block:: bash
+      brew install gcc@13
 
 - **MacOS Apple Silicon**
 
   - `GCC 14`
 
-    ```bash
-    brew install gcc@14
-    ```
+    .. code-block:: bash
+      brew install gcc@14
