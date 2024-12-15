@@ -66,34 +66,31 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, noise=True,
     :param list targets:
      The list of targets in the scene. Targets can be either ideal point targets or 3D mesh objects.
 
-     **3D Mesh Target**:
-     A target represented as a 3D model. Each target is defined as a dictionary with the following keys:
+        - **3D Mesh Target**:
+          A target represented as a 3D model. Each target is defined as a dictionary with the following keys:
 
-        - **model** (*str*): Path to the target model file.
-        - **origin** (*numpy.ndarray*): Origin position of the target model [x, y, z] in meters. Default: ``[0, 0, 0]``.
-        - **location** (*numpy.ndarray*): Location of the target in meters [x, y, z]. Default: ``[0, 0, 0]``.
-        - **speed** (*numpy.ndarray*): Target velocity in meters per second [vx, vy, vz]. Default: ``[0, 0, 0]``.
-        - **rotation** (*numpy.ndarray*): Target orientation in degrees [yaw, pitch, roll]. Default: ``[0, 0, 0]``.
-        - **rotation_rate** (*numpy.ndarray*): Target's angular velocity in degrees per second [yaw rate, pitch rate, roll rate]. Default: ``[0, 0, 0]``.
-        - **permittivity** (*complex*): Target's permittivity. Defaults to a perfect electric conductor (PEC).
-        - **unit** (*str*): Unit of the target model. Supported values: ``'mm'``, ``'cm'``, ``'m'``. Default: ``'m'``.
+            - **model** (*str*): Path to the target model file.
+            - **origin** (*numpy.ndarray*): Origin position of the target model [x, y, z] in meters. Default: ``[0, 0, 0]``.
+            - **location** (*numpy.ndarray*): Location of the target in meters [x, y, z]. Default: ``[0, 0, 0]``.
+            - **speed** (*numpy.ndarray*): Target velocity in meters per second [vx, vy, vz]. Default: ``[0, 0, 0]``.
+            - **rotation** (*numpy.ndarray*): Target orientation in degrees [yaw, pitch, roll]. Default: ``[0, 0, 0]``.
+            - **rotation_rate** (*numpy.ndarray*): Target's angular velocity in degrees per second [yaw rate, pitch rate, roll rate]. Default: ``[0, 0, 0]``.
+            - **permittivity** (*complex*): Target's permittivity. Defaults to a perfect electric conductor (PEC).
+            - **unit** (*str*): Unit of the target model. Supported values: ``mm``, ``cm``, ``m``. Default: ``m``.
 
-     **Ideal Point Target**:
-     A simplified target defined as a point in space. Each target is represented as a dictionary with the following keys:
+        - **Ideal Point Target**:
+          A simplified target defined as a point in space. Each target is represented as a dictionary with the following keys:
 
-        - **location** (*numpy.ndarray*): Target location in meters [x, y, z].
-        - **rcs** (*float*): Target's radar cross-section (RCS) in dBsm.
-        - **speed** (*numpy.ndarray*): Target velocity in meters per second [vx, vy, vz]. Default: ``[0, 0, 0]``.
-        - **phase** (*float*): Target phase in degrees. Default: ``0``.
+            - **location** (*numpy.ndarray*): Target location in meters [x, y, z].
+            - **rcs** (*float*): Target's radar cross-section (RCS) in dBsm.
+            - **speed** (*numpy.ndarray*): Target velocity in meters per second [vx, vy, vz]. Default: ``[0, 0, 0]``.
+            - **phase** (*float*): Target phase in degrees. Default: ``0``.
 
      *Note*: Target parameters can be time-varying by using ``Radar.timestamp``. For example:
-
-     ```python
-     location = (1e-3 * np.sin(2 * np.pi * 1 * radar.timestamp), 0, 0)
-     ```
+     ``location = (1e-3 * np.sin(2 * np.pi * 1 * radar.timestamp), 0, 0)``
 
     :param float or list frame_time:
-     Radar firing times or frame instances, specified as a float or a list of time values.
+     Radar firing times or frame instances, specified as a float or a list of time values. Default: ``0``.
     :param float density:
      Ray density, defined as the number of rays per wavelength. Default: ``1.0``.
     :param str or None level:
