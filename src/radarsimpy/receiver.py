@@ -68,11 +68,13 @@ class Receiver:
 
     :ivar dict rf_prop:
         RF properties of the receiver:
+
         - **rf_gain** (*float*): RF gain in decibels (dB).
         - **noise_figure** (*float*): Noise figure in decibels (dB).
 
     :ivar dict bb_prop:
         Baseband properties of the receiver:
+
         - **fs** (*float*): Sampling rate in samples per second (sps).
         - **load_resistor** (*float*): Load resistance in ohms (Ω).
         - **baseband_gain** (*float*): Baseband gain in decibels (dB).
@@ -80,6 +82,7 @@ class Receiver:
 
     :ivar dict rxchannel_prop:
         Properties of the receiver channels:
+
         - **size** (*int*): Number of receiver channels.
         - **locations** (*numpy.ndarray*): 3D locations of the receiver channels [x, y, z] in meters.
         - **polarization** (*numpy.ndarray*): Polarization vectors of the receiver channels.
