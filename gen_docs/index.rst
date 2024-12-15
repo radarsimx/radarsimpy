@@ -10,13 +10,14 @@ Welcome to RadarSimPy's documentation!
   :height: 20
   :target: https://radarsimx.com/product/radarsimpy/
 
+.. image:: https://raw.githubusercontent.com/radarsimx/.github/main/profile/radarsimx_main.svg
+   :width: 400
+   :alt: RadarSimX
+   :target: https://radarsimx.com
+
 - Copyright © 2018 - PRESENT  radarsimx.com
 - E-mail: info@radarsimx.com
 - Website: https://radarsimx.com
-
-.. image:: https://raw.githubusercontent.com/radarsimx/.github/main/profile/radarsimx_main.svg
-    :width: 600
-    :alt: RadarSimX
 
 .. toctree::
    :maxdepth: 2
