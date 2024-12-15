@@ -9,7 +9,7 @@ Coordinate Systems
 
 .. image:: https://raw.githubusercontent.com/radarsimx/radarsimpy/refs/heads/master/assets/phi_theta.svg
     :width: 400
-    :alt: Alternative text
+    :alt: Phi Theta Plot
 
 **Local Coordinate**
 
@@ -20,11 +20,11 @@ Coordinate Systems
 
 .. image:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/yaw_pitch_roll.svg
     :width: 400
-    :alt: Alternative text
+    :alt: Yaw Pitch Roll Plot
 
 - **azimuth** (deg): azimuth -90 ~ 90 deg equal to phi -90 ~ 90 deg
 - **elevation** (deg): elevation -90 ~ 90 deg equal to theta 180 ~ 0 deg
 
 .. image:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/azimuth_elevation.svg
     :width: 400
-    :alt: Alternative text
+    :alt: Azimuth Elevation Plot
