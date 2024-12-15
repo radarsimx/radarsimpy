@@ -27,81 +27,71 @@ import numpy as np
 
 class Receiver:
     """
-    A class defines basic parameters of a radar receiver
+    Represents the basic parameters and properties of a radar receiver.
+
+    This class defines the RF and baseband properties of a radar receiver,
+    along with the characteristics of its receiver channels.
 
     :param float fs:
-        Sampling rate (sps)
+        Sampling rate in samples per second (sps).
     :param float noise_figure:
-        Noise figure (dB)
+        Noise figure of the receiver in decibels (dB).
     :param float rf_gain:
-        Total RF gain (dB)
+        Total RF gain of the receiver in decibels (dB).
     :param float load_resistor:
-        Load resistor to convert power to voltage (Ohm)
+        Load resistance to convert power to voltage, in ohms (Ω).
     :param float baseband_gain:
-        Total baseband gain (dB)
-    :param string bb_type:
-        Baseband data type, ``complex`` or ``real``.
-        Deafult is ``complex``
+        Total baseband gain in decibels (dB).
+    :param str bb_type:
+        Baseband data type, either ``complex`` or ``real``.
+        Defaults to ``complex``.
     :param list[dict] channels:
-        Properties of transmitter channels
+        A list of dictionaries defining the properties of receiver channels,
+        where each dictionary contains the following keys:
 
-        [{
+        - **location** (*numpy.ndarray*): 3D location of the channel relative to the radar's position [x, y, z] in meters.
+        - **polarization** (*numpy.ndarray*): Antenna polarization vector [x, y, z].
+          Defaults to ``[0, 0, 1]`` (vertical polarization).
+          Examples:
+            - Vertical polarization: ``[0, 0, 1]``
+            - Horizontal polarization: ``[0, 1, 0]``
+            - Right-handed circular polarization: ``[0, 1, 1j]``
+            - Left-handed circular polarization: ``[0, 1, -1j]``
+        - **azimuth_angle** (*numpy.ndarray*): Azimuth pattern angles in degrees.
+          Defaults to ``[-90, 90]``.
+        - **azimuth_pattern** (*numpy.ndarray*): Azimuth pattern in decibels (dB).
+          Defaults to ``[0, 0]``.
+        - **elevation_angle** (*numpy.ndarray*): Elevation pattern angles in degrees.
+          Defaults to ``[-90, 90]``.
+        - **elevation_pattern** (*numpy.ndarray*): Elevation pattern in decibels (dB).
+          Defaults to ``[0, 0]``.
 
-        - **location** (*numpy.1darray*) --
-            3D location of the channel relative to radar's location [x, y, z] (m)
-        - **polarization** (*numpy.1darray*) --
-            Antenna polarization [x, y, z]. ``default = [0, 0, 1] (vertical polarization)``
-            Example:
-            Vertical polarization [0, 0, 1]
-            Horizontal polarization [0, 1, 0]
-            Right-handed circular polarization [0, 1, 1j] (from the point of view of the source)
-            Left-handed circular polarization [0, 1, -1j] (from the point of view of the source)
-        - **azimuth_angle** (*numpy.1darray*) --
-            Angles for azimuth pattern (deg). ``default [-90, 90]``
-        - **azimuth_pattern** (*numpy.1darray*) --
-            Azimuth pattern (dB). ``default [0, 0]``
-        - **elevation_angle** (*numpy.1darray*) --
-            Angles for elevation pattern (deg). ``default [-90, 90]``
-        - **elevation_pattern** (*numpy.1darray*) --
-            Elevation pattern (dB). ``default [0, 0]``
+    :ivar dict rf_prop:
+        RF properties of the receiver:
+        - **rf_gain** (*float*): RF gain in decibels (dB).
+        - **noise_figure** (*float*): Noise figure in decibels (dB).
 
-        }]
+    :ivar dict bb_prop:
+        Baseband properties of the receiver:
+        - **fs** (*float*): Sampling rate in samples per second (sps).
+        - **load_resistor** (*float*): Load resistance in ohms (Ω).
+        - **baseband_gain** (*float*): Baseband gain in decibels (dB).
+        - **bb_type** (*str*): Baseband data type, either ``real`` or ``complex``.
 
-    :ivar dict rf_prop: RF properties
+    :ivar dict rxchannel_prop:
+        Properties of the receiver channels:
+        - **size** (*int*): Number of receiver channels.
+        - **locations** (*numpy.ndarray*): 3D locations of the receiver channels [x, y, z] in meters.
+        - **polarization** (*numpy.ndarray*): Polarization vectors of the receiver channels.
+        - **az_angles** (*numpy.ndarray*): Azimuth angles in degrees.
+        - **az_patterns** (*numpy.ndarray*): Azimuth pattern in decibels (dB).
+        - **el_angles** (*numpy.ndarray*): Elevation angles in degrees.
+        - **el_patterns** (*numpy.ndarray*): Elevation pattern in decibels (dB).
+        - **antenna_gains** (*numpy.ndarray*): Antenna gains of the receiver channels in decibels (dB).
 
-        - **rf_gain**: RF gain of the receiver (dB)
+    **Receiver Noise Model**:
 
-        - **noise_figure**: Receiver noise figure (dB)
-
-    :ivar dict bb_prop: Baseband properties
-
-        - **fs**: Sampling rate
-
-        - **load_resistor**: Load resistor (ohm)
-
-        - **baseband_gain**: Baseband gain (dB)
-
-        - **bb_type**: Baseband type, ``real`` or ``complex``
-
-    :ivar dict rxchannel_prop: Receiver channels
-
-        - **size**: Number of receiver channels
-
-        - **locations**: Location of the Rx channel [x, y, z] m
-
-        - **polarization**: Polarization of the Rx channel
-
-        - **az_angles**: Azimuth angles (deg)
-
-        - **az_patterns**: Azimuth pattern (dB)
-
-        - **el_angles**: Elevation angles (deg)
-
-        - **el_patterns**: Elevation pattern (dB)
-
-        - **antenna_gains**: Rx antenna gain (dB)
-
-    **Receiver noise**
+    The following diagram illustrates the radar receiver noise model and calculations:
 
     ::
 

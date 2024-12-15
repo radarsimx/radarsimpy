@@ -57,8 +57,8 @@ def marcumq(a, x, m=1):
     :rtype: float
 
     :references:
-        `Wikipedia - Marcum Q-function <https://en.wikipedia.org/wiki/Marcum_Q-function>`
-        `SciPy Documentation - scipy.stats.ncx2 <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ncx2.html>`
+        `Wikipedia - Marcum Q-function <https://en.wikipedia.org/wiki/Marcum_Q-function>`_
+        `SciPy Documentation - scipy.stats.ncx2 <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ncx2.html>`_
     """
     return 1 - distributions.ncx2.cdf(df=m * 2, nc=a**2, x=x**2)
 
