@@ -6,6 +6,10 @@
 Welcome to RadarSimPy's documentation!
 ======================================
 
+.. image:: https://img.shields.io/github/v/tag/radarsimx/radarsimpy?label=Download
+  :height: 20
+  :target: https://radarsimx.com/product/radarsimpy/
+
 .. toctree::
    :maxdepth: 2
    :caption: Instruction
