@@ -1,6 +1,15 @@
 Radar Model
 ===========
 
+Radar Configuration and Phase Noise Modeling in Python
+
+This module contains classes and functions to define and simulate
+the parameters and behavior of radar systems. It includes tools for
+configuring radar system properties, modeling oscillator phase noise,
+and simulating radar motion and noise characteristics. A major focus
+of the module is on accurately modeling radar signal properties,
+including phase noise and noise amplitudes.
+
 radarsimpy.Transmitter
 -----------------------
 
