@@ -53,9 +53,9 @@ np.import_array()
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, noise=True, log_path=None, ray_filter=None, debug=False, interf=None):
+cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=None, ray_filter=None, debug=False, interf=None):
     """
-    sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=None, debug=False, interf=None)
+    sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=None, ray_filter=None, debug=False, interf=None)
 
     Simulates the radar's baseband response for a given scene.
 
@@ -102,6 +102,11 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, noise=True,
 
     :param str or None log_path:
      Path to save ray-tracing data. Default: ``None`` (does not save data).
+    :param list or None ray_filter:
+     Filters rays based on the number of reflections.
+     Only rays with the number of reflections between ``ray_filter[0]``
+     and ``ray_filter[1]`` are included in the calculations.
+     Default: ``None`` (no filtering).
     :param bool debug:
      Whether to enable debug mode. Default: ``False``.
     :param Radar or None interf:
@@ -113,23 +118,23 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, noise=True,
         - **baseband** (*numpy.ndarray*): Time-domain baseband data with shape ``[channels/frames, pulses, samples]``. 
           The channel/frame order is as follows (with ``K`` frames, ``M`` Tx channels and ``N`` Rx channels):
 
-            - *[0]*: ``Frame[0] → Tx[0] → Rx[0]``
-            - *[1]*: ``Frame[0] → Tx[0] → Rx[1]``
+            - *[0, :, :]*: ``Frame[0] → Tx[0] → Rx[0]``
+            - *[1, :, :]*: ``Frame[0] → Tx[0] → Rx[1]``
             - ...
-            - *[N-1]*: ``Frame[0] → Tx[0] → Rx[N-1]``
-            - *[N]*: ``Frame[0] → Tx[1] → Rx[0]``
+            - *[N-1, :, :]*: ``Frame[0] → Tx[0] → Rx[N-1]``
+            - *[N, :, :]*: ``Frame[0] → Tx[1] → Rx[0]``
             - ...
-            - *[MN-1]*: ``Frame[0] → Tx[M-1] → Rx[N-1]``
-            - *[MN]*: ``Frame[1] → Tx[0] → Rx[0]``
+            - *[MN-1, :, :]*: ``Frame[0] → Tx[M-1] → Rx[N-1]``
+            - *[MN, :, :]*: ``Frame[1] → Tx[0] → Rx[0]``
             - ...
-            - *[KMN-1]*: ``Frame[K-1] → Tx[M-1] → Rx[N-1]``
+            - *[KMN-1, :, :]*: ``Frame[K-1] → Tx[M-1] → Rx[N-1]``
 
         - **noise** (*numpy.ndarray*): Time-domain noise data with the same shape and order as `baseband`.
         - **interference** (*numpy.ndarray*): Time-domain interference data (if applicable), with the same shape and order as `baseband`.
         - **timestamp** (*numpy.ndarray*): Timestamp array, directly derived from ``Radar.timestamp``.
 
     :rtype: dict
-"""
+    """
 
 
     # radar
@@ -303,26 +308,23 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, noise=True,
     min_ts = np.min(radar_ts)
     num_noise_samples = int(np.ceil((max_ts-min_ts)* radar.radar_prop["receiver"].bb_prop["fs"]))+1
 
-    if noise:
+    if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
+        noise_mat = np.zeros(ts_shape, dtype=np.float64)
+    elif radar.radar_prop["receiver"].bb_prop["bb_type"] == "complex":
+        noise_mat = np.zeros(ts_shape, dtype=complex)
+
+    for frame_idx in range(0, frames_c):
         if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
-            noise_mat = np.zeros(ts_shape, dtype=np.float64)
+            noise_per_frame_rx = radar.sample_prop["noise"] * np.random.randn(rxsize_c, num_noise_samples)
         elif radar.radar_prop["receiver"].bb_prop["bb_type"] == "complex":
-            noise_mat = np.zeros(ts_shape, dtype=complex)
+            noise_per_frame_rx = radar.sample_prop["noise"]/ np.sqrt(2) * (np.random.randn(rxsize_c, num_noise_samples) + 1j*np.random.randn(rxsize_c, num_noise_samples))
 
-        for frame_idx in range(0, frames_c):
-            if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
-                noise_per_frame_rx = radar.sample_prop["noise"] * np.random.randn(rxsize_c, num_noise_samples)
-            elif radar.radar_prop["receiver"].bb_prop["bb_type"] == "complex":
-                noise_per_frame_rx = radar.sample_prop["noise"]/ np.sqrt(2) * (np.random.randn(rxsize_c, num_noise_samples) + 1j*np.random.randn(rxsize_c, num_noise_samples))
-
-            for ch_idx in range(0, radar_ts_shape[0]):
-                for ps_idx in range(0, radar_ts_shape[1]):
-                    f_ch_idx = ch_idx+frame_idx*radar_ts_shape[0]
-                    t0 = (radar_ts[ch_idx, ps_idx, 0] - min_ts)*radar.radar_prop["receiver"].bb_prop["fs"]
-                    rx_ch = ch_idx%rxsize_c
-                    noise_mat[f_ch_idx, ps_idx, :] = noise_per_frame_rx[rx_ch, int(t0):(int(t0)+radar_ts_shape[2])]
-    else:
-        noise_mat = None
+        for ch_idx in range(0, radar_ts_shape[0]):
+            for ps_idx in range(0, radar_ts_shape[1]):
+                f_ch_idx = ch_idx+frame_idx*radar_ts_shape[0]
+                t0 = (radar_ts[ch_idx, ps_idx, 0] - min_ts)*radar.radar_prop["receiver"].bb_prop["fs"]
+                rx_ch = ch_idx%rxsize_c
+                noise_mat[f_ch_idx, ps_idx, :] = noise_per_frame_rx[rx_ch, int(t0):(int(t0)+radar_ts_shape[2])]
 
     if interf is not None:
         interf_radar_c = cp_Radar(interf, 0)
