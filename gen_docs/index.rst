@@ -31,7 +31,6 @@ Welcome to RadarSimPy's documentation!
 
    radar
    sim
-   rt
    process
    tools
 
