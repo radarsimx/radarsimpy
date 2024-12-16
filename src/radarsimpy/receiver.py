@@ -1,9 +1,11 @@
 """
-This script contains classes that define all the parameters for
-a radar receiver
+Radar Receiver Configuration and Noise Modeling
 
-This script requires that 'numpy' be installed within the Python
-environment you are running this script in.
+This module provides the `Receiver` class, which defines the parameters and
+properties of a radar receiver. It includes tools for configuring receiver
+channels, modeling noise properties, and validating baseband and RF characteristics.
+The module is intended to support radar system simulation by accurately modeling
+receiver behavior.
 
 ---
 

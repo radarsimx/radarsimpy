@@ -1,9 +1,12 @@
 """
-This script contains classes that define all the parameters for
-a radar system
+Radar Configuration and Phase Noise Modeling in Python
 
-This script requires that 'numpy' be installed within the Python
-environment you are running this script in.
+This module contains classes and functions to define and simulate
+the parameters and behavior of radar systems. It includes tools for
+configuring radar system properties, modeling oscillator phase noise,
+and simulating radar motion and noise characteristics. A major focus
+of the module is on accurately modeling radar signal properties,
+including phase noise and noise amplitudes.
 
 ---
 

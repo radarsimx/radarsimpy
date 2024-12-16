@@ -1,6 +1,11 @@
 # distutils: language = c++
 """
-A Python module for radar simulation
+The Python Module for Radar Simulation
+
+This module provides advanced radar simulation capabilities,
+enabling users to simulate radar baseband responses for complex scenes.
+It supports point targets, 3D mesh objects, and offers features such as
+ray-tracing, interference modeling, and noise simulation.
 
 ---
 

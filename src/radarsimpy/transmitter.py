@@ -1,9 +1,11 @@
 """
-This script contains classes that define all the parameters for
-a radar transmitter
+Radar Transmitter Configuration and Waveform Modeling
 
-This script requires that 'numpy' be installed within the Python
-environment you are running this script in.
+This module provides the `Transmitter` class, which defines the parameters
+and properties of a radar transmitter. It includes tools for configuring waveform
+properties, pulse modulation, and transmitter channel settings. The module supports
+advanced radar system simulations by enabling custom waveform generation and
+transmitter channel modulation.
 
 ---
 
@@ -34,7 +36,7 @@ class Transmitter:
 
     :param f: Waveform frequency in Hertz (Hz).
      The value can be:
-    
+
         - A single number: For a single-tone waveform.
         - A list ``[f_start, f_stop]``: For linear frequency modulation.
         - A 1D array: For arbitrary waveforms, which must be paired with ``t`` for timing.
@@ -51,7 +53,7 @@ class Transmitter:
     :param prp:
      Pulse repetition period (PRP) in seconds (s).
      Must satisfy ``prp >= pulse_length``.
-    
+
         - If ``prp`` is ``None``, it defaults to ``pulse_length``.
         - Can also be a 1D array to specify different PRPs for each pulse.
           In this case, the array length must match ``pulses``.
