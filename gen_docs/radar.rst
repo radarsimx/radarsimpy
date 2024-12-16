@@ -10,6 +10,21 @@ and simulating radar motion and noise characteristics. A major focus
 of the module is on accurately modeling radar signal properties,
 including phase noise and noise amplitudes.
 
+---
+
+- Copyright (C) 2018 - PRESENT  radarsimx.com
+- E-mail: info@radarsimx.com
+- Website: https://radarsimx.com
+
+::
+
+    ██████╗  █████╗ ██████╗  █████╗ ██████╗ ███████╗██╗███╗   ███╗██╗  ██╗
+    ██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔════╝██║████╗ ████║╚██╗██╔╝
+    ██████╔╝███████║██║  ██║███████║██████╔╝███████╗██║██╔████╔██║ ╚███╔╝ 
+    ██╔══██╗██╔══██║██║  ██║██╔══██║██╔══██╗╚════██║██║██║╚██╔╝██║ ██╔██╗ 
+    ██║  ██║██║  ██║██████╔╝██║  ██║██║  ██║███████║██║██║ ╚═╝ ██║██╔╝ ██╗
+    ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝
+
 radarsimpy.Transmitter
 -----------------------
 
