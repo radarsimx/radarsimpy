@@ -67,9 +67,9 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
     This function generates the radar's baseband response using the provided radar configuration and target data. It supports both ideal point targets and 3D mesh objects, and allows for varying levels of fidelity in the simulation. Additional options include interference modeling, ray density specification, and logging of simulation data.
 
     :param Radar radar:
-     The radar object to be used for the simulation.
+        The radar object to be used for the simulation.
     :param list targets:
-     The list of targets in the scene. Targets can be either ideal point targets or 3D mesh objects.
+        The list of targets in the scene. Targets can be either ideal point targets or 3D mesh objects.
 
         - **3D Mesh Target**:
           A target represented as a 3D model. Each target is defined as a dictionary with the following keys:
@@ -91,31 +91,31 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
             - **speed** (*numpy.ndarray*): Target velocity in meters per second [vx, vy, vz]. Default: ``[0, 0, 0]``.
             - **phase** (*float*): Target phase in degrees. Default: ``0``.
 
-     *Note*: Target parameters can be time-varying by using ``Radar.timestamp``. For example:
-     ``location = (1e-3 * np.sin(2 * np.pi * 1 * radar.timestamp), 0, 0)``
+        *Note*: Target parameters can be time-varying by using ``Radar.timestamp``. For example:
+        ``location = (1e-3 * np.sin(2 * np.pi * 1 * radar.timestamp), 0, 0)``
 
     :param float or list frame_time:
-     Radar firing times or frame instances, specified as a float or a list of time values. Default: ``0``.
+        Radar firing times or frame instances, specified as a float or a list of time values. Default: ``0``.
     :param float density:
-     Ray density, defined as the number of rays per wavelength. Default: ``1.0``.
+        Ray density, defined as the number of rays per wavelength. Default: ``1.0``.
     :param str or None level:
-     Fidelity level of the simulation. Default: ``None``.
+        Fidelity level of the simulation. Default: ``None``.
 
         - ``None``: Perform one ray-tracing simulation for the entire frame.
         - ``pulse``: Perform ray-tracing for each pulse.
         - ``sample``: Perform ray-tracing for each sample.
 
     :param str or None log_path:
-     Path to save ray-tracing data. Default: ``None`` (does not save data).
+        Path to save ray-tracing data. Default: ``None`` (does not save data).
     :param list or None ray_filter:
-     Filters rays based on the number of reflections.
-     Only rays with the number of reflections between ``ray_filter[0]``
-     and ``ray_filter[1]`` are included in the calculations.
-     Default: ``None`` (no filtering).
+        Filters rays based on the number of reflections.
+        Only rays with the number of reflections between ``ray_filter[0]``
+        and ``ray_filter[1]`` are included in the calculations.
+        Default: ``None`` (no filtering).
     :param bool debug:
-     Whether to enable debug mode. Default: ``False``.
+        Whether to enable debug mode. Default: ``False``.
     :param Radar or None interf:
-     Interference radar object. Default: ``None``.
+        Interference radar object. Default: ``None``.
 
     :return:
         A dictionary containing the simulated baseband response and related data:

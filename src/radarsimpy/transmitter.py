@@ -35,7 +35,7 @@ class Transmitter:
     and properties of the transmitter channels.
 
     :param f: Waveform frequency in Hertz (Hz).
-     The value can be:
+        The value can be:
 
         - A single number: For a single-tone waveform.
         - A list ``[f_start, f_stop]``: For linear frequency modulation.
@@ -43,16 +43,16 @@ class Transmitter:
 
     :type f: float or numpy.ndarray
     :param t:
-     Timing of the pulse(s) in seconds (s).
-     Used when ``f`` is a 1D array to specify an arbitrary waveform.
+        Timing of the pulse(s) in seconds (s).
+        Used when ``f`` is a 1D array to specify an arbitrary waveform.
     :type t: float or numpy.ndarray
     :param float tx_power:
-     Transmitter power in decibels-milliwatts (dBm).
+        Transmitter power in decibels-milliwatts (dBm).
     :param int pulses:
-     Total number of pulses.
+        Total number of pulses.
     :param prp:
-     Pulse repetition period (PRP) in seconds (s).
-     Must satisfy ``prp >= pulse_length``.
+        Pulse repetition period (PRP) in seconds (s).
+        Must satisfy ``prp >= pulse_length``.
 
         - If ``prp`` is ``None``, it defaults to ``pulse_length``.
         - Can also be a 1D array to specify different PRPs for each pulse.
@@ -60,14 +60,14 @@ class Transmitter:
 
     :type prp: float or numpy.ndarray
     :param numpy.ndarray f_offset:
-     Frequency offset for each pulse in Hertz (Hz). The length must match ``pulses``.
+        Frequency offset for each pulse in Hertz (Hz). The length must match ``pulses``.
     :param numpy.ndarray pn_f:
-     Frequencies associated with phase noise in Hertz (Hz).
+        Frequencies associated with phase noise in Hertz (Hz).
     :param numpy.ndarray pn_power:
-     Power of phase noise in dB/Hz.
+        Power of phase noise in dB/Hz.
     :param list[dict] channels:
-     Properties of transmitter channels.
-     Each channel is represented as a dictionary with the following keys:
+        Properties of transmitter channels.
+        Each channel is represented as a dictionary with the following keys:
 
         - **location** (*numpy.ndarray*):
           3D location of the channel relative to the radar [x, y, z] in meters.
@@ -104,14 +104,14 @@ class Transmitter:
           Default: ``None``.
 
     :ivar dict rf_prop:
-     RF properties of the transmitter:
+        RF properties of the transmitter:
 
         - **tx_power** (*float*): Transmitter power in dBm.
         - **pn_f** (*numpy.ndarray*): Frequencies associated with phase noise (Hz).
         - **pn_power** (*numpy.ndarray*): Power of phase noise (dB/Hz).
 
     :ivar dict waveform_prop:
-     Waveform properties:
+        Waveform properties:
 
         - **f** (*float or numpy.ndarray*): Waveform frequency (Hz).
         - **t** (*float or numpy.ndarray*): Timing of each pulse (s).
@@ -123,7 +123,7 @@ class Transmitter:
         - **pulse_start_time** (*numpy.ndarray*): Start times of each pulse (s).
 
     :ivar dict txchannel_prop:
-     Properties of the transmitter channels:
+        Properties of the transmitter channels:
 
         - **size** (*int*): Number of transmitter channels.
         - **delay** (*numpy.ndarray*): Transmitter start delay (s).

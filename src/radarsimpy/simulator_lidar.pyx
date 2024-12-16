@@ -50,44 +50,44 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
     This function simulates a Lidar scanning scene in a 3D environment, calculating the interaction of Lidar rays with the provided targets. It handles both static and dynamic targets, allowing for customizable positions, velocities, and orientations of objects in the scene. The simulation produces a set of rays representing the Lidar's perception of the environment.
 
     :param dict lidar:
-     Lidar configuration parameters. The following keys are required:
+        Lidar configuration parameters. The following keys are required:
 
-        - **position** (*numpy.1darray*):  
+        - **position** (*numpy.ndarray*):  
           The 3D position of the Lidar in meters (m), specified as [x, y, z].
-        - **phi** (*numpy.1darray*):  
+        - **phi** (*numpy.ndarray*):  
           Array of phi scanning angles in degrees (°). Phi represents the horizontal scanning angles in the Lidar's field of view. The total number of scanning directions is determined by the combination of phi and theta angles.
-        - **theta** (*numpy.1darray*):  
+        - **theta** (*numpy.ndarray*):  
           Array of theta scanning angles in degrees (°). Theta represents the vertical scanning angles in the Lidar's field of view. The total number of scanning directions is computed as:  
           ``len(phi) * len(theta)``.
 
     :param list[dict] targets:
-     A list of target objects in the scene. Each target is represented as a dictionary containing the following keys:
+        A list of target objects in the scene. Each target is represented as a dictionary containing the following keys:
 
         - **model** (*str*):  
           File path to the target model (3D object) in the scene.
-        - **origin** (*numpy.1darray*, optional):  
+        - **origin** (*numpy.ndarray*):  
           The origin position of the target model in meters (m), specified as [x, y, z].  
           Default: ``[0, 0, 0]``.
-        - **location** (*numpy.1darray*, optional):  
+        - **location** (*numpy.ndarray*):  
           The 3D location of the target in meters (m), specified as [x, y, z].  
           Default: ``[0, 0, 0]``.
-        - **speed** (*numpy.1darray*, optional):  
+        - **speed** (*numpy.ndarray*):  
           Speed vector of the target in meters per second (m/s), specified as [vx, vy, vz].  
           Default: ``[0, 0, 0]``.
-        - **rotation** (*numpy.1darray*, optional):  
+        - **rotation** (*numpy.ndarray*):  
           The angular orientation of the target in degrees (°), specified as [yaw, pitch, roll].  
           Default: ``[0, 0, 0]``.
-        - **rotation_rate** (*numpy.1darray*, optional):  
+        - **rotation_rate** (*numpy.ndarray*):  
           The angular rotation rate of the target in degrees per second (°/s), specified as [yaw rate, pitch rate, roll rate].  
           Default: ``[0, 0, 0]``.
-        - **unit** (*str*, optional):  
+        - **unit** (*str*):  
           The unit system for the target model's geometry.  
           Supported values: ``mm``, ``cm``, ``m``.  
           Default: ``m``.
 
     :param float frame_time:
-     Simulation timestamp in seconds (s). This parameter determines the time reference for the Lidar's scanning operation and target positions.  
-     Default: ``0``.
+        Simulation timestamp in seconds (s). This parameter determines the time reference for the Lidar's scanning operation and target positions.  
+        Default: ``0``.
 
     :return:  
         Simulated Lidar rays based on the provided configuration and targets.

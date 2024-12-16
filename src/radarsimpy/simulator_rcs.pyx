@@ -60,53 +60,53 @@ cpdef sim_rcs(targets,
     This function computes the RCS of one or more targets by simulating how electromagnetic waves interact with the target models. The simulation uses the SBR technique, which accurately models wave scattering by tracing rays that shoot at the target and bounce off its surfaces.
 
     :param list[dict] targets:
-     A list of target dictionaries specifying the properties of each target. Each dictionary contains the following keys:
+        A list of target dictionaries specifying the properties of each target. Each dictionary contains the following keys:
 
         - **model** (*str*):  
           File path to the 3D target model.
-        - **origin** (*numpy.1darray*, optional):  
+        - **origin** (*numpy.ndarray*):  
           The origin position of the target model in meters (m), specified as [x, y, z].  
           Default: ``[0, 0, 0]``.
-        - **location** (*numpy.1darray*, optional):  
+        - **location** (*numpy.ndarray*):  
           The 3D location of the target in meters (m), specified as [x, y, z].  
           Default: ``[0, 0, 0]``.
-        - **rotation** (*numpy.1darray*, optional):  
+        - **rotation** (*numpy.ndarray*):  
           The target's orientation in degrees (°), specified as [yaw, pitch, roll].  
           Default: ``[0, 0, 0]``.
-        - **permittivity** (*complex*, optional):  
+        - **permittivity** (*complex*):  
           The target's permittivity, which represents its electromagnetic material properties.  
           Default: Perfect Electric Conductor (PEC).
-        - **unit** (*str*, optional):  
+        - **unit** (*str*):  
           Unit of measurement for the target model's geometry.  
           Supported values: ``mm``, ``cm``, ``m``.  
           Default: ``m``.
 
     :param float f:
-     Center frequency of the incident wave in Hertz (Hz).
+        The center frequency of the incident electromagnetic wave in Hertz (Hz).
     :param float inc_phi:
-     Incidence angle (phi) in degrees (°).  
-     This is the azimuth angle of the incoming wave relative to the target.
+        The horizontal incidence angle (phi) of the incoming wave in degrees (°).  
+        This angle is measured relative to the target at the transmitter's point of view.
     :param float inc_theta:
-     Incidence angle (theta) in degrees (°).  
-     This is the elevation angle of the incoming wave relative to the target.
-    :param list inc_pol:
-     Polarization of the incident wave, specified as a 3D vector [x, y, z].  
-     Default: ``[0, 0, 1]`` (vertical polarization).
+        The vertical incidence angle (theta) of the incoming wave in degrees (°).  
+        This angle is measured relative to the target at the transmitter's point of view.
+    :param list[float] inc_pol:
+        The polarization of the incident wave, specified as a 3D vector [x, y, z].  
+        Default: ``[0, 0, 1]`` (vertical polarization).
     :param float obs_phi:
-     Observation angle (phi) in degrees (°).  
-     This is the azimuth angle at which the RCS is observed.  
-     Default: ``None`` (if not specified, it is set to the same value as `inc_phi`).
+        The horizontal observation angle (phi) in degrees (°).  
+        This is the angle at which the RCS is observed from the observer's point of view.  
+        Default: ``None`` (if not specified, it is set to the same value as `inc_phi`).
     :param float obs_theta:
-     Observation angle (theta) in degrees (°).  
-     This is the elevation angle at which the RCS is observed.  
-     Default: ``None`` (if not specified, it is set to the same value as `inc_theta`).
-    :param list obs_pol:
-     Polarization of the observer, specified as a 3D vector [x, y, z].  
-     Default: ``None`` (if not specified, it is set to the same value as `inc_pol`).
+        The vertical observation angle (theta) in degrees (°).  
+        This is the angle at which the RCS is observed from the observer's point of view.  
+        Default: ``None`` (if not specified, it is set to the same value as `inc_theta`).
+    :param list[float] obs_pol:
+        The polarization of the observer, specified as a 3D vector [x, y, z].  
+        Default: ``None`` (if not specified, it is set to the same value as `inc_pol`).
     :param float density:
-     Ray density, defined as the number of rays per wavelength.  
-     Higher values improve accuracy but increase computational cost.  
-     Default: ``1``.
+        The ray density, defined as the number of rays per wavelength.  
+        Higher ray density improves accuracy but increases computational cost.  
+        Default: ``1.0``.
 
     :return:  
         The Radar Cross Section (RCS) of the target(s) in square meters (m²).  

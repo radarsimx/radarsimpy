@@ -266,23 +266,23 @@ class Radar:
     :param Transmitter transmitter: The radar transmitter instance.
     :param Receiver receiver: The radar receiver instance.
     :param list location:
-     The 3D location of the radar relative to a global coordinate system [x, y, z] in meters (m).
-     Default: ``[0, 0, 0]``.
+        The 3D location of the radar relative to a global coordinate system [x, y, z] in meters (m).
+        Default: ``[0, 0, 0]``.
     :param list speed:
-     The velocity of the radar in meters per second (m/s), specified as [vx, vy, vz].
-     Default: ``[0, 0, 0]``.
+        The velocity of the radar in meters per second (m/s), specified as [vx, vy, vz].
+        Default: ``[0, 0, 0]``.
     :param list rotation:
-     The radar's orientation in degrees (°), specified as [yaw, pitch, roll].
-     Default: ``[0, 0, 0]``.
+        The radar's orientation in degrees (°), specified as [yaw, pitch, roll].
+        Default: ``[0, 0, 0]``.
     :param list rotation_rate:
-     The radar's angular velocity in degrees per second (°/s),
-     specified as [yaw rate, pitch rate, roll rate].
-     Default: ``[0, 0, 0]``.
+        The radar's angular velocity in degrees per second (°/s),
+        specified as [yaw rate, pitch rate, roll rate].
+        Default: ``[0, 0, 0]``.
     :param int seed:
-     Seed for the random noise generator to ensure reproducibility.
+        Seed for the random noise generator to ensure reproducibility.
 
     :ivar dict time_prop:
-     Time-related properties of the radar system:
+        Time-related properties of the radar system:
 
         - **timestamp_shape** (*tuple*): The shape of the timestamp array.
         - **timestamp** (*numpy.ndarray*): The timestamp for each sample in a frame,
@@ -298,21 +298,21 @@ class Radar:
             - [MN-1, :, :]: ``Tx[M-1] → Rx[N-1]``
 
     :ivar dict sample_prop:
-     Sample-related properties:
+        Sample-related properties:
 
         - **samples_per_pulse** (*int*): Number of samples in a single pulse.
         - **noise** (*float*): Noise amplitude.
         - **phase_noise** (*numpy.ndarray*): Phase noise matrix for pulse samples.
 
     :ivar dict array_prop:
-     Metadata related to the radar's virtual array:
+        Metadata related to the radar's virtual array:
 
         - **size** (*int*): Total number of virtual array elements.
         - **virtual_array** (*numpy.ndarray*): 3D locations of each virtual array element,
           structured as ``[channel_size, 3]`` where each row corresponds to an [x, y, z] position.
 
     :ivar dict radar_prop:
-     Radar system properties:
+        Radar system properties:
 
         - **transmitter** (*Transmitter*): Instance of the radar transmitter.
         - **receiver** (*Receiver*): Instance of the radar receiver.
