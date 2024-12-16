@@ -175,7 +175,7 @@ GPU parallelization (CUDA) has been added since v6.0.0.
 - **yaw** (deg): rotation along the z-axis. Positive yaw rotates the object from the positive x-axis to the positive y-axis
 - **pitch** (deg): rotation along the y-axis. Positive pitch rotates the object from the positive x-axis to the positive z-axis
 - **roll** (deg): rotation along the x-axis. Positive roll rotates the object from the positive y-axis to the positive z-axis
-- **origin** (m): `[x, y, z]`, the rotation centor of the object. Radar's origin is always at `[0, 0, 0]`
+- **origin** (m): `[x, y, z]`, the motion (rotation and translation) centor of the object. Radar's origin is always at `[0, 0, 0]`
 
 <img src="./assets/yaw_pitch_roll.svg" alt="yaw_pitch_roll" width="400"/>
 
