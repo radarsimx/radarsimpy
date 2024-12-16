@@ -16,7 +16,7 @@ Coordinate Systems
 - **yaw** (deg): rotation along the z-axis. Positive yaw rotates the object from the positive x-axis to the positive y-axis
 - **pitch** (deg): rotation along the y-axis. Positive pitch rotates the object from the positive x-axis to the positive z-axis
 - **roll** (deg): rotation along the x-axis. Positive roll rotates the object from the positive y-axis to the positive z-axis
-- **origin** (m): ``[x, y, z]``, the rotation centor of the object. Radar's origin is always at ``[0, 0, 0]``
+- **origin** (m): ``[x, y, z]``, the motion (rotation and translation) centor of the object. Radar's origin is always at ``[0, 0, 0]``
 
 .. image:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/yaw_pitch_roll.svg
     :width: 400

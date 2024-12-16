@@ -75,7 +75,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
           A target represented as a 3D model. Each target is defined as a dictionary with the following keys:
 
             - **model** (*str*): Path to the target model file.
-            - **origin** (*numpy.ndarray*): Origin position of the target model [x, y, z] in meters. Default: ``[0, 0, 0]``.
+            - **origin** (*numpy.ndarray*): Origin position (rotation and translation center) of the target model [x, y, z] in meters. Default: ``[0, 0, 0]``.
             - **location** (*numpy.ndarray*): Location of the target in meters [x, y, z]. Default: ``[0, 0, 0]``.
             - **speed** (*numpy.ndarray*): Target velocity in meters per second [vx, vy, vz]. Default: ``[0, 0, 0]``.
             - **rotation** (*numpy.ndarray*): Target orientation in degrees [yaw, pitch, roll]. Default: ``[0, 0, 0]``.

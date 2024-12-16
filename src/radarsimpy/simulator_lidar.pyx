@@ -66,7 +66,7 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
         - **model** (*str*):  
           File path to the target model (3D object) in the scene.
         - **origin** (*numpy.ndarray*):  
-          The origin position of the target model in meters (m), specified as [x, y, z].  
+          The origin position (rotation and translation center) of the target model in meters (m), specified as [x, y, z].  
           Default: ``[0, 0, 0]``.
         - **location** (*numpy.ndarray*):  
           The 3D location of the target in meters (m), specified as [x, y, z].  
