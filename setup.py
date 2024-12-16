@@ -194,15 +194,6 @@ ext_modules = [
         extra_link_args=LINK_ARGS,
     ),
     Extension(
-        "radarsimpy.rt",
-        ["src/radarsimpy/raytracing/rt.pyx"],
-        define_macros=MACROS,
-        include_dirs=INCLUDE_DIRS,
-        libraries=["radarsimcpp"] + LIBS,
-        library_dirs=LIB_DIRS,
-        extra_link_args=LINK_ARGS,
-    ),
-    Extension(
         "radarsimpy.simulator",
         ["src/radarsimpy/simulator.pyx"],
         define_macros=MACROS,

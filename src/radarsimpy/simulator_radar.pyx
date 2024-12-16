@@ -348,18 +348,3 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
             "noise": noise_mat,
             "timestamp": timestamp,
             "interference": interference}
-
-
-@cython.cdivision(True)
-@cython.boundscheck(False)
-@cython.wraparound(False)
-cpdef simc(radar, targets, interf=None):
-    """
-    simc(radar, targets, interf=None)
-
-    **deprecated** Please use `simulator.sim_radar(radar, targets, interf=None)`
-    """
-
-    warnings.warn("The `simc()` function has been deprecated, please use `sim_radar()`.", DeprecationWarning)
-
-    return sim_radar(radar, targets, interf=interf)

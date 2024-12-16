@@ -20,7 +20,7 @@ A Python module for radar simulation
 
 import numpy as np
 
-from radarsimpy.rt import lidar_scene  # pylint: disable=no-name-in-module
+from radarsimpy.simulator import sim_lidar  # pylint: disable=no-name-in-module
 
 
 def test_lidar_scene_basic():
@@ -38,7 +38,7 @@ def test_lidar_scene_basic():
             "location": np.array([10, 0, 0]),
         }
     ]
-    rays = lidar_scene(lidar, targets)
+    rays = sim_lidar(lidar, targets)
     assert rays.shape[0] == 1  # Check if rays are generated
     assert np.allclose(
         rays[0]["positions"], [10, 0, 0], atol=1e-05
@@ -67,7 +67,7 @@ def test_lidar_scene_multiple_targets():
             "location": np.array([0, 10, 0]),
         },
     ]
-    rays = lidar_scene(lidar, targets)
+    rays = sim_lidar(lidar, targets)
     assert rays.shape[0] == 2  # Check if rays are generated for all targets
     assert np.allclose(
         rays[0]["positions"], [9.5000010e00, 0.0000000e00, -4.1525823e-07], atol=1e-05
@@ -99,8 +99,8 @@ def test_lidar_scene_target_movement():
             "speed": np.array([1, 0, 0]),
         }
     ]
-    rays_t0 = lidar_scene(lidar, targets, t=0)
-    rays_t1 = lidar_scene(lidar, targets, t=1)
+    rays_t0 = sim_lidar(lidar, targets, frame_time=0)
+    rays_t1 = sim_lidar(lidar, targets, frame_time=1)
     assert np.allclose(rays_t0[0]["positions"], [10, 0, 0], atol=1e-05)
     assert np.allclose(rays_t0[0]["directions"], [-1, 0, 0], atol=1e-05)
     assert np.allclose(rays_t1[0]["positions"], [11, 0, 0], atol=1e-05)
@@ -123,8 +123,8 @@ def test_lidar_scene_target_rotation():
             "rotation_rate": np.array([45, 0, 0]),
         }
     ]
-    rays_t0 = lidar_scene(lidar, targets, t=0)
-    rays_t1 = lidar_scene(lidar, targets, t=1)
+    rays_t0 = sim_lidar(lidar, targets, frame_time=0)
+    rays_t1 = sim_lidar(lidar, targets, frame_time=1)
     assert np.allclose(rays_t0[0]["positions"], [10, 0, 0], atol=1e-05)
     assert np.allclose(rays_t0[0]["directions"], [-1, 0, 0], atol=1e-05)
     assert np.allclose(rays_t1[0]["positions"], [10, 0, 0], atol=1e-05)

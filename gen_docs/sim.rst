@@ -6,4 +6,4 @@ Simulator
     :undoc-members:
     :inherited-members:
     :show-inheritance:
-    :exclude-members: simc
+    :exclude-members:
