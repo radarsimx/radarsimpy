@@ -123,16 +123,16 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
         - **baseband** (*numpy.ndarray*): Time-domain baseband data with shape ``[channels/frames, pulses, samples]``. 
           The channel/frame order is as follows (with ``K`` frames, ``M`` Tx channels and ``N`` Rx channels):
 
-            - [0, :, :]: ``Frame[0] → Tx[0] → Rx[0]``
-            - [1, :, :]: ``Frame[0] → Tx[0] → Rx[1]``
+            - [0, :, :] ``Frame[0] → Tx[0] → Rx[0]``
+            - [1, :, :] ``Frame[0] → Tx[0] → Rx[1]``
             - ...
-            - [N-1, :, :]: ``Frame[0] → Tx[0] → Rx[N-1]``
-            - [N, :, :]: ``Frame[0] → Tx[1] → Rx[0]``
+            - [N-1, :, :] ``Frame[0] → Tx[0] → Rx[N-1]``
+            - [N, :, :] ``Frame[0] → Tx[1] → Rx[0]``
             - ...
-            - [MN-1, :, :]: ``Frame[0] → Tx[M-1] → Rx[N-1]``
-            - [MN, :, :]: ``Frame[1] → Tx[0] → Rx[0]``
+            - [M·N-1, :, :] ``Frame[0] → Tx[M-1] → Rx[N-1]``
+            - [M·N, :, :] ``Frame[1] → Tx[0] → Rx[0]``
             - ...
-            - [KMN-1, :, :]: ``Frame[K-1] → Tx[M-1] → Rx[N-1]``
+            - [K·M·N-1, :, :] ``Frame[K-1] → Tx[M-1] → Rx[N-1]``
 
         - **noise** (*numpy.ndarray*): Time-domain noise data with the same shape and order as `baseband`.
         - **interference** (*numpy.ndarray*): Time-domain interference data (if applicable), with the same shape and order as `baseband`.
