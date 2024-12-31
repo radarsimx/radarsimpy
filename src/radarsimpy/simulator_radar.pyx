@@ -61,7 +61,9 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
 
     Simulates the radar's baseband response for a given scene.
 
-    This function generates the radar's baseband response using the provided radar configuration and target data. It supports both ideal point targets and 3D mesh objects, and allows for varying levels of fidelity in the simulation. Additional options include interference modeling, ray density specification, and logging of simulation data.
+    This function generates the radar's baseband response using the provided radar configuration and target data.
+    It supports both ideal point targets and 3D mesh objects, and allows for varying levels of fidelity in the simulation.
+    Additional options include interference modeling, ray density specification, and logging of simulation data.
 
     :param Radar radar:
         The radar object to be used for the simulation.
