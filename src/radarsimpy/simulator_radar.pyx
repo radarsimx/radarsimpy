@@ -24,8 +24,6 @@ ray-tracing, interference modeling, and noise simulation.
 
 """
 
-import warnings
-
 import numpy as np
 
 from libcpp.string cimport string
@@ -53,7 +51,6 @@ from radarsimpy.lib.cp_radarsimc cimport cp_Point
 cimport cython
 cimport numpy as np
 np.import_array()
-
 
 @cython.cdivision(True)
 @cython.boundscheck(False)
@@ -141,37 +138,42 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
     :rtype: dict
     """
 
-
-    # radar
+    # Define radar object
     cdef Radar[double, float_t] radar_c
 
-    # interference radar
+    # Define interference radar object
     cdef Radar[double, float_t] interf_radar_c
 
-    # point targets
+    # Define vectors for point and 3D mesh targets
     cdef vector[Point[float_t]] point_vt
     cdef vector[Target[float_t]] target_vt
 
-    # simulator
+    # Define simulators
     cdef SceneSimulator[double, float_t] scene_c
     cdef IdealSimulator[double, float_t] sim_c
     cdef InterferenceSimulator[double, float_t] int_sim_c
 
+    # Define vector for snapshots
     cdef vector[Snapshot[float_t]] snaps
 
+    # Define ray filter
     cdef Vec2[int_t] ray_filter_c
 
+    # Define variables for simulation levels and indices
     cdef int_t level_id = 0
     cdef int_t fm_idx, tx_idx, ps_idx, sp_idx
 
+    # Define variables for frame, channel, receiver, and transmitter sizes
     cdef int_t frames_c = np.size(frame_time)
     cdef int_t channles_c = radar.array_prop["size"]
     cdef int_t rxsize_c = radar.radar_prop["receiver"].rxchannel_prop["size"]
     cdef int_t txsize_c = radar.radar_prop["transmitter"].txchannel_prop["size"]
     cdef int_t pulses_c, samples_c
 
+    # Define log path
     cdef string log_path_c
 
+    # Check for FreeTier limitations
     if IsFreeTier():
         if len(targets) > 2:
             raise Exception("You're currently using RadarSimPy's FreeTier, which limits RCS simulation to 2 maximum target. Please consider supporting my work by upgrading to the standard version. Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ to access the standard version download links. Your support will help improve the software. Thank you for considering it.")
@@ -193,6 +195,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
     else:
         log_path_c = str.encode("")
 
+    # Calculate timestamp for each frame
     if frames_c > 1:
         toffset = np.repeat(
             np.tile(
@@ -218,6 +221,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
 
     ts_shape = np.shape(timestamp)
 
+    # Set ray filter
     if ray_filter is None:
         ray_filter_c = Vec2[int_t](0, 10)
     else:
@@ -228,13 +232,11 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
     """
     cdef double[:, :, :] timestamp_mv = timestamp.astype(np.float64)
 
+    # Process each target
     for _, tgt in enumerate(targets):
         if "model" in tgt:
             flag_run_scene = True
             target_vt.push_back(cp_Target(radar, tgt, timestamp))
-            # scene_c.AddTarget(
-            #     cp_Target(radar, tgt, timestamp)
-            # )
         else:
             loc = tgt["location"]
             spd = tgt.get("speed", (0, 0, 0))
@@ -250,6 +252,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
     cdef double[:,:,::1] bb_real = np.empty(ts_shape, order='C', dtype=np.float64)
     cdef double[:,:,::1] bb_imag = np.empty(ts_shape, order='C', dtype=np.float64)
 
+    # Run ideal point target simulation
     if point_vt.size() > 0:
         sim_c.Run(radar_c, point_vt, &bb_real[0][0][0], &bb_imag[0][0][0])
         if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
@@ -259,8 +262,8 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
     else:
         baseband = 0
 
+    # Run scene simulation if there are 3D mesh targets
     if flag_run_scene:
-        # scene_c.SetRadar(radar_c)
         """
         Snapshot
         """
@@ -279,6 +282,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
         else:
             raise Exception("Unknown fidelity level. `None`: Perform one ray tracing simulation for the whole frame; `pulse`: Perform ray tracing for each pulse; `sample`: Perform ray tracing for each sample.")
 
+        # Create snapshots for each frame, transmitter, pulse, and sample
         for fm_idx in range(0, frames_c):
             for tx_idx in range(0, txsize_c):
                 for ps_idx in range(0, pulses_c):
@@ -292,6 +296,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
                                 sp_idx)
                         )
 
+        # Run scene simulation
         scene_c.Run(
             radar_c,
             target_vt,
@@ -309,6 +314,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
         else:
             baseband = baseband+np.asarray(bb_real)+1j*np.asarray(bb_imag)
 
+    # Generate noise matrix
     max_ts = np.max(radar_ts)
     min_ts = np.min(radar_ts)
     num_noise_samples = int(np.ceil((max_ts-min_ts)* radar.radar_prop["receiver"].bb_prop["fs"]))+1
@@ -318,6 +324,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
     elif radar.radar_prop["receiver"].bb_prop["bb_type"] == "complex":
         noise_mat = np.zeros(ts_shape, dtype=complex)
 
+    # Add noise to each frame
     for frame_idx in range(0, frames_c):
         if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
             noise_per_frame_rx = radar.sample_prop["noise"] * np.random.randn(rxsize_c, num_noise_samples)
@@ -331,6 +338,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
                 rx_ch = ch_idx%rxsize_c
                 noise_mat[f_ch_idx, ps_idx, :] = noise_per_frame_rx[rx_ch, int(t0):(int(t0)+radar_ts_shape[2])]
 
+    # Run interference simulation if interference radar is provided
     if interf is not None:
         interf_radar_c = cp_Radar(interf, 0)
 
@@ -344,6 +352,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
     else:
         interference = None
 
+    # Return the simulation results
     return {"baseband": baseband,
             "noise": noise_mat,
             "timestamp": timestamp,
