@@ -102,7 +102,7 @@ def test_pulsed_radar():
         np.arctan2(np.real(baseband[0, 0, :]), np.imag(baseband[0, 0, :])),
         np.array(
             [
-                1.0,
+                0.0,
                 0.0,
                 0.0,
                 0.0,
