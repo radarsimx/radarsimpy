@@ -86,9 +86,17 @@ mkdir ./src/radarsimcpp/build
 cd ./src/radarsimcpp/build
 
 if [ "${ARCH,,}" == "gpu" ]; then
-    cmake -DCMAKE_BUILD_TYPE=Release -DGPU_BUILD=ON -DGTEST=$([ "${TEST,,}" == "on" ] && echo "ON" || echo "OFF") ..
+  if [ "${TEST,,}" == "on" ]; then
+    cmake -DCMAKE_BUILD_TYPE=Release -DGPU_BUILD=ON -DGTEST=ON ..
+  elif [ "${TEST,,}" == "off" ]; then
+    cmake -DCMAKE_BUILD_TYPE=Release -DGPU_BUILD=ON -DGTEST=OFF ..
+  fi
 elif [ "${ARCH,,}" == "cpu" ]; then
-    cmake -DCMAKE_BUILD_TYPE=Release -DGTEST=$([ "${TEST,,}" == "on" ] && echo "ON" || echo "OFF") ..
+  if [ "${TEST,,}" == "on" ]; then
+    cmake -DCMAKE_BUILD_TYPE=Release -DGTEST=ON ..
+  elif [ "${TEST,,}" == "off" ]; then
+    cmake -DCMAKE_BUILD_TYPE=Release -DGTEST=OFF ..
+  fi
 fi
 
 cmake --build .
