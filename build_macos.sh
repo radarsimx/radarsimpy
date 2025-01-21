@@ -81,10 +81,10 @@ echo "## Building libradarsimcpp.so with ${ARCH} ##"
 mkdir ./src/radarsimcpp/build 
 cd ./src/radarsimcpp/build
 
-if [ "${ARCH}" == "gpu" ]; then
-    cmake -DCMAKE_BUILD_TYPE=Release -DGPU_BUILD=ON -DGTEST=ON ..
-elif [ "${ARCH}" == "cpu" ]; then
-    cmake -DCMAKE_BUILD_TYPE=Release -DGTEST=ON ..
+if [ "${ARCH,,}" == "gpu" ]; then
+    cmake -DCMAKE_BUILD_TYPE=Release -DGPU_BUILD=ON -DGTEST=$([ "${TEST,,}" == "on" ] && echo "ON" || echo "OFF") ..
+elif [ "${ARCH,,}" == "cpu" ]; then
+    cmake -DCMAKE_BUILD_TYPE=Release -DGTEST=$([ "${TEST,,}" == "on" ] && echo "ON" || echo "OFF") ..
 fi
 cmake --build .
 

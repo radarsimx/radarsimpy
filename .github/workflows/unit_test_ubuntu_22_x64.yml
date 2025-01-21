@@ -28,17 +28,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Build
+      - name: Build & Test
         env:
           CC: ${{matrix.c_compiler}}
           CXX: ${{matrix.cxx_compiler}}
         run: |
           sudo chown -R $USER:$USER /home/runner/work/radarsimpy
           chmod +x build_linux.sh
-          ./build_linux.sh --tier=standard --arch=cpu --test=off
-      - name: Test with Google Test
-        run: |
-          ./src/radarsimcpp/build/radarsimcpp_test
-      - name: Test with pytest
-        run: |
-          pytest
+          ./build_linux.sh --tier=standard --arch=cpu --test=on
