@@ -81,18 +81,18 @@ echo "## Building libradarsimcpp.so with ${ARCH} ##"
 mkdir ./src/radarsimcpp/build 
 cd ./src/radarsimcpp/build
 
-if [ "${ARCH,,}" == "gpu" ]; then
-  if [ "${TEST,,}" == "on" ]; then
-    cmake -DCMAKE_BUILD_TYPE=Release -DGPU_BUILD=ON -DGTEST=ON ..
-  elif [ "${TEST,,}" == "off" ]; then
-    cmake -DCMAKE_BUILD_TYPE=Release -DGPU_BUILD=ON -DGTEST=OFF ..
-  fi
-elif [ "${ARCH,,}" == "cpu" ]; then
-  if [ "${TEST,,}" == "on" ]; then
-    cmake -DCMAKE_BUILD_TYPE=Release -DGTEST=ON ..
-  elif [ "${TEST,,}" == "off" ]; then
-    cmake -DCMAKE_BUILD_TYPE=Release -DGTEST=OFF ..
-  fi
+if [ "${ARCH}" == "gpu" ]; then
+    if [ "${TEST}" == "on" ]; then
+        cmake -DCMAKE_BUILD_TYPE=Release -DGPU_BUILD=ON -DGTEST=ON ..
+    elif [ "${TEST}" == "off" ]; then
+        cmake -DCMAKE_BUILD_TYPE=Release -DGPU_BUILD=ON -DGTEST=OFF ..
+    fi
+elif [ "${ARCH}" == "cpu" ]; then
+    if [ "${TEST}" == "on" ]; then
+        cmake -DCMAKE_BUILD_TYPE=Release -DGTEST=ON ..
+    elif [ "${TEST}" == "off" ]; then
+        cmake -DCMAKE_BUILD_TYPE=Release -DGTEST=OFF ..
+    fi
 fi
 cmake --build .
 
