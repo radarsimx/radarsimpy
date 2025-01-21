@@ -256,13 +256,13 @@ Check all the usage examples on [radarsimx.com](https://radarsimx.com/category/e
 - ### Windows (MSVC)
 
   ```batch
-  build_win.bat --arch cpu --test on
+  build_win.bat --arch=cpu --test=on
   ```
 
   Build for GPU (CUDA)
 
   ```batch
-  build_win.bat --arch gpu --test on
+  build_win.bat --arch=gpu --test=on
   ```
 
 - ### Linux (GCC)
