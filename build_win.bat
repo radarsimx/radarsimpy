@@ -78,9 +78,17 @@ CD ".\src\radarsimcpp\build"
 ECHO ## Building radarsimcpp.dll with MSVC ##
 @REM MSVC needs to set the build type using '--config Relesae' 
 if /I %ARCH% == gpu (
-    cmake -DGPU_BUILD=ON -DGTEST=ON ..
+    if /I %TEST% == on (
+        cmake -DGPU_BUILD=ON -DGTEST=ON ..
+    ) else (
+        cmake -DGPU_BUILD=ON -DGTEST=OFF ..
+    )
 ) else if /I %ARCH% == cpu (
-    cmake -DGTEST=ON ..
+    if /I %TEST% == on (
+        cmake -DGTEST=ON ..
+    ) else (
+        cmake -DGTEST=OFF ..
+    )
 )
 cmake --build . --config Release
 
