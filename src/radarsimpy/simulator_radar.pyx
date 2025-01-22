@@ -1,4 +1,5 @@
 # distutils: language = c++
+
 """
 The Python Module for Radar Simulation
 
@@ -24,38 +25,47 @@ ray-tracing, interference modeling, and noise simulation.
 
 """
 
+# NumPy imports
 import numpy as np
-
-from libcpp.string cimport string
-
-from radarsimpy.includes.type_def cimport vector
-from radarsimpy.includes.type_def cimport float_t
-from radarsimpy.includes.type_def cimport int_t
-
-from radarsimpy.includes.rsvector cimport Vec2
-
-from radarsimpy.includes.radarsimc cimport Radar
-from radarsimpy.includes.radarsimc cimport Snapshot
-from radarsimpy.includes.radarsimc cimport Point
-from radarsimpy.includes.radarsimc cimport Target
-from radarsimpy.includes.radarsimc cimport SceneSimulator
-from radarsimpy.includes.radarsimc cimport IdealSimulator
-from radarsimpy.includes.radarsimc cimport InterferenceSimulator
-
-from radarsimpy.includes.radarsimc cimport IsFreeTier
-
-from radarsimpy.lib.cp_radarsimc cimport cp_Radar
-from radarsimpy.lib.cp_radarsimc cimport cp_Target
-from radarsimpy.lib.cp_radarsimc cimport cp_Point
-
-cimport cython
 cimport numpy as np
 np.import_array()
+
+# Cython decorators
+cimport cython
+
+# C++ type definitions
+from libcpp.string cimport string
+from radarsimpy.includes.type_def cimport (
+    vector,
+    float_t,
+    int_t
+)
+
+# RadarSimX core components
+from radarsimpy.includes.rsvector cimport Vec2
+from radarsimpy.includes.radarsimc cimport (
+    Radar,
+    Snapshot,
+    Point,
+    Target,
+    SceneSimulator,
+    IdealSimulator,
+    InterferenceSimulator,
+    IsFreeTier
+)
+
+# RadarSimX library components
+from radarsimpy.lib.cp_radarsimc cimport (
+    cp_Radar,
+    cp_Target,
+    cp_Point
+)
 
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=None, ray_filter=None, debug=False, interf=None):
+cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, 
+                log_path=None, ray_filter=None, debug=False, interf=None):
     """
     sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=None, ray_filter=None, debug=False, interf=None)
 
@@ -140,42 +150,39 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
     :rtype: dict
     """
 
-    # Define radar object
-    cdef Radar[double, float_t] radar_c
+    #----------------------
+    # C++ Object Declarations
+    #----------------------
+    # Core simulation objects
+    cdef:
+        Radar[double, float_t] radar_c
+        Radar[double, float_t] interf_radar_c
+        vector[Point[float_t]] point_vt
+        vector[Target[float_t]] target_vt
+        vector[Snapshot[float_t]] snaps
+        Vec2[int_t] ray_filter_c
+        
+    # Simulator instances
+    cdef:
+        SceneSimulator[double, float_t] scene_c
+        IdealSimulator[double, float_t] sim_c
+        InterferenceSimulator[double, float_t] int_sim_c
 
-    # Define interference radar object
-    cdef Radar[double, float_t] interf_radar_c
+    # Size and index variables
+    cdef:
+        int_t level_id = 0
+        int_t fm_idx, tx_idx, ps_idx, sp_idx
+        int_t frames_c = np.size(frame_time)
+        int_t channles_c = radar.array_prop["size"]
+        int_t rxsize_c = radar.radar_prop["receiver"].rxchannel_prop["size"]
+        int_t txsize_c = radar.radar_prop["transmitter"].txchannel_prop["size"]
+        int_t pulses_c, samples_c
+        string log_path_c
 
-    # Define vectors for point and 3D mesh targets
-    cdef vector[Point[float_t]] point_vt
-    cdef vector[Target[float_t]] target_vt
-
-    # Define simulators
-    cdef SceneSimulator[double, float_t] scene_c
-    cdef IdealSimulator[double, float_t] sim_c
-    cdef InterferenceSimulator[double, float_t] int_sim_c
-
-    # Define vector for snapshots
-    cdef vector[Snapshot[float_t]] snaps
-
-    # Define ray filter
-    cdef Vec2[int_t] ray_filter_c
-
-    # Define variables for simulation levels and indices
-    cdef int_t level_id = 0
-    cdef int_t fm_idx, tx_idx, ps_idx, sp_idx
-
-    # Define variables for frame, channel, receiver, and transmitter sizes
-    cdef int_t frames_c = np.size(frame_time)
-    cdef int_t channles_c = radar.array_prop["size"]
-    cdef int_t rxsize_c = radar.radar_prop["receiver"].rxchannel_prop["size"]
-    cdef int_t txsize_c = radar.radar_prop["transmitter"].txchannel_prop["size"]
-    cdef int_t pulses_c, samples_c
-
-    # Define log path
-    cdef string log_path_c
-
-    # Check for FreeTier limitations
+    #----------------------
+    # Initialization
+    #----------------------
+    # FreeTier validation
     if IsFreeTier():
         if len(targets) > 2:
             raise Exception("You're currently using RadarSimPy's FreeTier, which limits RCS simulation to 2 maximum target. Please consider supporting my work by upgrading to the standard version. Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ to access the standard version download links. Your support will help improve the software. Thank you for considering it.")
@@ -186,18 +193,17 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
         if radar.radar_prop["receiver"].rxchannel_prop["size"] > 1:
             raise Exception("You're currently using RadarSimPy's FreeTier, which imposes a restriction on the maximum number of receiver channels to 1. Please consider supporting my work by upgrading to the standard version. Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ to access the standard version download links. Your support will help improve the software. Thank you for considering it.")
 
+    # Basic setup
     flag_run_scene = False
     frame_start_time = np.array(frame_time, dtype=np.float64)
+    log_path_c = str.encode(log_path) if log_path is not None else str.encode("")
 
+    #----------------------
+    # Timestamp Processing
+    #----------------------
     radar_ts = radar.time_prop["timestamp"]
     radar_ts_shape = np.shape(radar.time_prop["timestamp"])
 
-    if log_path is not None:
-        log_path_c = str.encode(log_path)
-    else:
-        log_path_c = str.encode("")
-
-    # Calculate timestamp for each frame
     if frames_c > 1:
         toffset = np.repeat(
             np.tile(
@@ -229,9 +235,9 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
     else:
         ray_filter_c = Vec2[int_t](<int_t>ray_filter[0], <int_t>ray_filter[1])
 
-    """
-    Targets
-    """
+    #----------------------
+    # Target Processing
+    #----------------------
     cdef double[:, :, :] timestamp_mv = timestamp.astype(np.float64)
 
     # Process each target
@@ -254,6 +260,9 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
     cdef double[:,:,::1] bb_real = np.empty(ts_shape, order='C', dtype=np.float64)
     cdef double[:,:,::1] bb_imag = np.empty(ts_shape, order='C', dtype=np.float64)
 
+    #----------------------
+    # Simulation Execution
+    #----------------------
     # Run ideal point target simulation
     if point_vt.size() > 0:
         sim_c.Run(radar_c, point_vt, &bb_real[0][0][0], &bb_imag[0][0][0])
@@ -316,6 +325,9 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
         else:
             baseband = baseband+np.asarray(bb_real)+1j*np.asarray(bb_imag)
 
+    #----------------------
+    # Noise Generation
+    #----------------------
     # Generate noise matrix
     max_ts = np.max(radar_ts)
     min_ts = np.min(radar_ts)
@@ -340,6 +352,9 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=No
                 rx_ch = ch_idx%rxsize_c
                 noise_mat[f_ch_idx, ps_idx, :] = noise_per_frame_rx[rx_ch, int(t0):(int(t0)+radar_ts_shape[2])]
 
+    #----------------------
+    # Interference Processing
+    #----------------------
     # Run interference simulation if interference radar is provided
     if interf is not None:
         interf_radar_c = cp_Radar(interf, 0)
