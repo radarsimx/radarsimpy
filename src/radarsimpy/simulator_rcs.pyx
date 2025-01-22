@@ -1,4 +1,5 @@
 # distutils: language = c++
+
 """
 The Python Module for Radar Cross Section (RCS) Simulation
 
@@ -21,41 +22,39 @@ This module provides tools for simulating and calculating the Radar Cross Sectio
 
 """
 
-
-from radarsimpy.includes.rsvector cimport Vec3
-from radarsimpy.includes.type_def cimport vector
-from radarsimpy.lib.cp_radarsimc cimport cp_RCS_Target
-from radarsimpy.includes.radarsimc cimport Target, Rcs
-
-from radarsimpy.includes.radarsimc cimport IsFreeTier
-
-from libcpp.complex cimport complex as cpp_complex
-
+# Standard library imports
 import numpy as np
 
+# Cython imports
 cimport cython
 cimport numpy as np
-np.import_array()
 
-# np_float = np.float32
+# Local imports
+from radarsimpy.includes.rsvector cimport Vec3
+from radarsimpy.includes.type_def cimport vector
+from radarsimpy.includes.radarsimc cimport Target, Rcs, IsFreeTier
+from radarsimpy.lib.cp_radarsimc cimport cp_RCS_Target
+from libcpp.complex cimport complex as cpp_complex
+
+# Initialize NumPy
+np.import_array()
 
 
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef sim_rcs(targets,
-              f,
-              inc_phi,
-              inc_theta,
-              inc_pol=[0, 0, 1],
-              obs_phi=None,
-              obs_theta=None,
-              obs_pol=None,
-              density=1):
-    """
-    sim_rcs(targets, f, inc_phi, inc_theta, inc_pol=[0, 0, 1], obs_phi=None, obs_theta=None, obs_pol=None, density=1)
-
-    Calculate the Radar Cross Section (RCS) of targets using the Shooting and Bouncing Rays (SBR) method.
+cpdef sim_rcs(
+    targets,
+    f,
+    inc_phi,
+    inc_theta,
+    inc_pol=[0, 0, 1],
+    obs_phi=None,
+    obs_theta=None,
+    obs_pol=None,
+    density=1
+):
+    """Calculate the Radar Cross Section (RCS) of targets using the Shooting and Bouncing Rays (SBR) method.
 
     This function computes the RCS of one or more targets by simulating how electromagnetic waves interact with the target models. The simulation uses the SBR technique, which accurately models wave scattering by tracing rays that shoot at the target and bounce off its surfaces.
 
@@ -116,52 +115,71 @@ cpdef sim_rcs(targets,
     """
     if IsFreeTier():
         if len(targets) > 3:
-            raise Exception("You're currently using RadarSimPy's FreeTier, which limits RCS simulation to 3 maximum targets. Please consider supporting my work by upgrading to the standard version. Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ to access the standard version download links. Your support will help improve the software. Thank you for considering it.")
+            raise Exception(
+                "You're currently using RadarSimPy's FreeTier, which limits RCS simulation to 3 maximum targets. "
+                "Please consider supporting my work by upgrading to the standard version. "
+                "Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ "
+                "to access the standard version download links. "
+                "Your support will help improve the software. Thank you for considering it."
+            )
 
     cdef vector[Target[float]] targets_vt
-
     cdef Vec3[cpp_complex[double]] inc_pol_cpp
     cdef Vec3[cpp_complex[double]] obs_pol_cpp
 
+    # Set default observation parameters if not provided
     if obs_pol is None:
         obs_pol = inc_pol
-
-    inc_pol_cpp = Vec3[cpp_complex[double]](cpp_complex[double](np.real(inc_pol[0]), np.imag(inc_pol[0])), cpp_complex[double](np.real(inc_pol[1]), np.imag(inc_pol[1])), cpp_complex[double](np.real(inc_pol[2]), np.imag(inc_pol[2])))
-
-    obs_pol_cpp = Vec3[cpp_complex[double]](cpp_complex[double](np.real(obs_pol[0]), np.imag(obs_pol[0])), cpp_complex[double](np.real(obs_pol[1]), np.imag(obs_pol[1])), cpp_complex[double](np.real(obs_pol[2]), np.imag(obs_pol[2])))
-
-    for idx_c in range(0, len(targets)):
-        targets_vt.push_back(cp_RCS_Target(targets[idx_c]))
-
     if obs_phi is None:
         obs_phi = inc_phi
-
     if obs_theta is None:
         obs_theta = inc_theta
 
+    # Convert polarization vectors to C++ types
+    inc_pol_cpp = Vec3[cpp_complex[double]](
+        cpp_complex[double](np.real(inc_pol[0]), np.imag(inc_pol[0])),
+        cpp_complex[double](np.real(inc_pol[1]), np.imag(inc_pol[1])),
+        cpp_complex[double](np.real(inc_pol[2]), np.imag(inc_pol[2]))
+    )
+    
+    obs_pol_cpp = Vec3[cpp_complex[double]](
+        cpp_complex[double](np.real(obs_pol[0]), np.imag(obs_pol[0])),
+        cpp_complex[double](np.real(obs_pol[1]), np.imag(obs_pol[1])),
+        cpp_complex[double](np.real(obs_pol[2]), np.imag(obs_pol[2]))
+    )
+
+    # Process targets
+    for idx_c in range(0, len(targets)):
+        targets_vt.push_back(cp_RCS_Target(targets[idx_c]))
+
+    # Convert angles to radians
     inc_phi_rad = np.radians(inc_phi)
     inc_theta_rad = np.radians(inc_theta)
     obs_phi_rad = np.radians(obs_phi)
     obs_theta_rad = np.radians(obs_theta)
 
+    # Calculate direction vectors
     cdef Vec3[double] inc_dir = Vec3[double](
-        <double> (np.sin(inc_theta_rad)*np.cos(inc_phi_rad)),
-        <double> (np.sin(inc_theta_rad)*np.sin(inc_phi_rad)),
-        <double> (np.cos(inc_theta_rad)))
+        <double>(np.sin(inc_theta_rad) * np.cos(inc_phi_rad)),
+        <double>(np.sin(inc_theta_rad) * np.sin(inc_phi_rad)),
+        <double>(np.cos(inc_theta_rad))
+    )
 
     cdef Vec3[double] obs_dir = Vec3[double](
-        <double> (np.sin(obs_theta_rad)*np.cos(obs_phi_rad)),
-        <double> (np.sin(obs_theta_rad)*np.sin(obs_phi_rad)),
-        <double> (np.cos(obs_theta_rad)))
+        <double>(np.sin(obs_theta_rad) * np.cos(obs_phi_rad)),
+        <double>(np.sin(obs_theta_rad) * np.sin(obs_phi_rad)),
+        <double>(np.cos(obs_theta_rad))
+    )
 
-    cdef Rcs[double] rcs
-
-    rcs = Rcs[double](targets_vt,
-                      inc_dir,
-                      obs_dir,
-                      inc_pol_cpp,
-                      obs_pol_cpp,
-                      <double> f,
-                      <double> density)
+    # Calculate RCS
+    cdef Rcs[double] rcs = Rcs[double](
+        targets_vt,
+        inc_dir,
+        obs_dir,
+        inc_pol_cpp,
+        obs_pol_cpp,
+        <double>f,
+        <double>density
+    )
 
     return rcs.CalculateRcs()

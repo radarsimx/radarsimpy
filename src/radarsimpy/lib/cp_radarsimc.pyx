@@ -19,33 +19,25 @@ A Python module for radar simulation
 
 """
 
+# Standard imports
+import numpy as np
 
-from radarsimpy.includes.radarsimc cimport Transmitter
-from radarsimpy.includes.radarsimc cimport Receiver
-from radarsimpy.includes.radarsimc cimport TxChannel
-from radarsimpy.includes.radarsimc cimport RxChannel
-from radarsimpy.includes.radarsimc cimport Radar
-from radarsimpy.includes.radarsimc cimport Target
-from radarsimpy.includes.radarsimc cimport Point
-
-from radarsimpy.includes.rsvector cimport Vec3
-from radarsimpy.includes.type_def cimport int_t, float_t
-from radarsimpy.includes.type_def cimport vector
-
-from radarsimpy.includes.radarsimc cimport Mem_Copy
-from radarsimpy.includes.radarsimc cimport Mem_Copy_Vec3
-from radarsimpy.includes.radarsimc cimport Mem_Copy_Complex
-from radarsimpy.includes.radarsimc cimport IsFreeTier
-
+# Cython imports
+cimport cython
+cimport numpy as np
 from libcpp.complex cimport complex as cpp_complex
 from libcpp cimport bool
 
-import numpy as np
+# Local imports
+from radarsimpy.includes.radarsimc cimport (
+    Transmitter, Receiver, TxChannel, RxChannel, 
+    Radar, Target, Point, Mem_Copy, Mem_Copy_Vec3,
+    Mem_Copy_Complex, IsFreeTier
+)
+from radarsimpy.includes.rsvector cimport Vec3
+from radarsimpy.includes.type_def cimport int_t, float_t, vector
 
-cimport cython
-cimport numpy as np
 np.import_array()
-
 np_float = np.float32
 
 @cython.cdivision(True)
@@ -483,14 +475,7 @@ cdef Target[float_t] cp_Target(radar,
     cdef int_t[:, :] cells_mv
 
     unit = target.get("unit", "m")
-    if unit == "m":
-        scale = 1
-    elif unit == "cm":
-        scale = 100
-    elif unit == "mm":
-        scale = 1000
-    else:
-        scale = 1
+    scale = {"m": 1, "cm": 100, "mm": 1000}.get(unit, 1)
 
     try:
         import pymeshlab
@@ -645,54 +630,44 @@ cdef Target[float_t] cp_RCS_Target(target):
     :return: C++ object of a target
     :rtype: Target
     """
-
-    # vector of location, speed, rotation, rotation rate
-    cdef vector[Vec3[float_t]] loc_vt
-    cdef vector[Vec3[float_t]] spd_vt
-    cdef vector[Vec3[float_t]] rot_vt
-    cdef vector[Vec3[float_t]] rrt_vt
-
+    
+    # Vector declarations
+    cdef vector[Vec3[float_t]] loc_vt, spd_vt, rot_vt, rrt_vt
     cdef cpp_complex[float_t] ep_c, mu_c
-
     cdef float_t scale
     cdef float_t[:, :] points_mv
     cdef int_t[:, :] cells_mv
 
+    # Set scale based on units
     unit = target.get("unit", "m")
-    if unit == "m":
-        scale = 1
-    elif unit == "cm":
-        scale = 100
-    elif unit == "mm":
-        scale = 1000
-    else:
-        scale = 1
+    scale = {"m": 1, "cm": 100, "mm": 1000}.get(unit, 1)
 
+    # Load mesh data
     try:
         import pymeshlab
-    except:
-        try:
-            import meshio
-        except:
-            raise("PyMeshLab is requied to process the 3D model.")
-        else:
-            t_mesh = meshio.read(target["model"])
-            points_mv = t_mesh.points.astype(np_float)/scale
-            cells_mv = t_mesh.cells[0].data.astype(np.int32)
-    else:
         ms = pymeshlab.MeshSet()
         ms.load_new_mesh(target["model"])
         t_mesh = ms.current_mesh()
         v_matrix = np.array(t_mesh.vertex_matrix())
         f_matrix = np.array(t_mesh.face_matrix())
+        
         if np.isfortran(v_matrix):
             points_mv = np.ascontiguousarray(v_matrix).astype(np_float)/scale
             cells_mv = np.ascontiguousarray(f_matrix).astype(np.int32)
         ms.clear()
-    
-    if IsFreeTier():
-        if cells_mv.shape[0] > 8:
-            raise Exception("You are presently utilizing RadarSimPy's FreeTier plan, which imposes a restriction on the maximum mesh size of a target to 8. Please consider supporting my work by upgrading to the standard version. Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ to access the standard version download links. Your support will help improve the software. Thank you for considering it.")
+        
+    except ImportError:
+        try:
+            import meshio
+            t_mesh = meshio.read(target["model"])
+            points_mv = t_mesh.points.astype(np_float)/scale
+            cells_mv = t_mesh.cells[0].data.astype(np.int32)
+        except ImportError:
+            raise("PyMeshLab is required to process the 3D model.")
+
+    # Check FreeTier mesh size limit
+    if IsFreeTier() and cells_mv.shape[0] > 8:
+        raise Exception("You are presently utilizing RadarSimPy's FreeTier plan, which imposes a restriction on the maximum mesh size of a target to 8. Please consider supporting my work by upgrading to the standard version. Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ to access the standard version download links. Your support will help improve the software. Thank you for considering it.")
 
     cdef float_t[:] origin_mv = np.array(target.get("origin", (0, 0, 0)), dtype=np_float)
 

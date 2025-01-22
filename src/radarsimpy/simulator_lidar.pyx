@@ -21,20 +21,19 @@ This module provides tools for simulating a lidar system in complex 3D environme
 
 """
 
+# Core imports
+from libcpp cimport bool
+import numpy as np
+cimport numpy as np
+cimport cython
 
+# RadarSimX imports
 from radarsimpy.includes.radarsimc cimport Target, PointCloud
 from radarsimpy.includes.radarsimc cimport Mem_Copy
 from radarsimpy.includes.rsvector cimport Vec3
 from radarsimpy.includes.type_def cimport float_t, int_t, vector
 
-# import meshio
-import numpy as np
-from libcpp cimport bool
-
-cimport cython
-cimport numpy as np
 np.import_array()
-
 np_float = np.float32
 
 
@@ -96,7 +95,8 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
         numpy.ndarray - A structured array representing the Lidar ray interactions with the scene, including details such as ray origins, directions, and intersections.
     """
     cdef PointCloud[float_t] pointcloud_c
-
+    
+    # Memory view declarations
     cdef float_t[:, :] points_mv
     cdef int_t[:, :] cells_mv
     cdef float_t[:] origin_mv
@@ -105,32 +105,17 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
     cdef float_t[:] rotation_mv
     cdef float_t[:] rotation_rate_mv
     cdef float_t scale
-
     cdef int_t idx_c
 
+    # Process targets
     for idx_c in range(0, len(targets)):
+        # Unit conversion
         unit = targets[idx_c].get("unit", "m")
-        if unit == "m":
-            scale = 1
-        elif unit == "cm":
-            scale = 100
-        elif unit == "mm":
-            scale = 1000
-        else:
-            scale = 1
+        scale = 1000 if unit == "mm" else 100 if unit == "cm" else 1
 
+        # Model loading
         try:
             import pymeshlab
-        except:
-            try:
-                import meshio
-            except:
-                raise("PyMeshLab is requied to process the 3D model.")
-            else:
-                t_mesh = meshio.read(targets[idx_c]["model"])
-                points_mv = t_mesh.points.astype(np_float)/scale
-                cells_mv = t_mesh.cells[0].data.astype(np.int32)
-        else:
             ms = pymeshlab.MeshSet()
             ms.load_new_mesh(targets[idx_c]["model"])
             t_mesh = ms.current_mesh()
@@ -140,31 +125,41 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
                 points_mv = np.ascontiguousarray(v_matrix).astype(np_float)/scale
                 cells_mv = np.ascontiguousarray(f_matrix).astype(np.int32)
             ms.clear()
+        except ImportError:
+            try:
+                import meshio
+                t_mesh = meshio.read(targets[idx_c]["model"])
+                points_mv = t_mesh.points.astype(np_float)/scale
+                cells_mv = t_mesh.cells[0].data.astype(np.int32)
+            except ImportError:
+                raise("PyMeshLab is required to process the 3D model.")
 
+        # Target parameters
         origin_mv = np.array(targets[idx_c].get("origin", (0, 0, 0)), dtype=np_float)
-
         location_mv = np.array(targets[idx_c].get("location", (0, 0, 0)), dtype=np_float) + \
             frame_time*np.array(targets[idx_c].get("speed", (0, 0, 0)), dtype=np_float)
         speed_mv = np.array(targets[idx_c].get("speed", (0, 0, 0)), dtype=np_float)
-
+        
         rotation_mv = np.radians(
             np.array(targets[idx_c].get("rotation", (0, 0, 0)), dtype=np_float) + \
             frame_time*np.array(targets[idx_c].get("rotation_rate", (0, 0, 0)), dtype=np_float)
-            )
+        )
         rotation_rate_mv = np.radians(
             np.array(targets[idx_c].get("rotation_rate", (0, 0, 0)), dtype=np_float)
-            )
+        )
 
+        # Add target to pointcloud
         pointcloud_c.AddTarget(Target[float_t](&points_mv[0, 0],
-                                               &cells_mv[0, 0],
-                                               <int_t> cells_mv.shape[0],
-                                               Vec3[float_t](&origin_mv[0]),
-                                               Vec3[float_t](&location_mv[0]),
-                                               Vec3[float_t](&speed_mv[0]),
-                                               Vec3[float_t](&rotation_mv[0]),
-                                               Vec3[float_t](&rotation_rate_mv[0]),
-                                               <bool> targets[idx_c].get("is_ground", False)))
+                                             &cells_mv[0, 0],
+                                             <int_t> cells_mv.shape[0],
+                                             Vec3[float_t](&origin_mv[0]),
+                                             Vec3[float_t](&location_mv[0]),
+                                             Vec3[float_t](&speed_mv[0]),
+                                             Vec3[float_t](&rotation_mv[0]),
+                                             Vec3[float_t](&rotation_rate_mv[0]),
+                                             <bool> targets[idx_c].get("is_ground", False)))
 
+    # Lidar parameters
     cdef float_t[:] phi_mv = np.radians(np.array(lidar["phi"], dtype=np_float))
     cdef float_t[:] theta_mv = np.radians(np.array(lidar["theta"], dtype=np_float))
     cdef float_t[:] position_mv = np.array(lidar["position"], dtype=np_float)
@@ -175,13 +170,14 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
     cdef vector[float_t] theta_vt
     Mem_Copy(&theta_mv[0], <int_t>(theta_mv.shape[0]), theta_vt)
 
+    # Perform ray tracing
     pointcloud_c.Sbr(phi_vt,
                      theta_vt,
                      Vec3[float_t](&position_mv[0]))
 
+    # Prepare output
     ray_type = np.dtype([("positions", np_float, (3,)),
-                         ("directions", np_float, (3,))])
-
+                        ("directions", np_float, (3,))])
     rays = np.zeros(pointcloud_c.cloud_.size(), dtype=ray_type)
 
     for idx_c in range(0, <int_t> pointcloud_c.cloud_.size()):
