@@ -111,7 +111,7 @@ def range_doppler_fft(data, rwin=None, dwin=None, rn=None, dn=None) -> np.ndarra
 
 def cfar_ca_1d(
     data, guard, trailing, pfa=1e-5, axis=0, detector="squarelaw", offset=None
-):
+) -> np.ndarray:
     """
     1-D Cell Averaging CFAR (CA-CFAR)
 
@@ -171,7 +171,7 @@ def cfar_ca_1d(
     return cfar
 
 
-def cfar_ca_2d(data, guard, trailing, pfa=1e-5, detector="squarelaw", offset=None):
+def cfar_ca_2d(data, guard, trailing, pfa=1e-5, detector="squarelaw", offset=None) -> np.ndarray:
     """
     2-D Cell Averaging CFAR (CA-CFAR)
 
@@ -239,7 +239,7 @@ def cfar_ca_2d(data, guard, trailing, pfa=1e-5, detector="squarelaw", offset=Non
     return a * convolve(data, cfar_win, mode="same")
 
 
-def os_cfar_threshold(k, n, pfa):
+def os_cfar_threshold(k, n, pfa) -> float:
     """
     Use Secant method to calculate OS-CFAR's threshold
 
@@ -298,7 +298,7 @@ def os_cfar_threshold(k, n, pfa):
 
 def cfar_os_1d(
     data, guard, trailing, k, pfa=1e-5, axis=0, detector="squarelaw", offset=None
-):
+) -> np.ndarray:
     """
     1-D Ordered Statistic CFAR (OS-CFAR)
 
@@ -397,7 +397,7 @@ def cfar_os_1d(
     return cfar
 
 
-def cfar_os_2d(data, guard, trailing, k, pfa=1e-5, detector="squarelaw", offset=None):
+def cfar_os_2d(data, guard, trailing, k, pfa=1e-5, detector="squarelaw", offset=None) -> np.ndarray:
     """
     2-D Ordered Statistic CFAR (OS-CFAR)
 
@@ -500,7 +500,7 @@ def cfar_os_2d(data, guard, trailing, k, pfa=1e-5, detector="squarelaw", offset=
     return cfar
 
 
-def doa_music(covmat, nsig, spacing=0.5, scanangles=range(-90, 91)):
+def doa_music(covmat, nsig, spacing=0.5, scanangles=range(-90, 91)) -> tuple[list, list, np.ndarray]:
     """
     Estimate arrival directions of signals using MUSIC for a uniform linear
     array (ULA)
@@ -545,7 +545,7 @@ def doa_music(covmat, nsig, spacing=0.5, scanangles=range(-90, 91)):
     return scanangles[doa_idx], doa_idx, ps_db
 
 
-def doa_root_music(covmat, nsig, spacing=0.5):
+def doa_root_music(covmat, nsig, spacing=0.5) -> list:
     """
     Estimate arrival directions of signals using root-MUSIC for a uniform
     linear array (ULA)
@@ -594,7 +594,7 @@ def doa_root_music(covmat, nsig, spacing=0.5):
     return np.degrees(np.arcsin(sin_vals))
 
 
-def doa_esprit(covmat, nsig, spacing=0.5):
+def doa_esprit(covmat, nsig, spacing=0.5) -> list:
     """
     Estimate arrival directions of signals using ESPRIT for a uniform linear
     array (ULA)
@@ -624,7 +624,7 @@ def doa_esprit(covmat, nsig, spacing=0.5):
     return np.degrees(np.arcsin(np.angle(eigs) / np.pi / (spacing / 0.5)))
 
 
-def doa_iaa(beam_vect, steering_vect, num_it=15, p_init=None):
+def doa_iaa(beam_vect, steering_vect, num_it=15, p_init=None) -> np.ndarray:
     """
     IAA-APES follows Source Localization and Sensing: A Nonparametric Iterative Adaptive
     Approach Based on Weighted Least Square and its notation
@@ -681,7 +681,7 @@ def doa_iaa(beam_vect, steering_vect, num_it=15, p_init=None):
     return 10 * np.log10(np.real(spectrum_k))
 
 
-def doa_bartlett(covmat, spacing=0.5, scanangles=range(-90, 91)):
+def doa_bartlett(covmat, spacing=0.5, scanangles=range(-90, 91)) -> np.ndarray:
     """
     Bartlett beamforming for a uniform linear array (ULA)
 
@@ -714,7 +714,7 @@ def doa_bartlett(covmat, spacing=0.5, scanangles=range(-90, 91)):
     return 10 * np.log10(ps)
 
 
-def doa_capon(covmat, spacing=0.5, scanangles=range(-90, 91)):
+def doa_capon(covmat, spacing=0.5, scanangles=range(-90, 91)) -> np.ndarray:
     """
     Capon (MVDR) beamforming for a uniform linear array (ULA)
 
