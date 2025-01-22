@@ -23,13 +23,14 @@ environment you are running this script in.
 
 from warnings import warn
 import numpy as np
+from numpy.typing import NDArray
 from scipy.signal import convolve, find_peaks
 from scipy import linalg
 from scipy import fft
 from .tools import log_factorial  # pylint: disable=no-name-in-module
 
 
-def range_fft(data, rwin=None, n=None) -> np.ndarray:
+def range_fft(data, rwin=None, n=None) -> NDArray:
     """
     Calculate range profile matrix
 
@@ -56,7 +57,7 @@ def range_fft(data, rwin=None, n=None) -> np.ndarray:
     return fft.fft(data * rwin, n=n, axis=2)
 
 
-def doppler_fft(data, dwin=None, n=None) -> np.ndarray:
+def doppler_fft(data, dwin=None, n=None) -> NDArray:
     """
     Calculate range-Doppler matrix
 
@@ -83,7 +84,7 @@ def doppler_fft(data, dwin=None, n=None) -> np.ndarray:
     return fft.fft(data * dwin, n=n, axis=1)
 
 
-def range_doppler_fft(data, rwin=None, dwin=None, rn=None, dn=None) -> np.ndarray:
+def range_doppler_fft(data, rwin=None, dwin=None, rn=None, dn=None) -> NDArray:
     """
     Range-Doppler processing
 
@@ -111,7 +112,7 @@ def range_doppler_fft(data, rwin=None, dwin=None, rn=None, dn=None) -> np.ndarra
 
 def cfar_ca_1d(
     data, guard, trailing, pfa=1e-5, axis=0, detector="squarelaw", offset=None
-) -> np.ndarray:
+) -> NDArray:
     """
     1-D Cell Averaging CFAR (CA-CFAR)
 
@@ -171,7 +172,7 @@ def cfar_ca_1d(
     return cfar
 
 
-def cfar_ca_2d(data, guard, trailing, pfa=1e-5, detector="squarelaw", offset=None) -> np.ndarray:
+def cfar_ca_2d(data, guard, trailing, pfa=1e-5, detector="squarelaw", offset=None) -> NDArray:
     """
     2-D Cell Averaging CFAR (CA-CFAR)
 
@@ -298,7 +299,7 @@ def os_cfar_threshold(k, n, pfa) -> float:
 
 def cfar_os_1d(
     data, guard, trailing, k, pfa=1e-5, axis=0, detector="squarelaw", offset=None
-) -> np.ndarray:
+) -> NDArray:
     """
     1-D Ordered Statistic CFAR (OS-CFAR)
 
@@ -397,7 +398,7 @@ def cfar_os_1d(
     return cfar
 
 
-def cfar_os_2d(data, guard, trailing, k, pfa=1e-5, detector="squarelaw", offset=None) -> np.ndarray:
+def cfar_os_2d(data, guard, trailing, k, pfa=1e-5, detector="squarelaw", offset=None) -> NDArray:
     """
     2-D Ordered Statistic CFAR (OS-CFAR)
 
@@ -500,7 +501,7 @@ def cfar_os_2d(data, guard, trailing, k, pfa=1e-5, detector="squarelaw", offset=
     return cfar
 
 
-def doa_music(covmat, nsig, spacing=0.5, scanangles=range(-90, 91)) -> tuple[list, list, np.ndarray]:
+def doa_music(covmat, nsig, spacing=0.5, scanangles=range(-90, 91)) -> tuple[list, list, NDArray]:
     """
     Estimate arrival directions of signals using MUSIC for a uniform linear
     array (ULA)
@@ -624,7 +625,7 @@ def doa_esprit(covmat, nsig, spacing=0.5) -> list:
     return np.degrees(np.arcsin(np.angle(eigs) / np.pi / (spacing / 0.5)))
 
 
-def doa_iaa(beam_vect, steering_vect, num_it=15, p_init=None) -> np.ndarray:
+def doa_iaa(beam_vect, steering_vect, num_it=15, p_init=None) -> NDArray:
     """
     IAA-APES follows Source Localization and Sensing: A Nonparametric Iterative Adaptive
     Approach Based on Weighted Least Square and its notation
@@ -681,7 +682,7 @@ def doa_iaa(beam_vect, steering_vect, num_it=15, p_init=None) -> np.ndarray:
     return 10 * np.log10(np.real(spectrum_k))
 
 
-def doa_bartlett(covmat, spacing=0.5, scanangles=range(-90, 91)) -> np.ndarray:
+def doa_bartlett(covmat, spacing=0.5, scanangles=range(-90, 91)) -> NDArray:
     """
     Bartlett beamforming for a uniform linear array (ULA)
 
@@ -714,7 +715,7 @@ def doa_bartlett(covmat, spacing=0.5, scanangles=range(-90, 91)) -> np.ndarray:
     return 10 * np.log10(ps)
 
 
-def doa_capon(covmat, spacing=0.5, scanangles=range(-90, 91)) -> np.ndarray:
+def doa_capon(covmat, spacing=0.5, scanangles=range(-90, 91)) -> NDArray:
     """
     Capon (MVDR) beamforming for a uniform linear array (ULA)
 
