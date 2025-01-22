@@ -30,8 +30,10 @@ functions:
 
 """
 
+from typing import Union
 import warnings
 import numpy as np
+from numpy.typing import NDArray
 from scipy.special import (  # pylint: disable=no-name-in-module
     erfc,
     erfcinv,
@@ -42,7 +44,7 @@ from scipy.special import (  # pylint: disable=no-name-in-module
 from scipy.stats import distributions
 
 
-def marcumq(a, x, m=1):
+def marcumq(a, x, m=1) -> float:
     """
     Calculates the generalized Marcum Q function.
 
@@ -63,7 +65,7 @@ def marcumq(a, x, m=1):
     return 1 - distributions.ncx2.cdf(df=m * 2, nc=a**2, x=x**2)
 
 
-def log_factorial(n):
+def log_factorial(n) -> Union[float, NDArray]:
     """
     Compute the factorial of 'n' using logarithms to avoid overflow
 
@@ -85,7 +87,7 @@ def log_factorial(n):
     return val
 
 
-def threshold(pfa, npulses):
+def threshold(pfa, npulses) -> float:
     """
     Threshold ratio
 
@@ -106,7 +108,7 @@ def threshold(pfa, npulses):
     return gammaincinv(npulses, 1 - pfa)
 
 
-def pd_swerling0(npulses, snr, thred):
+def pd_swerling0(npulses, snr, thred) -> float:
     """
     Calculates the probability of detection (Pd) for Swerling 0 target model.
 
@@ -179,7 +181,7 @@ def pd_swerling0(npulses, snr, thred):
     return q - val1 * val2
 
 
-def pd_swerling1(npulses, snr, thred):
+def pd_swerling1(npulses, snr, thred) -> float:
     """
     Calculates the probability of detection (Pd) for Swerling 1 target model.
 
@@ -216,7 +218,7 @@ def pd_swerling1(npulses, snr, thred):
     )
 
 
-def pd_swerling2(npulses, snr, thred):
+def pd_swerling2(npulses, snr, thred) -> float:
     """
     Calculates the probability of detection (Pd) for Swerling 2 target model.
 
@@ -241,7 +243,7 @@ def pd_swerling2(npulses, snr, thred):
     return 1 - gammainc(npulses, (thred / (1 + snr)))
 
 
-def pd_swerling3(npulses, snr, thred):
+def pd_swerling3(npulses, snr, thred) -> float:
     """
     Calculates the probability of detection (Pd) for Swerling 3 target model.
 
@@ -289,7 +291,7 @@ def pd_swerling3(npulses, snr, thred):
     return pd
 
 
-def pd_swerling4(npulses, snr, thred):
+def pd_swerling4(npulses, snr, thred) -> float:
     """
     Calculates the probability of detection (Pd) for Swerling 4 target model.
 
@@ -356,7 +358,7 @@ def pd_swerling4(npulses, snr, thred):
     return 1 - sum_var / beta**npulses
 
 
-def roc_pd(pfa, snr, npulses=1, stype="Coherent"):
+def roc_pd(pfa, snr, npulses=1, stype="Coherent") -> Union[float, NDArray, None]:
     """
     Calculate probability of detection (Pd) in receiver operating
     characteristic (ROC)
@@ -444,7 +446,7 @@ def roc_pd(pfa, snr, npulses=1, stype="Coherent"):
     return pd
 
 
-def roc_snr(pfa, pd, npulses=1, stype="Coherent"):
+def roc_snr(pfa, pd, npulses=1, stype="Coherent") -> Union[float, NDArray, None]:
     """
     Calculate the minimal SNR for certain probability of
     detection (Pd) and probability of false alarm (Pfa) in
