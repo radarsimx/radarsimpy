@@ -19,39 +19,31 @@ A Python module for radar simulation
 
 """
 
-from radarsimpy.includes.rsvector cimport Vec3, Vec2
-from radarsimpy.includes.type_def cimport int_t
-from radarsimpy.includes.type_def cimport vector
+#------------------------------------------------------------------------------
+# Imports
+#------------------------------------------------------------------------------
 from libcpp cimport bool
 from libcpp.complex cimport complex as cpp_complex
 from libcpp.string cimport string
+from radarsimpy.includes.rsvector cimport Vec3, Vec2
+from radarsimpy.includes.type_def cimport int_t, vector
 
-
-"""
-Memory Manipulation
-    Copy memory view into C++ vector
-"""
+#------------------------------------------------------------------------------
+# Memory Management
+#------------------------------------------------------------------------------
 cdef extern from "libs/mem_lib.hpp":
-    cdef void Mem_Copy[T](T * ptr,
-                          int_t size,
-                          vector[T] &vect) except +
-    cdef void Mem_Copy_Complex[T](T * ptr_real,
-                                  T * ptr_imag,
-                                  int_t size,
-                                  vector[cpp_complex[T]] &vect) except +
-    cdef void Mem_Copy_Vec3[T](T *ptr_x,
-                               T *ptr_y,
-                               T *ptr_z,
-                               int_t size,
-                               vector[Vec3[T]] &vect) except +
+    cdef void Mem_Copy[T](T * ptr, int_t size, vector[T] &vect) except +
+    cdef void Mem_Copy_Complex[T](T * ptr_real, T * ptr_imag, 
+                                 int_t size, vector[cpp_complex[T]] &vect) except +
+    cdef void Mem_Copy_Vec3[T](T *ptr_x, T *ptr_y, T *ptr_z,
+                              int_t size, vector[Vec3[T]] &vect) except +
 
 cdef extern from "libs/free_tier.hpp":
     cdef int IsFreeTier() except +
 
-
-"""
-Target
-"""
+#------------------------------------------------------------------------------
+# Target and Ray Classes
+#------------------------------------------------------------------------------
 cdef extern from "target.hpp":
     cdef cppclass Target[T]:
         Target() except +
@@ -79,10 +71,6 @@ cdef extern from "target.hpp":
                const Vec3[T] & rotation_rate,
                const bool & is_ground) except +
 
-
-"""
-Ray
-"""
 cdef extern from "ray.hpp":
     cdef cppclass Ray[T]:
         Ray() except +
@@ -90,10 +78,9 @@ cdef extern from "ray.hpp":
         Vec3[T] * location_
         int reflections_
 
-
-"""
-Rcs
-"""
+#------------------------------------------------------------------------------
+# RCS and Point Cloud
+#------------------------------------------------------------------------------
 cdef extern from "rcs.hpp":
     cdef cppclass Rcs[T]:
         Rcs() except +
@@ -107,10 +94,6 @@ cdef extern from "rcs.hpp":
 
         T CalculateRcs()
 
-
-"""
-PointCloud
-"""
 cdef extern from "pointcloud.hpp":
     cdef cppclass PointCloud[T]:
         PointCloud() except +
@@ -121,10 +104,6 @@ cdef extern from "pointcloud.hpp":
 
         vector[Ray[T]] cloud_
 
-
-"""
-Point
-"""
 cdef extern from "point.hpp":
     cdef cppclass Point[T]:
         Point() except +
@@ -133,10 +112,9 @@ cdef extern from "point.hpp":
               const vector[T] & rcs,
               const vector[T] & phs) except +
 
-
-"""
-Transmitter and TxChannel
-"""
+#------------------------------------------------------------------------------
+# Transmitter Components
+#------------------------------------------------------------------------------
 cdef extern from "transmitter.hpp":
     cdef cppclass TxChannel[T]:
         TxChannel() except +
@@ -170,10 +148,9 @@ cdef extern from "transmitter.hpp":
                     const vector[cpp_complex[H]] & phase_noise) except +
         void AddChannel(const TxChannel[L] & channel)
 
-
-"""
-Receiver and RxChannel
-"""
+#------------------------------------------------------------------------------
+# Receiver Components
+#------------------------------------------------------------------------------
 cdef extern from "receiver.hpp":
     cdef cppclass RxChannel[T]:
         RxChannel() except +
@@ -194,10 +171,9 @@ cdef extern from "receiver.hpp":
                  const T & baseband_bw) except +
         void AddChannel(const RxChannel[T] & channel)
 
-
-"""
-Radar
-"""
+#------------------------------------------------------------------------------
+# Radar System
+#------------------------------------------------------------------------------
 cdef extern from "radar.hpp":
     cdef cppclass Radar[H, L]:
         Radar() except +
@@ -208,10 +184,6 @@ cdef extern from "radar.hpp":
               vector[Vec3[L]] & rotation_array,
               Vec3[L] rotrate_array) except +
 
-
-"""
-Snapshot
-"""
 cdef extern from "snapshot.hpp":
     cdef cppclass Snapshot[T]:
         Snapshot() except +
@@ -221,10 +193,9 @@ cdef extern from "snapshot.hpp":
                  const int & pulse_idx,
                  const int & sample_idx) except +
 
-
-"""
-Ideal Simulator
-"""
+#------------------------------------------------------------------------------
+# Simulators
+#------------------------------------------------------------------------------
 cdef extern from "simulator_ideal.hpp":
     cdef cppclass IdealSimulator[H, L]:
         IdealSimulator() except +
@@ -233,10 +204,6 @@ cdef extern from "simulator_ideal.hpp":
                  double * bb_real,
                  double * bb_imag)
 
-
-"""
-Scene Simulator
-"""
 cdef extern from "simulator_scene.hpp":
     cdef cppclass SceneSimulator[H, L]:
         SceneSimulator() except +
@@ -251,10 +218,6 @@ cdef extern from "simulator_scene.hpp":
                  double * bb_real,
                  double * bb_imag)
 
-
-"""
-Interference Simulator
-"""
 cdef extern from "simulator_interference.hpp":
     cdef cppclass InterferenceSimulator[H, L]:
         InterferenceSimulator() except +
