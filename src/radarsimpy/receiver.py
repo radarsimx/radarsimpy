@@ -24,7 +24,9 @@ receiver behavior.
 
 """
 
+from typing import List, Dict, Union, Optional
 import numpy as np
+from numpy.typing import NDArray
 
 
 class Receiver:
@@ -140,13 +142,13 @@ class Receiver:
 
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        fs,
-        noise_figure=10,
-        rf_gain=0,
-        load_resistor=500,
-        baseband_gain=0,
-        bb_type="complex",
-        channels=None,
+        fs: float,
+        noise_figure: float = 10,
+        rf_gain: float = 0,
+        load_resistor: float = 500,
+        baseband_gain: float = 0,
+        bb_type: str = "complex",
+        channels: Optional[List[Dict]] = None
     ):
         self.rf_prop = {}
         self.bb_prop = {}
@@ -172,7 +174,7 @@ class Receiver:
 
         self.rxchannel_prop = self.process_rxchannel_prop(channels)
 
-    def validate_bb_prop(self, bb_prop):
+    def validate_bb_prop(self, bb_prop: Dict) -> None:
         """
         Validate baseband properties
 
@@ -183,7 +185,7 @@ class Receiver:
         if bb_prop["bb_type"] != "complex" and bb_prop["bb_type"] != "real":
             raise ValueError("Invalid baseband type")
 
-    def process_rxchannel_prop(self, channels):
+    def process_rxchannel_prop(self, channels: List[Dict]) -> Dict:
         """
         Process receiver channel parameters
 

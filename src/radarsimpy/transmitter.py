@@ -24,7 +24,9 @@ transmitter channel modulation.
 
 """
 
+from typing import List, Dict, Union, Optional, Any
 import numpy as np
+from numpy.typing import NDArray
 
 
 class Transmitter:
@@ -174,15 +176,15 @@ class Transmitter:
 
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        f,
-        t,
-        tx_power=0,
-        pulses=1,
-        prp=None,
-        f_offset=None,
-        pn_f=None,
-        pn_power=None,
-        channels=None,
+        f: Union[float, List, NDArray],
+        t: Union[float, List, NDArray],
+        tx_power: float = 0,
+        pulses: int = 1,
+        prp: Optional[Union[float, NDArray]] = None,
+        f_offset: Optional[Union[float, NDArray]] = None,
+        pn_f: Optional[NDArray] = None,
+        pn_power: Optional[NDArray] = None,
+        channels: Optional[List[Dict]] = None,
     ):
         self.rf_prop = {}
         self.waveform_prop = {}
@@ -243,7 +245,7 @@ class Transmitter:
 
         self.txchannel_prop = self.process_txchannel_prop(channels)
 
-    def validate_rf_prop(self, rf_prop):
+    def validate_rf_prop(self, rf_prop: Dict) -> None:
         """
         Validate RF properties
 
@@ -261,7 +263,7 @@ class Transmitter:
             if len(rf_prop["pn_f"]) != len(rf_prop["pn_power"]):
                 raise ValueError("Lengths of `pn_f` and `pn_power` should be the same")
 
-    def validate_waveform_prop(self, waveform_prop):
+    def validate_waveform_prop(self, waveform_prop: Dict) -> None:
         """
         Validate waveform properties
 
@@ -284,7 +286,12 @@ class Transmitter:
         if np.min(waveform_prop["prp"]) < waveform_prop["pulse_length"]:
             raise ValueError("`prp` should be larger than `pulse_length`")
 
-    def process_waveform_modulation(self, mod_t, amp, phs):
+    def process_waveform_modulation(
+        self,
+        mod_t: Optional[NDArray],
+        amp: Optional[NDArray], 
+        phs: Optional[NDArray]
+    ) -> Dict:
         """
         Process waveform modulation parameters
 
@@ -334,7 +341,11 @@ class Transmitter:
 
         return {"enabled": True, "var": mod_var, "t": mod_t}
 
-    def process_pulse_modulation(self, pulse_amp, pulse_phs):
+    def process_pulse_modulation(
+        self,
+        pulse_amp: NDArray,
+        pulse_phs: NDArray
+    ) -> NDArray:
         """
         Process pulse modulation parameters
 
@@ -359,7 +370,7 @@ class Transmitter:
 
         return np.array(pulse_amp) * np.exp(1j * (np.array(pulse_phs) / 180 * np.pi))
 
-    def process_txchannel_prop(self, channels):
+    def process_txchannel_prop(self, channels: List[Dict]) -> Dict:
         """
         Process transmitter channel parameters
 

@@ -25,12 +25,19 @@ including phase noise and noise amplitudes.
 
 """
 
+from typing import List, Dict, Union, Tuple, Optional
 import numpy as np
+from numpy.typing import NDArray
 
 
 def cal_phase_noise(  # pylint: disable=too-many-arguments, too-many-locals
-    signal, fs, freq, power, seed=None, validation=False
-):
+    signal: NDArray, 
+    fs: float,
+    freq: NDArray,
+    power: NDArray,
+    seed: Optional[int] = None,
+    validation: bool = False
+) -> NDArray:
     """
     Oscillator Phase Noise Model
 
@@ -325,13 +332,13 @@ class Radar:
 
     def __init__(  # pylint: disable=too-many-arguments
         self,
-        transmitter,
-        receiver,
-        location=(0, 0, 0),
-        speed=(0, 0, 0),
-        rotation=(0, 0, 0),
-        rotation_rate=(0, 0, 0),
-        seed=None,
+        transmitter: "Transmitter",
+        receiver: "Receiver", 
+        location: Tuple[float, float, float] = (0, 0, 0),
+        speed: Tuple[float, float, float] = (0, 0, 0),
+        rotation: Tuple[float, float, float] = (0, 0, 0),
+        rotation_rate: Tuple[float, float, float] = (0, 0, 0),
+        seed: Optional[int] = None,
         **kwargs
     ):
         self.time_prop = {}
@@ -404,7 +411,7 @@ class Radar:
             rotation_rate,
         )
 
-    def gen_timestamp(self):
+    def gen_timestamp(self) -> NDArray:
         """
         Generate timestamp
 
@@ -446,7 +453,7 @@ class Radar:
 
         return timestamp
 
-    def cal_noise(self, noise_temp=290):
+    def cal_noise(self, noise_temp: float = 290) -> float:
         """
         Calculate noise amplitudes
 
@@ -472,7 +479,13 @@ class Radar:
         # noise_amplitude_peak = np.sqrt(2) * noise_amplitude_mixer
         return noise_amplitude_mixer
 
-    def validate_radar_motion(self, location, speed, rotation, rotation_rate):
+    def validate_radar_motion(
+        self,
+        location: List[Union[float, NDArray]],
+        speed: List[Union[float, NDArray]],
+        rotation: List[Union[float, NDArray]], 
+        rotation_rate: List[Union[float, NDArray]]
+    ) -> None:
         """
         Validate radar motion inputs
 
@@ -521,7 +534,13 @@ class Radar:
                         + "] must be a scalar or have the same shape as timestamp"
                     )
 
-    def process_radar_motion(self, location, speed, rotation, rotation_rate):
+    def process_radar_motion(
+        self,
+        location: List[Union[float, NDArray]],
+        speed: List[Union[float, NDArray]],
+        rotation: List[Union[float, NDArray]],
+        rotation_rate: List[Union[float, NDArray]]
+    ) -> None:
         """
         Process radar motion parameters
 
