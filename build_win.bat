@@ -7,44 +7,43 @@ set TEST=on
 goto GETOPTS
 
 :Help
-ECHO:
-ECHO Usages:
-ECHO    --help	Show the usages of the parameters
-ECHO    --tier	Build tier, choose 'standard' or 'free'. Default is 'standard'
-ECHO    --arch	Build architecture, choose 'cpu' or 'gpu'. Default is 'cpu'
-ECHO    --test	Enable or disable unit test, choose 'on' or 'off'. Default is 'on'
-ECHO:
-goto EOF
+    ECHO:
+    ECHO Usages:
+    ECHO    --help    Show the usages of the parameters
+    ECHO    --tier    Build tier, choose 'standard' or 'free'. Default is 'standard'
+    ECHO    --arch    Build architecture, choose 'cpu' or 'gpu'. Default is 'cpu'
+    ECHO    --test    Enable or disable unit test, choose 'on' or 'off'. Default is 'on'
+    ECHO:
+    goto EOF
 
 :GETOPTS
-if /I "%1" == "--help" goto Help
-if /I "%1" == "--tier" set TIER=%2 & shift
-if /I "%1" == "--arch" set ARCH=%2 & shift
-if /I "%1" == "--test" set TEST=%2 & shift
-shift
-if not "%1" == "" goto GETOPTS
+    if /I "%1" == "--help" goto Help
+    if /I "%1" == "--tier" set TIER=%2 & shift
+    if /I "%1" == "--arch" set ARCH=%2 & shift
+    if /I "%1" == "--test" set TEST=%2 & shift
+    shift
+    if not "%1" == "" goto GETOPTS
 
-if /I NOT %TIER% == free (
-    if /I NOT %TIER% == standard (
-        ECHO ERROR: Invalid --tier parameters, please choose 'free' or 'standard'
-        goto EOF
+    if /I NOT %TIER% == free (
+        if /I NOT %TIER% == standard (
+            ECHO ERROR: Invalid --tier parameters, please choose 'free' or 'standard'
+            goto EOF
+        )
     )
-)
 
-if /I NOT %ARCH% == cpu (
-    if /I NOT %ARCH% == gpu (
-        ECHO ERROR: Invalid --arch parameters, please choose 'cpu' or 'gpu'
-        goto EOF
+    if /I NOT %ARCH% == cpu (
+        if /I NOT %ARCH% == gpu (
+            ECHO ERROR: Invalid --arch parameters, please choose 'cpu' or 'gpu'
+            goto EOF
+        )
     )
-)
 
-if /I NOT %TEST% == on (
-    if /I NOT %TEST% == off (
-        ECHO ERROR: Invalid --test parameters, please choose 'on' or 'off'
-        goto EOF
+    if /I NOT %TEST% == on (
+        if /I NOT %TEST% == off (
+            ECHO ERROR: Invalid --test parameters, please choose 'on' or 'off'
+            goto EOF
+        )
     )
-)
-
 
 ECHO Automatic build script of radarsimcpp/radarsimpy for Windows
 ECHO:
@@ -118,11 +117,11 @@ DEL ".\src\*.html"
 ECHO ## Build completed ##
 
 if /I %TEST% == on (
-ECHO ## Run Google test ##
-.\src\radarsimcpp\build\Release\radarsimcpp_test.exe
+    ECHO ## Run Google test ##
+    .\src\radarsimcpp\build\Release\radarsimcpp_test.exe
 
-ECHO ## Pytest ##
-pytest
+    ECHO ## Pytest ##
+    pytest
 )
 
 :EOF

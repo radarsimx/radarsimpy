@@ -2,17 +2,17 @@
 
 Help()
 {
-   # Display Help
-   echo
-   echo "Usages:"
-   echo
-   echo "Syntax: build_linux.sh --tier=[standard|free] --arch=[cpu|gpu] --test=[on|off]"
-   echo "options:"
-   echo "   --help	Show the usages of the parameters"
-   echo "   --tier	Build tier, choose 'standard' or 'free'. Default is 'standard'"
-   echo "   --arch	Build architecture, choose 'cpu' or 'gpu'. Default is 'cpu'"
-   echo "   --test	Enable or disable unit test, choose 'on' or 'off'. Default is 'on'"
-   echo
+    # Display Help
+    echo
+    echo "Usages:"
+    echo
+    echo "Syntax: build_linux.sh --tier=[standard|free] --arch=[cpu|gpu] --test=[on|off]"
+    echo "options:"
+    echo "    --help    Show the usages of the parameters"
+    echo "    --tier    Build tier, choose 'standard' or 'free'. Default is 'standard'"
+    echo "    --arch    Build architecture, choose 'cpu' or 'gpu'. Default is 'cpu'"
+    echo "    --test    Enable or disable unit test, choose 'on' or 'off'. Default is 'on'"
+    echo
 }
 
 TIER="standard"
@@ -20,29 +20,29 @@ ARCH="cpu"
 TEST="on"
 
 for i in "$@"; do
-  case $i in
-    --help*)
-      Help
-      exit;;
-    --tier=*)
-      TIER="${i#*=}"
-      shift # past argument
-      ;;
-    --arch=*)
-      ARCH="${i#*=}"
-      shift # past argument
-      ;;
-    --test=*)
-      TEST="${i#*=}"
-      shift # past argument
-      ;;
-    --*)
-      echo "Unknown option $1"
-      exit 1
-      ;;
-    *)
-      ;;
-  esac
+    case $i in
+        --help*)
+            Help
+            exit;;
+        --tier=*)
+            TIER="${i#*=}"
+            shift # past argument
+            ;;
+        --arch=*)
+            ARCH="${i#*=}"
+            shift # past argument
+            ;;
+        --test=*)
+            TEST="${i#*=}"
+            shift # past argument
+            ;;
+        --*)
+            echo "Unknown option $1"
+            exit 1
+            ;;
+        *)
+            ;;
+    esac
 done
 
 if [ "${TIER,,}" != "standard" ] && [ "${TIER,,}" != "free" ]; then
