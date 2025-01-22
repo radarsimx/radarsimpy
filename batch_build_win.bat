@@ -34,7 +34,7 @@ CD ".\src\radarsimcpp\build"
 
 REM Build C++ library with CMake
 ECHO ## Building radarsimcpp.dll with MSVC ##
-cmake -DGTEST=ON ..  REM Enable Google Test framework
+cmake -DGTEST=ON ..
 cmake --build . --config Release
 
 REM Build Python extensions for multiple Python versions (Free Tier)

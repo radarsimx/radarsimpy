@@ -1,9 +1,9 @@
 @ECHO OFF
 
 REM Default build configuration
-set TIER=standard    REM Build tier: standard or free version
-set ARCH=cpu        REM Target architecture: CPU or GPU acceleration
-set TEST=on         REM Enable/disable unit testing
+set TIER=standard
+set ARCH=cpu
+set TEST=on
 
 goto GETOPTS
 
@@ -22,9 +22,9 @@ REM Command line parameter parsing section
 :GETOPTS
     REM Parse command line arguments
     if /I "%1" == "--help" goto Help
-    if /I "%1" == "--tier" set TIER=%2 & shift    REM Set build tier
-    if /I "%1" == "--arch" set ARCH=%2 & shift    REM Set target architecture
-    if /I "%1" == "--test" set TEST=%2 & shift    REM Set test mode
+    if /I "%1" == "--tier" set TIER=%2 & shift
+    if /I "%1" == "--arch" set ARCH=%2 & shift
+    if /I "%1" == "--test" set TEST=%2 & shift
     shift
     if not "%1" == "" goto GETOPTS
 
@@ -90,18 +90,18 @@ ECHO ## Building radarsimcpp.dll with MSVC ##
 @REM MSVC requires explicit Release configuration
 if /I %ARCH% == gpu (
     if /I %TEST% == on (
-        cmake -DGPU_BUILD=ON -DGTEST=ON ..    REM GPU build with tests
+        cmake -DGPU_BUILD=ON -DGTEST=ON ..
     ) else (
-        cmake -DGPU_BUILD=ON -DGTEST=OFF ..   REM GPU build without tests
+        cmake -DGPU_BUILD=ON -DGTEST=OFF ..
     )
 ) else if /I %ARCH% == cpu (
     if /I %TEST% == on (
-        cmake -DGTEST=ON ..                   REM CPU build with tests
+        cmake -DGTEST=ON ..
     ) else (
-        cmake -DGTEST=OFF ..                  REM CPU build without tests
+        cmake -DGTEST=OFF ..
     )
 )
-cmake --build . --config Release              REM Build the project
+cmake --build . --config Release
 
 REM Build Python extensions using Cython
 ECHO ## Building radarsimpy with Cython ##
@@ -132,10 +132,10 @@ DEL ".\src\*.html"
 REM Run tests if enabled
 if /I %TEST% == on (
     ECHO ## Run Google test ##
-    .\src\radarsimcpp\build\Release\radarsimcpp_test.exe    REM Run C++ tests
+    .\src\radarsimcpp\build\Release\radarsimcpp_test.exe
 
     ECHO ## Pytest ##
-    pytest    REM Run Python tests
+    pytest
 )
 
 :EOF

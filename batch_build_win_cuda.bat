@@ -34,7 +34,7 @@ CD ".\src\radarsimcpp\build"
 
 REM Build C++ library with CMake (with CUDA support)
 ECHO ## Building radarsimcpp.dll with MSVC ##
-cmake -DGPU_BUILD=ON -DGTEST=ON ..  REM Enable CUDA and Google Test
+cmake -DGPU_BUILD=ON -DGTEST=ON ..
 cmake --build . --config Release
 
 REM Build Python extensions for multiple Python versions (Free Tier)
