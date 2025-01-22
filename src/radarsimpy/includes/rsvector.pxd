@@ -20,24 +20,24 @@ A Python module for radar simulation
 """
 
 """
-rsvector
-
-vector library
+rsvector - Vector library module
 """
+
 cdef extern from "rsvector.hpp" namespace "rsv" nogil:
-    # 3D vector
+    # 3D vector class
     cdef cppclass Vec3[T]:
-        Vec3()
-        Vec3(const T & ...)
-        Vec3(T * )
+        Vec3() except +
+        Vec3(const T&, const T&, const T&) except +
+        Vec3(T*) except +
 
-        inline Vec3 & operator = (const Vec3 &)
-        inline T & operator[](const unsigned int &)
+        Vec3& operator=(const Vec3&)
+        T& operator[](const unsigned int&)
 
+    # 2D vector class
     cdef cppclass Vec2[T]:
-        Vec2()
-        Vec2(const T & ...)
-        Vec2(T * )
+        Vec2() except +
+        Vec2(const T&, const T&) except +
+        Vec2(T*) except +
 
-        inline Vec2 & operator = (const Vec2 &)
-        inline T & operator[](const unsigned int &)
+        Vec2& operator=(const Vec2&)
+        T& operator[](const unsigned int&)
