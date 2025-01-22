@@ -1,11 +1,13 @@
 @ECHO OFF
 
-set TIER=standard
-set ARCH=cpu
-set TEST=on
+REM Default build configuration
+set TIER=standard    REM Build tier: standard or free version
+set ARCH=cpu        REM Target architecture: CPU or GPU acceleration
+set TEST=on         REM Enable/disable unit testing
 
 goto GETOPTS
 
+REM Help section - displays command line parameter usage
 :Help
     ECHO:
     ECHO Usages:
@@ -16,14 +18,17 @@ goto GETOPTS
     ECHO:
     goto EOF
 
+REM Command line parameter parsing section
 :GETOPTS
+    REM Parse command line arguments
     if /I "%1" == "--help" goto Help
-    if /I "%1" == "--tier" set TIER=%2 & shift
-    if /I "%1" == "--arch" set ARCH=%2 & shift
-    if /I "%1" == "--test" set TEST=%2 & shift
+    if /I "%1" == "--tier" set TIER=%2 & shift    REM Set build tier
+    if /I "%1" == "--arch" set ARCH=%2 & shift    REM Set target architecture
+    if /I "%1" == "--test" set TEST=%2 & shift    REM Set test mode
     shift
     if not "%1" == "" goto GETOPTS
 
+    REM Validate tier parameter
     if /I NOT %TIER% == free (
         if /I NOT %TIER% == standard (
             ECHO ERROR: Invalid --tier parameters, please choose 'free' or 'standard'
@@ -31,6 +36,7 @@ goto GETOPTS
         )
     )
 
+    REM Validate architecture parameter
     if /I NOT %ARCH% == cpu (
         if /I NOT %ARCH% == gpu (
             ECHO ERROR: Invalid --arch parameters, please choose 'cpu' or 'gpu'
@@ -38,6 +44,7 @@ goto GETOPTS
         )
     )
 
+    REM Validate test parameter
     if /I NOT %TEST% == on (
         if /I NOT %TEST% == off (
             ECHO ERROR: Invalid --test parameters, please choose 'on' or 'off'
@@ -45,6 +52,7 @@ goto GETOPTS
         )
     )
 
+REM Display banner and copyright information
 ECHO Automatic build script of radarsimcpp/radarsimpy for Windows
 ECHO:
 ECHO ----------
@@ -62,44 +70,51 @@ ECHO  #    #  #    # #    # #    # #   #  #     # # #    #  #   #
 ECHO  #     # #    # #####  #    # #    #  #####  # #    # #     # 
 ECHO:
 
+REM Store current directory for later use
 SET pwd=%cd%
 
+REM Clean up previous build artifacts
 ECHO clean old build files
 RMDIR /Q/S .\src\radarsimcpp\build
 
 ECHO clean old radarsimpy module
 RMDIR /Q/S .\radarsimpy
 
-@REM go to the build folder
+REM Create and enter build directory
+@REM Create fresh build directory and change to it
 MD ".\src\radarsimcpp\build"
 CD ".\src\radarsimcpp\build"
 
+REM Configure CMake build based on architecture and test settings
 ECHO ## Building radarsimcpp.dll with MSVC ##
-@REM MSVC needs to set the build type using '--config Relesae' 
+@REM MSVC requires explicit Release configuration
 if /I %ARCH% == gpu (
     if /I %TEST% == on (
-        cmake -DGPU_BUILD=ON -DGTEST=ON ..
+        cmake -DGPU_BUILD=ON -DGTEST=ON ..    REM GPU build with tests
     ) else (
-        cmake -DGPU_BUILD=ON -DGTEST=OFF ..
+        cmake -DGPU_BUILD=ON -DGTEST=OFF ..   REM GPU build without tests
     )
 ) else if /I %ARCH% == cpu (
     if /I %TEST% == on (
-        cmake -DGTEST=ON ..
+        cmake -DGTEST=ON ..                   REM CPU build with tests
     ) else (
-        cmake -DGTEST=OFF ..
+        cmake -DGTEST=OFF ..                  REM CPU build without tests
     )
 )
-cmake --build . --config Release
+cmake --build . --config Release              REM Build the project
 
+REM Build Python extensions using Cython
 ECHO ## Building radarsimpy with Cython ##
 CD %pwd%
 python setup.py build_ext -b ./ --tier %TIER% --arch %ARCH%
 
+REM Copy built artifacts to final locations
 ECHO ## Copying dll files to ./radarsimpy ##
 XCOPY ".\src\radarsimcpp\build\Release\radarsimcpp.dll" ".\radarsimpy\"
 XCOPY ".\src\radarsimpy\*.py" ".\radarsimpy\"
 XCOPY ".\src\radarsimpy\lib\__init__.py" ".\radarsimpy\lib\"
 
+REM Clean up intermediate build files
 ECHO ## Cleaning radarsimpy builds ##
 RMDIR build /s /q
 
@@ -114,14 +129,13 @@ DEL ".\src\radarsimpy\lib\*.html"
 DEL ".\src\*.cpp"
 DEL ".\src\*.html"
 
-ECHO ## Build completed ##
-
+REM Run tests if enabled
 if /I %TEST% == on (
     ECHO ## Run Google test ##
-    .\src\radarsimcpp\build\Release\radarsimcpp_test.exe
+    .\src\radarsimcpp\build\Release\radarsimcpp_test.exe    REM Run C++ tests
 
     ECHO ## Pytest ##
-    pytest
+    pytest    REM Run Python tests
 )
 
 :EOF
