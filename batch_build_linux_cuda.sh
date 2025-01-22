@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Display banner and copyright information
 echo "Automatic build script of radarsimcpp/radarsimpy for Linux"
 echo ""
 echo "----------"
@@ -15,35 +16,42 @@ echo "██╔══██╗██╔══██║██║  ██║██
 echo "██║  ██║██║  ██║██████╔╝██║  ██║██║  ██║███████║██║██║ ╚═╝ ██║██╔╝ ██╗"
 echo "╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝"
 
+# Store current working directory for later reference
 workpath=$(pwd)
 
+# Clean previous build artifacts and directories
 echo "## Clean old build files ##"
 rm -rf ./src/radarsimcpp/build
 rm -rf ./radarsimpy
 
+# Build CUDA-enabled C++ library
 echo "## Building libradarsimcpp.so with GPU ##"
 mkdir ./src/radarsimcpp/build 
 cd ./src/radarsimcpp/build
 
+# Configure CMake for GPU build with CUDA support
 cmake -DCMAKE_BUILD_TYPE=Release -DGPU_BUILD=ON -DGTEST=ON ..
 cmake --build .
 
+# Build Python extensions for multiple Python versions (Free Tier)
 echo "## Building radarsimpy with Cython ##"
 cd $workpath
+# Build GPU-enabled extensions for Python 3.9-3.12
 conda run -n py312 python setup.py build_ext -b ./ --tier free --arch gpu
 conda run -n py311 python setup.py build_ext -b ./ --tier free --arch gpu
 conda run -n py310 python setup.py build_ext -b ./ --tier free --arch gpu
 conda run -n py39 python setup.py build_ext -b ./ --tier free --arch gpu
 
+# Copy built libraries and Python files
 echo "## Copying lib files to ./radarsimpy ##"
-
 cp ./src/radarsimpy/*.py ./radarsimpy
 cp ./src/radarsimpy/lib/__init__.py ./radarsimpy/lib
 cp ./src/radarsimcpp/build/*.so ./radarsimpy
 
+# Clean intermediate build files
 echo "## Cleaning radarsimpy builds ##"
 rm -rf build
-
+# Remove generated C/C++/HTML files
 rm -f ./src/radarsimpy/*.c
 rm -f ./src/radarsimpy/*.cpp
 rm -f ./src/radarsimpy/*.html
@@ -55,29 +63,30 @@ rm -f ./src/radarsimpy/lib/*.html
 rm -f ./src/*.cpp
 rm -f ./src/*.html
 
+# Package Free Tier GPU release
 echo "## Copying lib files to freetier release folder ##"
-
 rm -rf ./Linux_x86_64_GPU_FreeTier
 mkdir ./Linux_x86_64_GPU_FreeTier
 mkdir ./Linux_x86_64_GPU_FreeTier/radarsimpy
 cp -rf ./radarsimpy/* ./Linux_x86_64_GPU_FreeTier/radarsimpy
 
+# Clean and rebuild for Standard Tier
 rm -rf ./radarsimpy
-
+# Build GPU-enabled extensions for Standard Tier
 conda run -n py312 python setup.py build_ext -b ./ --tier standard --arch gpu
 conda run -n py311 python setup.py build_ext -b ./ --tier standard --arch gpu
 conda run -n py310 python setup.py build_ext -b ./ --tier standard --arch gpu
 conda run -n py39 python setup.py build_ext -b ./ --tier standard --arch gpu
 
+# Copy files for Standard Tier
 echo "## Copying lib files to ./radarsimpy ##"
-# mkdir ./radarsimpy
 cp ./src/radarsimpy/*.py ./radarsimpy
 cp ./src/radarsimpy/lib/__init__.py ./radarsimpy/lib
 cp ./src/radarsimcpp/build/*.so ./radarsimpy
 
+# Final cleanup of build artifacts
 echo "## Cleaning radarsimpy builds ##"
 rm -rf build
-
 rm -f ./src/radarsimpy/*.c
 rm -f ./src/radarsimpy/*.cpp
 rm -f ./src/radarsimpy/*.html
@@ -89,14 +98,14 @@ rm -f ./src/radarsimpy/lib/*.html
 rm -f ./src/*.cpp
 rm -f ./src/*.html
 
+# Package Standard Tier GPU release
 echo "## Copying lib files to standard release folder ##"
-
 rm -rf ./Linux_x86_64_GPU
 mkdir ./Linux_x86_64_GPU
 mkdir ./Linux_x86_64_GPU/radarsimpy
 cp -rf ./radarsimpy/* ./Linux_x86_64_GPU/radarsimpy
 
+# Run unit tests
 echo "## Build completed ##"
-
 echo "## Run Google test ##"
 ./src/radarsimcpp/build/radarsimcpp_test
