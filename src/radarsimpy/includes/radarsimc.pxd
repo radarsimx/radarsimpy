@@ -42,7 +42,7 @@ cdef extern from "libs/free_tier.hpp":
     cdef int IsFreeTier() except +
 
 #------------------------------------------------------------------------------
-# Target and Ray Classes
+# Target
 #------------------------------------------------------------------------------
 cdef extern from "target.hpp":
     cdef cppclass Target[T]:
@@ -71,6 +71,9 @@ cdef extern from "target.hpp":
                const Vec3[T] & rotation_rate,
                const bool & is_ground) except +
 
+#------------------------------------------------------------------------------
+# Ray
+#------------------------------------------------------------------------------
 cdef extern from "ray.hpp":
     cdef cppclass Ray[T]:
         Ray() except +
@@ -79,7 +82,7 @@ cdef extern from "ray.hpp":
         int reflections_
 
 #------------------------------------------------------------------------------
-# RCS and Point Cloud
+# RCS
 #------------------------------------------------------------------------------
 cdef extern from "rcs.hpp":
     cdef cppclass Rcs[T]:
@@ -94,6 +97,9 @@ cdef extern from "rcs.hpp":
 
         T CalculateRcs()
 
+#------------------------------------------------------------------------------
+# Point Cloud
+#------------------------------------------------------------------------------
 cdef extern from "pointcloud.hpp":
     cdef cppclass PointCloud[T]:
         PointCloud() except +
@@ -104,6 +110,9 @@ cdef extern from "pointcloud.hpp":
 
         vector[Ray[T]] cloud_
 
+#------------------------------------------------------------------------------
+# Point Target
+#------------------------------------------------------------------------------
 cdef extern from "point.hpp":
     cdef cppclass Point[T]:
         Point() except +
@@ -184,6 +193,9 @@ cdef extern from "radar.hpp":
               vector[Vec3[L]] & rotation_array,
               Vec3[L] rotrate_array) except +
 
+#------------------------------------------------------------------------------
+# Snapshot
+#------------------------------------------------------------------------------
 cdef extern from "snapshot.hpp":
     cdef cppclass Snapshot[T]:
         Snapshot() except +
