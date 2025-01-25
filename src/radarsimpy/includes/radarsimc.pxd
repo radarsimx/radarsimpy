@@ -208,17 +208,17 @@ cdef extern from "snapshot.hpp":
 #------------------------------------------------------------------------------
 # Simulators
 #------------------------------------------------------------------------------
-cdef extern from "simulator_ideal.hpp":
-    cdef cppclass IdealSimulator[H, L]:
-        IdealSimulator() except +
+cdef extern from "simulator_point.hpp":
+    cdef cppclass PointSimulator[H, L]:
+        PointSimulator() except +
         void Run(Radar[H, L] radar,
                  vector[Point[L]] points,
                  double * bb_real,
                  double * bb_imag)
 
-cdef extern from "simulator_scene.hpp":
-    cdef cppclass SceneSimulator[H, L]:
-        SceneSimulator() except +
+cdef extern from "simulator_mesh.hpp":
+    cdef cppclass MeshSimulator[H, L]:
+        MeshSimulator() except +
         void Run(Radar[H, L] & radar,
                  vector[Target[L]] & targets,
                  int level,

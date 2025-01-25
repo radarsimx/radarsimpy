@@ -48,8 +48,8 @@ from radarsimpy.includes.radarsimc cimport (
     Snapshot,
     Point,
     Target,
-    SceneSimulator,
-    IdealSimulator,
+    MeshSimulator,
+    PointSimulator,
     InterferenceSimulator,
     IsFreeTier
 )
@@ -164,8 +164,8 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None,
         
     # Simulator instances
     cdef:
-        SceneSimulator[double, float_t] scene_c
-        IdealSimulator[double, float_t] sim_c
+        MeshSimulator[double, float_t] scene_c
+        PointSimulator[double, float_t] sim_c
         InterferenceSimulator[double, float_t] int_sim_c
 
     # Size and index variables
