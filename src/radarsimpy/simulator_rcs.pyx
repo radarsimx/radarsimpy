@@ -32,7 +32,7 @@ cimport numpy as np
 # Local imports
 from radarsimpy.includes.rsvector cimport Vec3
 from radarsimpy.includes.type_def cimport vector
-from radarsimpy.includes.radarsimc cimport Target, Rcs, IsFreeTier
+from radarsimpy.includes.radarsimc cimport Target, RcsSimulator, IsFreeTier
 from radarsimpy.lib.cp_radarsimc cimport cp_RCS_Target
 from libcpp.complex cimport complex as cpp_complex
 
@@ -172,7 +172,7 @@ cpdef sim_rcs(
     )
 
     # Calculate RCS
-    cdef Rcs[double] rcs = Rcs[double](
+    cdef RcsSimulator[double] rcs = RcsSimulator[double](
         targets_vt,
         inc_dir,
         obs_dir,
@@ -182,4 +182,4 @@ cpdef sim_rcs(
         <double>density
     )
 
-    return rcs.CalculateRcs()
+    return rcs.Run()

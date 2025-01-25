@@ -28,7 +28,7 @@ cimport numpy as np
 cimport cython
 
 # RadarSimX imports
-from radarsimpy.includes.radarsimc cimport Target, PointCloud
+from radarsimpy.includes.radarsimc cimport Target, LidarSimulator
 from radarsimpy.includes.radarsimc cimport Mem_Copy
 from radarsimpy.includes.rsvector cimport Vec3
 from radarsimpy.includes.type_def cimport float_t, int_t, vector
@@ -94,7 +94,7 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
     :rtype:  
         numpy.ndarray - A structured array representing the Lidar ray interactions with the scene, including details such as ray origins, directions, and intersections.
     """
-    cdef PointCloud[float_t] pointcloud_c
+    cdef LidarSimulator[float_t] pointcloud_c
     
     # Memory view declarations
     cdef float_t[:, :] points_mv
@@ -171,7 +171,7 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
     Mem_Copy(&theta_mv[0], <int_t>(theta_mv.shape[0]), theta_vt)
 
     # Perform ray tracing
-    pointcloud_c.Sbr(phi_vt,
+    pointcloud_c.Run(phi_vt,
                      theta_vt,
                      Vec3[float_t](&position_mv[0]))
 

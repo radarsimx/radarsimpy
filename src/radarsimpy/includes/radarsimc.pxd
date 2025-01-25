@@ -84,10 +84,10 @@ cdef extern from "ray.hpp":
 #------------------------------------------------------------------------------
 # RCS
 #------------------------------------------------------------------------------
-cdef extern from "rcs.hpp":
-    cdef cppclass Rcs[T]:
-        Rcs() except +
-        Rcs(vector[Target[float]] & targets,
+cdef extern from "simulator_rcs.hpp":
+    cdef cppclass RcsSimulator[T]:
+        RcsSimulator() except +
+        RcsSimulator(vector[Target[float]] & targets,
             const Vec3[T] & inc_dir,
             const Vec3[T] & obs_dir,
             const Vec3[cpp_complex[T]] & inc_polarization,
@@ -95,16 +95,16 @@ cdef extern from "rcs.hpp":
             const T & frequency,
             const T & density) except +
 
-        T CalculateRcs()
+        T Run()
 
 #------------------------------------------------------------------------------
 # Point Cloud
 #------------------------------------------------------------------------------
-cdef extern from "pointcloud.hpp":
-    cdef cppclass PointCloud[T]:
-        PointCloud() except +
+cdef extern from "simulator_lidar.hpp":
+    cdef cppclass LidarSimulator[T]:
+        LidarSimulator() except +
         void AddTarget(const Target[T] & target)
-        void Sbr(const vector[T] & phi,
+        void Run(const vector[T] & phi,
                  const vector[T] & theta,
                  const Vec3[T] & position)
 
