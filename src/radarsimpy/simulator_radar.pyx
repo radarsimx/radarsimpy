@@ -194,7 +194,6 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None,
             raise Exception("You're currently using RadarSimPy's FreeTier, which imposes a restriction on the maximum number of receiver channels to 1. Please consider supporting my work by upgrading to the standard version. Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ to access the standard version download links. Your support will help improve the software. Thank you for considering it.")
 
     # Basic setup
-    flag_run_scene = False
     frame_start_time = np.array(frame_time, dtype=np.float64)
     log_path_c = str.encode(log_path) if log_path is not None else str.encode("")
 
@@ -243,7 +242,6 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None,
     # Process each target
     for _, tgt in enumerate(targets):
         if "model" in tgt:
-            flag_run_scene = True
             target_vt.push_back(cp_Target(radar, tgt, timestamp))
         else:
             loc = tgt["location"]
@@ -274,7 +272,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None,
         baseband = 0
 
     # Run scene simulation if there are 3D mesh targets
-    if flag_run_scene:
+    if target_vt.size() > 0:
         """
         Snapshot
         """
