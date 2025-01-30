@@ -192,6 +192,10 @@ cdef extern from "radar.hpp":
               Vec3[L] speed_array,
               vector[Vec3[L]] & rotation_array,
               Vec3[L] rotrate_array) except +
+        void InitBaseband(H *bb_real,
+                          H *bb_imag) except +
+        void SyncBaseband() except +
+        void ResetBaseband() except +
         void FreeDeviceMemory() except +
 
 #------------------------------------------------------------------------------
@@ -213,9 +217,7 @@ cdef extern from "simulator_point.hpp":
     cdef cppclass PointSimulator[H, L]:
         PointSimulator() except +
         void Run(Radar[H, L] & radar,
-                 vector[Point[L]] & points,
-                 double * bb_real,
-                 double * bb_imag)
+                 vector[Point[L]] & points)
 
 cdef extern from "simulator_mesh.hpp":
     cdef cppclass MeshSimulator[H, L]:
@@ -227,9 +229,7 @@ cdef extern from "simulator_mesh.hpp":
                  vector[Snapshot[L]] & snapshots,
                  L density,
                  Vec2[int_t] ray_filter,
-                 string log_path,
-                 double * bb_real,
-                 double * bb_imag)
+                 string log_path)
 
 cdef extern from "simulator_interference.hpp":
     cdef cppclass InterferenceSimulator[H, L]:

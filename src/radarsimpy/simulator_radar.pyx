@@ -258,18 +258,21 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None,
     cdef double[:,:,::1] bb_real = np.empty(ts_shape, order='C', dtype=np.float64)
     cdef double[:,:,::1] bb_imag = np.empty(ts_shape, order='C', dtype=np.float64)
 
+    radar_c.InitBaseband(&bb_real[0][0][0],
+                         &bb_imag[0][0][0])
+
     #----------------------
     # Simulation Execution
     #----------------------
     # Run ideal point target simulation
     if point_vt.size() > 0:
-        sim_c.Run(radar_c, point_vt, &bb_real[0][0][0], &bb_imag[0][0][0])
-        if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
-            baseband = np.asarray(bb_real)
-        else:
-            baseband = np.asarray(bb_real)+1j*np.asarray(bb_imag)
-    else:
-        baseband = 0
+        sim_c.Run(radar_c, point_vt)
+    #     if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
+    #         baseband = np.asarray(bb_real)
+    #     else:
+    #         baseband = np.asarray(bb_real)+1j*np.asarray(bb_imag)
+    # else:
+    #     baseband = 0
 
     # Run scene simulation if there are 3D mesh targets
     if target_vt.size() > 0:
@@ -314,14 +317,14 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None,
             snaps,
             <float_t> density,
             ray_filter_c,
-            log_path_c,
-            &bb_real[0][0][0],
-            &bb_imag[0][0][0])
+            log_path_c)
 
-        if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
-            baseband = baseband+np.asarray(bb_real)
-        else:
-            baseband = baseband+np.asarray(bb_real)+1j*np.asarray(bb_imag)
+    radar_c.SyncBaseband()
+
+    if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
+        baseband = np.asarray(bb_real)
+    else:
+        baseband = np.asarray(bb_real)+1j*np.asarray(bb_imag)
 
     #----------------------
     # Noise Generation
@@ -356,6 +359,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None,
     # Run interference simulation if interference radar is provided
     if interf is not None:
         interf_radar_c = cp_Radar(interf, frame_start_time)
+        radar_c.ResetBaseband()
 
         int_sim_c.Run(radar_c, interf_radar_c, &bb_real[0][0][0], &bb_imag[0][0][0])
 
