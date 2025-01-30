@@ -235,6 +235,4 @@ cdef extern from "simulator_interference.hpp":
     cdef cppclass InterferenceSimulator[H, L]:
         InterferenceSimulator() except +
         void Run(Radar[H, L] & radar,
-                 Radar[H, L] & interf_radar,
-                 double *interf_bb_real,
-                 double *interf_bb_imag)
+                 Radar[H, L] & interf_radar)
