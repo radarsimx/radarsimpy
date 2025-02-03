@@ -267,12 +267,6 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None,
     # Run ideal point target simulation
     if point_vt.size() > 0:
         sim_c.Run(radar_c, point_vt)
-    #     if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
-    #         baseband = np.asarray(bb_real)
-    #     else:
-    #         baseband = np.asarray(bb_real)+1j*np.asarray(bb_imag)
-    # else:
-    #     baseband = 0
 
     # Run scene simulation if there are 3D mesh targets
     if target_vt.size() > 0:
