@@ -172,14 +172,13 @@ cpdef sim_rcs(
     )
 
     # Calculate RCS
-    cdef RcsSimulator[double] rcs = RcsSimulator[double](
+    cdef RcsSimulator[double] rcs = RcsSimulator[double]()
+
+    return rcs.Run(
         targets_vt,
         inc_dir,
         obs_dir,
         inc_pol_cpp,
         obs_pol_cpp,
         <double>f,
-        <double>density
-    )
-
-    return rcs.Run()
+        <double>density)
