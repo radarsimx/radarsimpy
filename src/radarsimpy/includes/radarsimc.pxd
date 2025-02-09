@@ -87,15 +87,13 @@ cdef extern from "ray.hpp":
 cdef extern from "simulator_rcs.hpp":
     cdef cppclass RcsSimulator[T]:
         RcsSimulator() except +
-        RcsSimulator(vector[Target[float]] & targets,
-            const Vec3[T] & inc_dir,
-            const Vec3[T] & obs_dir,
-            const Vec3[cpp_complex[T]] & inc_polarization,
-            const Vec3[cpp_complex[T]] & obs_polarization,
-            const T & frequency,
-            const T & density) except +
-
-        T Run()
+        T Run(vector[Target[float]] & targets,
+              const Vec3[T] & inc_dir,
+              const Vec3[T] & obs_dir,
+              const Vec3[cpp_complex[T]] & inc_polarization,
+              const Vec3[cpp_complex[T]] & obs_polarization,
+              const T & frequency,
+              const T & density) except +
 
 #------------------------------------------------------------------------------
 # Point Cloud
