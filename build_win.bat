@@ -133,9 +133,17 @@ REM Run tests if enabled
 if /I %TEST% == on (
     ECHO ## Run Google test ##
     .\src\radarsimcpp\build\Release\radarsimcpp_test.exe
+    if errorlevel 1 (
+        echo Google test failed!
+        exit /b 1
+    )
 
     ECHO ## Pytest ##
     pytest
+    if errorlevel 1 (
+        echo Pytest failed!
+        exit /b 1
+    )
 )
 
 :EOF
