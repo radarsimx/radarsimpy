@@ -161,5 +161,4 @@ if [ "${TEST,,}" == "on" ]; then
     return_code=$(($return_code + $?))
 fi
 
-# exit $return_code
-exit 1
+exit $return_code
