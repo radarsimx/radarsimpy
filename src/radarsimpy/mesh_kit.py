@@ -62,7 +62,7 @@ def import_mesh_module() -> dict:
     :rtype: dict
     :raises ImportError: If no valid mesh processing module is found
     """
-    module_list = ["pyvista", "pymeshlab", "trimesh", "meshio"]
+    module_list = ["trimesh", "pyvista", "pymeshlab", "meshio"]
 
     for _, module_name in enumerate(module_list):
         if check_module_installed(module_name):

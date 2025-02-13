@@ -1,6 +1,6 @@
 numpy
 scipy
-pyvista
+trimesh
 cython
 setuptools
 pytest
