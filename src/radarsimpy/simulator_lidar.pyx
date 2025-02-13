@@ -33,6 +33,8 @@ from radarsimpy.includes.radarsimc cimport Mem_Copy
 from radarsimpy.includes.rsvector cimport Vec3
 from radarsimpy.includes.type_def cimport float_t, int_t, vector
 
+from radarsimpy.mesh_kit import import_mesh_module, load_mesh
+
 np.import_array()
 np_float = np.float32
 
@@ -108,31 +110,15 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
     cdef int_t idx_c
 
     # Process targets
+    module_dict = import_mesh_module()
     for idx_c in range(0, len(targets)):
         # Unit conversion
         unit = targets[idx_c].get("unit", "m")
         scale = 1000 if unit == "mm" else 100 if unit == "cm" else 1
 
-        # Model loading
-        try:
-            import pymeshlab
-            ms = pymeshlab.MeshSet()
-            ms.load_new_mesh(targets[idx_c]["model"])
-            t_mesh = ms.current_mesh()
-            v_matrix = np.array(t_mesh.vertex_matrix())
-            f_matrix = np.array(t_mesh.face_matrix())
-            if np.isfortran(v_matrix):
-                points_mv = np.ascontiguousarray(v_matrix).astype(np_float)/scale
-                cells_mv = np.ascontiguousarray(f_matrix).astype(np.int32)
-            ms.clear()
-        except ImportError:
-            try:
-                import meshio
-                t_mesh = meshio.read(targets[idx_c]["model"])
-                points_mv = t_mesh.points.astype(np_float)/scale
-                cells_mv = t_mesh.cells[0].data.astype(np.int32)
-            except ImportError:
-                raise("PyMeshLab is required to process the 3D model.")
+        mesh_data = load_mesh(targets[idx_c]["model"], scale, module_dict["module"], module_dict["name"])
+        points_mv = mesh_data["points"].astype(np_float)
+        cells_mv = mesh_data["cells"].astype(np.int32)
 
         # Target parameters
         origin_mv = np.array(targets[idx_c].get("origin", (0, 0, 0)), dtype=np_float)

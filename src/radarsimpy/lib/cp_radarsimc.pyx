@@ -625,7 +625,7 @@ cdef Target[float_t] cp_Target(radar,
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef Target[float_t] cp_RCS_Target(target):
+cdef Target[float_t] cp_RCS_Target(target, module_dict):
     """
     cp_RCS_Target((radar, target, shape)
 
@@ -649,28 +649,32 @@ cdef Target[float_t] cp_RCS_Target(target):
     unit = target.get("unit", "m")
     scale = {"m": 1, "cm": 100, "mm": 1000}.get(unit, 1)
 
+    mesh_data = load_mesh(target["model"], scale, module_dict["module"], module_dict["name"])
+    points_mv = mesh_data["points"].astype(np_float)
+    cells_mv = mesh_data["cells"].astype(np.int32)
+
     # Load mesh data
-    try:
-        import pymeshlab
-        ms = pymeshlab.MeshSet()
-        ms.load_new_mesh(target["model"])
-        t_mesh = ms.current_mesh()
-        v_matrix = np.array(t_mesh.vertex_matrix())
-        f_matrix = np.array(t_mesh.face_matrix())
+    # try:
+    #     import pymeshlab
+    #     ms = pymeshlab.MeshSet()
+    #     ms.load_new_mesh(target["model"])
+    #     t_mesh = ms.current_mesh()
+    #     v_matrix = np.array(t_mesh.vertex_matrix())
+    #     f_matrix = np.array(t_mesh.face_matrix())
         
-        if np.isfortran(v_matrix):
-            points_mv = np.ascontiguousarray(v_matrix).astype(np_float)/scale
-            cells_mv = np.ascontiguousarray(f_matrix).astype(np.int32)
-        ms.clear()
+    #     if np.isfortran(v_matrix):
+    #         points_mv = np.ascontiguousarray(v_matrix).astype(np_float)/scale
+    #         cells_mv = np.ascontiguousarray(f_matrix).astype(np.int32)
+    #     ms.clear()
         
-    except ImportError:
-        try:
-            import meshio
-            t_mesh = meshio.read(target["model"])
-            points_mv = t_mesh.points.astype(np_float)/scale
-            cells_mv = t_mesh.cells[0].data.astype(np.int32)
-        except ImportError:
-            raise("PyMeshLab is required to process the 3D model.")
+    # except ImportError:
+    #     try:
+    #         import meshio
+    #         t_mesh = meshio.read(target["model"])
+    #         points_mv = t_mesh.points.astype(np_float)/scale
+    #         cells_mv = t_mesh.cells[0].data.astype(np.int32)
+    #     except ImportError:
+    #         raise("PyMeshLab is required to process the 3D model.")
 
     # Check FreeTier mesh size limit
     if IsFreeTier() and cells_mv.shape[0] > 8:

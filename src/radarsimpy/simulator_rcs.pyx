@@ -36,6 +36,8 @@ from radarsimpy.includes.radarsimc cimport Target, RcsSimulator, IsFreeTier
 from radarsimpy.lib.cp_radarsimc cimport cp_RCS_Target
 from libcpp.complex cimport complex as cpp_complex
 
+from radarsimpy.mesh_kit import import_mesh_module
+
 # Initialize NumPy
 np.import_array()
 
@@ -149,8 +151,9 @@ cpdef sim_rcs(
     )
 
     # Process targets
+    module_dict = import_mesh_module()
     for idx_c in range(0, len(targets)):
-        targets_vt.push_back(cp_RCS_Target(targets[idx_c]))
+        targets_vt.push_back(cp_RCS_Target(targets[idx_c], module_dict))
 
     # Convert angles to radians
     inc_phi_rad = np.radians(inc_phi)
