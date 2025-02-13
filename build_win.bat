@@ -129,21 +129,24 @@ DEL ".\src\radarsimpy\lib\*.html"
 DEL ".\src\*.cpp"
 DEL ".\src\*.html"
 
+SET TEST_FAILED=0
 REM Run tests if enabled
 if /I %TEST% == on (
     ECHO ## Run Google test ##
     .\src\radarsimcpp\build\Release\radarsimcpp_test.exe
     if errorlevel 1 (
         echo Google test failed!
-        exit /b 1
+        SET TEST_FAILED=1
     )
 
     ECHO ## Pytest ##
     pytest
     if errorlevel 1 (
         echo Pytest failed!
-        exit /b 1
+        SET TEST_FAILED=1
     )
 )
+
+exit /b %TEST_FAILED%
 
 :EOF
