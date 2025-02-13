@@ -147,13 +147,18 @@ rm -f ./src/*.html
 
 echo "## Build completed ##"
 
+return_code = 0
 # Run tests if enabled
 if [ "${TEST,,}" == "on" ]; then
     # Run C++ unit tests using Google Test
     echo "## Run Google test ##"
     ./src/radarsimcpp/build/radarsimcpp_test
+    return_code = $(($return_code + $?))
 
     # Run Python unit tests using pytest
     echo "## Pytest ##"
     pytest
+    return_code = $(($return_code + $?))
 fi
+
+exit $return_code
