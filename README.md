@@ -109,7 +109,6 @@ Download the [pre-built module](https://radarsimx.com/product/radarsimpy/), and 
     - \_\_init__.py
     - radarsimcpp.dll
     - simulator.xxx.pyd
-    - rt.xxx.pyd
     - radar.py
     - processing.py
     - ...
@@ -124,7 +123,6 @@ Download the [pre-built module](https://radarsimx.com/product/radarsimpy/), and 
     - \_\_init__.py
     - libradarsimcpp.so
     - simulator.xxx.so
-    - rt.xxx.so
     - radar.py
     - processing.py
     - ...
@@ -139,7 +137,6 @@ Download the [pre-built module](https://radarsimx.com/product/radarsimpy/), and 
     - \_\_init__.py
     - libradarsimcpp.dylib
     - simulator.xxx.so
-    - rt.xxx.so
     - radar.py
     - processing.py
     - ...
