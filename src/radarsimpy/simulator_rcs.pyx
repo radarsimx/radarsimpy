@@ -151,9 +151,9 @@ cpdef sim_rcs(
     )
 
     # Process targets
-    module_dict = import_mesh_module()
+    mesh_module = import_mesh_module()
     for idx_c in range(0, len(targets)):
-        targets_vt.push_back(cp_RCS_Target(targets[idx_c], module_dict))
+        targets_vt.push_back(cp_RCS_Target(targets[idx_c], mesh_module))
 
     # Convert angles to radians
     inc_phi_rad = np.radians(inc_phi)

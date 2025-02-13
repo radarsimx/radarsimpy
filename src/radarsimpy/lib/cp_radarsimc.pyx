@@ -438,7 +438,7 @@ cdef Radar[double, float_t] cp_Radar(radar, frame_start_time):
 cdef Target[float_t] cp_Target(radar,
                                target,
                                timestamp,
-                               module_dict):
+                               mesh_module):
     """
     cp_Target((radar, target, ts_shape)
 
@@ -454,8 +454,6 @@ cdef Target[float_t] cp_Target(radar,
     :return: C++ object of a target
     :rtype: Target
     """
-    # timestamp = radar.time_prop["timestamp"]
-
     # vector of location, speed, rotation, rotation rate
     cdef vector[Vec3[float_t]] loc_vt
     cdef vector[Vec3[float_t]] spd_vt
@@ -480,31 +478,9 @@ cdef Target[float_t] cp_Target(radar,
     unit = target.get("unit", "m")
     scale = {"m": 1, "cm": 100, "mm": 1000}.get(unit, 1)
 
-    mesh_data = load_mesh(target["model"], scale, module_dict["module"], module_dict["name"])
+    mesh_data = load_mesh(target["model"], scale, mesh_module)
     points_mv = mesh_data["points"].astype(np_float)
     cells_mv = mesh_data["cells"].astype(np.int32)
-
-    # try:
-    #     import pymeshlab
-    # except:
-    #     try:
-    #         import meshio
-    #     except:
-    #         raise("PyMeshLab is requied to process the 3D model.")
-    #     else:
-    #         t_mesh = meshio.read(target["model"])
-    #         points_mv = t_mesh.points.astype(np_float)/scale
-    #         cells_mv = t_mesh.cells[0].data.astype(np.int32)
-    # else:
-    #     ms = pymeshlab.MeshSet()
-    #     ms.load_new_mesh(target["model"])
-    #     t_mesh = ms.current_mesh()
-    #     v_matrix = np.array(t_mesh.vertex_matrix())
-    #     f_matrix = np.array(t_mesh.face_matrix())
-    #     if np.isfortran(v_matrix):
-    #         points_mv = np.ascontiguousarray(v_matrix).astype(np_float)/scale
-    #         cells_mv = np.ascontiguousarray(f_matrix).astype(np.int32)
-    #     ms.clear()
     
     if IsFreeTier():
         if cells_mv.shape[0] > 8:
@@ -625,7 +601,7 @@ cdef Target[float_t] cp_Target(radar,
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef Target[float_t] cp_RCS_Target(target, module_dict):
+cdef Target[float_t] cp_RCS_Target(target, mesh_module):
     """
     cp_RCS_Target((radar, target, shape)
 
@@ -637,7 +613,6 @@ cdef Target[float_t] cp_RCS_Target(target, module_dict):
     :return: C++ object of a target
     :rtype: Target
     """
-    
     # Vector declarations
     cdef vector[Vec3[float_t]] loc_vt, spd_vt, rot_vt, rrt_vt
     cdef cpp_complex[float_t] ep_c, mu_c
@@ -649,32 +624,9 @@ cdef Target[float_t] cp_RCS_Target(target, module_dict):
     unit = target.get("unit", "m")
     scale = {"m": 1, "cm": 100, "mm": 1000}.get(unit, 1)
 
-    mesh_data = load_mesh(target["model"], scale, module_dict["module"], module_dict["name"])
+    mesh_data = load_mesh(target["model"], scale, mesh_module)
     points_mv = mesh_data["points"].astype(np_float)
     cells_mv = mesh_data["cells"].astype(np.int32)
-
-    # Load mesh data
-    # try:
-    #     import pymeshlab
-    #     ms = pymeshlab.MeshSet()
-    #     ms.load_new_mesh(target["model"])
-    #     t_mesh = ms.current_mesh()
-    #     v_matrix = np.array(t_mesh.vertex_matrix())
-    #     f_matrix = np.array(t_mesh.face_matrix())
-        
-    #     if np.isfortran(v_matrix):
-    #         points_mv = np.ascontiguousarray(v_matrix).astype(np_float)/scale
-    #         cells_mv = np.ascontiguousarray(f_matrix).astype(np.int32)
-    #     ms.clear()
-        
-    # except ImportError:
-    #     try:
-    #         import meshio
-    #         t_mesh = meshio.read(target["model"])
-    #         points_mv = t_mesh.points.astype(np_float)/scale
-    #         cells_mv = t_mesh.cells[0].data.astype(np.int32)
-    #     except ImportError:
-    #         raise("PyMeshLab is required to process the 3D model.")
 
     # Check FreeTier mesh size limit
     if IsFreeTier() and cells_mv.shape[0] > 8:

@@ -110,13 +110,13 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
     cdef int_t idx_c
 
     # Process targets
-    module_dict = import_mesh_module()
+    mesh_module = import_mesh_module()
     for idx_c in range(0, len(targets)):
         # Unit conversion
         unit = targets[idx_c].get("unit", "m")
         scale = 1000 if unit == "mm" else 100 if unit == "cm" else 1
 
-        mesh_data = load_mesh(targets[idx_c]["model"], scale, module_dict["module"], module_dict["name"])
+        mesh_data = load_mesh(targets[idx_c]["model"], scale, mesh_module)
         points_mv = mesh_data["points"].astype(np_float)
         cells_mv = mesh_data["cells"].astype(np.int32)
 

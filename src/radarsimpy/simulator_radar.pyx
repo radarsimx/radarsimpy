@@ -242,12 +242,12 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None,
     cdef double[:, :, :] timestamp_mv = timestamp.astype(np.float64)
 
     # Process each target
-    module_dict = None
+    mesh_module = None
     for _, tgt in enumerate(targets):
         if "model" in tgt:
-            if module_dict is None:
-                module_dict = import_mesh_module()
-            target_vt.push_back(cp_Target(radar, tgt, timestamp, module_dict))
+            if mesh_module is None:
+                mesh_module = import_mesh_module()
+            target_vt.push_back(cp_Target(radar, tgt, timestamp, mesh_module))
         else:
             loc = tgt["location"]
             spd = tgt.get("speed", (0, 0, 0))

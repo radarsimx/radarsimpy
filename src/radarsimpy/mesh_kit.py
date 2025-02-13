@@ -52,14 +52,14 @@ def safe_import(module_name: str) -> object:
         return None
 
 
-def import_mesh_module() -> dict:
+def import_mesh_module() -> object:
     """
     Import the first available mesh processing module from a predefined list
 
     Tries to import modules in this order: pyvista, pymeshlab, trimesh, meshio
 
-    :return: Dictionary containing the module name and the imported module object
-    :rtype: dict
+    :return: The mesh processing module object
+    :rtype: object
     :raises ImportError: If no valid mesh processing module is found
     """
     module_list = ["trimesh", "pyvista", "pymeshlab", "meshio"]
@@ -67,55 +67,60 @@ def import_mesh_module() -> dict:
     for _, module_name in enumerate(module_list):
         if check_module_installed(module_name):
             module = safe_import(module_name)
-            return {"name": module_name, "module": module}
+            return module
 
     raise ImportError(
-        "No valid module was found to process the 3D model file, please install one of the following modules: `pyvista`, `pymeshlab`, `trimesh`, `meshio`"
+        "No valid module was found to process the 3D model file, "
+        + "please install one of the following modules: "
+        + "`pyvista`, `pymeshlab`, `trimesh`, `meshio`"
     )
 
 
-def load_mesh(
-    mesh_file_name: str, scale: float, module: object, module_name: str
-) -> dict:
+def load_mesh(mesh_file_name: str, scale: float, mesh_module: object) -> dict:
     """
     Load a 3D mesh file using the specified module
 
     :param str mesh_file_name: Path to the mesh file
     :param float scale: Scale factor to apply to the mesh vertices
-    :param object module: The mesh processing module object
-    :param str module_name: Name of the mesh processing module being used
+    :param object mesh_module: The mesh processing module object
 
     :return: Dictionary containing mesh points and cells
     :rtype: dict with keys:
         - points (numpy.ndarray): Array of vertex coordinates
         - cells (numpy.ndarray): Array of face indices
     """
-    if module_name == "pyvista":
-        t_mesh = module.read(mesh_file_name)
-        points = np.array(t_mesh.points) / scale
-        cells = t_mesh.faces.reshape(-1, 4)[:, 1:]
+    if mesh_module.__name__ == "pyvista":
+        mesh_data = mesh_module.read(mesh_file_name)
+        points = np.array(mesh_data.points) / scale
+        cells = mesh_data.faces.reshape(-1, 4)[:, 1:]
         return {"points": points, "cells": cells}
 
-    elif module_name == "pymeshlab":
-        ms = module.MeshSet()
+    if mesh_module.__name__ == "pymeshlab":
+        ms = mesh_module.MeshSet()
         ms.load_new_mesh(mesh_file_name)
-        t_mesh = ms.current_mesh()
-        points = np.array(t_mesh.vertex_matrix()) / scale
-        cells = np.array(t_mesh.face_matrix())
+        mesh_data = ms.current_mesh()
+        points = np.array(mesh_data.vertex_matrix()) / scale
+        cells = np.array(mesh_data.face_matrix())
         if np.isfortran(points):
             points = np.ascontiguousarray(points)
             cells = np.ascontiguousarray(cells)
         ms.clear()
         return {"points": points, "cells": cells}
 
-    elif module_name == "trimesh":
-        t_mesh = module.load(mesh_file_name)
-        points = np.array(t_mesh.vertices) / scale
-        cells = np.array(t_mesh.faces)
+    if mesh_module.__name__ == "trimesh":
+        mesh_data = mesh_module.load(mesh_file_name)
+        points = np.array(mesh_data.vertices) / scale
+        cells = np.array(mesh_data.faces)
         return {"points": points, "cells": cells}
 
-    elif module_name == "meshio":
-        t_mesh = module.read(mesh_file_name)
-        points = t_mesh.points / scale
-        cells = t_mesh.cells[0].data
+    if mesh_module.__name__ == "meshio":
+        mesh_data = mesh_module.read(mesh_file_name)
+        points = mesh_data.points / scale
+        cells = mesh_data.cells[0].data
         return {"points": points, "cells": cells}
+
+    raise ImportError(
+        "No valid module was found to process the 3D model file, "
+        + "please install one of the following modules: "
+        + "`pyvista`, `pymeshlab`, `trimesh`, `meshio`"
+    )
