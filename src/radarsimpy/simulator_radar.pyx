@@ -61,6 +61,8 @@ from radarsimpy.lib.cp_radarsimc cimport (
     cp_Point
 )
 
+from radarsimpy.mesh_kit import import_mesh_module
+
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -240,9 +242,12 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None,
     cdef double[:, :, :] timestamp_mv = timestamp.astype(np.float64)
 
     # Process each target
+    module_dict = None
     for _, tgt in enumerate(targets):
         if "model" in tgt:
-            target_vt.push_back(cp_Target(radar, tgt, timestamp))
+            if module_dict is None:
+                module_dict = import_mesh_module()
+            target_vt.push_back(cp_Target(radar, tgt, timestamp, module_dict))
         else:
             loc = tgt["location"]
             spd = tgt.get("speed", (0, 0, 0))

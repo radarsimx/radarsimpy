@@ -1,6 +1,6 @@
 numpy
 scipy
-pymeshlab
+pyvista
 cython
 setuptools
 pytest
