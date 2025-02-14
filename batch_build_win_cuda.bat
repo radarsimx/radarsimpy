@@ -40,7 +40,8 @@ cmake --build . --config Release
 REM Build Python extensions for multiple Python versions (Free Tier)
 ECHO ## Building radarsimpy with Cython ##
 CD %pwd%
-REM Build for Python 3.9-3.12 with GPU support
+REM Build for Python 3.9-3.13 with GPU support
+conda.exe run -n py313 python setup.py build_ext -b ./ --tier=free --arch=gpu
 conda.exe run -n py312 python setup.py build_ext -b ./ --tier=free --arch=gpu
 conda.exe run -n py311 python setup.py build_ext -b ./ --tier=free --arch=gpu
 conda.exe run -n py310 python setup.py build_ext -b ./ --tier=free --arch=gpu
@@ -76,6 +77,7 @@ RMDIR /Q/S .\radarsimpy
 
 REM Build Standard Tier GPU version
 REM Build Python extensions for multiple Python versions (Standard Tier)
+conda.exe run -n py313 python setup.py build_ext -b ./ --tier=standard --arch=gpu
 conda.exe run -n py312 python setup.py build_ext -b ./ --tier=standard --arch=gpu
 conda.exe run -n py311 python setup.py build_ext -b ./ --tier=standard --arch=gpu
 conda.exe run -n py310 python setup.py build_ext -b ./ --tier=standard --arch=gpu

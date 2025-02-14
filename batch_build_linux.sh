@@ -36,7 +36,8 @@ cmake --build .
 # Build Python extensions for multiple Python versions (Free Tier)
 echo "## Building radarsimpy with Cython ##"
 cd $workpath
-# Build CPU-only extensions for Python 3.9-3.12
+# Build CPU-only extensions for Python 3.9-3.13
+conda run -n py313 python setup.py build_ext -b ./ --tier free --arch cpu
 conda run -n py312 python setup.py build_ext -b ./ --tier free --arch cpu
 conda run -n py311 python setup.py build_ext -b ./ --tier free --arch cpu
 conda run -n py310 python setup.py build_ext -b ./ --tier free --arch cpu
@@ -73,6 +74,7 @@ cp -rf ./radarsimpy/* ./Linux_x86_64_CPU_FreeTier/radarsimpy
 # Clean and rebuild for Standard Tier
 rm -rf ./radarsimpy
 # Build CPU-only extensions for Standard Tier
+conda run -n py313 python setup.py build_ext -b ./ --tier standard --arch cpu
 conda run -n py312 python setup.py build_ext -b ./ --tier standard --arch cpu
 conda run -n py311 python setup.py build_ext -b ./ --tier standard --arch cpu
 conda run -n py310 python setup.py build_ext -b ./ --tier standard --arch cpu
