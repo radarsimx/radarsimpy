@@ -29,7 +29,7 @@ jobs:
           pip install -r requirements.txt
       - name: Build
         run: |
-          .\build_win.bat --tier standard --arch cpu --test off
+          .\build_win.bat --tier=standard --arch=cpu --test=off
       - name: Archive built module
         uses: actions/upload-artifact@v4
         if: success()
