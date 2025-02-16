@@ -23,7 +23,7 @@ jobs:
       - uses: maxim-lobanov/setup-xcode@v1.6.0
         with:
           # Version of Xcode to use
-          xcode-version: '16.2'
+          xcode-version: '15.4'
       - name: Set up Python ${{matrix.python-version}}
         uses: actions/setup-python@v5
         with:
