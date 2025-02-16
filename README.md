@@ -81,10 +81,10 @@ RadarSimPy is a powerful and versatile Python-based Radar Simulator that models 
 
 - ### MacOS Intel
 
-  - `GCC 13`
+  - `GCC 14`
 
     ```bash
-    brew install gcc@13
+    brew install gcc@14
     ```
 
 - ### MacOS Apple Silicon
