@@ -122,14 +122,12 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
 
         # Target parameters
         origin_mv = np.array(targets[idx_c].get("origin", (0, 0, 0)), dtype=np_float)
-        location_mv = np.array(targets[idx_c].get("location", (0, 0, 0)), dtype=np_float) + \
-            frame_time*np.array(targets[idx_c].get("speed", (0, 0, 0)), dtype=np_float)
+        temp_location = np.array(targets[idx_c].get("location", (0, 0, 0))) + frame_time*np.array(targets[idx_c].get("speed", (0, 0, 0)))
+        location_mv = temp_location.astype(np_float)
         speed_mv = np.array(targets[idx_c].get("speed", (0, 0, 0)), dtype=np_float)
         
-        rotation_mv = np.radians(
-            np.array(targets[idx_c].get("rotation", (0, 0, 0)), dtype=np_float) + \
-            frame_time*np.array(targets[idx_c].get("rotation_rate", (0, 0, 0)), dtype=np_float)
-        )
+        temp_rotation = np.array(targets[idx_c].get("rotation", (0, 0, 0))) + frame_time*np.array(targets[idx_c].get("rotation_rate", (0, 0, 0)))
+        rotation_mv = np.radians(temp_rotation.astype(np_float))
         rotation_rate_mv = np.radians(
             np.array(targets[idx_c].get("rotation_rate", (0, 0, 0)), dtype=np_float)
         )
