@@ -4,7 +4,7 @@ Dependence
 - ``Python`` >= 3.9
 - ``NumPy`` >= 2.0
 - ``SciPy``
-- ``PyMeshLab`` (*preferred*) or ``meshio``
+- ``PyMeshLab``, ``PyVista``, ``trimesh`` or ``meshio``
 
 **Windows**
 
@@ -28,11 +28,11 @@ Dependence
 
 **MacOS Intel**
 
-    - ``GCC 13``
+    - ``GCC 14``
 
     .. code-block:: bash
 
-        brew install gcc@13
+        brew install gcc@14
 
 **MacOS Apple Silicon**
 
