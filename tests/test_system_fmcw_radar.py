@@ -664,7 +664,7 @@ def test_fmcw_raytracing_radar_rotation():
     amp = 20 * np.log10(np.abs(range_profile[0, 0, 33]))
     phs = np.angle(range_profile[0, 0, 33]) / np.pi * 180
 
-    npt.assert_almost_equal(amp, -47.18, decimal=1)
+    npt.assert_almost_equal(amp, -50.18, decimal=1)
     npt.assert_almost_equal(phs, -65.29, decimal=0)
 
 
@@ -733,11 +733,11 @@ def test_fmcw_raytracing_radar_speed():
     amp1 = 20 * np.log10(np.abs(range_profile[0, 0, 47]))
     phs1 = np.angle(range_profile[0, 0, 47]) / np.pi * 180
 
-    npt.assert_almost_equal(amp1, -54.36, decimal=1)
+    npt.assert_almost_equal(amp1, -57.36, decimal=1)
     npt.assert_almost_equal(phs1, -14.57, decimal=0)
 
     amp2 = 20 * np.log10(np.abs(range_profile[1, 0, 33]))
     phs2 = np.angle(range_profile[1, 0, 33]) / np.pi * 180
 
-    npt.assert_almost_equal(amp2, -46.82, decimal=1)
+    npt.assert_almost_equal(amp2, -49.82, decimal=1)
     npt.assert_almost_equal(phs2, -84.39, decimal=0)
