@@ -358,7 +358,8 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None,
     # Run interference simulation if interference radar is provided
     if interf is not None:
         interf_radar_c = cp_Radar(interf, frame_start_time)
-        radar_c.ResetBaseband()
+        radar_c.InitBaseband(&bb_real[0][0][0],
+                             &bb_imag[0][0][0])
 
         int_sim_c.Run(radar_c, interf_radar_c)
         radar_c.SyncBaseband()

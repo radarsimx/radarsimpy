@@ -193,7 +193,6 @@ cdef extern from "radar.hpp":
         void InitBaseband(H *bb_real,
                           H *bb_imag) except +
         void SyncBaseband() except +
-        void ResetBaseband() except +
         void FreeDeviceMemory() except +
 
 #------------------------------------------------------------------------------
