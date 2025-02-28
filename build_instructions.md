@@ -88,5 +88,3 @@ The compiled module will be available in the `radarsimpy` folder.
 ## Troubleshooting
 
 - If CMake fails to find CUDA, ensure CUDA_PATH environment variable is set correctly
-- For Windows GPU builds, ensure you have compatible NVIDIA drivers installed
-- For Linux GPU builds, ensure nvidia-smi works and shows your GPU
