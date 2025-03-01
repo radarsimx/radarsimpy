@@ -45,7 +45,6 @@ from radarsimpy.includes.type_def cimport (
 from radarsimpy.includes.rsvector cimport Vec2
 from radarsimpy.includes.radarsimc cimport (
     Radar,
-    Snapshot,
     Point,
     Target,
     MeshSimulator,
@@ -161,7 +160,6 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None,
         Radar[double, float_t] interf_radar_c
         vector[Point[float_t]] point_vt
         vector[Target[float_t]] target_vt
-        vector[Snapshot[float_t]] snaps
         Vec2[int_t] ray_filter_c
         
     # Simulator instances
@@ -173,7 +171,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None,
     # Size and index variables
     cdef:
         int_t level_id = 0
-        int_t fm_idx, tx_idx, ps_idx, sp_idx
+        int_t ps_idx
         int_t frames_c = np.size(frame_time)
         int_t channles_c = radar.array_prop["size"]
         int_t rxsize_c = radar.radar_prop["receiver"].rxchannel_prop["size"]
@@ -280,43 +278,22 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None,
         """
         if level is None:
             level_id = 0
-            pulses_c  = 1
-            samples_c = 1
         elif level == "pulse":
             level_id = 1
-            pulses_c  = radar.radar_prop["transmitter"].waveform_prop["pulses"]
-            samples_c = 1
         elif level == "sample":
             level_id = 2
-            pulses_c = radar.radar_prop["transmitter"].waveform_prop["pulses"]
-            samples_c = radar.sample_prop["samples_per_pulse"]
         else:
             raise Exception("Unknown fidelity level. `None`: Perform one ray tracing simulation for the whole frame; `pulse`: Perform ray tracing for each pulse; `sample`: Perform ray tracing for each sample.")
-
-        # Create snapshots for each frame, transmitter, pulse, and sample
-        for fm_idx in range(0, frames_c):
-            for tx_idx in range(0, txsize_c):
-                for ps_idx in range(0, pulses_c):
-                    for sp_idx in range(0, samples_c):
-                        snaps.push_back(
-                            Snapshot[float_t](
-                                timestamp_mv[fm_idx*channles_c + tx_idx*rxsize_c, ps_idx, sp_idx],
-                                fm_idx,
-                                tx_idx,
-                                ps_idx,
-                                sp_idx)
-                        )
 
         # Run scene simulation
         scene_c.Run(
             radar_c,
             target_vt,
             level_id,
-            debug,
-            snaps,
             <float_t> density,
             ray_filter_c,
-            log_path_c)
+            log_path_c,
+            debug)
 
     radar_c.SyncBaseband()
 

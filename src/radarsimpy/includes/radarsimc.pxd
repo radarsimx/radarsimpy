@@ -196,18 +196,6 @@ cdef extern from "radar.hpp":
         void FreeDeviceMemory() except +
 
 #------------------------------------------------------------------------------
-# Snapshot
-#------------------------------------------------------------------------------
-cdef extern from "snapshot.hpp":
-    cdef cppclass Snapshot[T]:
-        Snapshot() except +
-        Snapshot(double time,
-                 int frame_idx,
-                 int ch_idx,
-                 int pulse_idx,
-                 int sample_idx) except +
-
-#------------------------------------------------------------------------------
 # Simulators
 #------------------------------------------------------------------------------
 cdef extern from "simulator_point.hpp":
@@ -222,11 +210,10 @@ cdef extern from "simulator_mesh.hpp":
         void Run(Radar[H, L] & radar,
                  vector[Target[L]] & targets,
                  int level,
-                 bool debug,
-                 vector[Snapshot[L]] & snapshots,
                  L density,
                  Vec2[int_t] ray_filter,
-                 string log_path)
+                 string log_path,
+                 bool debug)
 
 cdef extern from "simulator_interference.hpp":
     cdef cppclass InterferenceSimulator[H, L]:
