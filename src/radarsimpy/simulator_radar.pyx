@@ -65,10 +65,10 @@ from radarsimpy.mesh_kit import import_mesh_module
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, 
-                log_path=None, ray_filter=None, debug=False, interf=None):
+cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None,
+                ray_filter=None, back_propagating=False, log_path=None, debug=False):
     """
-    sim_radar(radar, targets, frame_time=0, density=1, level=None, log_path=None, ray_filter=None, debug=False, interf=None)
+    sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None, ray_filter=None, back_propagating=False, log_path=None, debug=False)
 
     Simulates the radar's baseband response for a given scene.
 
@@ -114,18 +114,21 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None,
         - ``None``: Perform one ray-tracing simulation for the entire frame.
         - ``pulse``: Perform ray-tracing for each pulse.
         - ``sample``: Perform ray-tracing for each sample.
-
-    :param str or None log_path:
-        Path to save ray-tracing data. Default: ``None`` (does not save data).
+    :param Radar or None interf:
+        Interference radar object. Default: ``None``.
     :param list or None ray_filter:
         Filters rays based on the number of reflections.
         Only rays with the number of reflections between ``ray_filter[0]``
         and ``ray_filter[1]`` are included in the calculations.
         Default: ``None`` (no filtering).
+    :param bool back_propagating:
+        Whether to enable back propagation in the simulation. When enabled, the simulation will consider
+        rays that propagate back towards the radar after reflecting off targets. Default: ``False``.
+    :param str or None log_path:
+        Path to save ray-tracing data. Default: ``None`` (does not save data).
     :param bool debug:
-        Whether to enable debug mode. Default: ``False``.
-    :param Radar or None interf:
-        Interference radar object. Default: ``None``.
+        Whether to enable debug mode. When enabled, additional debug information will be printed
+        during the simulation process. Default: ``False``.
 
     :return:
         A dictionary containing the simulated baseband response and related data:
@@ -292,6 +295,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None,
             level_id,
             <float_t> density,
             ray_filter_c,
+            back_propagating,
             log_path_c,
             debug)
 

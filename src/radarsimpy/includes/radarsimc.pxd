@@ -212,6 +212,7 @@ cdef extern from "simulator_mesh.hpp":
                  int level,
                  L density,
                  Vec2[int_t] ray_filter,
+                 bool back_propagating,
                  string log_path,
                  bool debug)
 
