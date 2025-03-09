@@ -167,9 +167,9 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None
         
     # Simulator instances
     cdef:
-        MeshSimulator[double, float_t] scene_c
-        PointSimulator[double, float_t] sim_c
-        InterferenceSimulator[double, float_t] int_sim_c
+        MeshSimulator[double, float_t] mesh_sim_c
+        PointSimulator[double, float_t] point_sim_c
+        InterferenceSimulator[double, float_t] interf_sim_c
 
     # Size and index variables
     cdef:
@@ -272,24 +272,19 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None
     #----------------------
     # Run ideal point target simulation
     if point_vt.size() > 0:
-        sim_c.Run(radar_c, point_vt)
+        point_sim_c.Run(radar_c, point_vt)
 
     # Run scene simulation if there are 3D mesh targets
     if target_vt.size() > 0:
-        """
-        Snapshot
-        """
-        if level is None:
-            level_id = 0
-        elif level == "pulse":
-            level_id = 1
-        elif level == "sample":
-            level_id = 2
-        else:
-            raise Exception("Unknown fidelity level. `None`: Perform one ray tracing simulation for the whole frame; `pulse`: Perform ray tracing for each pulse; `sample`: Perform ray tracing for each sample.")
+        level_map = {None: 0, "frame": 0, "pulse": 1, "sample": 2}
+        try:
+            level_id = level_map[level]
+        except KeyError:
+            raise ValueError("Unknown fidelity level. `frame`: Perform one ray tracing simulation for the whole frame; "
+                          "`pulse`: Perform ray tracing for each pulse; `sample`: Perform ray tracing for each sample.")
 
         # Run scene simulation
-        scene_c.Run(
+        mesh_sim_c.Run(
             radar_c,
             target_vt,
             level_id,
@@ -342,7 +337,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None
         radar_c.InitBaseband(&bb_real[0][0][0],
                              &bb_imag[0][0][0])
 
-        int_sim_c.Run(radar_c, interf_radar_c)
+        interf_sim_c.Run(radar_c, interf_radar_c)
         radar_c.SyncBaseband()
 
         if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
