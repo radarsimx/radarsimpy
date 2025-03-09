@@ -96,7 +96,7 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
     :rtype:  
         numpy.ndarray - A structured array representing the Lidar ray interactions with the scene, including details such as ray origins, directions, and intersections.
     """
-    cdef LidarSimulator[float_t] pointcloud_c
+    cdef LidarSimulator[float_t] lidar_sim_c
     
     # Memory view declarations
     cdef float_t[:, :] points_mv
@@ -133,7 +133,7 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
         )
 
         # Add target to pointcloud
-        pointcloud_c.AddTarget(Target[float_t](&points_mv[0, 0],
+        lidar_sim_c.AddTarget(Target[float_t](&points_mv[0, 0],
                                              &cells_mv[0, 0],
                                              <int_t> cells_mv.shape[0],
                                              Vec3[float_t](&origin_mv[0]),
@@ -155,21 +155,21 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
     Mem_Copy(&theta_mv[0], <int_t>(theta_mv.shape[0]), theta_vt)
 
     # Perform ray tracing
-    pointcloud_c.Run(phi_vt,
+    lidar_sim_c.Run(phi_vt,
                      theta_vt,
                      Vec3[float_t](&position_mv[0]))
 
     # Prepare output
     ray_type = np.dtype([("positions", np_float, (3,)),
                         ("directions", np_float, (3,))])
-    rays = np.zeros(pointcloud_c.cloud_.size(), dtype=ray_type)
+    rays = np.zeros(lidar_sim_c.cloud_.size(), dtype=ray_type)
 
-    for idx_c in range(0, <int_t> pointcloud_c.cloud_.size()):
-        rays[idx_c]["positions"][0] = pointcloud_c.cloud_[idx_c].location_[1][0]
-        rays[idx_c]["positions"][1] = pointcloud_c.cloud_[idx_c].location_[1][1]
-        rays[idx_c]["positions"][2] = pointcloud_c.cloud_[idx_c].location_[1][2]
-        rays[idx_c]["directions"][0] = pointcloud_c.cloud_[idx_c].direction_[1][0]
-        rays[idx_c]["directions"][1] = pointcloud_c.cloud_[idx_c].direction_[1][1]
-        rays[idx_c]["directions"][2] = pointcloud_c.cloud_[idx_c].direction_[1][2]
+    for idx_c in range(0, <int_t> lidar_sim_c.cloud_.size()):
+        rays[idx_c]["positions"][0] = lidar_sim_c.cloud_[idx_c].location_[1][0]
+        rays[idx_c]["positions"][1] = lidar_sim_c.cloud_[idx_c].location_[1][1]
+        rays[idx_c]["positions"][2] = lidar_sim_c.cloud_[idx_c].location_[1][2]
+        rays[idx_c]["directions"][0] = lidar_sim_c.cloud_[idx_c].direction_[1][0]
+        rays[idx_c]["directions"][1] = lidar_sim_c.cloud_[idx_c].direction_[1][1]
+        rays[idx_c]["directions"][2] = lidar_sim_c.cloud_[idx_c].direction_[1][2]
 
     return rays

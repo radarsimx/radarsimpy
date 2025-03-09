@@ -117,7 +117,7 @@ cpdef sim_rcs(
     """
     if IsFreeTier():
         if len(targets) > 3:
-            raise Exception(
+            raise RuntimeError(
                 "You're currently using RadarSimPy's FreeTier, which limits RCS simulation to 3 maximum targets. "
                 "Please consider supporting my work by upgrading to the standard version. "
                 "Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ "
@@ -175,9 +175,9 @@ cpdef sim_rcs(
     )
 
     # Calculate RCS
-    cdef RcsSimulator[double] rcs = RcsSimulator[double]()
+    cdef RcsSimulator[double] rcs_sim_c
 
-    return rcs.Run(
+    return rcs_sim_c.Run(
         targets_vt,
         inc_dir,
         obs_dir,

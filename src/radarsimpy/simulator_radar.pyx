@@ -179,7 +179,6 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None
         int_t channles_c = radar.array_prop["size"]
         int_t rxsize_c = radar.radar_prop["receiver"].rxchannel_prop["size"]
         int_t txsize_c = radar.radar_prop["transmitter"].txchannel_prop["size"]
-        int_t pulses_c, samples_c
         string log_path_c
 
     #----------------------
