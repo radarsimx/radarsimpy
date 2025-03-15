@@ -144,14 +144,12 @@ cdef extern from "transmitter.hpp":
                     const vector[H] & freq,
                     const vector[H] & freq_time,
                     const vector[H] & freq_offset,
-                    const vector[H] & pulse_start_time,
-                    const vector[H] & frame_start_time) except +
+                    const vector[H] & pulse_start_time) except +
         Transmitter(const L & tx_power,
                     const vector[H] & freq,
                     const vector[H] & freq_time,
                     const vector[H] & freq_offset,
                     const vector[H] & pulse_start_time,
-                    const vector[H] & frame_start_time,
                     const vector[cpp_complex[H]] & phase_noise) except +
         void AddChannel(const TxChannel[L] & channel)
 
@@ -186,6 +184,7 @@ cdef extern from "radar.hpp":
         Radar() except +
         Radar(Transmitter[H, L] & tx,
               Receiver[L] & rx,
+              vector[H] & frame_start_time,
               vector[Vec3[L]] & location_array,
               Vec3[L] speed_array,
               vector[Vec3[L]] & rotation_array,

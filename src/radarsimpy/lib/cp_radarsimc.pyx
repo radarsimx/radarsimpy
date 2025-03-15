@@ -201,7 +201,6 @@ cdef Transmitter[double, float_t] cp_Transmitter(radar, frame_start_time):
         t_vt,
         f_offset_vt,
         t_pstart_vt,
-        t_frame_vt,
         pn_vt
     )
 
@@ -365,12 +364,21 @@ cdef Radar[double, float_t] cp_Radar(radar, frame_start_time):
     cdef float_t[:, :, :] locx_mv, locy_mv, locz_mv
     cdef float_t[:, :, :] rotx_mv, roty_mv, rotz_mv
 
+    cdef vector[double] t_frame_vt
     cdef vector[Vec3[float_t]] loc_vt
     cdef Vec3[float_t] spd_vt
     cdef vector[Vec3[float_t]] rot_vt
     cdef Vec3[float_t] rrt_vt
 
     cdef int_t idx_c
+
+    # frame time offset
+    cdef double[:] t_frame_mv
+    if frames_c > 1:
+        t_frame_mv = frame_start_time.astype(np.float64)
+        Mem_Copy(&t_frame_mv[0], frames_c, t_frame_vt)
+    else:
+        t_frame_vt.push_back(<double> frame_start_time)
 
     """
     Transmitter
@@ -424,6 +432,7 @@ cdef Radar[double, float_t] cp_Radar(radar, frame_start_time):
 
     radar_c = Radar[double, float_t](tx_c,
                              rx_c,
+                             t_frame_vt,
                              loc_vt,
                              spd_vt,
                              rot_vt,
