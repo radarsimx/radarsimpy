@@ -140,7 +140,7 @@ cdef Point[float_t] cp_Point(location,
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef Transmitter[double, float_t] cp_Transmitter(radar, frame_start_time):
+cdef Transmitter[double, float_t] cp_Transmitter(radar):
     """
     cp_Transmitter(radar)
 
@@ -152,24 +152,14 @@ cdef Transmitter[double, float_t] cp_Transmitter(radar, frame_start_time):
     :return: C++ object of a radar transmitter
     :rtype: Transmitter
     """
-    cdef int_t frames_c = np.size(frame_start_time)
     cdef int_t channles_c = radar.array_prop["size"]
     cdef int_t pulses_c = radar.radar_prop["transmitter"].waveform_prop["pulses"]
     cdef int_t samples_c = radar.sample_prop["samples_per_pulse"]
 
-    cdef vector[double] t_frame_vt
     cdef vector[double] f_vt, t_vt
     cdef vector[double] f_offset_vt
     cdef vector[double] t_pstart_vt
     cdef vector[cpp_complex[double]] pn_vt
-    
-    # frame time offset
-    cdef double[:] t_frame_mv
-    if frames_c > 1:
-        t_frame_mv = frame_start_time.astype(np.float64)
-        Mem_Copy(&t_frame_mv[0], frames_c, t_frame_vt)
-    else:
-        t_frame_vt.push_back(<double> frame_start_time)
 
     # frequency
     cdef double[:] f_mv = radar.radar_prop["transmitter"].waveform_prop["f"].astype(np.float64)
@@ -383,7 +373,7 @@ cdef Radar[double, float_t] cp_Radar(radar, frame_start_time):
     """
     Transmitter
     """
-    tx_c = cp_Transmitter(radar, frame_start_time)
+    tx_c = cp_Transmitter(radar)
     for idx_c in range(0, txsize_c):
         tx_c.AddChannel(
             cp_TxChannel(radar.radar_prop["transmitter"], idx_c)
