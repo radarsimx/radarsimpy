@@ -65,7 +65,7 @@ from radarsimpy.mesh_kit import import_mesh_module
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None,
+cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None, interf_frame_time=None,
                 ray_filter=None, back_propagating=False, log_path=None, debug=False):
     """
     sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None, ray_filter=None, back_propagating=False, log_path=None, debug=False)
@@ -332,7 +332,11 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None
     #----------------------
     # Run interference simulation if interference radar is provided
     if interf is not None:
-        interf_radar_c = cp_Radar(interf, frame_start_time)
+        if interf_frame_time is None:
+            interf_frame_time = frame_time
+        
+        interf_frame_start_time= np.array(interf_frame_time, dtype=np.float64)
+        interf_radar_c = cp_Radar(interf, interf_frame_start_time)
         radar_c.InitBaseband(&bb_real[0][0][0],
                              &bb_imag[0][0][0])
 
