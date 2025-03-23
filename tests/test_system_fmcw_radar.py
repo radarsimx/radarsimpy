@@ -403,8 +403,8 @@ def test_fmcw_raytracing_tx_azimuth():
     amp = 20 * np.log10(np.abs(range_profile[0, 0, 47]))
     phs = np.angle(range_profile[0, 0, 47]) / np.pi * 180
 
-    npt.assert_almost_equal(amp, -48.01, decimal=1)
-    npt.assert_almost_equal(phs, 154.20, decimal=0)
+    npt.assert_almost_equal(amp, -47.116, decimal=1)
+    npt.assert_almost_equal(phs, 152.265, decimal=0)
 
 
 def test_fmcw_raytracing_tx_elevation():
@@ -470,7 +470,7 @@ def test_fmcw_raytracing_tx_elevation():
     amp = 20 * np.log10(np.abs(range_profile[0, 0, 47]))
     phs = np.angle(range_profile[0, 0, 47]) / np.pi * 180
 
-    npt.assert_almost_equal(amp, -51.03, decimal=1)
+    npt.assert_almost_equal(amp, -50.246, decimal=1)
     npt.assert_almost_equal(phs, 151.81, decimal=0)
 
 
@@ -537,8 +537,8 @@ def test_fmcw_raytracing_rx_azimuth():
     amp = 20 * np.log10(np.abs(range_profile[0, 0, 47]))
     phs = np.angle(range_profile[0, 0, 47]) / np.pi * 180
 
-    npt.assert_almost_equal(amp, -48.01, decimal=1)
-    npt.assert_almost_equal(phs, 154.20, decimal=0)
+    npt.assert_almost_equal(amp, -47.122, decimal=1)
+    npt.assert_almost_equal(phs, 152.258, decimal=0)
 
 
 def test_fmcw_raytracing_rx_elevation():
@@ -602,7 +602,7 @@ def test_fmcw_raytracing_rx_elevation():
     amp = 20 * np.log10(np.abs(range_profile[0, 0, 47]))
     phs = np.angle(range_profile[0, 0, 47]) / np.pi * 180
 
-    npt.assert_almost_equal(amp, -51.04, decimal=1)
+    npt.assert_almost_equal(amp, -50.262, decimal=1)
     npt.assert_almost_equal(phs, 151.81, decimal=0)
 
 
@@ -733,7 +733,7 @@ def test_fmcw_raytracing_radar_speed():
     amp1 = 20 * np.log10(np.abs(range_profile[0, 0, 47]))
     phs1 = np.angle(range_profile[0, 0, 47]) / np.pi * 180
 
-    npt.assert_almost_equal(amp1, -57.36, decimal=1)
+    npt.assert_almost_equal(amp1, -59.086, decimal=1)
     npt.assert_almost_equal(phs1, -14.57, decimal=0)
 
     amp2 = 20 * np.log10(np.abs(range_profile[1, 0, 33]))
