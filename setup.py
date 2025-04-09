@@ -74,7 +74,7 @@ if os_type == "Linux":
     LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
     LIB_DIRS = [
         "src/radarsimcpp/build",
-        "src/radarsimcpp/hdf5/lib_linux_gcc11_x86_64/lib",
+        "src/radarsimcpp/hdf5-lib-build/libs/lib_linux_gcc11_x86_64/lib",
     ]
     LIBS = ["hdf5", "hdf5_cpp", "hdf5_hl", "hdf5_hl_cpp"]
     if args.arch == "gpu":
