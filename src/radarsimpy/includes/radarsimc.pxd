@@ -206,14 +206,14 @@ cdef extern from "simulator_point.hpp":
 cdef extern from "simulator_mesh.hpp":
     cdef cppclass MeshSimulator[H, L]:
         MeshSimulator() except +
-        void Run(Radar[H, L] & radar,
-                 vector[Target[L]] & targets,
-                 int level,
-                 L density,
-                 Vec2[int_t] ray_filter,
-                 bool back_propagating,
-                 string log_path,
-                 bool debug)
+        int Run(Radar[H, L] & radar,
+                vector[Target[L]] & targets,
+                int level,
+                L density,
+                Vec2[int_t] ray_filter,
+                bool back_propagating,
+                string log_path,
+                bool debug)
 
 cdef extern from "simulator_interference.hpp":
     cdef cppclass InterferenceSimulator[H, L]:

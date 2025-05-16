@@ -62,6 +62,11 @@ from radarsimpy.lib.cp_radarsimc cimport (
 
 from radarsimpy.mesh_kit import import_mesh_module
 
+def raise_err(err):
+    if err == 1:
+        raise RuntimeError("ERROR_TOO_MANY_RAYS_PER_GRID: Trying to launch too many rays in a grid. Please reduce the `density` or reduce the `grid`.")
+
+
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -153,6 +158,8 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None
 
     :rtype: dict
     """
+
+    err = 0
 
     #----------------------
     # C++ Object Declarations
@@ -283,7 +290,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None
                           "`pulse`: Perform ray tracing for each pulse; `sample`: Perform ray tracing for each sample.")
 
         # Run scene simulation
-        mesh_sim_c.Run(
+        err = mesh_sim_c.Run(
             radar_c,
             target_vt,
             level_id,
@@ -292,6 +299,14 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None
             back_propagating,
             log_path_c,
             debug)
+
+        if err:
+            radar_c.FreeDeviceMemory()
+            raise_err(err)
+            return {"baseband": None,
+                    "noise": None,
+                    "timestamp": None,
+                    "interference": None}
 
     radar_c.SyncBaseband()
 
