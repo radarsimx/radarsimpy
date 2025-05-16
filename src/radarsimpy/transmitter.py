@@ -24,7 +24,7 @@ transmitter channel modulation.
 
 """
 
-from typing import List, Dict, Union, Optional, Any
+from typing import List, Dict, Union, Optional
 import numpy as np
 from numpy.typing import NDArray
 
@@ -174,7 +174,7 @@ class Transmitter:
 
     """
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(  # pylint: disable=too-many-arguments, too-many-positional-arguments
         self,
         f: Union[float, List, NDArray],
         t: Union[float, List, NDArray],
@@ -289,7 +289,7 @@ class Transmitter:
     def process_waveform_modulation(
         self,
         mod_t: Optional[NDArray],
-        amp: Optional[NDArray], 
+        amp: Optional[NDArray],
         phs: Optional[NDArray]
     ) -> Dict:
         """

@@ -65,7 +65,9 @@ from radarsimpy.mesh_kit import import_mesh_module
 
 def raise_err(err):
     if err == ErrorType.ERROR_TOO_MANY_RAYS_PER_GRID:
-        raise RuntimeError("ERROR_TOO_MANY_RAYS_PER_GRID: Trying to launch too many rays in a grid. Please reduce the `density` or reduce the `grid`.")
+        raise RuntimeError(f"[ERROR_TOO_MANY_RAYS_PER_GRID] The simulation is attempting to launch an excessive number of rays in a grid, which exceeds system's memory limitations. To resolve this issue, please try one or both of the following solutions:\n\
+    1. Reduce the `grid` dimensions for the Transmitter (Tx) Channel.\n\
+    2. Decrease the `density` parameter value in your `sim_radar()` function call.")
 
 
 @cython.cdivision(True)
