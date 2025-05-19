@@ -64,6 +64,15 @@ from radarsimpy.lib.cp_radarsimc cimport (
 from radarsimpy.mesh_kit import import_mesh_module
 
 def raise_err(err):
+    """
+    Raises appropriate runtime errors based on simulation error types.
+
+    This function handles error reporting for various simulation scenarios,
+    providing detailed error messages and potential solutions.
+
+    :param ErrorType err: The error type encountered during simulation
+    :raises RuntimeError: When a simulation error is encountered, with detailed message
+    """
     if err == ErrorType.ERROR_TOO_MANY_RAYS_PER_GRID:
         raise RuntimeError(f"[ERROR_TOO_MANY_RAYS_PER_GRID] The simulation is attempting to launch an excessive number of rays in a grid, which exceeds system's memory limitations. To resolve this issue, please try one or both of the following solutions:\n\
     1. Reduce the `grid` dimensions for the Transmitter (Tx) Channel.\n\
