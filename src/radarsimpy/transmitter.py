@@ -17,8 +17,8 @@ transmitter channel modulation.
 
     ██████╗  █████╗ ██████╗  █████╗ ██████╗ ███████╗██╗███╗   ███╗██╗  ██╗
     ██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔════╝██║████╗ ████║╚██╗██╔╝
-    ██████╔╝███████║██║  ██║███████║██████╔╝███████╗██║██╔████╔██║ ╚███╔╝ 
-    ██╔══██╗██╔══██║██║  ██║██╔══██║██╔══██╗╚════██║██║██║╚██╔╝██║ ██╔██╗ 
+    ██████╔╝███████║██║  ██║███████║██████╔╝███████╗██║██╔████╔██║ ╚███╔╝
+    ██╔══██╗██╔══██║██║  ██║██╔══██║██╔══██╗╚════██║██║██║╚██╔╝██║ ██╔██╗
     ██║  ██║██║  ██║██████╔╝██║  ██║██║  ██║███████║██║██║ ╚═╝ ██║██╔╝ ██╗
     ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝
 
@@ -95,7 +95,8 @@ class Transmitter:
           Default: ``[-90, 90]``.
         - **elevation_pattern** (*numpy.ndarray*): Elevation pattern in decibels (dB).
           Default: ``[0, 0]``.
-        - **grid** (*float*): The grid size in degrees (°) used to initially check the occupancy of a scene.
+        - **grid** (*float*):
+          The grid size in degrees (°) used to initially check the occupancy of a scene.
           Default: ``1``.
         - **pulse_amp** (*numpy.ndarray*):
           Relative amplitude sequence for pulse amplitude modulation.
@@ -292,10 +293,7 @@ class Transmitter:
             raise ValueError("`prp` should be larger than `pulse_length`")
 
     def process_waveform_modulation(
-        self,
-        mod_t: Optional[NDArray],
-        amp: Optional[NDArray],
-        phs: Optional[NDArray]
+        self, mod_t: Optional[NDArray], amp: Optional[NDArray], phs: Optional[NDArray]
     ) -> Dict:
         """
         Process waveform modulation parameters
@@ -347,9 +345,7 @@ class Transmitter:
         return {"enabled": True, "var": mod_var, "t": mod_t}
 
     def process_pulse_modulation(
-        self,
-        pulse_amp: NDArray,
-        pulse_phs: NDArray
+        self, pulse_amp: NDArray, pulse_phs: NDArray
     ) -> NDArray:
         """
         Process pulse modulation parameters
