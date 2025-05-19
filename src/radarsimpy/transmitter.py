@@ -62,11 +62,14 @@ class Transmitter:
 
     :type prp: float or numpy.ndarray
     :param numpy.ndarray f_offset:
-        Frequency offset for each pulse in Hertz (Hz). The length must match ``pulses``.
+        Frequency offset for each pulse in Hertz (Hz).
+        Length must match ``pulses``. Default: ``None`` (no offset).
     :param numpy.ndarray pn_f:
         Frequencies associated with phase noise in Hertz (Hz).
+        Must be paired with ``pn_power``. Default: ``None``.
     :param numpy.ndarray pn_power:
-        Power of phase noise in dB/Hz.
+        Power spectral density of phase noise in dB/Hz.
+        Must be paired with ``pn_f``. Default: ``None``.
     :param list[dict] channels:
         Properties of transmitter channels.
         Each channel is represented as a dictionary with the following keys:
@@ -92,6 +95,8 @@ class Transmitter:
           Default: ``[-90, 90]``.
         - **elevation_pattern** (*numpy.ndarray*): Elevation pattern in decibels (dB).
           Default: ``[0, 0]``.
+        - **grid** (*float*): The grid size in degrees (°) used to initially check the occupancy of a scene.
+          Default: ``1``.
         - **pulse_amp** (*numpy.ndarray*):
           Relative amplitude sequence for pulse amplitude modulation.
           Length must match ``pulses``. Default: ``1``.
