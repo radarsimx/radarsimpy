@@ -133,6 +133,9 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None
         - ``sample``: Perform ray-tracing for each sample.
     :param Radar or None interf:
         Interference radar object. Default: ``None``.
+    :param float or list or None interf_frame_time:
+        Frame times for interference radar simulation. If None, uses the same frame_time as the main radar.
+        Default: ``None``.
     :param list or None ray_filter:
         Filters rays based on the number of reflections.
         Only rays with the number of reflections between ``ray_filter[0]``
