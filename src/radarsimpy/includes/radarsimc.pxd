@@ -62,7 +62,7 @@ cdef extern from "target.hpp":
                const vector[Vec3[T]] & rotation_rate_array,
                const cpp_complex[T] & ep,
                const cpp_complex[T] & mu,
-               const bool & is_ground) except +
+               const bool & skip_diffusion) except +
         Target(const T * points,
                const int_t * cells,
                const int_t & cell_size) except +
@@ -74,7 +74,7 @@ cdef extern from "target.hpp":
                const Vec3[T] & speed,
                const Vec3[T] & rotation,
                const Vec3[T] & rotation_rate,
-               const bool & is_ground) except +
+               const bool & skip_diffusion) except +
 
 #------------------------------------------------------------------------------
 # Ray

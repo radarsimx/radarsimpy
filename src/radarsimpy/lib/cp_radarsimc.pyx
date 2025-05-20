@@ -595,7 +595,7 @@ cdef Target[float_t] cp_Target(radar,
                            rrt_vt,
                            ep_c,
                            mu_c,
-                           <bool> target.get("is_ground", False))
+                           <bool> target.get("skip_diffusion", False))
 
 @cython.cdivision(True)
 @cython.boundscheck(False)
@@ -671,4 +671,4 @@ cdef Target[float_t] cp_RCS_Target(target, mesh_module):
                            rrt_vt,
                            ep_c,
                            mu_c,
-                           <bool> target.get("is_ground", False))
+                           <bool> target.get("skip_diffusion", False))
