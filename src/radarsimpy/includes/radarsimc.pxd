@@ -92,9 +92,9 @@ cdef extern from "ray.hpp":
 cdef extern from "simulator_rcs.hpp":
     cdef cppclass RcsSimulator[T]:
         RcsSimulator() except +
-        T Run(vector[Target[float]] & targets,
-              Vec3[T] inc_dir,
-              Vec3[T] obs_dir,
+        vector[T] Run(vector[Target[float]] & targets,
+              vector[Vec3[T]] inc_dir_array,
+              vector[Vec3[T]] obs_dir_array,
               Vec3[cpp_complex[T]] inc_polarization,
               Vec3[cpp_complex[T]] obs_polarization,
               T frequency,

@@ -137,6 +137,38 @@ cpdef sim_rcs(
     if obs_theta is None:
         obs_theta = inc_theta
 
+    if isinstance(inc_phi, (list, tuple, np.ndarray)):
+        inc_phi = np.array(inc_phi)
+    else:
+        inc_phi = np.array([inc_phi])
+
+    if isinstance(inc_theta, (list, tuple, np.ndarray)):
+        inc_theta = np.array(inc_theta)
+    else:
+        inc_theta = np.array([inc_theta])
+    
+    if np.shape(inc_phi)!=np.shape(inc_theta):
+        raise ValueError('The lengths of `inc_phi` and `inc_theta` must be the same')
+
+    if isinstance(obs_phi, (list, tuple, np.ndarray)):
+        obs_phi = np.array(obs_phi)
+    else:
+        obs_phi = np.array([obs_phi])
+
+    if isinstance(obs_theta, (list, tuple, np.ndarray)):
+        obs_theta = np.array(obs_theta)
+    else:
+        obs_theta = np.array([obs_theta])
+    
+    if np.shape(obs_phi)!=np.shape(obs_theta):
+        raise ValueError('The lengths of `obs_phi` and `obs_theta` must be the same')
+    
+    if np.shape(inc_phi)!=np.shape(obs_phi):
+        raise ValueError('The lengths of `inc_phi` and `obs_phi` must be the same')
+    
+    cdef int array_size = np.size(obs_phi)
+    cdef int idx
+
     # Convert polarization vectors to C++ types
     inc_pol_cpp = Vec3[cpp_complex[double]](
         cpp_complex[double](np.real(inc_pol[0]), np.imag(inc_pol[0])),
@@ -161,23 +193,36 @@ cpdef sim_rcs(
     obs_phi_rad = np.radians(obs_phi)
     obs_theta_rad = np.radians(obs_theta)
 
-    # Calculate direction vectors
-    cdef Vec3[double] inc_dir = Vec3[double](
-        <double>(np.sin(inc_theta_rad) * np.cos(inc_phi_rad)),
-        <double>(np.sin(inc_theta_rad) * np.sin(inc_phi_rad)),
-        <double>(np.cos(inc_theta_rad))
-    )
+    inc_dir_x=np.sin(inc_theta_rad) * np.cos(inc_phi_rad)
+    inc_dir_y=np.sin(inc_theta_rad) * np.sin(inc_phi_rad)
+    inc_dir_z=np.cos(inc_theta_rad)
 
-    cdef Vec3[double] obs_dir = Vec3[double](
-        <double>(np.sin(obs_theta_rad) * np.cos(obs_phi_rad)),
-        <double>(np.sin(obs_theta_rad) * np.sin(obs_phi_rad)),
-        <double>(np.cos(obs_theta_rad))
-    )
+    obs_dir_x=np.sin(obs_theta_rad) * np.cos(obs_phi_rad)
+    obs_dir_y=np.sin(obs_theta_rad) * np.sin(obs_phi_rad)
+    obs_dir_z=np.cos(obs_theta_rad)
+
+    cdef vector[Vec3[double]] inc_dir
+    cdef vector[Vec3[double]] obs_dir
+
+    for idx in range(0, array_size):
+
+        # Calculate direction vectors
+        inc_dir.push_back(Vec3[double](
+            <double>(inc_dir_x[idx]),
+            <double>(inc_dir_y[idx]),
+            <double>(inc_dir_z[idx])
+        ))
+
+        obs_dir.push_back(Vec3[double](
+            <double>(obs_dir_x[idx]),
+            <double>(obs_dir_y[idx]),
+            <double>(obs_dir_z[idx])
+        ))
 
     # Calculate RCS
     cdef RcsSimulator[double] rcs_sim_c
 
-    return rcs_sim_c.Run(
+    cdef vector[double] rcs_vect = rcs_sim_c.Run(
         targets_vt,
         inc_dir,
         obs_dir,
@@ -185,3 +230,13 @@ cpdef sim_rcs(
         obs_pol_cpp,
         <double>f,
         <double>density)
+
+    rcs=np.zeros(array_size)
+
+    for idx in range(0, array_size):
+        rcs[idx] = rcs_vect[idx]
+
+    if array_size == 1:
+        return rcs[0]
+    else:
+        return rcs
