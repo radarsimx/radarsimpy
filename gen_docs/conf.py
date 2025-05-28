@@ -42,13 +42,12 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
-    "sphinx_rtd_theme",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
-html_favicon = "radarsimdoc.png"  # pylint: disable=invalid-name
+html_favicon = "_static/radarsimdoc.png"  # pylint: disable=invalid-name
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -61,20 +60,23 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_rtd_theme"  # pylint: disable=invalid-name
+html_theme = "pydata_sphinx_theme"  # pylint: disable=invalid-name
+
 html_theme_options = {
-    'logo_only': False,
-    'prev_next_buttons_location': 'bottom',
-    'style_external_links': False,
-    'vcs_pageview_mode': '',
-    'flyout_display': 'hidden',
-    'version_selector': True,
-    # Toc options
-    'collapse_navigation': True,
-    'sticky_navigation': True,
-    'navigation_depth': 4,
-    'includehidden': True,
-    'titles_only': False
+    "logo": {
+        "text": "RadarSimPy v"+version,
+        "image_light": "_static/radarsimdoc.svg",
+        "image_dark": "_static/radarsimdoc.svg",
+    },
+    "navbar_align": "left",
+    # "navbar_end": ["navbar-icon-links"],
+    # "navbar_start": ["navbar-logo"],
+    "secondary_sidebar_items": ["page-toc"],
+    "show_nav_level": 2,
+    "show_toc_level": 1,
+    "use_edit_page_button": False,
+    "show_version_warning_banner": True,
+    "header_links_before_dropdown": 8,
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
