@@ -8,7 +8,7 @@
    viewBox="0 0 400 400"
    version="1.1"
    id="svg8"
-   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
    sodipodi:docname="radarsimdoc.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -27,10 +27,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.175"
-     inkscape:cx="-480"
+     inkscape:cx="-482.85714"
      inkscape:cy="954.28571"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g2485"
      inkscape:document-rotation="0"
      showgrid="false"
      inkscape:window-width="2253"
@@ -228,17 +228,11 @@
            y="378.69226"
            rx="10"
            ry="10" />
-        <text
-           xml:space="preserve"
-           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:100.061px;line-height:1.25;font-family:Roboto;-inkscape-font-specification:'Roboto Bold';fill:#4d4d4d;fill-opacity:1;stroke:none;stroke-width:2.50154"
-           x="276.6011"
-           y="471.98056"
-           id="text238"><tspan
-             sodipodi:role="line"
-             id="tspan236"
-             style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:Roboto;-inkscape-font-specification:'Roboto Bold';fill:#4d4d4d;fill-opacity:1;stroke-width:2.50154"
-             x="276.6011"
-             y="471.98056">Doc</tspan></text>
+        <path
+           d="m 344.8427,435.55836 q 0,18.11104 -10.30628,27.31665 -10.20622,9.10555 -28.7175,9.10555 h -20.21233 v -71.44355 h 22.41367 q 11.20683,0 19.41183,4.00244 8.30506,4.00244 12.80781,11.8072 4.6028,7.70469 4.6028,19.21171 z m -15.70957,0.40024 q 0,-11.90726 -5.20317,-17.41061 -5.20318,-5.60342 -15.10921,-5.60342 h -8.10494 v 46.52837 h 6.50396 q 21.91336,0 21.91336,-23.51434 z m 78.9481,8.60525 q 0,13.60829 -7.20439,21.01281 -7.10433,7.40451 -19.41184,7.40451 -7.60463,0 -13.60829,-3.30201 -5.9036,-3.30202 -9.30567,-9.60586 -3.40208,-6.4039 -3.40208,-15.50945 0,-13.6083 7.10433,-20.91275 7.10433,-7.30445 19.5119,-7.30445 7.70469,0 13.60829,3.30201 5.9036,3.30201 9.30568,9.60585 3.40207,6.20379 3.40207,15.30934 z m -37.723,0 q 0,8.10494 2.60159,12.3075 2.70165,4.1025 8.70531,4.1025 5.9036,0 8.50518,-4.1025 2.70165,-4.20256 2.70165,-12.3075 0,-8.10494 -2.70165,-12.10738 -2.60158,-4.1025 -8.60524,-4.1025 -5.9036,0 -8.60525,4.1025 -2.60159,4.00244 -2.60159,12.10738 z m 72.24399,28.41732 q -12.20744,0 -18.91153,-6.70409 -6.60402,-6.80414 -6.60402,-21.31299 0,-10.0061 3.40207,-16.30994 3.40208,-6.30384 9.40574,-9.30567 6.10372,-3.00183 14.00854,-3.00183 5.60341,0 9.70591,1.10067 4.20256,1.10067 7.30445,2.60158 l -4.40268,11.50702 q -3.50213,-1.40086 -6.60402,-2.30141 -3.00183,-0.90054 -6.00366,-0.90054 -11.60708,0 -11.60708,16.51006 0,8.205 3.00183,12.10738 3.10189,3.90238 8.60525,3.90238 4.70286,0 8.30506,-1.20073 3.60219,-1.3008 7.00427,-3.50214 v 12.70775 q -3.40208,2.20134 -7.20439,3.10189 -3.70226,1.00061 -9.40574,1.00061 z"
+           id="text238"
+           style="font-weight:bold;font-size:100.061px;line-height:1.25;font-family:Roboto;-inkscape-font-specification:'Roboto Bold';fill:#4d4d4d;stroke-width:2.50154"
+           aria-label="Doc" />
       </g>
     </g>
   </g>

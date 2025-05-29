@@ -28,9 +28,9 @@ copyright = (  # pylint: disable=redefined-builtin, invalid-name
 )
 author = "Dr. Zhengyu Peng"  # pylint: disable=invalid-name
 version = radarsimpy.__version__  # pylint: disable=invalid-name
-release = version # pylint: disable=invalid-name
+release = version  # pylint: disable=invalid-name
 
-pygments_style = 'sphinx'
+pygments_style = "sphinx"
 
 # -- General configuration ---------------------------------------------------
 
@@ -43,6 +43,8 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
 ]
+
+autodoc_typehints = "description"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -64,7 +66,7 @@ html_theme = "pydata_sphinx_theme"  # pylint: disable=invalid-name
 
 html_theme_options = {
     "logo": {
-        "text": "RadarSimPy v"+version,
+        "text": "RadarSimPy v" + version,
         "image_light": "_static/radarsimdoc.svg",
         "image_dark": "_static/radarsimdoc.svg",
     },
