@@ -15,27 +15,19 @@ Welcome to RadarSimPy's documentation!
 
 |
 
+User Guide
+----------
+
 .. toctree::
    :maxdepth: 2
-   :caption: Instruction
 
-   dependence
-   installation
-   coordinate
+   user_guide/index
+
+
+API
+----------
 
 .. toctree::
-   :maxdepth: 3
-   :caption: API
+   :maxdepth: 2
 
-   radar
-   sim
-   process
-   tools
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   api/index

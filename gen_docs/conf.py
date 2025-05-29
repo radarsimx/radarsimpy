@@ -24,9 +24,8 @@ import radarsimpy  # pylint: disable=wrong-import-position
 
 project = "RadarSimPy"  # pylint: disable=invalid-name
 copyright = (  # pylint: disable=redefined-builtin, invalid-name
-    "2018 - " + str(datetime.datetime.now().year) + ", radarsimx.com"
+    "2018 - " + str(datetime.datetime.now().year) + ", RadarSimX LLC"
 )
-author = "Dr. Zhengyu Peng"  # pylint: disable=invalid-name
 version = radarsimpy.__version__  # pylint: disable=invalid-name
 release = version  # pylint: disable=invalid-name
 

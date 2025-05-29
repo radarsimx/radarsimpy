@@ -6,4 +6,4 @@ Simulator
     :undoc-members:
     :inherited-members:
     :show-inheritance:
-    :exclude-members:
+    :exclude-members: raise_err
