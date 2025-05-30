@@ -1,43 +1,45 @@
-Dependence
-===========
+Dependencies
+============
 
-- ``Python`` >= 3.9
-- ``NumPy`` >= 2.0
-- ``SciPy``
-- ``PyMeshLab``, ``PyVista``, ``trimesh`` or ``meshio``
+Python Requirements
+-------------------
 
-**Windows**
+* ``Python`` >= 3.9
+* ``NumPy`` >= 2.0
+* ``SciPy`` >= 1.11.0
+* One of the following mesh processing libraries:
 
-    - `Visual C++ Runtime <https://aka.ms/vs/16/release/vc_redist.x64.exe/>`_
-    - GPU version (CUDA12) - Check `Minimum Required Driver Versions <https://docs.nvidia.com/deploy/cuda-compatibility/#id1>`_
+  * ``PyMeshLab`` >= 2022.2
+  * ``PyVista`` >= 0.43.0
+  * ``trimesh`` >= 4.0.0
+  * ``meshio`` >= 5.3.0
 
-**Ubuntu 22.04**
+System Requirements
+-------------------
 
-    - ``GCC 11`` *(Included by default, no additional installation required)*
-    - GPU version (CUDA12) - Check `Minimum Required Driver Versions <https://docs.nvidia.com/deploy/cuda-compatibility/#id1>`_
+Windows
+^^^^^^^
+* `Visual C++ Runtime <https://aka.ms/vs/16/release/vc_redist.x64.exe/>`_
+* For GPU version (CUDA 12): Latest NVIDIA drivers - See `compatibility guide <https://docs.nvidia.com/deploy/cuda-compatibility/#id1>`_
 
-**Ubuntu 24.04**
+Linux
+^^^^^
 
-    - ``GCC 13`` *(Included by default, no additional installation required)*
-    - GPU version (CUDA12) - Check `Minimum Required Driver Versions <https://docs.nvidia.com/deploy/cuda-compatibility/#id1>`_
+**Ubuntu 22.04/24.04**
 
-**Generic Linux x86-64**
+* GCC (included by default)
+* For GPU version (CUDA 12): Latest NVIDIA drivers
 
-    - Try the module for Ubuntu 22.04 or Ubuntu 24.04
-    - `Request a Custom Build <https://radarsimx.com/request-a-custom-build/>`_ if it doesn't work
+**Other Linux distributions**
 
-**MacOS Intel**
+* Try the Ubuntu builds first
+* `Request a custom build <https://radarsimx.com/request-a-custom-build/>`_ if needed
 
-    - ``GCC 14``
+MacOS
+^^^^^
 
-    .. code-block:: bash
+**Intel/Apple Silicon**
 
-        brew install gcc@14
+* GCC 14 installation::
 
-**MacOS Apple Silicon**
-
-    - ``GCC 14``
-
-    .. code-block:: bash
-        
-        brew install gcc@14
+    brew install gcc@14

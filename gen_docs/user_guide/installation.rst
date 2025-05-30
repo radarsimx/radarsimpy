@@ -1,47 +1,58 @@
 Installation
-=============
+============
 
-Download the `pre-built module <https://radarsimx.com/product/radarsimpy/>`_, and put the radarsimpy folder within your project folder as shown below:
+Quick Start
+-----------
 
-**Windows**
+1. Download the `pre-built module <https://radarsimx.com/product/radarsimpy/>`_
+2. Extract the package
+3. Place the radarsimpy folder in your project directory
 
-::
+Directory Structure
+-------------------
 
-    - your_project.py
-    - your_project.ipynb
-    - radarsimpy
-        - __init__.py
-        - radarsimcpp.dll
-        - simulator.xxx.pyd
-        - radar.py
-        - processing.py
-        - ...
+The following shows the typical project structure after installation:
 
+Common Files
+^^^^^^^^^^^^
+.. code-block:: none
 
-**Linux**
+    your_project/
+    ├── your_project.py
+    ├── your_project.ipynb
+    └── radarsimpy/
+        ├── __init__.py
+        ├── radar.py
+        ├── processing.py
+        └── ...
 
-::
+Platform-Specific Files
+^^^^^^^^^^^^^^^^^^^^^^^
 
-    - your_project.py
-    - your_project.ipynb
-    - radarsimpy
-        - __init__.py
-        - libradarsimcpp.so
-        - simulator.xxx.so
-        - radar.py
-        - processing.py
-        - ...
+**Windows**::
 
-**MacOS**
+    radarsimpy/
+    ├── radarsimcpp.dll
+    └── simulator.xxx.pyd
 
-::
+**Linux**::
 
-    - your_project.py
-    - your_project.ipynb
-    - radarsimpy
-        - __init__.py
-        - libradarsimcpp.dylib
-        - simulator.xxx.so
-        - radar.py
-        - processing.py
-        - ...
+    radarsimpy/
+    ├── libradarsimcpp.so
+    └── simulator.xxx.so
+
+**MacOS**::
+
+    radarsimpy/
+    ├── libradarsimcpp.dylib
+    └── simulator.xxx.so
+
+Verification
+------------
+
+To verify the installation, run:
+
+.. code-block:: python
+
+    import radarsimpy
+    print(radarsimpy.__version__)

@@ -41,6 +41,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
+    "sphinx.ext.doctest",  # Add doctest extension
 ]
 
 autodoc_typehints = "description"
@@ -70,14 +71,27 @@ html_theme_options = {
         "image_dark": "_static/radarsimdoc.svg",
     },
     "navbar_align": "left",
-    # "navbar_end": ["navbar-icon-links"],
-    # "navbar_start": ["navbar-logo"],
     "secondary_sidebar_items": ["page-toc"],
     "show_nav_level": 2,
-    "show_toc_level": 1,
-    "use_edit_page_button": False,
+    "show_toc_level": 2,
     "show_version_warning_banner": True,
     "header_links_before_dropdown": 8,
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/radarsimx/radarsimpy",
+            "icon": "fab fa-github",
+        },
+    ],
+    "footer_start": ["copyright"],
+    "footer_end": ["sphinx-version", "theme-version"],
+}
+
+html_context = {
+    "default_mode": "auto",
+    "display_github": True,
+    "github_user": "radarsimx",
+    "github_repo": "radarsimpy",
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
