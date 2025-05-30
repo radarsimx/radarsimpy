@@ -78,6 +78,11 @@ html_theme_options = {
     "header_links_before_dropdown": 8,
     "icon_links": [
         {
+            "name": "RadarSimX",
+            "url": "https://radarsimx.com/",
+            "icon": "fas fa-globe",
+        },
+        {
             "name": "GitHub",
             "url": "https://github.com/radarsimx/radarsimpy",
             "icon": "fab fa-github",

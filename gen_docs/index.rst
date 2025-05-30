@@ -18,6 +18,8 @@ Welcome to RadarSimPy's documentation!
 User Guide
 ----------
 
+Step-by-step guides to help you get started with RadarSimPy and understand key concepts.
+
 .. toctree::
    :maxdepth: 2
 
@@ -25,7 +27,9 @@ User Guide
 
 
 API
-----------
+---
+
+Complete reference documentation for all RadarSimPy classes and functions.
 
 .. toctree::
    :maxdepth: 2
