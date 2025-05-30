@@ -89,7 +89,8 @@ html_theme_options = {
         },
     ],
     "footer_start": ["copyright"],
-    "footer_end": ["sphinx-version", "theme-version"],
+    "footer_center ": ["sphinx-version"],
+    "footer_end": ["theme-version"],
 }
 
 html_context = {
