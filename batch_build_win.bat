@@ -70,8 +70,8 @@ DEL ".\src\*.html"
 
 REM Create FreeTier distribution
 ECHO ## Copying lib files to freetier release folder ##
-RMDIR /Q/S .\Windows_x86_64_CPU_FreeTier
-XCOPY /E /I .\radarsimpy .\Windows_x86_64_CPU_FreeTier\radarsimpy
+RMDIR /Q/S .\trial\Windows_x86_64_CPU
+XCOPY /E /I .\radarsimpy .\trial\Windows_x86_64_CPU\radarsimpy
 
 RMDIR /Q/S .\radarsimpy
 
@@ -106,8 +106,8 @@ DEL ".\src\*.html"
 
 REM Create Standard Tier distribution
 ECHO ## Copying lib files to standard release folder ##
-RMDIR /Q/S .\Windows_x86_64_CPU
-XCOPY /E /I .\radarsimpy .\Windows_x86_64_CPU\radarsimpy
+RMDIR /Q/S .\standard\Windows_x86_64_CPU
+XCOPY /E /I .\radarsimpy .\standard\Windows_x86_64_CPU\radarsimpy
 
 REM Build completed
 ECHO ## Build completed ##

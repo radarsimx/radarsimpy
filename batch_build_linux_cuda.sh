@@ -66,10 +66,10 @@ rm -f ./src/*.html
 
 # Package Free Tier GPU release
 echo "## Copying lib files to freetier release folder ##"
-rm -rf ./Linux_x86_64_GPU_FreeTier
-mkdir ./Linux_x86_64_GPU_FreeTier
-mkdir ./Linux_x86_64_GPU_FreeTier/radarsimpy
-cp -rf ./radarsimpy/* ./Linux_x86_64_GPU_FreeTier/radarsimpy
+rm -rf ./trial/Linux_x86_64_GPU
+mkdir ./trial/Linux_x86_64_GPU
+mkdir ./trial/Linux_x86_64_GPU/radarsimpy
+cp -rf ./radarsimpy/* ./trial/Linux_x86_64_GPU/radarsimpy
 
 # Clean and rebuild for Standard Tier
 rm -rf ./radarsimpy
@@ -102,10 +102,10 @@ rm -f ./src/*.html
 
 # Package Standard Tier GPU release
 echo "## Copying lib files to standard release folder ##"
-rm -rf ./Linux_x86_64_GPU
-mkdir ./Linux_x86_64_GPU
-mkdir ./Linux_x86_64_GPU/radarsimpy
-cp -rf ./radarsimpy/* ./Linux_x86_64_GPU/radarsimpy
+rm -rf ./standard/Linux_x86_64_GPU
+mkdir ./standard/Linux_x86_64_GPU
+mkdir ./standard/Linux_x86_64_GPU/radarsimpy
+cp -rf ./radarsimpy/* ./standard/Linux_x86_64_GPU/radarsimpy
 
 # Run unit tests
 echo "## Build completed ##"

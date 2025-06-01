@@ -70,8 +70,8 @@ DEL ".\src\*.html"
 
 REM Create FreeTier GPU distribution
 ECHO ## Copying lib files to freetier release folder ##
-RMDIR /Q/S .\Windows_x86_64_GPU_FreeTier
-XCOPY /E /I .\radarsimpy .\Windows_x86_64_GPU_FreeTier\radarsimpy
+RMDIR /Q/S .\trial\Windows_x86_64_GPU
+XCOPY /E /I .\radarsimpy .\trial\Windows_x86_64_GPU\radarsimpy
 
 RMDIR /Q/S .\radarsimpy
 
@@ -106,8 +106,8 @@ DEL ".\src\*.html"
 
 REM Create Standard Tier GPU distribution
 ECHO ## Copying lib files to standard release folder ##
-RMDIR /Q/S .\Windows_x86_64_GPU
-XCOPY /E /I .\radarsimpy .\Windows_x86_64_GPU\radarsimpy
+RMDIR /Q/S .\standard\Windows_x86_64_GPU
+XCOPY /E /I .\radarsimpy .\standard\Windows_x86_64_GPU\radarsimpy
 
 REM Run unit tests
 ECHO ## Run Google test ##

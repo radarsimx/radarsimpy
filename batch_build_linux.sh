@@ -66,10 +66,10 @@ rm -f ./src/*.html
 
 # Package Free Tier CPU release
 echo "## Copying lib files to freetier release folder ##"
-rm -rf ./Linux_x86_64_CPU_FreeTier
-mkdir ./Linux_x86_64_CPU_FreeTier
-mkdir ./Linux_x86_64_CPU_FreeTier/radarsimpy
-cp -rf ./radarsimpy/* ./Linux_x86_64_CPU_FreeTier/radarsimpy
+rm -rf ./trial/Linux_x86_64_CPU
+mkdir ./trial/Linux_x86_64_CPU
+mkdir ./trial/Linux_x86_64_CPU/radarsimpy
+cp -rf ./radarsimpy/* ./trial/Linux_x86_64_CPU/radarsimpy
 
 # Clean and rebuild for Standard Tier
 rm -rf ./radarsimpy
@@ -102,10 +102,10 @@ rm -f ./src/*.html
 
 # Package Standard Tier CPU release
 echo "## Copying lib files to standard release folder ##"
-rm -rf ./Linux_x86_64_CPU
-mkdir ./Linux_x86_64_CPU
-mkdir ./Linux_x86_64_CPU/radarsimpy
-cp -rf ./radarsimpy/* ./Linux_x86_64_CPU/radarsimpy
+rm -rf ./standard/Linux_x86_64_CPU
+mkdir ./standard/Linux_x86_64_CPU
+mkdir ./standard/Linux_x86_64_CPU/radarsimpy
+cp -rf ./radarsimpy/* ./standard/Linux_x86_64_CPU/radarsimpy
 
 # Run unit tests
 echo "## Build completed ##"
