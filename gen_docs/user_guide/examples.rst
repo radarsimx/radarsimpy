@@ -50,7 +50,7 @@ Interference
 
 System Characterization
 -----------------------
-* `FMCW Radar Link Budget - Ideal Point Target <https://radarsimx.com/2024/10/11/fmcw-radar-link-budget-ideal-point-target/>`_
+* `FMCW Radar Link Budget (Point Target) <https://radarsimx.com/2024/10/11/fmcw-radar-link-budget-point-target//>`_
 * `Phase noise <https://radarsimx.com/2021/01/13/phase-noise/>`_
 * `Receiver operating characteristic (ROC) <https://radarsimx.com/2019/10/06/receiver-operating-characteristic/>`_
 
