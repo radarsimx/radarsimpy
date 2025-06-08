@@ -118,11 +118,8 @@ cpdef sim_rcs(
     if IsFreeTier():
         if len(targets) > 3:
             raise RuntimeError(
-                "You're currently using RadarSimPy's FreeTier, which limits RCS simulation to 3 maximum targets. "
-                "Please consider supporting my work by upgrading to the standard version. "
-                "Just choose any amount greater than zero on https://radarsimx.com/product/radarsimpy/ "
-                "to access the standard version download links. "
-                "Your support will help improve the software. Thank you for considering it."
+                "You're currently using RadarSimPy's trial version, which limits RCS simulation to 3 maximum targets. "
+                "Please consider supporting my work by upgrading to the standard version on https://radarsimx.com/product/radarsimpy/."
             )
 
     cdef vector[Target[float]] targets_vt
