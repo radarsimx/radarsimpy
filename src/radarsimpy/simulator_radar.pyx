@@ -210,13 +210,37 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None
     # FreeTier validation
     if IsFreeTier():
         if len(targets) > 2:
-            raise RuntimeError("You're currently using RadarSimPy's trial version, which limits RCS simulation to 2 maximum target. Please consider supporting my work by upgrading to the standard version on https://radarsimx.com/product/radarsimpy/.")
+            raise RuntimeError(
+                "\nTrial Version Limitation - Target Count\n"
+                "----------------------------------------\n"
+                "Current limitation: Maximum 2 targets\n"
+                "Your scene: {} targets\n\n"
+                "To simulate more targets, please upgrade to the Standard Version:\n"
+                "→ https://radarsimx.com/product/radarsimpy/\n"
+                .format(len(targets))
+            )
 
         if radar.radar_prop["transmitter"].txchannel_prop["size"] > 1:
-            raise RuntimeError("You're currently using RadarSimPy's trial version, which imposes a restriction on the maximum number of transmitter channels to 1. Please consider supporting my work by upgrading to the standard version on https://radarsimx.com/product/radarsimpy/.")
+            raise RuntimeError(
+                "\nTrial Version Limitation - Transmitter Channels\n"
+                "----------------------------------------------\n"
+                "Current limitation: 1 transmitter channel\n"
+                "Your configuration: {} channels\n\n"
+                "To use multiple transmitter channels, please upgrade to the Standard Version:\n"
+                "→ https://radarsimx.com/product/radarsimpy/\n"
+                .format(radar.radar_prop["transmitter"].txchannel_prop["size"])
+            )
 
         if radar.radar_prop["receiver"].rxchannel_prop["size"] > 1:
-            raise RuntimeError("You're currently using RadarSimPy's trial version, which imposes a restriction on the maximum number of receiver channels to 1. Please consider supporting my work by upgrading to the standard version on https://radarsimx.com/product/radarsimpy/.")
+            raise RuntimeError(
+                "\nTrial Version Limitation - Receiver Channels\n"
+                "-------------------------------------------\n"
+                "Current limitation: 1 receiver channel\n"
+                "Your configuration: {} channels\n\n"
+                "To use multiple receiver channels, please upgrade to the Standard Version:\n"
+                "→ https://radarsimx.com/product/radarsimpy/\n"
+                .format(radar.radar_prop["receiver"].rxchannel_prop["size"])
+            )
 
     # Basic setup
     frame_start_time = np.array(frame_time, dtype=np.float64)

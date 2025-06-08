@@ -483,7 +483,16 @@ cdef Target[float_t] cp_Target(radar,
     
     if IsFreeTier():
         if cells_mv.shape[0] > 8:
-            raise RuntimeError("You're currently using RadarSimPy's trial version, which imposes a restriction on the maximum mesh size of a target to 8. Please consider supporting my work by upgrading to the standard version on https://radarsimx.com/product/radarsimpy/.")
+            raise RuntimeError(
+                "\nTrial Version Limitation - Mesh Size\n"
+                "-----------------------------------\n"
+                "Current limitation: Maximum 8 mesh faces\n"
+                "Your model: {} faces\n\n"
+                "This limitation helps maintain reasonable simulation times in the trial version.\n"
+                "To simulate larger meshes, please upgrade to the Standard Version:\n"
+                "→ https://radarsimx.com/product/radarsimpy/\n"
+                .format(cells_mv.shape[0])
+            )
 
     cdef float_t[:] origin_mv = np.array(target.get("origin", (0, 0, 0)), dtype=np_float)
 
@@ -628,8 +637,18 @@ cdef Target[float_t] cp_RCS_Target(target, mesh_module):
     cells_mv = mesh_data["cells"].astype(np.int32)
 
     # Check FreeTier mesh size limit
-    if IsFreeTier() and cells_mv.shape[0] > 8:
-        raise RuntimeError("You're currently using RadarSimPy's trial version, which imposes a restriction on the maximum mesh size of a target to 8. Please consider supporting my work by upgrading to the standard version on https://radarsimx.com/product/radarsimpy/.")
+    if IsFreeTier():
+        if cells_mv.shape[0] > 8:
+            raise RuntimeError(
+                "\nTrial Version Limitation - Mesh Size\n"
+                "-----------------------------------\n"
+                "Current limitation: Maximum 8 mesh faces\n"
+                "Your model: {} faces\n\n"
+                "This limitation helps maintain reasonable simulation times in the trial version.\n"
+                "To simulate larger meshes, please upgrade to the Standard Version:\n"
+                "→ https://radarsimx.com/product/radarsimpy/\n"
+                .format(cells_mv.shape[0])
+            )
 
     cdef float_t[:] origin_mv = np.array(target.get("origin", (0, 0, 0)), dtype=np_float)
 
