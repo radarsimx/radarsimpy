@@ -14,8 +14,8 @@ mesh processing libraries.
 
     ██████╗  █████╗ ██████╗  █████╗ ██████╗ ███████╗██╗███╗   ███╗██╗  ██╗
     ██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔════╝██║████╗ ████║╚██╗██╔╝
-    ██████╔╝███████║██║  ██║███████║██████╔╝███████╗██║██╔████╔██║ ╚███╔╝ 
-    ██╔══██╗██╔══██║██║  ██║██╔══██║██╔══██╗╚════██║██║██║╚██╔╝██║ ██╔██╗ 
+    ██████╔╝███████║██║  ██║███████║██████╔╝███████╗██║██╔████╔██║ ╚███╔╝
+    ██╔══██╗██╔══██║██║  ██║██╔══██║██╔══██╗╚════██║██║██║╚██╔╝██║ ██╔██╗
     ██║  ██║██║  ██║██████╔╝██║  ██║██║  ██║███████║██║██║ ╚═╝ ██║██╔╝ ██╗
     ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝
 
@@ -70,9 +70,18 @@ def import_mesh_module() -> object:
             return module
 
     raise ImportError(
-        "No valid module was found to process the 3D model file, "
-        + "please install one of the following modules: "
-        + "`pyvista`, `pymeshlab`, `trimesh`, `meshio`"
+        "\nMesh Processing Module Required\n"
+        "-----------------------------\n"
+        "No valid module was found to process 3D model files.\n\n"
+        "Please install one of the following modules:\n"
+        "1. PyVista (Recommended)\n"
+        "    • pip install pyvista\n"
+        "2. PyMeshLab\n"
+        "    • pip install pymeshlab\n"
+        "3. Trimesh\n"
+        "    • pip install trimesh\n"
+        "4. meshio\n"
+        "    • pip install meshio\n"
     )
 
 
@@ -120,7 +129,16 @@ def load_mesh(mesh_file_name: str, scale: float, mesh_module: object) -> dict:
         return {"points": points, "cells": cells}
 
     raise ImportError(
-        "No valid module was found to process the 3D model file, "
-        + "please install one of the following modules: "
-        + "`pyvista`, `pymeshlab`, `trimesh`, `meshio`"
+        "\nMesh Processing Module Required\n"
+        "-----------------------------\n"
+        "No valid module was found to process 3D model files.\n\n"
+        "Please install one of the following modules:\n"
+        "1. PyVista (Recommended)\n"
+        "    • pip install pyvista\n"
+        "2. PyMeshLab\n"
+        "    • pip install pymeshlab\n"
+        "3. Trimesh\n"
+        "    • pip install trimesh\n"
+        "4. meshio\n"
+        "    • pip install meshio\n"
     )

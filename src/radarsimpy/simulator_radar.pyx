@@ -326,8 +326,27 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None
         try:
             level_id = level_map[level]
         except KeyError:
-            raise ValueError("Unknown fidelity level. `frame`: Perform one ray tracing simulation for the whole frame; "
-                          "`pulse`: Perform ray tracing for each pulse; `sample`: Perform ray tracing for each sample.")
+            raise ValueError(
+                "\nInvalid Simulation Fidelity Level\n"
+                "------------------------------\n"
+                "The specified simulation fidelity level is not recognized.\n\n"
+                "Available levels:\n"
+                "- None or 'frame': One ray tracing simulation per frame\n"
+                "    • Assumes linear motion during the frame\n"
+                "    • Best performance, suitable for most scenarios\n"
+                "- 'pulse': Ray tracing for each pulse\n"
+                "    • Assumes linear motion during the pulse\n"
+                "    • Increased computation time\n"
+                "- 'sample': Ray tracing for each sample\n"
+                "    • Highest accuracy for complex motion\n"
+                "    • Significantly longer computation time\n\n"
+                "Your input: '{}'\n\n"
+                "Choose the appropriate level based on:\n"
+                "1. Target motion complexity\n"
+                "2. Required accuracy\n"
+                "3. Available computation time\n"
+                .format(level)
+            )
 
         # Run scene simulation
         err = mesh_sim_c.Run(
