@@ -18,8 +18,8 @@ including phase noise and noise amplitudes.
 
     ██████╗  █████╗ ██████╗  █████╗ ██████╗ ███████╗██╗███╗   ███╗██╗  ██╗
     ██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔════╝██║████╗ ████║╚██╗██╔╝
-    ██████╔╝███████║██║  ██║███████║██████╔╝███████╗██║██╔████╔██║ ╚███╔╝ 
-    ██╔══██╗██╔══██║██║  ██║██╔══██║██╔══██╗╚════██║██║██║╚██╔╝██║ ██╔██╗ 
+    ██████╔╝███████║██║  ██║███████║██████╔╝███████╗██║██╔████╔██║ ╚███╔╝
+    ██╔══██╗██╔══██║██║  ██║██╔══██║██╔══██╗╚════██║██║██║╚██╔╝██║ ██╔██╗
     ██║  ██║██║  ██║██████╔╝██║  ██║██║  ██║███████║██║██║ ╚═╝ ██║██╔╝ ██╗
     ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝
 
@@ -31,12 +31,12 @@ from numpy.typing import NDArray
 
 
 def cal_phase_noise(  # pylint: disable=too-many-arguments, too-many-locals
-    signal: NDArray, 
+    signal: NDArray,
     fs: float,
     freq: NDArray,
     power: NDArray,
     seed: Optional[int] = None,
-    validation: bool = False
+    validation: bool = False,
 ) -> NDArray:
     """
     Oscillator Phase Noise Model
@@ -333,20 +333,31 @@ class Radar:
     def __init__(  # pylint: disable=too-many-arguments
         self,
         transmitter: "Transmitter",
-        receiver: "Receiver", 
+        receiver: "Receiver",
         location: Tuple[float, float, float] = (0, 0, 0),
         speed: Tuple[float, float, float] = (0, 0, 0),
         rotation: Tuple[float, float, float] = (0, 0, 0),
         rotation_rate: Tuple[float, float, float] = (0, 0, 0),
         seed: Optional[int] = None,
-        **kwargs
+        **kwargs,
     ):
         self.time_prop = {}
-        self.sample_prop = {
-            "samples_per_pulse": int(
-                transmitter.waveform_prop["pulse_length"] * receiver.bb_prop["fs"]
+
+        # Calculate samples per pulse and validate
+        samples_per_pulse = int(
+            transmitter.waveform_prop["pulse_length"] * receiver.bb_prop["fs"]
+        )
+        if samples_per_pulse <= 0:
+            pulse_length = transmitter.waveform_prop["pulse_length"]
+            fs = receiver.bb_prop["fs"]
+            product = pulse_length * fs
+            raise ValueError(
+                f"samples_per_pulse must be greater than 0, got {samples_per_pulse}. "
+                f"This occurs when pulse_length ({pulse_length}) * fs ({fs}) = {product:.6f} < 1. "
+                f"Either increase the pulse_length or increase the sampling frequency."
             )
-        }
+
+        self.sample_prop = {"samples_per_pulse": samples_per_pulse}
         self.array_prop = {
             "size": (
                 transmitter.txchannel_prop["size"] * receiver.rxchannel_prop["size"]
@@ -483,8 +494,8 @@ class Radar:
         self,
         location: List[Union[float, NDArray]],
         speed: List[Union[float, NDArray]],
-        rotation: List[Union[float, NDArray]], 
-        rotation_rate: List[Union[float, NDArray]]
+        rotation: List[Union[float, NDArray]],
+        rotation_rate: List[Union[float, NDArray]],
     ) -> None:
         """
         Validate radar motion inputs
@@ -539,7 +550,7 @@ class Radar:
         location: List[Union[float, NDArray]],
         speed: List[Union[float, NDArray]],
         rotation: List[Union[float, NDArray]],
-        rotation_rate: List[Union[float, NDArray]]
+        rotation_rate: List[Union[float, NDArray]],
     ) -> None:
         """
         Process radar motion parameters
