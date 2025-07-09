@@ -21,6 +21,7 @@ A Python module for radar simulation
 
 # Standard imports
 import numpy as np
+import warnings
 
 # Cython imports
 cimport cython
@@ -679,6 +680,10 @@ cdef Target[float_t] cp_RCS_Target(target, mesh_module):
 
     rotation_rate_mv = np.radians(rotation_rate.astype(np_float)).astype(np_float)
     rrt_vt.push_back(Vec3[float_t](&rotation_rate_mv[0]))
+
+    # add a deprecated warning for target["is_ground"] has been replaced with target["skip_diffusion"]
+    if "is_ground" in target:
+        warnings.warn("Deprecated: 'is_ground' has been replaced with 'skip_diffusion'", DeprecationWarning)
 
     return Target[float_t](&points_mv[0, 0],
                            &cells_mv[0, 0],
