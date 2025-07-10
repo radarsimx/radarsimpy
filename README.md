@@ -1,11 +1,40 @@
-[![Windows x64](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_windows_x64.yml/badge.svg)](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_windows_x64.yml)
-[![Ubuntu 22.04 x64](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_ubuntu_22_x64.yml/badge.svg)](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_ubuntu_22_x64.yml)
-[![Ubuntu 24.04 x64](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_ubuntu_24_x64.yml/badge.svg)](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_ubuntu_24_x64.yml)
-[![MacOS x64](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_macos_x64.yml/badge.svg)](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_macos_x64.yml)
-[![MacOS Apple Silicon](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_macos_arm64.yml/badge.svg)](https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_macos_arm64.yml)
+<p align="center">
+  <img src="./assets/radarsimpy.svg" alt="RadarSimPy logo" width="200"/>
+</p>
 
-[![Documentations](https://img.shields.io/github/v/tag/radarsimx/radarsimpy?label=Documentation&logo=read-the-docs)](https://radarsimx.github.io/radarsimpy/)
-[![Download](https://img.shields.io/github/v/tag/radarsimx/radarsimpy?label=Download&logo=python)](https://radarsimx.com/product/radarsimpy/)
+<p align="center">
+  <a href="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_windows_x64.yml"><img src="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_windows_x64.yml/badge.svg" alt="Windows x64"/></a>
+  <a href="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_ubuntu_22_x64.yml"><img src="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_ubuntu_22_x64.yml/badge.svg" alt="Ubuntu 22.04 x64"/></a>
+  <a href="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_ubuntu_24_x64.yml"><img src="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_ubuntu_24_x64.yml/badge.svg" alt="Ubuntu 24.04 x64"/></a>
+  <a href="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_macos_x64.yml"><img src="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_macos_x64.yml/badge.svg" alt="MacOS x64"/></a>
+  <a href="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_macos_arm64.yml"><img src="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_macos_arm64.yml/badge.svg" alt="MacOS Apple Silicon"/></a>
+  <a href="https://radarsimx.github.io/radarsimpy/"><img src="https://img.shields.io/github/v/tag/radarsimx/radarsimpy?label=Documentation&logo=read-the-docs" alt="Documentation"/></a>
+  <a href="https://radarsimx.com/product/radarsimpy/"><img src="https://img.shields.io/github/v/tag/radarsimx/radarsimpy?label=Download&logo=python" alt="Download"/></a>
+</p>
+
+# RadarSimPy
+
+A **Radar** **Sim**ulator for **Py**thon
+
+RadarSimPy is a powerful and versatile Python-based Radar Simulator that models radar transceivers and simulates baseband data from point targets and 3D models. Its signal processing tools offer range/Doppler processing, direction of arrival estimation, and beamforming using various cutting-edge techniques, and you can even characterize radar detection using Swerling’s models. Whether you’re a beginner or an advanced user, RadarSimPy is the perfect tool for anyone looking to develop new radar technologies or expand their knowledge of radar systems.
+
+---
+
+## Table of Contents
+
+- [Key Features](#key-features)
+- [Dependencies](#dependencies)
+- [Installation](#installation)
+- [Quickstart](#quickstart)
+- [Acceleration](#acceleration)
+- [Coordinate Systems](#coordinate-systems)
+- [Usage Examples](#usage-examples)
+- [Build](#build)
+- [API Reference](#api-reference)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
 
 # RadarSimPy
 
@@ -15,147 +44,109 @@ A **Radar** **Sim**ulator for **Py**thon
 
 RadarSimPy is a powerful and versatile Python-based Radar Simulator that models radar transceivers and simulates baseband data from point targets and 3D models. Its signal processing tools offer range/Doppler processing, direction of arrival estimation, and beamforming using various cutting-edge techniques, and you can even characterize radar detection using Swerling’s models. Whether you’re a beginner or an advanced user, RadarSimPy is the perfect tool for anyone looking to develop new radar technologies or expand their knowledge of radar systems.
 
+---
+
 ## Key Features
 
-- ### Radar Modeling
-
-  - Radar transceiver modeling
+- :satellite: **Radar Modeling**
+  - Transceiver modeling
   - Arbitrary waveform (CW, FMCW, PMCW, Pulse, ...)
   - Phase noise
   - Phase/amplitude modulation (CDM, FDM, DDM, TDM, ...)
   - Fast-time/slow-time modulation
-
-- ### Simulation
-
-  - Simulation of radar baseband data from point targets
-  - Simulation of radar baseband data from 3D modeled objects/environment
-  - Simulation of interference
-  - Simulation of target's RCS
-  - Simulation of LiDAR point cloud from 3D modeled objects/environment
-
-- ### Signal Processing
-
+- :video_game: **Simulation**
+  - Baseband data from point targets & 3D models
+  - Interference simulation
+  - Target RCS simulation
+  - LiDAR point cloud simulation
+- :signal_strength: **Signal Processing**
   - Range/Doppler processing
-  - Direction of arrival (DoA) estimation
-    - **MU**ltiple **SI**gnal **C**lassification (MUSIC) DoA estimations for a uniform linear array (ULA)
-    - Root-MUSIC DoA estimation for a ULA
-    - **E**stimation of **S**ignal **P**arameters via **R**ational **I**nvariance **T**echniques (ESPRIT) DoA estimation for a ULA
-    - **I**terative **A**daptive **A**pproach (IAA) for amplitude and phase estimation
-  - Beamformer
-    - Capon beamformer
-    - Bartlett beamformer
-  - Constant false alarm rate (CFAR)
-    - 1D/2D cell-averaging CFAR (CA-CFAR)
-    - 1D/2D ordered-statistic CFAR (OS-CFAR)
+  - DoA estimation (MUSIC, Root-MUSIC, ESPRIT, IAA)
+  - Beamforming (Capon, Bartlett)
+  - CFAR (CA-CFAR, OS-CFAR)
+- :chart_with_upwards_trend: **Characterization**
+  - Radar detection characteristics (Swerling’s models)
 
-- ### Characterization
+---
 
-  - Radar detection characteristics based on Swerling's models
+## Dependencies
 
-## Dependence
+- Python >= 3.9
+- NumPy >= 2.0
+- SciPy
+- PyMeshLab, PyVista, trimesh, or meshio
 
-- `Python` >= 3.9
-- `NumPy` >= 2.0
-- `SciPy`
-- `PyMeshLab`, `PyVista`, `trimesh` or `meshio`
+**Platform-specific requirements:**
 
-- ### Windows
+- **Windows**
+  - [Visual C++ Runtime](https://aka.ms/vs/16/release/vc_redist.x64.exe/)
+  - GPU version (CUDA12.8) – see [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1)
+- **Ubuntu 22.04**
+  - GCC 11 (default)
+  - GPU version (CUDA12.8) – see [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1)
+- **Ubuntu 24.04**
+  - GCC 13 (default)
+  - GPU version (CUDA12.8) – see [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1)
+- **Generic Linux x86-64**
+  - Try Ubuntu 22.04/24.04 module, or [request a custom build](https://radarsimx.com/request-a-custom-build/)
+- **MacOS Intel/Apple Silicon**
+  - GCC 14: `brew install gcc@14`
 
-  - [`Visual C++ Runtime`](https://aka.ms/vs/16/release/vc_redist.x64.exe/)
-  - GPU version (CUDA12.8) - Check [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1)
-
-- ### Ubuntu 22.04
-
-  - `GCC 11` *(Included by default, no additional installation required)*
-  - GPU version (CUDA12.8) - Check [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1)
-
-- ### Ubuntu 24.04
-
-  - `GCC 13` *(Included by default, no additional installation required)*
-  - GPU version (CUDA12.8) - Check [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1)
-
-- ### Generic Linux x86-64
-
-  - Try the module for Ubuntu 22.04 or Ubuntu 24.04
-  - [Request a Custom Build](https://radarsimx.com/request-a-custom-build/) if it doesn't work
-
-- ### MacOS Intel
-
-  - `GCC 14`
-
-    ```bash
-    brew install gcc@14
-    ```
-
-- ### MacOS Apple Silicon
-
-  - `GCC 14`
-
-    ```bash
-    brew install gcc@14
-    ```
+---
 
 ## Installation
 
-Download the [pre-built module](https://radarsimx.com/product/radarsimpy/), and put the radarsimpy folder within your project folder as shown below:
+Download the [pre-built module](https://radarsimx.com/product/radarsimpy/) and place the `radarsimpy` folder in your project directory:
+
+```text
+your_project.py
+your_project.ipynb
+radarsimpy/
+  ├── __init__.py
+  ├── [platform-specific binaries]
+  ├── radar.py
+  ├── processing.py
+  └── ...
+```
+
+**Platform-specific binaries:**
+
+- **Windows:** `radarsimcpp.dll`, `simulator.xxx.pyd`
+- **Linux:** `libradarsimcpp.so`, `simulator.xxx.so`
+- **MacOS:** `libradarsimcpp.dylib`, `simulator.xxx.so`
 
 ---
 
-- ### Windows
+## Quickstart
 
-  - your_project.py
-  - your_project.ipynb
-  - radarsimpy
-    - \_\_init__.py
-    - radarsimcpp.dll
-    - simulator.xxx.pyd
-    - radar.py
-    - processing.py
-    - ...
+```python
+import radarsimpy
+# Example: create a radar and simulate a point target
+from radarsimpy import radar, processing
 
----
-
-- ### Linux
-
-  - your_project.py
-  - your_project.ipynb
-  - radarsimpy
-    - \_\_init__.py
-    - libradarsimcpp.so
-    - simulator.xxx.so
-    - radar.py
-    - processing.py
-    - ...
-
----
-
-- ### MacOS
-
-  - your_project.py
-  - your_project.ipynb
-  - radarsimpy
-    - \_\_init__.py
-    - libradarsimcpp.dylib
-    - simulator.xxx.so
-    - radar.py
-    - processing.py
-    - ...
+# (See documentation for detailed usage)
+```
 
 ---
 
 ## Acceleration
 
-This module supports CPU/GPU parallelization.
-CPU parallelization is implemented through OpenMP.
-GPU parallelization (CUDA) has been added since v6.0.0.
+This module supports CPU/GPU parallelization:
+
+- **CPU:** via OpenMP
+- **GPU:** via CUDA (since v6.0.0)
 
 |         | CPU (x86-64) | CPU (ARM64) | GPU (CUDA) |
-|---------|--------------|-------------|------------|
-| Windows | ✔️           | ❌️           | ✔️        |
-| Linux   | ✔️           | ❌️           | ✔️        |
-| MacOS   | ✔️           | ✔️          | ❌️         |
+| ------- | ------------ | ----------- | ---------- |
+| Windows | ✔️           | ❌️         | ✔️         |
+| Linux   | ✔️           | ❌️         | ✔️         |
+| MacOS   | ✔️           | ✔️          | ❌️        |
 
-![performance](https://github.com/radarsimx/radarsimpy/raw/master/assets/performance.svg)
+<p align="center">
+  <img src="https://github.com/radarsimx/radarsimpy/raw/master/assets/performance.svg" alt="performance" width="500"/>
+</p>
+
+---
 
 ## Coordinate Systems
 
@@ -181,9 +172,11 @@ GPU parallelization (CUDA) has been added since v6.0.0.
 
 <img src="./assets/azimuth_elevation.svg" alt="azimuth_elevation" width="400"/>
 
+---
+
 ## Usage Examples
 
-Check all the usage examples on [radarsimx.com](https://radarsimx.com/category/examples/). The source files of these examples are available at [radarsimnb repository](https://github.com/radarsimx/radarsimnb).
+Find more usage examples at [radarsimx.com](https://radarsimx.com/category/examples/). Source files are available in the [radarsimnb repository](https://github.com/radarsimx/radarsimnb).
 
 - ### Waveform
 
@@ -246,6 +239,8 @@ Check all the usage examples on [radarsimx.com](https://radarsimx.com/category/e
 
   - [LIDAR point cloud](https://radarsimx.com/2020/02/05/lidar-point-cloud/)
 
+---
+
 ## Build
 
 > **Building `radarsimpy` requires to access the source code of `radarsimcpp`. If you don't have access to `radarsimcpp`, please use the [pre-built module](https://radarsimx.com/product/radarsimpy/). For organizations seeking full source code access for customization or advanced integration, please submit [Quote for Source Code](https://radarsimx.com/quote-for-source-code/).**
@@ -280,6 +275,20 @@ Check all the usage examples on [radarsimx.com](https://radarsimx.com/category/e
   ./build_macos.sh --arch=cpu --test=on
   ```
 
+---
+
 ## API Reference
 
-Please check the [Documentation](https://radarsimx.github.io/radarsimpy/)
+See the [Documentation](https://radarsimx.github.io/radarsimpy/)
+
+---
+
+## Contributing
+
+Contributions, issues, and feature requests are welcome! Please open an issue or submit a pull request on GitHub.
+
+---
+
+## License
+
+This project is licensed under the terms of the [LICENSE](LICENSE) file.
