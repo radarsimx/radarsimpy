@@ -20,22 +20,6 @@ RadarSimPy is a powerful and versatile Python-based Radar Simulator that models 
 
 ---
 
-## Table of Contents
-
-- [Key Features](#key-features)
-- [Dependencies](#dependencies)
-- [Installation](#installation)
-- [Quickstart](#quickstart)
-- [Acceleration](#acceleration)
-- [Coordinate Systems](#coordinate-systems)
-- [Usage Examples](#usage-examples)
-- [Build](#build)
-- [API Reference](#api-reference)
-- [Contributing](#contributing)
-- [License](#license)
-
----
-
 ## Key Features
 
 - :satellite: **Radar Modeling**
