@@ -175,10 +175,9 @@ pip install -r requirements.txt
 
 - **Apple Silicon (M1/M2/M3)**: Fully supported for CPU builds
 - **Intel Macs**: Fully supported for CPU builds
-- **GPU Support**: Limited CUDA support on macOS, CPU builds recommended
-- **Compiler**: Uses Clang by default, GCC available via Homebrew
+- **Compiler**: Uses GCC by default
 
-## Build Output and Verification
+## Build Output
 
 ### Output Structure
 
@@ -186,50 +185,21 @@ After a successful build, the following structure will be created:
 
 ```text
 radarsimpy/
-├── __init__.py              # Main module initialization
-├── radar.py                 # Radar simulation core
-├── transmitter.py           # Transmitter configurations
-├── receiver.py              # Receiver configurations
-├── processing.py            # Signal processing utilities
-├── tools.py                 # Utility functions
-├── mesh_kit.py             # Mesh handling utilities
-├── lib/                    # Library modules
-│   └── __init__.py
-├── libradarsimcpp.so       # C++ library (Linux)
-├── libradarsimcpp.dylib    # C++ library (macOS)
-├── radarsimcpp.dll         # C++ library (Windows)
-└── simulator.*.pyd         # Python extension (platform-specific)
+  ├── lib
+    ├── __init__.py
+    └── cp_radarsimc.**.pyd
+  ├── __init__.py
+  ├── [platform-specific binaries]
+  ├── radar.py
+  ├── processing.py
+  └── ...
 ```
 
-### Verification
+**Platform-specific binaries:**
 
-1. **Test the installation**:
-
-   ```python
-   import radarsimpy as rs
-   print(f"RadarSimPy version: {rs.__version__}")
-   ```
-
-2. **Run basic functionality test**:
-
-   ```python
-   import radarsimpy as rs
-   import numpy as np
-   
-   # Create a simple radar configuration
-   radar = rs.Radar(
-       frequency=24e9,
-       tx_power=10,
-       noise_figure=8
-   )
-   print("Radar created successfully!")
-   ```
-
-3. **Check build logs**:
-
-   - **Linux**: `build_YYYYMMDD_HHMMSS.log`
-   - **macOS**: `build_macos_YYYYMMDD_HHMMSS.log`
-   - **Windows**: `build_win_YYYYMMDD_HHMMSS.log`
+- **Windows:** `radarsimcpp.dll`, `simulator.xxx.pyd`
+- **Linux:** `libradarsimcpp.so`, `simulator.xxx.so`
+- **MacOS:** `libradarsimcpp.dylib`, `simulator.xxx.so`
 
 ---
 
