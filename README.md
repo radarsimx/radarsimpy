@@ -36,16 +36,6 @@ RadarSimPy is a powerful and versatile Python-based Radar Simulator that models 
 
 ---
 
-# RadarSimPy
-
-<img src="./assets/radarsimpy.svg" alt="logo" width="200"/>
-
-A **Radar** **Sim**ulator for **Py**thon
-
-RadarSimPy is a powerful and versatile Python-based Radar Simulator that models radar transceivers and simulates baseband data from point targets and 3D models. Its signal processing tools offer range/Doppler processing, direction of arrival estimation, and beamforming using various cutting-edge techniques, and you can even characterize radar detection using Swerling’s models. Whether you’re a beginner or an advanced user, RadarSimPy is the perfect tool for anyone looking to develop new radar technologies or expand their knowledge of radar systems.
-
----
-
 ## Key Features
 
 - :satellite: **Radar Modeling**
@@ -117,18 +107,6 @@ radarsimpy/
 
 ---
 
-## Quickstart
-
-```python
-import radarsimpy
-# Example: create a radar and simulate a point target
-from radarsimpy import radar, processing
-
-# (See documentation for detailed usage)
-```
-
----
-
 ## Acceleration
 
 This module supports CPU/GPU parallelization:
@@ -142,9 +120,7 @@ This module supports CPU/GPU parallelization:
 | Linux   | ✔️           | ❌️         | ✔️         |
 | MacOS   | ✔️           | ✔️          | ❌️        |
 
-<p align="center">
-  <img src="https://github.com/radarsimx/radarsimpy/raw/master/assets/performance.svg" alt="performance" width="500"/>
-</p>
+<img src="https://github.com/radarsimx/radarsimpy/raw/master/assets/performance.svg" alt="performance" width="500"/>
 
 ---
 
@@ -243,7 +219,7 @@ Find more usage examples at [radarsimx.com](https://radarsimx.com/category/examp
 
 ## Build
 
-> **Building `radarsimpy` requires to access the source code of `radarsimcpp`. If you don't have access to `radarsimcpp`, please use the [pre-built module](https://radarsimx.com/product/radarsimpy/). For organizations seeking full source code access for customization or advanced integration, please submit [Quote for Source Code](https://radarsimx.com/quote-for-source-code/).**
+> Building `radarsimpy` requires to access the source code of `radarsimcpp`. If you don't have access to `radarsimcpp`, please use the [pre-built module](https://radarsimx.com/product/radarsimpy/). For organizations seeking full source code access for customization or advanced integration, please submit [Quote for Source Code](https://radarsimx.com/quote-for-source-code/).
 
 - ### Windows (MSVC)
 
