@@ -1,3 +1,40 @@
+# ==============================================================================
+# GitHub Actions Workflow: Windows x64 Unit Testing
+# ==============================================================================
+#
+# This workflow performs continuous integration testing for RadarSimPy on 
+# Windows x64 platforms. It builds and tests the radar simulation library
+# across multiple Python versions to ensure compatibility and reliability.
+#
+# Triggers:
+#   - Push to master branch
+#   - Pull requests targeting master branch
+#
+# Test Matrix:
+#   - Python versions: 3.9, 3.10, 3.11, 3.12, 3.13
+#   - Platform: Windows Latest (windows-latest runner)
+#   - Architecture: x64 (CPU-only builds)
+#
+# Key Features:
+#   - Pip package caching for faster builds
+#   - Visual Studio environment setup for C++ compilation
+#   - System information display for debugging
+#   - Build log capture on failure
+#   - Test result artifact upload
+#   - Timeout protection (60 minutes)
+#   - Fail-fast disabled to test all Python versions
+#
+# Requirements:
+#   - RADARSIMC SSH key secret for submodule access
+#   - CMake, Visual Studio Build Tools, and Python dependencies
+#   - build_win.bat script for Windows-specific building
+#
+# Artifacts:
+#   - Test results (XML format and build outputs)
+#   - Retained for 7 days for post-build analysis
+#
+# ==============================================================================
+
 name: Windows x64
 
 on:
