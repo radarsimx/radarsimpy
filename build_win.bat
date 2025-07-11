@@ -356,10 +356,10 @@ REM Run tests if enabled
     
     echo INFO: Running tests...
     
-    REM Run Google Test (C++)
+    REM Run Google Test (C++) using CTest
     if exist ".\src\radarsimcpp\build\%BUILD_TYPE%\radarsimcpp_test.exe" (
-        echo INFO: Running Google Test for C++...
-        .\src\radarsimcpp\build\Release\radarsimcpp_test.exe
+        echo INFO: Running Google Test for C++ using CTest...
+        ctest --test-dir ".\src\radarsimcpp\build" -C %BUILD_TYPE% --verbose
         if %errorlevel% neq 0 (
             echo ERROR: Google Test failed
             set TEST_FAILED=1
