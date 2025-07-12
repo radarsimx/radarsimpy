@@ -539,7 +539,7 @@ display_summary() {
     echo "    - Tests: ${TEST^^}"
     echo "    - Parallel Jobs: ${JOBS}"
     echo "  Output Directory: ./radarsimpy"
-    echo "  Log File: ${LOG_FILE}"
+    [ "$VERBOSE" != "true" ] && echo "  Log File: ${LOG_FILE}"
     echo "=========================================="
     echo
 }
