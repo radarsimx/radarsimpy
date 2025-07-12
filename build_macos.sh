@@ -43,7 +43,7 @@
 #   --test=TEST         Enable unit tests: 'on' or 'off' (default: on)
 #   --jobs=N            Number of parallel build jobs (default: auto-detect)
 #   --clean=CLEAN       Clean build artifacts: 'true' or 'false' (default: true)
-#   --verbose           Enable verbose output (default: false)
+#   --verbose           Enable verbose output (default: true)
 #   --cmake-args=ARGS   Additional CMake arguments
 #
 # EXAMPLES:
