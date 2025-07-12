@@ -296,10 +296,6 @@ validate_parameters() {
     log_success "All parameters validated successfully"
 }
 
-# Run parameter validation and system checks
-validate_parameters
-check_requirements
-
 # Display project banner and build configuration
 display_banner() {
     echo
@@ -329,8 +325,6 @@ display_banner() {
     echo
 }
 
-display_banner
-
 # Store current working directory
 readonly WORKPATH=$(pwd)
 log_info "Working directory: ${WORKPATH}"
@@ -355,8 +349,6 @@ clean_build_artifacts() {
         log_info "Skipping build artifact cleanup"
     fi
 }
-
-clean_build_artifacts
 
 # Build libradarsimcpp.so
 build_cpp_library() {
@@ -410,8 +402,6 @@ build_cpp_library() {
     cd "$WORKPATH"
 }
 
-build_cpp_library
-
 # Build Python extensions using Cython
 build_python_extensions() {
     local build_start=$(date +%s)
@@ -430,8 +420,6 @@ build_python_extensions() {
     local build_time=$((build_end - build_start))
     log_success "Python extensions built successfully in ${build_time}s"
 }
-
-build_python_extensions
 
 # Copy library files to radarsimpy directory
 install_libraries() {
@@ -458,8 +446,6 @@ install_libraries() {
     log_success "Library files installed successfully"
 }
 
-install_libraries
-
 # Clean up intermediate build files
 cleanup_build_files() {
     log_info "Cleaning up intermediate build files..."
@@ -474,8 +460,6 @@ cleanup_build_files() {
     
     log_success "Intermediate build files cleaned"
 }
-
-cleanup_build_files
 
 # Run tests if enabled
 run_tests() {
@@ -563,7 +547,23 @@ display_summary() {
 # Main execution
 main() {
     local return_code=0
-    
+
+    # Run parameter validation and system checks
+    validate_parameters
+    check_requirements
+
+    display_banner
+
+    clean_build_artifacts
+
+    build_cpp_library
+
+    build_python_extensions
+
+    install_libraries
+
+    cleanup_build_files
+
     # Run tests and capture return code
     if ! run_tests; then
         return_code=$?
