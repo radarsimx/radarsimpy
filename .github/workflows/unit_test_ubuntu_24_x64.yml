@@ -1,3 +1,37 @@
+# ==============================================================================
+# GitHub Actions Workflow: Ubuntu 24.04 x64 Unit Testing
+# ==============================================================================
+#
+# This workflow performs continuous integration testing for RadarSimPy on 
+# Ubuntu 24.04 x64 platforms. It builds and tests the radar simulation library
+# across multiple Python versions to ensure compatibility and reliability.
+#
+# Triggers:
+#   - Push to master branch
+#   - Pull requests targeting master branch
+#
+# Test Matrix:
+#   - Python versions: 3.9, 3.10, 3.11, 3.12, 3.13
+#   - Platform: Ubuntu 24.04
+#   - Compilers: GCC-13
+#   - Architecture: x64 (CPU-only builds)
+#
+# Key Features:
+#   - Pip package caching for faster builds
+#   - GCC environment setup for C++ compilation
+#   - System information display for debugging
+#   - Build log capture on failure
+#   - Test result artifact upload
+#   - Timeout protection (60 minutes)
+#   - Fail-fast disabled to test all Python versions
+#
+# Requirements:
+#   - RADARSIMC SSH key secret for submodule access
+#   - CMake, GCC, and Python dependencies
+#   - build_linux.sh script for Linux-specific building
+#
+# ==============================================================================
+
 name: Ubuntu 24.04 x64
 
 on:
@@ -9,30 +43,70 @@ on:
 jobs:
   build:
     runs-on: ubuntu-24.04
+    timeout-minutes: 60
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
         c_compiler: [gcc-13]
         cxx_compiler: [g++-13]
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           ssh-key: ${{secrets.RADARSIMC}}
           submodules: recursive
+
       - name: Set up Python ${{matrix.python-version}}
         uses: actions/setup-python@v5
         with:
           python-version: ${{matrix.python-version}}
+
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
+      - name: Display system information
+        run: |
+          echo "Python version:"
+          python --version
+          echo "Pip version:"
+          pip --version
+          echo "CMake version:"
+          cmake --version
+          echo "GCC version:"
+          ${{matrix.c_compiler}} --version
+          echo "G++ version:"
+          ${{matrix.cxx_compiler}} --version
+
       - name: Build & Test
         env:
           CC: ${{matrix.c_compiler}}
           CXX: ${{matrix.cxx_compiler}}
+          PYTHONPATH: ${{ github.workspace }}
         run: |
           sudo chown -R $USER:$USER /home/runner/work/radarsimpy
           chmod +x build_linux.sh
           ./build_linux.sh --tier=standard --arch=cpu --test=on
+
+      - name: Display build logs on failure
+        if: failure()
+        run: |
+          if [ -f "build/CMakeFiles/CMakeOutput.log" ]; then
+            echo "=== CMake Output Log ==="
+            tail -n 100 "build/CMakeFiles/CMakeOutput.log"
+          fi
+          if [ -f "build/CMakeFiles/CMakeError.log" ]; then
+            echo "=== CMake Error Log ==="
+            tail -n 100 "build/CMakeFiles/CMakeError.log"
+          fi

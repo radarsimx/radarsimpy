@@ -29,10 +29,6 @@
 #   - CMake, Visual Studio Build Tools, and Python dependencies
 #   - build_win.bat script for Windows-specific building
 #
-# Artifacts:
-#   - Test results (XML format and build outputs)
-#   - Retained for 7 days for post-build analysis
-#
 # ==============================================================================
 
 name: Windows x64
