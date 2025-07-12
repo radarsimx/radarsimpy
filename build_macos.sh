@@ -96,23 +96,57 @@ readonly BLUE='\033[0;34m'
 readonly NC='\033[0m' # No Color
 
 # Logging functions
+#
+# log_info() - Displays an informational message with blue coloring
+# Arguments:
+#   $1 - The message to display
+# Output:
+#   Writes the message to both stdout and the log file with [INFO] prefix
 log_info() {
     echo -e "${BLUE}[INFO]${NC} $1" | tee -a "${LOG_FILE}"
 }
 
+#
+# log_success() - Displays a success message with green coloring
+# Arguments:
+#   $1 - The success message to display
+# Output:
+#   Writes the message to both stdout and the log file with [SUCCESS] prefix
 log_success() {
     echo -e "${GREEN}[SUCCESS]${NC} $1" | tee -a "${LOG_FILE}"
 }
 
+#
+# log_warning() - Displays a warning message with yellow coloring
+# Arguments:
+#   $1 - The warning message to display
+# Output:
+#   Writes the message to both stdout and the log file with [WARNING] prefix
 log_warning() {
     echo -e "${YELLOW}[WARNING]${NC} $1" | tee -a "${LOG_FILE}"
 }
 
+#
+# log_error() - Displays an error message with red coloring
+# Arguments:
+#   $1 - The error message to display
+# Output:
+#   Writes the message to both stdout and the log file with [ERROR] prefix
 log_error() {
     echo -e "${RED}[ERROR]${NC} $1" | tee -a "${LOG_FILE}"
 }
 
-# Function to display help information and usage instructions
+#
+# Help() - Displays comprehensive usage information and command line options for macOS
+# Description:
+#   Shows the script's usage syntax, available command line options with descriptions,
+#   and practical examples specific to macOS builds. Includes macOS-specific notes.
+# Arguments:
+#   None
+# Output:
+#   Prints formatted help text to stdout
+# Exit:
+#   This function is typically called before script exit when --help is specified
 Help() {
     cat << EOF
 
@@ -139,7 +173,18 @@ EXAMPLES:
 EOF
 }
 
-# Cleanup function for signal handling
+#
+# cleanup() - Signal handler for build process cleanup (macOS)
+# Description:
+#   Handles cleanup operations when the script exits, either normally or due to
+#   errors/interruptions. Logs appropriate error messages and ensures proper
+#   exit code propagation for macOS builds.
+# Arguments:
+#   None (uses $? to get the exit code)
+# Global Variables:
+#   LOG_FILE - Path to the log file for error reporting
+# Exit:
+#   Exits with the same code that triggered the cleanup
 cleanup() {
     local exit_code=$?
     if [ $exit_code -ne 0 ]; then
@@ -149,7 +194,22 @@ cleanup() {
     exit $exit_code
 }
 
-# Function to detect number of CPU cores
+#
+# detect_cores() - Automatically detects the number of CPU cores available on macOS
+# Description:
+#   Attempts to determine the number of CPU cores using macOS-specific and
+#   general methods. Optimized for both Intel and Apple Silicon Macs.
+#   Falls back to a safe default if detection fails.
+# Arguments:
+#   None
+# Output:
+#   Prints the number of CPU cores to stdout
+# Return:
+#   Always returns 0 (success)
+# Methods used (in order):
+#   1. sysctl -n hw.ncpu (macOS native method)
+#   2. nproc command (compatibility fallback)
+#   3. Hard-coded fallback value of 4
 detect_cores() {
     if command -v sysctl &> /dev/null; then
         sysctl -n hw.ncpu
@@ -160,12 +220,44 @@ detect_cores() {
     fi
 }
 
-# Function to check if command exists
+#
+# command_exists() - Checks if a command is available in the system PATH (macOS)
+# Description:
+#   Verifies whether a given command/executable is available and can be executed
+#   on macOS. Used for dependency checking before attempting to use external tools.
+# Arguments:
+#   $1 - The command name to check for existence
+# Return:
+#   0 if command exists and is executable
+#   1 if command is not found or not executable
+# Example:
+#   if command_exists clang++; then echo "Clang++ is available"; fi
 command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
-# Function to check system requirements
+#
+# check_requirements() - Validates all system dependencies and requirements (macOS)
+# Description:
+#   Performs comprehensive system dependency checking for macOS including:
+#   - Required build tools (cmake, python3, clang++)
+#   - GPU-specific requirements (nvcc for CUDA builds, if supported)
+#   - Python packages (setuptools, Cython)
+#   - macOS-specific requirements (Xcode Command Line Tools)
+#   Exits the script with error code 1 if any dependencies are missing.
+# Arguments:
+#   None
+# Global Variables:
+#   ARCH - Build architecture (used to determine if GPU tools are needed)
+# Dependencies Checked:
+#   - cmake: Build system generator
+#   - python3: Python interpreter
+#   - clang++: C++ compiler (macOS default)
+#   - nvcc: NVIDIA CUDA compiler (GPU builds only, if available)
+#   - Xcode Command Line Tools
+#   - Python setuptools and Cython packages
+# Exit:
+#   Exits with code 1 if any required dependencies are missing
 check_requirements() {
     log_info "Checking system requirements..."
     

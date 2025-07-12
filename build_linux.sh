@@ -86,23 +86,57 @@ readonly BLUE='\033[0;34m'
 readonly NC='\033[0m' # No Color
 
 # Logging functions
+#
+# log_info() - Displays an informational message with blue coloring
+# Arguments:
+#   $1 - The message to display
+# Output:
+#   Writes the message to both stdout and the log file with [INFO] prefix
 log_info() {
     echo -e "${BLUE}[INFO]${NC} $1" | tee -a "${LOG_FILE}"
 }
 
+#
+# log_success() - Displays a success message with green coloring
+# Arguments:
+#   $1 - The success message to display
+# Output:
+#   Writes the message to both stdout and the log file with [SUCCESS] prefix
 log_success() {
     echo -e "${GREEN}[SUCCESS]${NC} $1" | tee -a "${LOG_FILE}"
 }
 
+#
+# log_warning() - Displays a warning message with yellow coloring
+# Arguments:
+#   $1 - The warning message to display
+# Output:
+#   Writes the message to both stdout and the log file with [WARNING] prefix
 log_warning() {
     echo -e "${YELLOW}[WARNING]${NC} $1" | tee -a "${LOG_FILE}"
 }
 
+#
+# log_error() - Displays an error message with red coloring
+# Arguments:
+#   $1 - The error message to display
+# Output:
+#   Writes the message to both stdout and the log file with [ERROR] prefix
 log_error() {
     echo -e "${RED}[ERROR]${NC} $1" | tee -a "${LOG_FILE}"
 }
 
-# Function to display help information and usage instructions
+#
+# Help() - Displays comprehensive usage information and command line options
+# Description:
+#   Shows the script's usage syntax, available command line options with descriptions,
+#   and practical examples of how to use the script with different configurations.
+# Arguments:
+#   None
+# Output:
+#   Prints formatted help text to stdout
+# Exit:
+#   This function is typically called before script exit when --help is specified
 Help() {
     cat << EOF
 
@@ -129,7 +163,18 @@ EXAMPLES:
 EOF
 }
 
-# Cleanup function for signal handling
+#
+# cleanup() - Signal handler for build process cleanup
+# Description:
+#   Handles cleanup operations when the script exits, either normally or due to
+#   errors/interruptions. Logs appropriate error messages and ensures proper
+#   exit code propagation.
+# Arguments:
+#   None (uses $? to get the exit code)
+# Global Variables:
+#   LOG_FILE - Path to the log file for error reporting
+# Exit:
+#   Exits with the same code that triggered the cleanup
 cleanup() {
     local exit_code=$?
     if [ $exit_code -ne 0 ]; then
@@ -139,7 +184,22 @@ cleanup() {
     exit $exit_code
 }
 
-# Function to detect number of CPU cores
+#
+# detect_cores() - Automatically detects the number of CPU cores available
+# Description:
+#   Attempts to determine the number of CPU cores using multiple methods
+#   for maximum compatibility across different Linux distributions and systems.
+#   Falls back to a safe default if detection fails.
+# Arguments:
+#   None
+# Output:
+#   Prints the number of CPU cores to stdout
+# Return:
+#   Always returns 0 (success)
+# Methods used (in order):
+#   1. nproc command (most reliable on modern systems)
+#   2. /proc/cpuinfo parsing (fallback for older systems)
+#   3. Hard-coded fallback value of 4
 detect_cores() {
     if command -v nproc &> /dev/null; then
         nproc
@@ -150,12 +210,42 @@ detect_cores() {
     fi
 }
 
-# Function to check if command exists
+#
+# command_exists() - Checks if a command is available in the system PATH
+# Description:
+#   Verifies whether a given command/executable is available and can be executed.
+#   Used for dependency checking before attempting to use external tools.
+# Arguments:
+#   $1 - The command name to check for existence
+# Return:
+#   0 if command exists and is executable
+#   1 if command is not found or not executable
+# Example:
+#   if command_exists cmake; then echo "CMake is available"; fi
 command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
-# Function to check system requirements
+#
+# check_requirements() - Validates all system dependencies and requirements
+# Description:
+#   Performs comprehensive system dependency checking including:
+#   - Required build tools (cmake, python3, gcc, g++)
+#   - GPU-specific requirements (nvcc for CUDA builds)
+#   - Python packages (setuptools, Cython)
+#   Exits the script with error code 1 if any dependencies are missing.
+# Arguments:
+#   None
+# Global Variables:
+#   ARCH - Build architecture (used to determine if GPU tools are needed)
+# Dependencies Checked:
+#   - cmake: Build system generator
+#   - python3: Python interpreter
+#   - gcc/g++: C/C++ compilers
+#   - nvcc: NVIDIA CUDA compiler (GPU builds only)
+#   - Python setuptools and Cython packages
+# Exit:
+#   Exits with code 1 if any required dependencies are missing
 check_requirements() {
     log_info "Checking system requirements..."
     
@@ -189,7 +279,34 @@ check_requirements() {
     log_success "All system requirements satisfied"
 }
 
-# Function to parse command line arguments
+#
+# parse_arguments() - Parses command line arguments and sets global configuration
+# Description:
+#   Processes all command line arguments passed to the script and sets global
+#   configuration variables. Handles both parameter validation and default value
+#   assignment. Also handles special cases like --help and automatic CPU detection.
+# Arguments:
+#   $@ - All command line arguments passed to the script
+# Global Variables Set:
+#   TIER - Build tier (standard/free)
+#   ARCH - Build architecture (cpu/gpu)  
+#   TEST - Unit test flag (on/off)
+#   JOBS - Number of parallel build jobs
+#   CLEAN - Clean build artifacts flag (true/false)
+#   VERBOSE - Verbose output flag (true/false)
+#   CMAKE_ARGS - Additional CMake arguments
+# Supported Options:
+#   --help: Shows help and exits
+#   --tier=VALUE: Sets build tier
+#   --arch=VALUE: Sets architecture
+#   --test=VALUE: Enables/disables tests
+#   --jobs=VALUE: Sets parallel job count
+#   --clean=VALUE: Enables/disables cleanup
+#   --verbose: Enables verbose output
+#   --cmake-args=VALUE: Passes additional CMake arguments
+# Exit:
+#   Exits with code 0 on --help
+#   Exits with code 1 on unknown options
 parse_arguments() {
     # Default configuration values (make them global)
     TIER="standard"         # Build tier (standard/free)
@@ -253,7 +370,28 @@ parse_arguments() {
     fi
 }
 
-# Validate parameters
+#
+# validate_parameters() - Validates all parsed command line parameters
+# Description:
+#   Performs comprehensive validation of all configuration parameters set by
+#   parse_arguments(). Checks for valid values, proper formatting, and logical
+#   constraints. Accumulates all validation errors before reporting them.
+# Arguments:
+#   None
+# Global Variables Used:
+#   TIER - Validated against 'standard' and 'free'
+#   ARCH - Validated against 'cpu' and 'gpu'
+#   TEST - Validated against 'on' and 'off'
+#   JOBS - Validated as positive integer
+#   CLEAN - Validated against 'true' and 'false'
+# Validation Rules:
+#   - TIER: Must be 'standard' or 'free' (case insensitive)
+#   - ARCH: Must be 'cpu' or 'gpu' (case insensitive)
+#   - TEST: Must be 'on' or 'off' (case insensitive)
+#   - JOBS: Must be positive integer >= 1
+#   - CLEAN: Must be 'true' or 'false' (case insensitive)
+# Exit:
+#   Exits with code 1 if any validation errors are found
 validate_parameters() {
     local errors=0
     
@@ -295,7 +433,25 @@ validate_parameters() {
     log_success "All parameters validated successfully"
 }
 
-# Display project banner and build configuration
+#
+# display_banner() - Shows project banner and current build configuration
+# Description:
+#   Displays the RadarSimPy project banner with ASCII art logo and shows
+#   the current build configuration settings. Provides visual confirmation
+#   of all build parameters before the build process begins.
+# Arguments:
+#   None
+# Global Variables Used:
+#   TIER - Build tier setting
+#   ARCH - Architecture setting  
+#   TEST - Test execution setting
+#   JOBS - Number of parallel jobs
+#   CLEAN - Clean build setting
+#   VERBOSE - Verbose output setting
+#   LOG_FILE - Log file path
+#   CMAKE_ARGS - Additional CMake arguments (if any)
+# Output:
+#   Prints formatted banner and configuration to stdout
 display_banner() {
     echo
     echo "=========================================="
@@ -324,7 +480,24 @@ display_banner() {
     echo
 }
 
-# Clean up previous build artifacts
+#
+# clean_build_artifacts() - Removes previous build artifacts and generated files
+# Description:
+#   Performs cleanup of build directories and generated files from previous
+#   build attempts. Only executes if CLEAN is set to 'true'. Removes both
+#   build directories and generated source files to ensure clean builds.
+# Arguments:
+#   None
+# Global Variables Used:
+#   CLEAN - Controls whether cleanup is performed
+# Directories/Files Removed:
+#   - ./src/radarsimcpp/build/ - C++ build directory
+#   - ./radarsimpy/ - Python package output directory
+#   - ./build/ - General build directory
+#   - *.c, *.cpp, *.html files in ./src/radarsimpy/ - Generated files
+# Behavior:
+#   - If CLEAN='true': Performs full cleanup
+#   - If CLEAN='false': Skips cleanup and logs message
 clean_build_artifacts() {
     if [ "${CLEAN,,}" == "true" ]; then
         log_info "Cleaning previous build artifacts..."
@@ -345,7 +518,33 @@ clean_build_artifacts() {
     fi
 }
 
-# Build libradarsimcpp.so
+#
+# build_cpp_library() - Builds the C++ library (libradarsimcpp.so)
+# Description:
+#   Compiles the RadarSimCpp C++ library using CMake build system. Configures
+#   build options based on architecture (CPU/GPU) and test settings. Supports
+#   parallel compilation and both verbose and quiet build modes.
+# Arguments:
+#   None
+# Global Variables Used:
+#   ARCH - Determines GPU build flags
+#   TEST - Controls Google Test compilation
+#   CMAKE_ARGS - Additional CMake arguments
+#   JOBS - Number of parallel compilation jobs
+#   VERBOSE - Controls build output verbosity
+#   WORKPATH - Working directory to return to
+#   LOG_FILE - Log file for quiet builds
+# Build Process:
+#   1. Creates build directory at ./src/radarsimcpp/build
+#   2. Configures CMake with appropriate flags
+#   3. Builds with specified parallel job count
+#   4. Times the build process
+#   5. Returns to original working directory
+# CMake Flags Set:
+#   - CMAKE_BUILD_TYPE=Release (always)
+#   - GPU_BUILD=ON (if ARCH=gpu)
+#   - GTEST=ON/OFF (based on TEST setting)
+#   - Custom flags from CMAKE_ARGS
 build_cpp_library() {
     local build_start=$(date +%s)
     log_info "Building libradarsimcpp.so with ${ARCH^^} architecture..."
@@ -397,7 +596,27 @@ build_cpp_library() {
     cd "$WORKPATH"
 }
 
-# Build Python extensions using Cython
+#
+# build_python_extensions() - Builds Python extensions using Cython
+# Description:
+#   Compiles Python extension modules using Cython and the setup.py build system.
+#   Links against the previously built C++ library and creates platform-specific
+#   binary extensions for Python import.
+# Arguments:
+#   None
+# Global Variables Used:
+#   WORKPATH - Working directory for build
+#   VERBOSE - Controls build output verbosity
+#   TIER - Build tier passed to setup.py
+#   ARCH - Architecture setting passed to setup.py
+#   LOG_FILE - Log file for quiet builds
+# Build Process:
+#   1. Changes to working directory
+#   2. Invokes setup.py build_ext with tier and architecture flags
+#   3. Times the build process
+#   4. Handles both verbose and quiet build modes
+# Output:
+#   Creates compiled Python extension modules in the current directory
 build_python_extensions() {
     local build_start=$(date +%s)
     log_info "Building Python extensions with Cython..."
@@ -416,7 +635,25 @@ build_python_extensions() {
     log_success "Python extensions built successfully in ${build_time}s"
 }
 
-# Copy library files to radarsimpy directory
+#
+# install_libraries() - Copies built libraries to final installation directory
+# Description:
+#   Installs all built components (Python files, shared libraries, and support
+#   files) into the ./radarsimpy/ directory structure. Creates the necessary
+#   directory hierarchy and handles missing files gracefully.
+# Arguments:
+#   None
+# Installation Process:
+#   1. Creates ./radarsimpy/lib/ directory structure
+#   2. Copies Python source files from ./src/radarsimpy/
+#   3. Copies library __init__.py file
+#   4. Copies shared libraries (.so files) from build directory
+# File Sources:
+#   - Python files: ./src/radarsimpy/*.py
+#   - Library init: ./src/radarsimpy/lib/__init__.py  
+#   - Shared libs: ./src/radarsimcpp/build/*.so
+# Error Handling:
+#   Uses '|| true' to continue gracefully if some files are missing
 install_libraries() {
     log_info "Installing library files to ./radarsimpy..."
     
@@ -441,7 +678,23 @@ install_libraries() {
     log_success "Library files installed successfully"
 }
 
-# Clean up intermediate build files
+#
+# cleanup_build_files() - Removes intermediate build files and directories
+# Description:
+#   Cleans up intermediate build artifacts that are no longer needed after
+#   the build process completes. Removes temporary directories and generated
+#   source files while preserving the final installation.
+# Arguments:
+#   None
+# Files/Directories Removed:
+#   - ./build/ - Intermediate build directory
+#   - *.c files in ./src/radarsimpy/ - Generated C source files
+#   - *.cpp files in ./src/radarsimpy/ - Generated C++ source files  
+#   - *.html files in ./src/radarsimpy/ - Generated documentation files
+# Error Handling:
+#   Uses '|| true' to continue gracefully if files don't exist
+# Purpose:
+#   Reduces disk space usage by removing temporary build artifacts
 cleanup_build_files() {
     log_info "Cleaning up intermediate build files..."
     
@@ -456,7 +709,32 @@ cleanup_build_files() {
     log_success "Intermediate build files cleaned"
 }
 
-# Run tests if enabled
+#
+# run_tests() - Executes test suites if testing is enabled
+# Description:
+#   Runs both C++ unit tests (Google Test) and Python unit tests (pytest)
+#   if the TEST flag is set to 'on'. Tracks test failures and provides
+#   comprehensive test result reporting with timing information.
+# Arguments:
+#   None
+# Global Variables Used:
+#   TEST - Controls whether tests are executed
+#   VERBOSE - Controls test output verbosity
+#   LOG_FILE - Log file for quiet test runs
+# Test Suites:
+#   1. C++ Unit Tests:
+#      - Executable: ./src/radarsimcpp/build/radarsimcpp_test
+#      - Framework: Google Test
+#   2. Python Unit Tests:
+#      - Command: pytest
+#      - Framework: pytest
+# Return Codes:
+#   0 - All tests passed or tests disabled
+#   >0 - Number of failed test suites
+# Behavior:
+#   - If TEST='off': Skips all tests
+#   - If TEST='on': Runs available test suites
+#   - Missing test executables are reported as warnings, not errors
 run_tests() {
     if [ "${TEST,,}" == "on" ]; then
         local test_start=$(date +%s)
@@ -518,7 +796,27 @@ run_tests() {
     return 0
 }
 
-# Display build summary
+#
+# display_summary() - Shows final build summary and statistics
+# Description:
+#   Displays a comprehensive summary of the completed build process including
+#   total build time, configuration settings, and output locations. Provides
+#   a final status report for the user.
+# Arguments:
+#   None
+# Global Variables Used:
+#   BUILD_START_TIME - Start time for total duration calculation
+#   TIER - Build tier setting
+#   ARCH - Architecture setting
+#   TEST - Test execution setting
+#   JOBS - Number of parallel jobs used
+#   VERBOSE - Verbose output setting (affects log file display)
+#   LOG_FILE - Log file location
+# Output Information:
+#   - Total build time in seconds
+#   - Configuration summary
+#   - Output directory location
+#   - Log file location (if not in verbose mode)
 display_summary() {
     local build_end=$(date +%s)
     local total_time=$((build_end - BUILD_START_TIME))
@@ -539,7 +837,37 @@ display_summary() {
     echo
 }
 
-# Main execution
+#
+# main() - Main execution function that orchestrates the entire build process
+# Description:
+#   Central coordinator function that manages the complete build workflow.
+#   Sets up signal handlers, parses arguments, validates configuration,
+#   and executes all build steps in the correct order. Handles error
+#   propagation and provides final status reporting.
+# Arguments:
+#   $@ - All command line arguments passed to the script
+# Global Variables Set:
+#   WORKPATH - Current working directory
+#   (All other globals set by parse_arguments)
+# Build Workflow:
+#   1. Set up signal handlers for cleanup
+#   2. Parse and validate command line arguments
+#   3. Check system requirements
+#   4. Display build configuration
+#   5. Clean previous build artifacts
+#   6. Build C++ library
+#   7. Build Python extensions
+#   8. Install libraries to final location
+#   9. Clean up intermediate files
+#   10. Run test suites (if enabled)
+#   11. Display build summary
+# Return Codes:
+#   0 - Build completed successfully
+#   >0 - Build failed (error code indicates failure type)
+# Error Handling:
+#   - Signal handlers ensure cleanup on interruption
+#   - Test failures are captured and reported
+#   - All errors are logged with appropriate messages
 main() {
     local return_code=0
 
