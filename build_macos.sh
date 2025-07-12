@@ -139,15 +139,6 @@ EXAMPLES:
 EOF
 }
 
-# Default configuration values
-TIER="standard"         # Build tier (standard/free)
-ARCH="cpu"             # Build architecture (cpu/gpu)
-TEST="on"              # Unit test flag (on/off)
-JOBS=""                # Number of parallel jobs (auto-detect if empty)
-CLEAN="true"           # Clean build artifacts before building
-VERBOSE="true"        # Enable verbose output
-CMAKE_ARGS=""          # Additional CMake arguments
-
 # Cleanup function for signal handling
 cleanup() {
     local exit_code=$?
@@ -157,10 +148,6 @@ cleanup() {
     fi
     exit $exit_code
 }
-
-# Set up signal handlers
-trap cleanup EXIT
-trap 'log_error "Build interrupted by user"; exit 130' INT TERM
 
 # Function to detect number of CPU cores
 detect_cores() {
@@ -216,50 +203,63 @@ check_requirements() {
     
     log_success "All system requirements satisfied"
 }
-# Parse command line arguments
-# Supports --help, --tier, --arch, --test, --jobs, --clean, --verbose, and --cmake-args parameters
-for i in "$@"; do
-    case $i in
-        --help*)
-            Help
-            exit 0
-            ;;
-        --tier=*)
-            TIER="${i#*=}"
-            ;;
-        --arch=*)
-            ARCH="${i#*=}"
-            ;;
-        --test=*)
-            TEST="${i#*=}"
-            ;;
-        --jobs=*)
-            JOBS="${i#*=}"
-            ;;
-        --clean=*)
-            CLEAN="${i#*=}"
-            ;;
-        --verbose*)
-            VERBOSE="true"
-            ;;
-        --cmake-args=*)
-            CMAKE_ARGS="${i#*=}"
-            ;;
-        --*)
-            log_error "Unknown option: $i"
-            echo "Use --help for usage information"
-            exit 1
-            ;;
-        *)
-            ;;
-    esac
-done
 
-# Set number of jobs if not specified
-if [ -z "$JOBS" ]; then
-    JOBS=$(detect_cores)
-    log_info "Auto-detected $JOBS CPU cores for parallel build"
-fi
+# Function to parse command line arguments
+parse_arguments() {
+    # Default configuration values (make them global)
+    TIER="standard"         # Build tier (standard/free)
+    ARCH="cpu"             # Build architecture (cpu/gpu)
+    TEST="on"              # Unit test flag (on/off)
+    JOBS=""                # Number of parallel jobs (auto-detect if empty)
+    CLEAN="true"           # Clean build artifacts before building
+    VERBOSE="true"        # Enable verbose output
+    CMAKE_ARGS=""          # Additional CMake arguments
+    
+    # Parse command line arguments
+    # Supports --help, --tier, --arch, --test, --jobs, --clean, --verbose, and --cmake-args parameters
+    for i in "$@"; do
+        case $i in
+            --help*)
+                Help
+                exit 0
+                ;;
+            --tier=*)
+                TIER="${i#*=}"
+                ;;
+            --arch=*)
+                ARCH="${i#*=}"
+                ;;
+            --test=*)
+                TEST="${i#*=}"
+                ;;
+            --jobs=*)
+                JOBS="${i#*=}"
+                ;;
+            --clean=*)
+                CLEAN="${i#*=}"
+                ;;
+            --verbose*)
+                VERBOSE="true"
+                ;;
+            --cmake-args=*)
+                CMAKE_ARGS="${i#*=}"
+                ;;
+            --*)
+                log_error "Unknown option: $i"
+                echo "Use --help for usage information"
+                exit 1
+                ;;
+            *)
+                ;;
+        esac
+    done
+    
+    # Set number of jobs if not specified
+    if [ -z "$JOBS" ]; then
+        JOBS=$(detect_cores)
+        log_info "Auto-detected $JOBS CPU cores for parallel build"
+    fi
+}
 
 # Validate parameters
 validate_parameters() {
@@ -331,10 +331,6 @@ display_banner() {
     [ -n "$CMAKE_ARGS" ] && echo "  - CMake Args: ${CMAKE_ARGS}"
     echo
 }
-
-# Store current working directory
-readonly WORKPATH=$(pwd)
-log_info "Working directory: ${WORKPATH}"
 
 # Clean up previous build artifacts
 clean_build_artifacts() {
@@ -555,6 +551,17 @@ display_summary() {
 main() {
     local return_code=0
 
+    # Set up signal handlers
+    trap cleanup EXIT
+    trap 'log_error "Build interrupted by user"; exit 130' INT TERM
+
+    # Parse command line arguments
+    parse_arguments "$@"
+
+    # Store current working directory
+    readonly WORKPATH=$(pwd)
+    log_info "Working directory: ${WORKPATH}"
+
     # Run parameter validation and system checks
     validate_parameters
     check_requirements
@@ -589,5 +596,5 @@ main() {
 }
 
 # Execute main function
-main
+main "$@"
 exit $?
