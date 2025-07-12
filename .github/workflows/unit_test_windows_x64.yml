@@ -109,13 +109,3 @@ jobs:
             echo "=== CMake Error Log ==="
             Get-Content "build/CMakeFiles/CMakeError.log" -Tail 100
           }
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results-py${{ matrix.python-version }}
-          path: |
-            test_results.xml
-            build/test_results/
-          retention-days: 7
