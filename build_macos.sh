@@ -192,7 +192,7 @@ check_requirements() {
     done
     
     # Check for GPU-specific requirements
-    if [ "${ARCH,,}" == "gpu" ]; then
+    if echo "$ARCH" | grep -qi '^gpu$'; then
         if ! command_exists nvcc; then
             missing_deps+=("nvcc (CUDA toolkit)")
         fi
@@ -344,7 +344,7 @@ log_info "Working directory: ${WORKPATH}"
 
 # Clean up previous build artifacts
 clean_build_artifacts() {
-    if [ "${CLEAN,,}" == "true" ]; then
+    if echo "$CLEAN" | grep -qi '^true$'; then
         log_info "Cleaning previous build artifacts..."
         
         # Remove build directories and files
@@ -584,13 +584,6 @@ main() {
     else
         log_error "Build completed with errors (exit code: $return_code)"
     fi
-    
-    return $return_code
-}
-
-# Execute main function
-main
-exit $?
     
     return $return_code
 }
