@@ -13,8 +13,8 @@
 # REQUIREMENTS:
 #   Linux:
 #   - Linux operating system
-#   - CMake 3.15 or higher
-#   - Python 3.7 or higher
+#   - CMake 3.18 or higher
+#   - Python 3.9 or higher
 #   - GCC/G++ compiler
 #   - CUDA toolkit (for GPU builds)
 #   - Python packages: setuptools, Cython
@@ -23,10 +23,9 @@
 #   macOS:
 #   - macOS 10.14 (Mojave) or later
 #   - Xcode Command Line Tools
-#   - CMake 3.15 or higher
-#   - Python 3.7 or higher
-#   - Clang/Clang++ compiler (comes with Xcode)
-#   - CUDA toolkit (for GPU builds, if supported)
+#   - CMake 3.18 or higher
+#   - Python 3.9 or higher
+#   - GCC/G++ compiler
 #   - Python packages: setuptools, Cython
 #   - pytest (for running tests)
 #
@@ -71,9 +70,8 @@
 #   >1 - Test failures (number indicates failed test suites)
 #
 # FILES CREATED:
-#   - ./radarsimpy/                         # Output directory with built libraries
+#   - ./radarsimpy/                        # Output directory with built libraries
 #   - ./build_YYYYMMDD_HHMMSS.log          # Timestamped build log
-#   - ./src/radarsimcpp/build/             # CMake build directory
 #
 # PLATFORM-SPECIFIC NOTES:
 #   Linux:
@@ -82,12 +80,11 @@
 #   - Uses nproc for CPU core detection
 #   
 #   macOS:
-#   - Uses Clang/Clang++ compiler instead of GCC
+#   - Uses GCC/G++ compiler
 #   - Creates .dylib files instead of .so files
 #   - Requires Xcode Command Line Tools for development headers
 #   - Uses sysctl for CPU core detection
 #   - Optimized for Apple Silicon and Intel processors
-#   - GPU support depends on CUDA availability and compatibility
 #
 # NOTES:
 #   - The script uses 'set -euo pipefail' for strict error handling
@@ -203,7 +200,7 @@ EXAMPLES:
 
 PLATFORM-SPECIFIC NOTES:
     Linux:  Uses GCC/G++, creates .so files, requires standard Linux dev tools
-    macOS:  Uses Clang++, creates .dylib files, requires Xcode Command Line Tools
+    macOS:  Uses GCC/G++, creates .dylib files, requires Xcode Command Line Tools
 
 EOF
 }
@@ -315,7 +312,7 @@ get_library_extension() {
 #
 # get_cpp_compiler() - Returns the appropriate C++ compiler for the platform
 # Description:
-#   Returns the platform-specific C++ compiler (clang++ for macOS, g++ for Linux)
+#   Returns the platform-specific C++ compiler (g++ for macOS, g++ for Linux)
 # Arguments:
 #   None
 # Output:
@@ -325,7 +322,7 @@ get_library_extension() {
 get_cpp_compiler() {
     case "${PLATFORM_NAME}" in
         "macOS")
-            echo "clang++"
+            echo "g++"
             ;;
         "Linux")
             echo "g++"
