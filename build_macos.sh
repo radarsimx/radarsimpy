@@ -368,7 +368,7 @@ clean_build_artifacts
 # Build the C++ library (macOS specific - creates .dylib files)
 build_cpp_library() {
     local build_start=$(date +%s)
-    log_info "Building libradarsimcpp.dylib with ${ARCH^^} architecture..."
+    log_info "Building libradarsimcpp.dylib with ${ARCH} architecture..."
     
     # Create build directory
     mkdir -p ./src/radarsimcpp/build
@@ -557,9 +557,9 @@ display_summary() {
     echo "=========================================="
     echo "  Total Build Time: ${total_time}s"
     echo "  Configuration:"
-    echo "    - Tier: ${TIER^^}"
-    echo "    - Architecture: ${ARCH^^}"
-    echo "    - Tests: ${TEST^^}"
+    echo "    - Tier: ${TIER}"
+    echo "    - Architecture: ${ARCH}"
+    echo "    - Tests: ${TEST}"
     echo "    - Parallel Jobs: ${JOBS}"
     echo "  Output Directory: ./radarsimpy"
     echo "  Log File: ${LOG_FILE}"
