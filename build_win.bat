@@ -16,7 +16,7 @@ REM   - CUDA SDK (for GPU builds)
 REM   - pytest (for Python tests)
 REM
 REM Usage:
-REM   build_win.bat [--tier=<standard|free>] [--arch=<cpu|gpu>] [--test=<on|off>]
+REM   build_win.bat [--tier=<standard|free>] [--arch=<cpu|gpu>] [--test=<on|off>] [--jobs=<auto|number>]
 REM
 REM ==============================================================================
 
@@ -27,6 +27,7 @@ set TEST=on
 set BUILD_TYPE=Release
 set SCRIPT_DIR=%~dp0
 set BUILD_FAILED=0
+set JOBS=0
 
 REM Initialize error tracking
 set CMAKE_FAILED=0
@@ -48,10 +49,12 @@ REM Help section - displays command line parameter usage
     echo   --tier    Build tier: 'standard' or 'free' - default: standard
     echo   --arch    Build architecture: 'cpu' or 'gpu' - default: cpu
     echo   --test    Enable unit tests: 'on' or 'off' - default: on
+    echo   --jobs    Number of parallel jobs: 'auto' or number - default: auto
     echo.
     echo Examples:
     echo   build_win.bat --arch=gpu --test=off
-    echo   build_win.bat --tier=free --arch=cpu
+    echo   build_win.bat --tier=free --arch=cpu --jobs=4
+    echo   build_win.bat --jobs=auto
     echo.
     goto EOF
 
@@ -74,6 +77,12 @@ REM Command line parameter parsing section
     )
     if /I "%1" == "--test" (
         set TEST=%2
+        shift
+        shift
+        goto GETOPTS
+    )
+    if /I "%1" == "--jobs" (
+        set JOBS=%2
         shift
         shift
         goto GETOPTS
@@ -104,6 +113,27 @@ REM Command line parameter parsing section
     if /I NOT "%TEST%" == "on" (
         if /I NOT "%TEST%" == "off" (
             echo ERROR: Invalid --test parameter '%TEST%'. Please choose 'on' or 'off'
+            goto ERROR_EXIT
+        )
+    )
+
+    REM Validate and set jobs parameter
+    if /I "%JOBS%" == "0" (
+        set JOBS=auto
+    )
+    if /I "%JOBS%" == "auto" (
+        REM Auto-detect number of CPU cores
+        if defined NUMBER_OF_PROCESSORS (
+            set JOBS=%NUMBER_OF_PROCESSORS%
+        ) else (
+            set JOBS=4
+        )
+        echo INFO: Auto-detected %JOBS% CPU cores for parallel build
+    ) else (
+        REM Validate that jobs is a positive integer
+        echo %JOBS%| findstr /r "^[1-9][0-9]*$" >nul
+        if %errorlevel% neq 0 (
+            echo ERROR: Invalid --jobs parameter '%JOBS%'. Please provide 'auto' or a positive integer
             goto ERROR_EXIT
         )
     )
@@ -162,6 +192,7 @@ REM Display banner and copyright information
     echo   Architecture: %ARCH%
     echo   Tests: %TEST%
     echo   Build Type: %BUILD_TYPE%
+    echo   Parallel Jobs: %JOBS%
     echo.
     echo ######                               #####           #     # 
     echo #     #   ##   #####    ##   #####  #     # # #    #  #   #  
@@ -246,8 +277,8 @@ REM Build C++ library
     )
     
     REM Build the C++ library
-    echo INFO: Building C++ library with %BUILD_TYPE% configuration...
-    cmake --build . --config %BUILD_TYPE% --parallel
+    echo INFO: Building C++ library with %BUILD_TYPE% configuration using %JOBS% parallel jobs...
+    cmake --build . --config %BUILD_TYPE% --parallel %JOBS%
     
     if %errorlevel% neq 0 (
         echo ERROR: C++ library build failed
@@ -405,6 +436,7 @@ REM Build completion
     echo   Architecture: %ARCH%
     echo   Tests: %TEST%
     echo   Build Type: %BUILD_TYPE%
+    echo   Parallel Jobs: %JOBS%
     echo.
     echo Output Location:
     echo   C++ Library: .\src\radarsimcpp\build\%BUILD_TYPE%\
