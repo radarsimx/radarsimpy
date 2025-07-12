@@ -226,31 +226,24 @@ for i in "$@"; do
             ;;
         --tier=*)
             TIER="${i#*=}"
-            shift
             ;;
         --arch=*)
             ARCH="${i#*=}"
-            shift
             ;;
         --test=*)
             TEST="${i#*=}"
-            shift
             ;;
         --jobs=*)
             JOBS="${i#*=}"
-            shift
             ;;
         --clean=*)
             CLEAN="${i#*=}"
-            shift
             ;;
         --verbose*)
             VERBOSE="true"
-            shift
             ;;
         --cmake-args=*)
             CMAKE_ARGS="${i#*=}"
-            shift
             ;;
         --*)
             log_error "Unknown option: $i"
@@ -271,42 +264,42 @@ fi
 # Validate parameters
 validate_parameters() {
     local errors=0
-    
+
     # Validate tier parameter
-    if [[ "${TIER,,}" != "standard" && "${TIER,,}" != "free" ]]; then
+    if ! echo "$TIER" | grep -qiE '^standard$|^free$'; then
         log_error "Invalid --tier parameter: '$TIER'. Choose 'free' or 'standard'"
         errors=$((errors + 1))
     fi
-    
+
     # Validate architecture parameter
-    if [[ "${ARCH,,}" != "cpu" && "${ARCH,,}" != "gpu" ]]; then
+    if ! echo "$ARCH" | grep -qiE '^cpu$|^gpu$'; then
         log_error "Invalid --arch parameter: '$ARCH'. Choose 'cpu' or 'gpu'"
         errors=$((errors + 1))
     fi
-    
+
     # Validate test parameter
-    if [[ "${TEST,,}" != "on" && "${TEST,,}" != "off" ]]; then
+    if ! echo "$TEST" | grep -qiE '^on$|^off$'; then
         log_error "Invalid --test parameter: '$TEST'. Choose 'on' or 'off'"
         errors=$((errors + 1))
     fi
-    
+
     # Validate jobs parameter
-    if ! [[ "$JOBS" =~ ^[0-9]+$ ]] || [ "$JOBS" -lt 1 ]; then
+    if ! echo "$JOBS" | grep -qE '^[0-9]+$' || [ "$JOBS" -lt 1 ]; then
         log_error "Invalid --jobs parameter: '$JOBS'. Must be a positive integer"
         errors=$((errors + 1))
     fi
-    
+
     # Validate clean parameter
-    if [[ "${CLEAN,,}" != "true" && "${CLEAN,,}" != "false" ]]; then
+    if ! echo "$CLEAN" | grep -qiE '^true$|^false$'; then
         log_error "Invalid --clean parameter: '$CLEAN'. Choose 'true' or 'false'"
         errors=$((errors + 1))
     fi
-    
+
     if [ $errors -gt 0 ]; then
         log_error "Parameter validation failed with $errors error(s)"
         exit 1
     fi
-    
+
     log_success "All parameters validated successfully"
 }
 
@@ -332,12 +325,12 @@ display_banner() {
     echo "╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝"
     echo
     echo "Build Configuration (macOS):"
-    echo "  - Tier: ${TIER^^}"
-    echo "  - Architecture: ${ARCH^^}"
-    echo "  - Tests: ${TEST^^}"
+    echo "  - Tier: $(echo "$TIER" | tr '[:lower:]' '[:upper:]')"
+    echo "  - Architecture: $(echo "$ARCH" | tr '[:lower:]' '[:upper:]')"
+    echo "  - Tests: $(echo "$TEST" | tr '[:lower:]' '[:upper:]')"
     echo "  - Parallel Jobs: ${JOBS}"
-    echo "  - Clean Build: ${CLEAN^^}"
-    echo "  - Verbose: ${VERBOSE^^}"
+    echo "  - Clean Build: $(echo "$CLEAN" | tr '[:lower:]' '[:upper:]')"
+    echo "  - Verbose: $(echo "$VERBOSE" | tr '[:lower:]' '[:upper:]')"
     echo "  - Log File: ${LOG_FILE}"
     [ -n "$CMAKE_ARGS" ] && echo "  - CMake Args: ${CMAKE_ARGS}"
     echo
@@ -385,12 +378,12 @@ build_cpp_library() {
     local cmake_args="-DCMAKE_BUILD_TYPE=Release"
     
     # Add architecture-specific flags
-    if [ "${ARCH,,}" == "gpu" ]; then
+    if echo "$ARCH" | grep -qi '^gpu$'; then
         cmake_args+=" -DGPU_BUILD=ON"
     fi
     
     # Add test flags
-    if [ "${TEST,,}" == "on" ]; then
+    if echo "$TEST" | grep -qi '^on$'; then
         cmake_args+=" -DGTEST=ON"
     else
         cmake_args+=" -DGTEST=OFF"
@@ -493,12 +486,12 @@ cleanup_build_files
 
 # Run tests if enabled
 run_tests() {
-    if [ "${TEST,,}" == "on" ]; then
+    if echo "$TEST" | grep -qi '^on$'; then
         local test_start=$(date +%s)
         local test_failures=0
-        
+
         log_info "Running test suite..."
-        
+
         # Run C++ unit tests using Google Test
         if [ -f "./src/radarsimcpp/build/radarsimcpp_test" ]; then
             log_info "Running C++ unit tests..."
@@ -591,6 +584,13 @@ main() {
     else
         log_error "Build completed with errors (exit code: $return_code)"
     fi
+    
+    return $return_code
+}
+
+# Execute main function
+main
+exit $?
     
     return $return_code
 }
