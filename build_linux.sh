@@ -135,7 +135,7 @@ ARCH="cpu"             # Build architecture (cpu/gpu)
 TEST="on"              # Unit test flag (on/off)
 JOBS=""                # Number of parallel jobs (auto-detect if empty)
 CLEAN="true"           # Clean build artifacts before building
-VERBOSE="false"        # Enable verbose output
+VERBOSE="true"        # Enable verbose output
 CMAKE_ARGS=""          # Additional CMake arguments
 
 # Cleanup function for signal handling
@@ -346,9 +346,9 @@ clean_build_artifacts() {
         rm -rf ./build
         
         # Remove generated source files
-        find ./src -name "*.c" -delete
-        find ./src -name "*.cpp" -delete
-        find ./src -name "*.html" -delete
+        find ./src/radarsimpy -name "*.c" -delete
+        find ./src/radarsimpy -name "*.cpp" -delete
+        find ./src/radarsimpy -name "*.html" -delete
         
         log_success "Build artifacts cleaned"
     else
@@ -468,9 +468,9 @@ cleanup_build_files() {
     rm -rf build
     
     # Remove generated source files
-    find ./src -name "*.c" -delete 2>/dev/null || true
-    find ./src -name "*.cpp" -delete 2>/dev/null || true
-    find ./src -name "*.html" -delete 2>/dev/null || true
+    find ./src/radarsimpy -name "*.c" -delete 2>/dev/null || true
+    find ./src/radarsimpy -name "*.cpp" -delete 2>/dev/null || true
+    find ./src/radarsimpy -name "*.html" -delete 2>/dev/null || true
     
     log_success "Intermediate build files cleaned"
 }
