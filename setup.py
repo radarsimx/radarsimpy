@@ -84,10 +84,10 @@ if os_type == "Linux":
 elif os_type == "Darwin":  # macOS
     LIBS = []
     if platform.processor() == "arm":  # M1/M2 processors
-        LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
+        LINK_ARGS = ["-Wl,-rpath,@loader_path"]
         LIB_DIRS = ["src/radarsimcpp/build"]
     else:  # Intel processors
-        LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
+        LINK_ARGS = ["-Wl,-rpath,@loader_path"]
         LIB_DIRS = ["src/radarsimcpp/build"]
 elif os_type == "Windows":
     LINK_ARGS = []
@@ -201,6 +201,7 @@ ext_modules = [
         ["src/radarsimpy/lib/cp_radarsimc.pyx"],
         define_macros=MACROS,
         include_dirs=INCLUDE_DIRS,
+        extra_compile_args=["-std=c++20"],
         libraries=["radarsimcpp"] + LIBS,
         library_dirs=LIB_DIRS,
         extra_link_args=LINK_ARGS,
@@ -211,6 +212,7 @@ ext_modules = [
         ["src/radarsimpy/simulator.pyx"],
         define_macros=MACROS,
         include_dirs=INCLUDE_DIRS,
+        extra_compile_args=["-std=c++20"],
         libraries=["radarsimcpp"] + LIBS,
         library_dirs=LIB_DIRS,
         extra_link_args=LINK_ARGS,
