@@ -931,17 +931,18 @@ run_tests() {
         # Run C++ unit tests using Google Test
         if [ -f "./src/radarsimcpp/build/radarsimcpp_test" ]; then
             log_info "Running C++ unit tests..."
+            local cpp_test_result=0
             if [ "$VERBOSE" = "true" ]; then
-                ./src/radarsimcpp/build/radarsimcpp_test
+                ./src/radarsimcpp/build/radarsimcpp_test || cpp_test_result=$?
             else
-                ./src/radarsimcpp/build/radarsimcpp_test >> "${LOG_FILE}" 2>&1
+                ./src/radarsimcpp/build/radarsimcpp_test >> "${LOG_FILE}" 2>&1 || cpp_test_result=$?
             fi
             
-            local cpp_test_result=$?
             if [ $cpp_test_result -eq 0 ]; then
                 log_success "C++ tests passed"
             else
                 log_error "C++ tests failed with exit code $cpp_test_result"
+                log_error "TEST FAILURE: C++ unit tests have failed - this should cause build failure"
                 test_failures=$((test_failures + 1))
             fi
         else
@@ -951,17 +952,18 @@ run_tests() {
         # Run Python unit tests using pytest
         if command_exists pytest; then
             log_info "Running Python unit tests..."
+            local python_test_result=0
             if [ "$VERBOSE" = "true" ]; then
-                pytest -v
+                pytest -v || python_test_result=$?
             else
-                pytest >> "${LOG_FILE}" 2>&1
+                pytest >> "${LOG_FILE}" 2>&1 || python_test_result=$?
             fi
             
-            local python_test_result=$?
             if [ $python_test_result -eq 0 ]; then
                 log_success "Python tests passed"
             else
                 log_error "Python tests failed with exit code $python_test_result"
+                log_error "TEST FAILURE: Python unit tests have failed - this should cause build failure"
                 test_failures=$((test_failures + 1))
             fi
         else
@@ -975,6 +977,7 @@ run_tests() {
             log_success "All tests passed in ${test_time}s"
         else
             log_error "$test_failures test suite(s) failed in ${test_time}s"
+            log_error "CRITICAL: Test failures detected - build should fail"
             return $test_failures
         fi
     else
@@ -1094,6 +1097,7 @@ main() {
     local test_result=$?
     if [ $test_result -ne 0 ]; then
         return_code=$test_result
+        log_error "Tests failed, setting exit code to $return_code"
     fi
     
     # Display build summary
@@ -1103,11 +1107,17 @@ main() {
         log_success "Build completed successfully on ${PLATFORM_NAME}!"
     else
         log_error "Build completed with errors (exit code: $return_code)"
+        log_error "FINAL STATUS: Build failed - GitHub Actions should detect this failure"
     fi
     
-    exit $return_code
+    # Force explicit exit to ensure GitHub Actions sees the failure
+    if [ $return_code -ne 0 ]; then
+        log_error "Exiting with error code $return_code to signal build failure"
+        exit $return_code
+    fi
+    
+    exit 0
 }
 
 # Execute main function
 main "$@"
-exit $?
