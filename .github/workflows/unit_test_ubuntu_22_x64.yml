@@ -96,8 +96,8 @@ jobs:
           PYTHONPATH: ${{ github.workspace }}
         run: |
           sudo chown -R $USER:$USER /home/runner/work/radarsimpy
-          chmod +x build_linux.sh
-          ./build_linux.sh --tier=standard --arch=cpu --test=on
+          chmod +x build.sh
+          ./build.sh --tier=standard --arch=cpu --test=on
 
       - name: Display build logs on failure
         if: failure()

@@ -104,8 +104,8 @@ jobs:
           CXX: ${{matrix.cxx_compiler}}
           PYTHONPATH: ${{ github.workspace }}
         run: |
-          chmod +x build_macos.sh
-          ./build_macos.sh --tier=standard --arch=cpu --test=on
+          chmod +x build.sh
+          ./build.sh --tier=standard --arch=cpu --test=on
 
       - name: Display build logs on failure
         if: failure()
