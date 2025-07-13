@@ -87,7 +87,7 @@ elif os_type == "Darwin":  # macOS
         LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
         LIB_DIRS = ["src/radarsimcpp/build"]
     else:  # Intel processors
-        LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
+        LINK_ARGS = ["-Wl,-rpath,\$$ORIGIN"]
         LIB_DIRS = ["src/radarsimcpp/build"]
 elif os_type == "Windows":
     LINK_ARGS = []
