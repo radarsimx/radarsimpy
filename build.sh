@@ -978,7 +978,6 @@ run_tests() {
         else
             log_error "$test_failures test suite(s) failed in ${test_time}s"
             log_error "CRITICAL: Test failures detected - build should fail"
-            set -e
             return $test_failures
         fi
     else
