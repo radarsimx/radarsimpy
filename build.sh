@@ -80,7 +80,7 @@
 #   - Uses nproc for CPU core detection
 #   
 #   macOS:
-#   - Uses GCC/G++ compiler
+#   - Uses Clang/Clang++ compiler
 #   - Creates .dylib files instead of .so files
 #   - Requires Xcode Command Line Tools for development headers
 #   - Uses sysctl for CPU core detection
@@ -97,11 +97,10 @@
 #===============================================================================
 
 # Exit on any error, undefined variables, and pipe failures
-set -euo pipefail
+# set -euo pipefail
 
 # Configuration
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly LOG_FILE="${SCRIPT_DIR}/build_$(date +%Y%m%d_%H%M%S).log"
 readonly BUILD_START_TIME=$(date +%s)
 
 # Platform detection
@@ -111,6 +110,11 @@ case "${PLATFORM}" in
     Darwin*)    PLATFORM_NAME="macOS";;
     *)          PLATFORM_NAME="Unknown";;
 esac
+
+readonly LOG_FILE="${SCRIPT_DIR}/build_logs/${PLATFORM_NAME}_build_$(date +%Y%m%d_%H%M%S).log"
+if [ ! -d "${SCRIPT_DIR}/build_logs" ]; then
+    mkdir -p "${SCRIPT_DIR}/build_logs"
+fi
 
 # Colors for output
 readonly RED='\033[0;31m'
@@ -200,7 +204,7 @@ EXAMPLES:
 
 PLATFORM-SPECIFIC NOTES:
     Linux:  Uses GCC/G++, creates .so files, requires standard Linux dev tools
-    macOS:  Uses GCC/G++, creates .dylib files, requires Xcode Command Line Tools
+    macOS:  Uses clang/clang++, creates .dylib files, requires Xcode Command Line Tools
 
 EOF
 }
@@ -312,7 +316,7 @@ get_library_extension() {
 #
 # get_cpp_compiler() - Returns the appropriate C++ compiler for the platform
 # Description:
-#   Returns the platform-specific C++ compiler (g++ for macOS, g++ for Linux)
+#   Returns the platform-specific C++ compiler (clang++ for macOS, g++ for Linux)
 # Arguments:
 #   None
 # Output:
@@ -322,7 +326,7 @@ get_library_extension() {
 get_cpp_compiler() {
     case "${PLATFORM_NAME}" in
         "macOS")
-            echo "g++"
+            echo "clang++"
             ;;
         "Linux")
             echo "g++"
