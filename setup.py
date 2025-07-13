@@ -84,7 +84,7 @@ if os_type == "Linux":
 elif os_type == "Darwin":  # macOS
     LIBS = []
     if platform.processor() == "arm":  # M1/M2 processors
-        LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
+        LINK_ARGS = ["-Wl,-rpath,@loader_path"]
         LIB_DIRS = ["src/radarsimcpp/build"]
     else:  # Intel processors
         LINK_ARGS = ["-Wl,-rpath,@loader_path"]
