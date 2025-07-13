@@ -941,7 +941,7 @@ run_tests() {
             if [ $cpp_test_result -eq 0 ]; then
                 log_success "C++ tests passed"
             else
-                log_error "C++ tests failed with exit code $cpp_test_result"
+                log_error "C++ tests failed"
                 test_failures=$((test_failures + 1))
             fi
         else
@@ -961,7 +961,7 @@ run_tests() {
             if [ $python_test_result -eq 0 ]; then
                 log_success "Python tests passed"
             else
-                log_error "Python tests failed with exit code $python_test_result"
+                log_error "Python tests failed"
                 test_failures=$((test_failures + 1))
             fi
         else
@@ -974,7 +974,7 @@ run_tests() {
         if [ $test_failures -eq 0 ]; then
             log_success "All tests passed in ${test_time}s"
         else
-            log_error "$test_failures test suite(s) failed in ${test_time}s"
+            log_error "$test_failures test suite(s) failed"
             return $test_failures
         fi
     else
@@ -1105,7 +1105,7 @@ main() {
         log_error "Build completed with errors (exit code: $return_code)"
     fi
     
-    exit $return_code
+    return $return_code
 }
 
 # Execute main function
