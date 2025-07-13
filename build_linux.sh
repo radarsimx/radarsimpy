@@ -581,12 +581,26 @@ build_cpp_library() {
         cmake $cmake_args .. >> "${LOG_FILE}" 2>&1
     fi
     
+    # Check CMake configuration success
+    if [ $? -ne 0 ]; then
+        log_error "CMake configuration failed"
+        cd "$WORKPATH"
+        exit 1
+    fi
+    
     # Build with parallel jobs
     log_info "Building with $JOBS parallel jobs..."
     if [ "$VERBOSE" == "true" ]; then
         cmake --build . --parallel "$JOBS"
     else
         cmake --build . --parallel "$JOBS" >> "${LOG_FILE}" 2>&1
+    fi
+    
+    # Check build success
+    if [ $? -ne 0 ]; then
+        log_error "C++ library build failed"
+        cd "$WORKPATH"
+        exit 1
     fi
     
     local build_end=$(date +%s)
@@ -628,6 +642,12 @@ build_python_extensions() {
         python3 setup.py build_ext -b ./ --tier "${TIER}" --arch "${ARCH}"
     else
         python3 setup.py build_ext -b ./ --tier "${TIER}" --arch "${ARCH}" >> "${LOG_FILE}" 2>&1
+    fi
+    
+    # Check build success
+    if [ $? -ne 0 ]; then
+        log_error "Python extensions build failed"
+        exit 1
     fi
     
     local build_end=$(date +%s)

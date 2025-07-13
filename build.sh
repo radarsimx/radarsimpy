@@ -740,12 +740,26 @@ build_cpp_library() {
         cmake $cmake_args .. >> "${LOG_FILE}" 2>&1
     fi
     
+    # Check CMake configuration success
+    if [ $? -ne 0 ]; then
+        log_error "CMake configuration failed"
+        cd "$WORKPATH"
+        exit 1
+    fi
+    
     # Build with parallel jobs
     log_info "Building with $JOBS parallel jobs..."
     if [ "$VERBOSE" = "true" ]; then
         cmake --build . --parallel "$JOBS"
     else
         cmake --build . --parallel "$JOBS" >> "${LOG_FILE}" 2>&1
+    fi
+    
+    # Check build success
+    if [ $? -ne 0 ]; then
+        log_error "C++ library build failed"
+        cd "$WORKPATH"
+        exit 1
     fi
     
     local build_end=$(date +%s)
@@ -787,6 +801,12 @@ build_python_extensions() {
         python3 setup.py build_ext -b ./ --tier "${TIER}" --arch "${ARCH}"
     else
         python3 setup.py build_ext -b ./ --tier "${TIER}" --arch "${ARCH}" >> "${LOG_FILE}" 2>&1
+    fi
+    
+    # Check build success
+    if [ $? -ne 0 ]; then
+        log_error "Python extensions build failed"
+        exit 1
     fi
     
     local build_end=$(date +%s)
@@ -917,7 +937,8 @@ run_tests() {
                 ./src/radarsimcpp/build/radarsimcpp_test >> "${LOG_FILE}" 2>&1
             fi
             
-            if [ $? -eq 0 ]; then
+            local cpp_test_result=$?
+            if [ $cpp_test_result -eq 0 ]; then
                 log_success "C++ tests passed"
             else
                 log_error "C++ tests failed"
@@ -936,7 +957,8 @@ run_tests() {
                 pytest >> "${LOG_FILE}" 2>&1
             fi
             
-            if [ $? -eq 0 ]; then
+            local python_test_result=$?
+            if [ $python_test_result -eq 0 ]; then
                 log_success "Python tests passed"
             else
                 log_error "Python tests failed"
@@ -1068,8 +1090,10 @@ main() {
     cleanup_build_files
 
     # Run tests and capture return code
-    if ! run_tests; then
-        return_code=$?
+    run_tests
+    local test_result=$?
+    if [ $test_result -ne 0 ]; then
+        return_code=$test_result
     fi
     
     # Display build summary
