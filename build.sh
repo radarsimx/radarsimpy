@@ -944,6 +944,11 @@ run_tests() {
                 log_error "C++ tests failed with exit code $cpp_test_result"
                 log_error "TEST FAILURE: C++ unit tests have failed - this should cause build failure"
                 test_failures=$((test_failures + 1))
+                
+                # Immediate failure for C++ tests - disable cleanup trap and exit
+                trap - EXIT
+                log_error "IMMEDIATE FAILURE: C++ test failure detected - exiting now"
+                exit 2
             fi
         else
             log_warning "C++ test executable not found, skipping C++ tests"
@@ -965,6 +970,11 @@ run_tests() {
                 log_error "Python tests failed with exit code $python_test_result"
                 log_error "TEST FAILURE: Python unit tests have failed - this should cause build failure"
                 test_failures=$((test_failures + 1))
+                
+                # Immediate failure for Python tests - disable cleanup trap and exit
+                trap - EXIT
+                log_error "IMMEDIATE FAILURE: Python test failure detected - exiting now"
+                exit 3
             fi
         else
             log_warning "pytest not found, skipping Python tests"
@@ -978,7 +988,11 @@ run_tests() {
         else
             log_error "$test_failures test suite(s) failed in ${test_time}s"
             log_error "CRITICAL: Test failures detected - build should fail"
-            return $test_failures
+            
+            # Disable cleanup trap to prevent interference with exit code
+            trap - EXIT
+            log_error "IMMEDIATE FAILURE: Disabling cleanup trap and exiting with error code $test_failures"
+            exit $test_failures
         fi
     else
         log_info "Tests disabled, skipping test execution"
@@ -1092,12 +1106,18 @@ main() {
 
     cleanup_build_files
 
-    # Run tests and capture return code
+    # Run tests - note: run_tests will exit immediately on failure
+    # This will never return non-zero because of immediate exit in run_tests
     run_tests
     local test_result=$?
     if [ $test_result -ne 0 ]; then
         return_code=$test_result
         log_error "Tests failed, setting exit code to $return_code"
+        
+        # Disable cleanup trap to prevent interference
+        trap - EXIT
+        log_error "CRITICAL: Test failure detected - disabling cleanup and exiting immediately"
+        exit $return_code
     fi
     
     # Display build summary
@@ -1113,6 +1133,7 @@ main() {
     # Force explicit exit to ensure GitHub Actions sees the failure
     if [ $return_code -ne 0 ]; then
         log_error "Exiting with error code $return_code to signal build failure"
+        trap - EXIT
         exit $return_code
     fi
     
