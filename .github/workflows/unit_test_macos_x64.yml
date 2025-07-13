@@ -13,19 +13,19 @@
 # Test Matrix:
 #   - Python versions: 3.9, 3.10, 3.11, 3.12, 3.13
 #   - Platform: MacOS 13
-#   - Compilers: Clang/Clang++
+#   - Compilers: GCC/G++
 #   - Architecture: x64 (CPU-only builds)
 #
 # Key Features:
 #   - Pip package caching for faster builds
-#   - Clang and Xcode environment setup
+#   - GCC and Xcode environment setup
 #   - System information display for debugging
 #   - Timeout protection (60 minutes)
 #   - Fail-fast disabled to test all Python versions
 #
 # Requirements:
 #   - RADARSIMC SSH key secret for submodule access
-#   - Xcode 15.2, CMake, Clang, and Python dependencies
+#   - Xcode 15.2, CMake, GCC, and Python dependencies
 #   - build.sh script
 #
 # ==============================================================================

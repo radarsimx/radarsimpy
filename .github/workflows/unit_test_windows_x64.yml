@@ -90,7 +90,7 @@ jobs:
 
       - name: Build & Test
         run: |
-          .\build_win.bat --tier=standard --arch=cpu --test=on
+          .\build.bat --tier=standard --arch=cpu --test=on
         env:
           PYTHONPATH: ${{ github.workspace }}
 
