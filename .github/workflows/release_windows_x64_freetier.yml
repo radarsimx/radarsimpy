@@ -1,0 +1,38 @@
+name: Release on Windows x64 Free Tier
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+      # - name: Remove Windows OpenSSH and use the default ssh in git
+      #   run: Remove-WindowsCapability -Online -Name OpenSSH.Client
+      - uses: actions/checkout@v4
+        with:
+          ssh-key: ${{secrets.RADARSIMC}}
+          submodules: recursive
+      - name: Set up Python ${{matrix.python-version}}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{matrix.python-version}}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Build
+        run: |
+          .\build_win.bat --tier=free --arch=cpu --test=off
+      - name: Archive built module
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: radarsimpy_win_py${{matrix.python-version}}_freetier
+          path: .\radarsimpy
