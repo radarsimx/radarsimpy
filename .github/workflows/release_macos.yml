@@ -326,9 +326,128 @@ jobs:
             *.log
           retention-days: 1
 
+  # Pack all artifacts into a single file
+  pack-artifacts:
+    needs: build
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: Create artifacts directory
+        run: mkdir -p artifacts
+      
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+      
+      - name: Display downloaded artifacts
+        run: |
+          echo "::group::Downloaded Artifacts"
+          find artifacts/ -type f -name "*.py" -o -name "*.so" -o -name "*.dylib" -o -name "*.pyd" | head -20
+          echo "::endgroup::"
+      
+      - name: Create artifact structure
+        run: |
+          mkdir -p packed/radarsimpy_macos_all
+          
+          # Copy each artifact to a subdirectory
+          for dir in artifacts/*/; do
+            if [ -d "$dir" ]; then
+              artifact_name=$(basename "$dir")
+              echo "Processing artifact: $artifact_name"
+              
+              # Create subdirectory for this artifact
+              mkdir -p "packed/radarsimpy_macos_all/$artifact_name"
+              
+              # Copy the radarsimpy module
+              if [ -d "$dir/radarsimpy" ]; then
+                cp -r "$dir/radarsimpy" "packed/radarsimpy_macos_all/$artifact_name/"
+              else
+                # If radarsimpy is at root level
+                cp -r "$dir"/* "packed/radarsimpy_macos_all/$artifact_name/" 2>/dev/null || true
+              fi
+            fi
+          done
+      
+      - name: Create README for packed artifacts
+        run: |
+          cat > packed/radarsimpy_macos_all/README.md << 'EOF'
+          # RadarSimPy MacOS Build Artifacts
+          
+          This archive contains all RadarSimPy builds for macOS platforms.
+          
+          ## Directory Structure
+          
+          Each subdirectory contains a complete RadarSimPy build for specific configurations:
+          
+          ### x64 (Intel) Standard Builds
+          - `radarsimpy_macos_py3.9/` - Python 3.9 (Standard)
+          - `radarsimpy_macos_py3.10/` - Python 3.10 (Standard)
+          - `radarsimpy_macos_py3.11/` - Python 3.11 (Standard)
+          - `radarsimpy_macos_py3.12/` - Python 3.12 (Standard)
+          - `radarsimpy_macos_py3.13/` - Python 3.13 (Standard)
+          
+          ### x64 (Intel) Free Tier Builds
+          - `radarsimpy_macos_py3.9_freetier/` - Python 3.9 (Free Tier)
+          - `radarsimpy_macos_py3.10_freetier/` - Python 3.10 (Free Tier)
+          - `radarsimpy_macos_py3.11_freetier/` - Python 3.11 (Free Tier)
+          - `radarsimpy_macos_py3.12_freetier/` - Python 3.12 (Free Tier)
+          - `radarsimpy_macos_py3.13_freetier/` - Python 3.13 (Free Tier)
+          
+          ### ARM64 (Apple Silicon) Standard Builds
+          - `radarsimpy_macos_arm_py3.9/` - Python 3.9 (Standard)
+          - `radarsimpy_macos_arm_py3.10/` - Python 3.10 (Standard)
+          - `radarsimpy_macos_arm_py3.11/` - Python 3.11 (Standard)
+          - `radarsimpy_macos_arm_py3.12/` - Python 3.12 (Standard)
+          - `radarsimpy_macos_arm_py3.13/` - Python 3.13 (Standard)
+          
+          ### ARM64 (Apple Silicon) Free Tier Builds
+          - `radarsimpy_macos_arm_py3.9_freetier/` - Python 3.9 (Free Tier)
+          - `radarsimpy_macos_arm_py3.10_freetier/` - Python 3.10 (Free Tier)
+          - `radarsimpy_macos_arm_py3.11_freetier/` - Python 3.11 (Free Tier)
+          - `radarsimpy_macos_arm_py3.12_freetier/` - Python 3.12 (Free Tier)
+          - `radarsimpy_macos_arm_py3.13_freetier/` - Python 3.13 (Free Tier)
+          
+          ## Usage
+          
+          1. Extract the appropriate build for your system and Python version
+          2. Install the module using pip or copy to your Python site-packages
+          3. Import and use RadarSimPy in your Python scripts
+          
+          ## Build Information
+          
+          - **Total Builds**: 20
+          - **Architectures**: x64 (Intel), ARM64 (Apple Silicon)
+          - **Python Versions**: 3.9, 3.10, 3.11, 3.12, 3.13
+          - **Tiers**: Standard, Free Tier
+          - **Build Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          EOF
+      
+      - name: Create compressed archive
+        run: |
+          cd packed
+          tar -czf radarsimpy_macos_all_builds.tar.gz radarsimpy_macos_all/
+          
+          # Create zip version as well
+          zip -r radarsimpy_macos_all_builds.zip radarsimpy_macos_all/
+          
+          echo "::group::Archive Information"
+          ls -lh *.tar.gz *.zip
+          echo "::endgroup::"
+      
+      - name: Upload packed artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: radarsimpy_macos_all_builds
+          path: |
+            packed/radarsimpy_macos_all_builds.tar.gz
+            packed/radarsimpy_macos_all_builds.zip
+          retention-days: 1
+          compression-level: 0
+
   # Summary job that runs after all builds complete
   build-summary:
-    needs: build
+    needs: [build, pack-artifacts]
     runs-on: ubuntu-latest
     if: always()
     steps:
@@ -349,6 +468,16 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Python Versions" >> $GITHUB_STEP_SUMMARY
           echo "- Python 3.9, 3.10, 3.11, 3.12, 3.13" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Packed Artifacts" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.pack-artifacts.result }}" == "success" ]; then
+            echo "✅ **All artifacts successfully packed into single archive**" >> $GITHUB_STEP_SUMMARY
+            echo "- Archive: `radarsimpy_macos_all_builds`" >> $GITHUB_STEP_SUMMARY
+            echo "- Formats: tar.gz, zip" >> $GITHUB_STEP_SUMMARY
+            echo "- Contains: All 20 build variants organized by configuration" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ **Artifact packing failed or was skipped**" >> $GITHUB_STEP_SUMMARY
+          fi
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Build Status" >> $GITHUB_STEP_SUMMARY
           echo "Check individual job results above for detailed build information." >> $GITHUB_STEP_SUMMARY
