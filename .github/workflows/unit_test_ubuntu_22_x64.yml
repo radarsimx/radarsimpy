@@ -28,7 +28,7 @@
 # Requirements:
 #   - RADARSIMC SSH key secret for submodule access
 #   - CMake, GCC, and Python dependencies
-#   - build_linux.sh script for Linux-specific building
+#   - build.sh script
 #
 # ==============================================================================
 
@@ -110,3 +110,12 @@ jobs:
             echo "=== CMake Error Log ==="
             tail -n 100 "build/CMakeFiles/CMakeError.log"
           fi
+
+      - name: Upload build logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs-python-${{matrix.python-version}}
+          path: build_logs/
+          retention-days: 7
+          if-no-files-found: warn
