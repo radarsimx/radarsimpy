@@ -200,13 +200,17 @@ def check_cuda_availability() -> Dict[str, str]:
     return cuda_info
 
 
-def check_cmake() -> Tuple[bool, str]:
+def check_cmake(min_version: str = "3.18") -> Tuple[bool, str]:
     """
-    Check if CMake is available.
+    Check if CMake is available and meets the minimum version.
 
     Returns:
         Tuple of (success, version or error message)
     """
+
+    def version_tuple(v):
+        return tuple(int(x) for x in v.split(".") if x.isdigit())
+
     try:
         result = subprocess.run(
             ["cmake", "--version"], capture_output=True, text=True, timeout=10
@@ -216,8 +220,14 @@ def check_cmake() -> Tuple[bool, str]:
             first_line = result.stdout.splitlines()[0]
             if "cmake version" in first_line.lower():
                 version = first_line.strip().split()[-1]
-                return True, version
-            return True, result.stdout.strip()
+                if version_tuple(version) >= version_tuple(min_version):
+                    return True, version
+                else:
+                    return (
+                        False,
+                        f"CMake version {version} found, but >= {min_version} required",
+                    )
+            return False, "Could not parse CMake version"
         else:
             return False, result.stderr.strip() or "CMake returned nonzero exit code"
     except (subprocess.TimeoutExpired, FileNotFoundError):
@@ -238,8 +248,8 @@ def validate_build_environment(tier: str, arch: str) -> List[str]:
     errors = []
 
     # Check Python version
-    if sys.version_info < (3, 8):
-        errors.append(f"Python 3.8+ required, found {sys.version}")
+    if sys.version_info < (3, 9):
+        errors.append(f"Python 3.9+ required, found {sys.version}")
 
     # Check dependencies
     deps_ok, missing = check_dependencies()
@@ -262,7 +272,7 @@ def validate_build_environment(tier: str, arch: str) -> List[str]:
     # Check CMake
     cmake_ok, cmake_info = check_cmake()
     if not cmake_ok:
-        errors.append(f"CMake not found: {cmake_info}")
+        errors.append(f"CMake not found or too old: {cmake_info}")
 
     # Check if source directories exist
     required_dirs = [
@@ -308,7 +318,7 @@ def get_build_info(tier: str, arch: str) -> Dict[str, str]:
 
     # Add CMake info
     cmake_ok, cmake_info = check_cmake()
-    info["cmake"] = cmake_info if cmake_ok else "Not found"
+    info["cmake"] = cmake_info if cmake_ok else f"Not found or too old: {cmake_info}"
 
     return info
 
@@ -335,7 +345,7 @@ if __name__ == "__main__":
 
     # Check CMake
     cmake_ok, cmake_info = check_cmake()
-    print(f"CMake: {cmake_info if cmake_ok else 'Not found'}")
+    print(f"CMake: {cmake_info if cmake_ok else 'Not found or too old: ' + cmake_info}")
 
     # Test validation
     print("\nValidation for standard CPU build:")
