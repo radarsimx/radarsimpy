@@ -7,10 +7,17 @@ on:
   # Allow manual trigger from the Actions tab
   workflow_dispatch:
 
+env:
+  # Global environment variables
+  PYTHONUNBUFFERED: 1
+  PYTHONDONTWRITEBYTECODE: 1
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
     strategy:
+      fail-fast: false
       matrix:
         include:
           # MacOS x64 Standard builds
@@ -179,12 +186,15 @@ jobs:
             artifact_name: radarsimpy_macos_arm_py3.13_freetier
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           ssh-key: ${{secrets.RADARSIMC}}
           submodules: recursive
+          fetch-depth: 0
       
-      - uses: maxim-lobanov/setup-xcode@v1.6.0
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1.6.0
         with:
           xcode-version: ${{ matrix.xcode_version }}
       
@@ -192,19 +202,110 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          cache: 'pip'
       
-      - name: Install dependencies
+      - name: Cache build dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/Library/Caches/Homebrew
+            ~/.ccache
+          key: ${{ runner.os }}-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.tier }}-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.tier }}-
+            ${{ runner.os }}-${{ matrix.os }}-${{ matrix.python-version }}-
+            ${{ runner.os }}-${{ matrix.os }}-
+      
+      - name: Install system dependencies
         run: |
-          python -m pip install --upgrade pip
+          # Install ccache for faster compilation
+          brew install ccache
+          echo "$(brew --prefix ccache)/bin" >> $GITHUB_PATH
+          
+          # Set up ccache
+          ccache --set-config=max_size=2G
+          ccache --set-config=cache_dir=~/.ccache
+      
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip wheel setuptools
           pip install -r requirements.txt
       
-      - name: Build
+      - name: Display build information
+        run: |
+          echo "::group::Build Information"
+          echo "OS: ${{ matrix.os }}"
+          echo "Python: ${{ matrix.python-version }}"
+          echo "Tier: ${{ matrix.tier }}"
+          echo "Architecture: ${{ matrix.arch }}"
+          echo "C Compiler: ${{ matrix.c_compiler }}"
+          echo "C++ Compiler: ${{ matrix.cxx_compiler }}"
+          echo "Xcode Version: ${{ matrix.xcode_version }}"
+          echo "::endgroup::"
+          
+          echo "::group::System Information"
+          uname -a
+          sw_vers
+          xcodebuild -version
+          python --version
+          pip --version
+          ${{ matrix.c_compiler }} --version
+          ${{ matrix.cxx_compiler }} --version
+          echo "::endgroup::"
+      
+      - name: Build RadarSimPy
         env:
           CC: ${{ matrix.c_compiler }}
           CXX: ${{ matrix.cxx_compiler }}
+          CCACHE_DIR: ~/.ccache
+          CCACHE_COMPILERCHECK: content
         run: |
+          echo "::group::Build Process"
           chmod +x build.sh
-          ./build.sh --tier=${{ matrix.tier }} --arch=${{ matrix.arch }} --test=off
+          ./build.sh --tier=${{ matrix.tier }} --arch=${{ matrix.arch }} --test=off --verbose
+          echo "::endgroup::"
+      
+      - name: Display build statistics
+        if: always()
+        run: |
+          echo "::group::Build Statistics"
+          ccache --show-stats
+          echo "::endgroup::"
+      
+      - name: Verify build artifacts
+        run: |
+          echo "::group::Build Verification"
+          ls -la ./radarsimpy/
+          if [ -f "./radarsimpy/__init__.py" ]; then
+            echo "✓ Python module found"
+          else
+            echo "✗ Python module missing"
+            exit 1
+          fi
+          
+          # Check for compiled extensions
+          if find ./radarsimpy -name "*.so" -o -name "*.dylib" -o -name "*.pyd" | grep -q .; then
+            echo "✓ Compiled extensions found:"
+            find ./radarsimpy -name "*.so" -o -name "*.dylib" -o -name "*.pyd"
+          else
+            echo "✗ No compiled extensions found"
+            exit 1
+          fi
+          echo "::endgroup::"
+      
+      - name: Create build summary
+        run: |
+          echo "## Build Summary 🛠️" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| OS | ${{ matrix.os }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Python Version | ${{ matrix.python-version }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tier | ${{ matrix.tier }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Architecture | ${{ matrix.arch }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Compiler | ${{ matrix.c_compiler }}/${{ matrix.cxx_compiler }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Xcode Version | ${{ matrix.xcode_version }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Artifact Name | ${{ matrix.artifact_name }} |" >> $GITHUB_STEP_SUMMARY
       
       - name: Archive built module
         uses: actions/upload-artifact@v4
@@ -212,3 +313,51 @@ jobs:
         with:
           name: ${{ matrix.artifact_name }}
           path: ./radarsimpy
+          retention-days: 1
+          compression-level: 6
+      
+      - name: Upload build logs on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: build-logs-${{ matrix.artifact_name }}
+          path: |
+            ./build_logs/
+            *.log
+          retention-days: 1
+
+  # Summary job that runs after all builds complete
+  build-summary:
+    needs: build
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Generate build summary
+        run: |
+          echo "# MacOS Build Summary 📊" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Build Matrix Results" >> $GITHUB_STEP_SUMMARY
+          echo "Total builds: 20 (5 Python versions × 2 architectures × 2 tiers)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Architecture Distribution" >> $GITHUB_STEP_SUMMARY
+          echo "- **x64 (Intel)**: 10 builds on macos-13" >> $GITHUB_STEP_SUMMARY
+          echo "- **ARM64 (Apple Silicon)**: 10 builds on macos-15" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Tier Distribution" >> $GITHUB_STEP_SUMMARY
+          echo "- **Standard**: 10 builds" >> $GITHUB_STEP_SUMMARY
+          echo "- **Free**: 10 builds" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Python Versions" >> $GITHUB_STEP_SUMMARY
+          echo "- Python 3.9, 3.10, 3.11, 3.12, 3.13" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Build Status" >> $GITHUB_STEP_SUMMARY
+          echo "Check individual job results above for detailed build information." >> $GITHUB_STEP_SUMMARY
+          
+          # Check if any builds failed
+          if [ "${{ needs.build.result }}" != "success" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ **Some builds may have failed. Check individual job logs for details.**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **All builds completed successfully!**" >> $GITHUB_STEP_SUMMARY
+          fi
