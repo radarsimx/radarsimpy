@@ -229,7 +229,7 @@ Find more usage examples at [radarsimx.com](https://radarsimx.com/category/examp
   ./build_linux.sh --arch=gpu --test=on
   ```
 
-- ### MacOS (GCC)
+- ### MacOS (Clang)
 
   ```bash
   ./build_macos.sh --arch=cpu --test=on
