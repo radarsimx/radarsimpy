@@ -1,9 +1,9 @@
 # ==============================================================================
-# GitHub Actions Workflow: Ubuntu 24.04 x64 Unit Testing
+# GitHub Actions Workflow: Windows x64 Unit Testing
 # ==============================================================================
 #
 # This workflow performs continuous integration testing for RadarSimPy on 
-# Ubuntu 24.04 x64 platforms. It builds and tests the radar simulation library
+# Windows x64 platforms. It builds and tests the radar simulation library
 # across multiple Python versions to ensure compatibility and reliability.
 #
 # Triggers:
@@ -12,13 +12,12 @@
 #
 # Test Matrix:
 #   - Python versions: 3.9, 3.10, 3.11, 3.12, 3.13
-#   - Platform: Ubuntu 24.04
-#   - Compilers: GCC-13
+#   - Platform: Windows Latest (windows-latest runner)
 #   - Architecture: x64 (CPU-only builds)
 #
 # Key Features:
 #   - Pip package caching for faster builds
-#   - GCC environment setup for C++ compilation
+#   - Visual Studio environment setup for C++ compilation
 #   - System information display for debugging
 #   - Build log capture on failure
 #   - Test result artifact upload
@@ -27,12 +26,12 @@
 #
 # Requirements:
 #   - RADARSIMC SSH key secret for submodule access
-#   - CMake, GCC, and Python dependencies
-#   - build.sh script
+#   - CMake, Visual Studio Build Tools, and Python dependencies
+#   - build_win.bat script for Windows-specific building
 #
 # ==============================================================================
 
-name: Ubuntu 24.04 x64
+name: Windows Unit Tests
 
 on:
   push:
@@ -42,14 +41,12 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: windows-latest
     timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
-        c_compiler: [gcc-13]
-        cxx_compiler: [g++-13]
 
     steps:
       - name: Checkout repository
@@ -66,7 +63,7 @@ jobs:
       - name: Cache pip packages
         uses: actions/cache@v4
         with:
-          path: ~/.cache/pip
+          path: ~\AppData\Local\pip\Cache
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
@@ -76,6 +73,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Set up Visual Studio environment
+        uses: ilammy/msvc-dev-cmd@v1
+
       - name: Display system information
         run: |
           echo "Python version:"
@@ -84,38 +84,24 @@ jobs:
           pip --version
           echo "CMake version:"
           cmake --version
-          echo "GCC version:"
-          ${{matrix.c_compiler}} --version
-          echo "G++ version:"
-          ${{matrix.cxx_compiler}} --version
+          echo "Visual Studio version:"
+          where cl
+          cl 2>&1 | head -1 || echo "cl not found"
 
       - name: Build & Test
-        env:
-          CC: ${{matrix.c_compiler}}
-          CXX: ${{matrix.cxx_compiler}}
-          PYTHONPATH: ${{ github.workspace }}
         run: |
-          sudo chown -R $USER:$USER /home/runner/work/radarsimpy
-          chmod +x build.sh
-          ./build.sh --tier=standard --arch=cpu --test=on
+          .\build.bat --tier=standard --arch=cpu --test=on
+        env:
+          PYTHONPATH: ${{ github.workspace }}
 
       - name: Display build logs on failure
         if: failure()
         run: |
-          if [ -f "build/CMakeFiles/CMakeOutput.log" ]; then
+          if (Test-Path "build/CMakeFiles/CMakeOutput.log") {
             echo "=== CMake Output Log ==="
-            tail -n 100 "build/CMakeFiles/CMakeOutput.log"
-          fi
-          if [ -f "build/CMakeFiles/CMakeError.log" ]; then
+            Get-Content "build/CMakeFiles/CMakeOutput.log" -Tail 100
+          }
+          if (Test-Path "build/CMakeFiles/CMakeError.log") {
             echo "=== CMake Error Log ==="
-            tail -n 100 "build/CMakeFiles/CMakeError.log"
-          fi
-
-      - name: Upload build logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-logs-python-${{matrix.python-version}}
-          path: build_logs/
-          retention-days: 7
-          if-no-files-found: warn
+            Get-Content "build/CMakeFiles/CMakeError.log" -Tail 100
+          }

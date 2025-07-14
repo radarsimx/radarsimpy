@@ -1,9 +1,9 @@
-# ==============================================================================
-# GitHub Actions Workflow: MacOS ARM64 Unit Testing
-# ==============================================================================
+# ============================================================================== 
+# GitHub Actions Workflow: Ubuntu x64 Unit Testing (22.04 & 24.04)
+# ============================================================================== 
 #
 # This workflow performs continuous integration testing for RadarSimPy on 
-# MacOS ARM64 (Apple Silicon) platforms. It builds and tests the radar simulation 
+# both Ubuntu 22.04 and 24.04 x64 platforms. It builds and tests the radar simulation
 # library across multiple Python versions to ensure compatibility and reliability.
 #
 # Triggers:
@@ -12,25 +12,27 @@
 #
 # Test Matrix:
 #   - Python versions: 3.9, 3.10, 3.11, 3.12, 3.13
-#   - Platform: MacOS 15
-#   - Compilers: Clang/Clang++
-#   - Architecture: ARM64 (CPU-only builds)
+#   - Platform: Ubuntu 22.04, Ubuntu 24.04
+#   - Compilers: GCC-11 (22.04), GCC-13 (24.04)
+#   - Architecture: x64 (CPU-only builds)
 #
 # Key Features:
 #   - Pip package caching for faster builds
-#   - Clang and Xcode environment setup
+#   - GCC environment setup for C++ compilation
 #   - System information display for debugging
+#   - Build log capture on failure
+#   - Test result artifact upload
 #   - Timeout protection (60 minutes)
 #   - Fail-fast disabled to test all Python versions
 #
 # Requirements:
 #   - RADARSIMC SSH key secret for submodule access
-#   - Xcode 16.3, CMake, Clang, and Python dependencies
+#   - CMake, GCC, and Python dependencies
 #   - build.sh script
 #
-# ==============================================================================
+# ============================================================================== 
 
-name: MacOS ARM64
+name: Ubuntu Unit Tests
 
 on:
   push:
@@ -40,14 +42,21 @@ on:
 
 jobs:
   build:
-    runs-on: macos-15
     timeout-minutes: 60
+    runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
+        include:
+          - runner: ubuntu-22.04
+            c_compiler: gcc-11
+            cxx_compiler: g++-11
+            os_label: ubuntu22
+          - runner: ubuntu-24.04
+            c_compiler: gcc-13
+            cxx_compiler: g++-13
+            os_label: ubuntu24
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
-        c_compiler: [clang]
-        cxx_compiler: [clang++]
 
     steps:
       - name: Checkout repository
@@ -56,23 +65,18 @@ jobs:
           ssh-key: ${{secrets.RADARSIMC}}
           submodules: recursive
 
-      - name: Set up Xcode
-        uses: maxim-lobanov/setup-xcode@v1.6.0
-        with:
-          xcode-version: '16.3'
-
-      - name: Set up Python ${{matrix.python-version}}
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: ${{matrix.python-version}}
+          python-version: ${{ matrix.python-version }}
 
       - name: Cache pip packages
         uses: actions/cache@v4
         with:
-          path: ~/Library/Caches/pip
-          key: ${{ runner.os }}-arm64-pip-${{ hashFiles('**/requirements.txt') }}
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
-            ${{ runner.os }}-arm64-pip-
+            ${{ runner.os }}-pip-
 
       - name: Install dependencies
         run: |
@@ -87,21 +91,18 @@ jobs:
           pip --version
           echo "CMake version:"
           cmake --version
-          echo "Xcode version:"
-          xcodebuild -version
           echo "GCC version:"
-          ${{matrix.c_compiler}} --version
+          ${{ matrix.c_compiler }} --version
           echo "G++ version:"
-          ${{matrix.cxx_compiler}} --version
-          echo "Architecture:"
-          uname -m
+          ${{ matrix.cxx_compiler }} --version
 
       - name: Build & Test
         env:
-          CC: ${{matrix.c_compiler}}
-          CXX: ${{matrix.cxx_compiler}}
+          CC: ${{ matrix.c_compiler }}
+          CXX: ${{ matrix.cxx_compiler }}
           PYTHONPATH: ${{ github.workspace }}
         run: |
+          sudo chown -R $USER:$USER /home/runner/work/radarsimpy
           chmod +x build.sh
           ./build.sh --tier=standard --arch=cpu --test=on
 
@@ -121,7 +122,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: build-logs-python-${{matrix.python-version}}
+          name: build-logs-python-${{ matrix.python-version }}-${{ matrix.os_label }}
           path: build_logs/
           retention-days: 7
           if-no-files-found: warn
