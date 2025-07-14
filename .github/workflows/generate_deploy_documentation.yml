@@ -1,0 +1,102 @@
+# GitHub Actions Workflow: Documentation Generation for radarsimpy
+#
+# This workflow builds the project and generates Sphinx documentation on every tag push or manual dispatch.
+# It also deploys the generated documentation to GitHub Pages.
+#
+# Workflow:
+# ----------------------
+# 1. Triggers on tag push or manual dispatch.
+# 2. Checks out the repository and submodules.
+# 3. Sets up Python and installs all dependencies, including Sphinx and theme.
+# 4. Builds the project (Linux, CPU, no tests).
+# 5. Generates Sphinx documentation (HTML output).
+# 6. Archives the documentation as an artifact for download.
+# 7. Prepares and uploads documentation for GitHub Pages.
+# 8. Deploys documentation to GitHub Pages.
+#
+# For more details, see the README or build_instructions.md.
+
+name: Generate and Deploy Documentation
+
+on:
+  # Trigger on any tag push (for releases)
+  push:
+    tags:
+      - "*"
+  # Allow manual trigger from the Actions tab
+  workflow_dispatch:
+
+# Set permissions for GitHub Pages deployment
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    name: Build and Generate Documentation
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        python-version: ["3.13"]
+        c_compiler: [gcc-14]
+        cxx_compiler: [g++-14]
+
+    steps:
+      - name: Checkout repository and submodules
+        uses: actions/checkout@v4
+        with:
+          ssh-key: ${{secrets.RADARSIMC}}
+          submodules: recursive
+
+      - name: Set up Python ${{matrix.python-version}}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{matrix.python-version}}
+
+      - name: Install Python and documentation dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install Sphinx pydata-sphinx-theme
+        shell: bash
+
+      - name: Build project (Linux, CPU, no tests)
+        env:
+          CC: ${{matrix.c_compiler}}
+          CXX: ${{matrix.cxx_compiler}}
+        run: |
+          set -e
+          sudo chown -R $USER:$USER /home/runner/work/radarsimpy
+          chmod +x build_linux.sh
+          ./build_linux.sh --tier=standard --arch=cpu --test=off
+        shell: bash
+
+      - name: Generate Sphinx documentation
+        run: |
+          cd gen_docs
+          make html
+        shell: bash
+
+      - name: Archive generated documentation (artifact)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs
+          path: ./gen_docs/_build/html
+        # This step saves the built documentation as an artifact for download/debugging.
+
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v4
+        # Prepares the workflow for GitHub Pages deployment.
+
+      - name: Upload documentation for GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "./gen_docs/_build/html"
+        # Uploads the documentation to be deployed to GitHub Pages.
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        # Deploys the uploaded documentation to GitHub Pages.
