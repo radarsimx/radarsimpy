@@ -195,5 +195,5 @@ jobs:
         with:
           name: build-logs-python-${{ matrix.python-version }}-${{ matrix.arch }}
           path: build_logs/
-          retention-days: 7
+          retention-days: 1
           if-no-files-found: warn
