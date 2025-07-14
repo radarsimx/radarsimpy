@@ -16,23 +16,61 @@ from typing import Dict, List, Optional, Tuple
 
 def check_dependencies() -> Tuple[bool, List[str]]:
     """
-    Check if all required dependencies are available.
+    Check if all required dependencies are available and meet version requirements.
 
     Returns:
-        Tuple of (success, missing_packages)
+        Tuple of (success, missing_or_incompatible_packages)
     """
-    required_packages = [
-        "numpy",
-        "cython",
-        "setuptools",
-    ]
-
     missing = []
-    for package in required_packages:
+    # Python version is checked in validate_build_environment
+
+    # NumPy >= 2.0
+    try:
+        import numpy
+        from packaging.version import Version
+
+        if Version(numpy.__version__) < Version("2.0"):
+            missing.append(f"numpy >= 2.0 (found {numpy.__version__})")
+    except ImportError:
+        missing.append("numpy >= 2.0")
+
+    # SciPy
+    try:
+        import scipy
+    except ImportError:
+        missing.append("scipy")
+
+    # At least one mesh library
+    mesh_libs = [
+        ("pymeshlab", "PyMeshLab"),
+        ("pyvista", "PyVista"),
+        ("trimesh", "trimesh"),
+        ("meshio", "meshio"),
+    ]
+    mesh_found = False
+    for mod, name in mesh_libs:
         try:
-            __import__(package)
+            __import__(mod)
+            mesh_found = True
+            break
         except ImportError:
-            missing.append(package)
+            continue
+    if not mesh_found:
+        missing.append(
+            "At least one of: PyMeshLab (pymeshlab), PyVista (pyvista), trimesh, meshio"
+        )
+
+    # Cython
+    try:
+        import cython
+    except ImportError:
+        missing.append("cython")
+
+    # setuptools
+    try:
+        import setuptools
+    except ImportError:
+        missing.append("setuptools")
 
     return len(missing) == 0, missing
 

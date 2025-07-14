@@ -203,37 +203,7 @@ Find more usage examples at [radarsimx.com](https://radarsimx.com/category/examp
 
 ## Build
 
-> Building `radarsimpy` requires to access the source code of `radarsimcpp`. If you don't have access to `radarsimcpp`, please use the [pre-built module](https://radarsimx.com/product/radarsimpy/). For organizations seeking full source code access for customization or advanced integration, please submit [Quote for Source Code](https://radarsimx.com/quote-for-source-code/).
-
-- ### Windows (MSVC)
-
-  ```batch
-  build_win.bat --arch=cpu --test=on
-  ```
-
-  Build for GPU (CUDA)
-
-  ```batch
-  build_win.bat --arch=gpu --test=on
-  ```
-
-- ### Linux (GCC)
-
-  ```bash
-  ./build_linux.sh --arch=cpu --test=on
-  ```
-
-  Build for GPU (CUDA)
-
-  ```bash
-  ./build_linux.sh --arch=gpu --test=on
-  ```
-
-- ### MacOS (Clang)
-
-  ```bash
-  ./build_macos.sh --arch=cpu --test=on
-  ```
+Check [Build Instructions](./build_instructions.md)
 
 ---
 

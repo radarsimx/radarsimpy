@@ -4,6 +4,8 @@
 
 RadarSimPy is a radar simulation library that provides both CPU and GPU acceleration capabilities. This document provides comprehensive build instructions for all supported platforms with detailed configuration options and troubleshooting guidance.
 
+> Building `radarsimpy` requires to access the source code of `radarsimcpp`. If you don't have access to `radarsimcpp`, please use the [pre-built module](https://radarsimx.com/product/radarsimpy/). For organizations seeking full source code access for customization or advanced integration, please submit [Quote for Source Code](https://radarsimx.com/quote-for-source-code/).
+
 ## Prerequisites for All Platforms
 
 ### System Requirements
@@ -19,6 +21,17 @@ Install the required Python packages:
 ```bash
 pip install -r requirements.txt
 ```
+
+## Validate Build Environment
+
+Before building, validate your environment to catch missing dependencies, outdated CMake, or compiler issues:
+
+```bash
+python build_config.py
+```
+
+- If you see `All checks passed!`, you are ready to build.
+- If you see errors, follow the suggestions to resolve them (e.g., install missing packages, update CMake, or fix compiler setup).
 
 ## Windows (MSVC)
 
@@ -43,10 +56,10 @@ pip install -r requirements.txt
    ```batch
    # Basic CPU build
    build.bat
-   
+
    # CPU build with custom options
    build.bat --arch=cpu --test=on
-   
+
    # GPU build (requires CUDA)
    build.bat --arch=gpu --test=on
    ```
@@ -66,10 +79,10 @@ pip install -r requirements.txt
    ```bash
    # Update package lists
    sudo apt-get update
-   
+
    # Install essential build tools
    sudo apt-get install -y build-essential cmake python3-dev python3-pip
-   
+
    # Install CMake (if system version is too old)
    sudo snap install cmake --classic
    ```
@@ -79,13 +92,13 @@ pip install -r requirements.txt
    ```bash
    # Install CUDA following NVIDIA's official guide:
    # https://developer.nvidia.com/cuda-downloads
-   
+
    # After CUDA installation, set up environment variables
    echo 'export PATH=/usr/local/cuda/bin:$PATH' >> ~/.bashrc
    echo 'export CUDA_PATH=/usr/local/cuda' >> ~/.bashrc
    echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
    source ~/.bashrc
-   
+
    # Verify CUDA installation
    nvcc --version
    ```
@@ -103,10 +116,10 @@ pip install -r requirements.txt
    ```bash
    # Basic CPU build
    ./build.sh
-   
+
    # CPU build with custom options
    ./build.sh --arch=cpu --test=on
-   
+
    # GPU build (requires CUDA)
    ./build.sh --arch=gpu --test=on
    ```
@@ -155,14 +168,14 @@ pip install -r requirements.txt
    ```bash
    # Basic CPU build
    ./build.sh
-   
+
    # CPU build with custom options
    ./build.sh --arch=cpu --test=on
    ```
 
 ### macOS Build Options
 
-- `--arch`: Architecture (`cpu` or `gpu`)
+- `--arch`: Architecture (`cpu`)
 - `--test`: Enable testing (`on` or `off`)
 - `--jobs`: Number of parallel build jobs (auto-detected by default)
 - `--verbose`: Enable verbose output
