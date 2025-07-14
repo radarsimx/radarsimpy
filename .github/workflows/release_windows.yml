@@ -1,0 +1,61 @@
+name: Release on Windows
+
+# GitHub Actions workflow to build and package radarsimpy for Windows.
+#
+# This workflow is triggered on every push to a tag (release event).
+# It builds the project for multiple Python versions and build tiers.
+# The resulting artifacts are uploaded for each build variant.
+
+on:
+  # Trigger workflow on any push to a tag (release event)
+  push:
+    tags:
+      - "*" # Matches any tag name
+  # Allow manual trigger from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    # Use the latest Windows runner
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        # Build for multiple Python versions and tiers
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        tier: ["standard", "free"]
+
+    steps:
+      # Checkout the repository and submodules using a deploy key (RADARSIMC)
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ssh-key: ${{secrets.RADARSIMC}} # SSH key for private submodules
+          submodules: recursive
+
+      # Set up the required Python version for this build matrix job
+      - name: Set up Python ${{matrix.python-version}}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{matrix.python-version}}
+
+      # Install Python dependencies from requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Build the project using the provided batch script
+      # --tier: build tier (standard/free)
+      # --arch: build architecture (cpu)
+      # --test=off: skip running tests during build
+      - name: Build
+        run: |
+          .\build.bat --tier=${{matrix.tier}} --arch=cpu --test=off
+
+      # Upload the built Python module as an artifact for this build variant
+      - name: Archive built module
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: radarsimpy_win_py${{matrix.python-version}}_${{matrix.tier}}tier
+          path: .\radarsimpy
