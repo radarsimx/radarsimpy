@@ -1,235 +1,337 @@
 """
-Setup script for a Python package "radarsimpy"
+Setup script for RadarSimPy - A Python-based Radar Simulator
 
----
+This setup script builds the radarsimpy package with C++ extensions and CUDA support.
+It supports both free and standard tiers, and both CPU and GPU architectures.
 
-- Copyright (C) 2018 - PRESENT  radarsimx.com
-- E-mail: info@radarsimx.com
-- Website: https://radarsimx.com
+Author: RadarSimX (info@radarsimx.com)
+Website: https://radarsimx.com
+License: See LICENSE file
 
 ::
 
     ██████╗  █████╗ ██████╗  █████╗ ██████╗ ███████╗██╗███╗   ███╗██╗  ██╗
     ██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔════╝██║████╗ ████║╚██╗██╔╝
-    ██████╔╝███████║██║  ██║███████║██████╔╝███████╗██║██╔████╔██║ ╚███╔╝ 
-    ██╔══██╗██╔══██║██║  ██║██╔══██║██╔══██╗╚════██║██║██║╚██╔╝██║ ██╔██╗ 
+    ██████╔╝███████║██║  ██║███████║██████╔╝███████╗██║██╔████╔██║ ╚███╔╝
+    ██╔══██╗██╔══██║██║  ██║██╔══██║██╔══██╗╚════██║██║██║╚██╔╝██║ ██╔██╗
     ██║  ██║██║  ██║██████╔╝██║  ██║██║  ██║███████║██║██║ ╚═╝ ██║██╔╝ ██╗
     ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝
 
 """
 
-# Import required system and platform modules
-import platform
 import argparse
-import sys
+import logging
 import os
-from os.path import join as pjoin
-from setuptools import setup
-from setuptools import Extension
-from Cython.Distutils import build_ext
-from Cython.Build import cythonize
-import numpy
+import platform
+import sys
+from pathlib import Path
+from typing import Dict, List, Optional
 
-# Set up command line argument parser for build configuration
-ap = argparse.ArgumentParser()
-ap.add_argument(
-    "-t", "--tier", required=False, help="Build tier, choose `free` or `standard`"
-)
-ap.add_argument(
-    "-a", "--arch", required=False, help="Build architecture, choose `cpu` or `gpu`"
-)
+try:
+    import numpy
+    from Cython.Build import cythonize
+    from Cython.Distutils import build_ext
+    from setuptools import Extension, find_packages, setup
+except ImportError as e:
+    print(f"Error importing required packages: {e}")
+    print("Please install required dependencies: pip install numpy cython setuptools")
+    sys.exit(1)
 
-# Parse command line arguments, separating setup.py specific args from pass-through args
-args, unknown = ap.parse_known_args()
-sys.argv = [sys.argv[0]] + unknown
+# Configure logging
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+logger = logging.getLogger(__name__)
 
-# Determine build tier (free vs standard)
-# Default to standard if not specified
-if args.tier is None:
-    ARG_TIER = "standard"
-elif args.tier.lower() == "free":
-    ARG_TIER = "free"
-elif args.tier.lower() == "standard":
-    ARG_TIER = "standard"
-else:
-    raise ValueError("Invalid --tier parameters, please choose 'free' or 'standard'")
+# Package metadata
+PACKAGE_NAME = "radarsimpy"
+PACKAGE_VERSION = "1.0.0"  # Consider reading from __init__.py or version file
+PACKAGE_DESCRIPTION = "A Python-based Radar Simulator"
+PACKAGE_URL = "https://github.com/radarsimx/radarsimpy"
+AUTHOR = "RadarSimX"
+AUTHOR_EMAIL = "info@radarsimx.com"
 
-# Determine build architecture (CPU vs GPU)
-# Default to CPU if not specified
-if args.arch is None:
-    ARG_ARCH = "cpu"
-elif args.arch.lower() == "cpu":
-    ARG_ARCH = "cpu"
-elif args.arch.lower() == "gpu":
-    ARG_ARCH = "gpu"
-else:
-    raise ValueError("Invalid --arch parameters, please choose 'cpu' or 'gpu'")
+# Build configuration constants
+VALID_TIERS = ["free", "standard"]
+VALID_ARCHS = ["cpu", "gpu"]
+DEFAULT_TIER = "standard"
+DEFAULT_ARCH = "cpu"
 
-# Detect operating system for platform-specific configurations
-os_type = platform.system()  # 'Linux', 'Windows', 'macOS'
 
-# Set platform-specific build configurations
-if os_type == "Linux":
-    # Linux-specific: Set rpath to find shared libraries in the same directory
-    LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
-    COMPILE_ARGS = ["-std=c++20"]
-    LIB_DIRS = [
-        "src/radarsimcpp/build",
-        "src/radarsimcpp/hdf5-lib-build/libs/lib_linux_gcc11_x86_64/lib",
+def parse_arguments() -> argparse.Namespace:
+    """Parse command line arguments for build configuration."""
+    parser = argparse.ArgumentParser(
+        description="Build script for RadarSimPy with configurable options",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "-t",
+        "--tier",
+        choices=VALID_TIERS,
+        default=DEFAULT_TIER,
+        help=f"Build tier (default: {DEFAULT_TIER})",
+    )
+    parser.add_argument(
+        "-a",
+        "--arch",
+        choices=VALID_ARCHS,
+        default=DEFAULT_ARCH,
+        help=f"Build architecture (default: {DEFAULT_ARCH})",
+    )
+    parser.add_argument(
+        "--verbose", "-v", action="store_true", help="Enable verbose output"
+    )
+
+    # Parse only known args to allow setuptools args to pass through
+    args, unknown = parser.parse_known_args()
+    sys.argv = [sys.argv[0]] + unknown
+
+    return args
+
+
+class BuildConfig:
+    """Configuration class for build settings."""
+
+    def __init__(self, tier: str, arch: str):
+        self.tier = tier
+        self.arch = arch
+        self.os_type = platform.system()
+        self.is_gpu = arch == "gpu"
+        self.is_free = tier == "free"
+
+        # Platform-specific settings
+        self._configure_platform()
+        self._configure_macros()
+        self._configure_cuda()
+
+    def _configure_platform(self):
+        """Configure platform-specific build settings."""
+        if self.os_type == "Linux":
+            self.link_args = ["-Wl,-rpath,$ORIGIN"]
+            self.compile_args = ["-std=c++20"]
+            self.lib_dirs = [
+                "src/radarsimcpp/build",
+                "src/radarsimcpp/hdf5-lib-build/libs/lib_linux_gcc11_x86_64/lib",
+            ]
+            self.libs = ["hdf5", "hdf5_cpp", "hdf5_hl", "hdf5_hl_cpp"]
+            self.nvcc_name = "nvcc"
+            self.cuda_lib_dir = "lib64"
+
+        elif self.os_type == "Darwin":  # macOS
+            self.compile_args = ["-std=c++20"]
+            self.link_args = ["-Wl,-rpath,@loader_path"]
+            self.lib_dirs = ["src/radarsimcpp/build"]
+            self.libs = []
+            self.nvcc_name = "nvcc"
+            self.cuda_lib_dir = "lib64"
+
+        elif self.os_type == "Windows":
+            self.link_args = []
+            self.compile_args = ["/std:c++20"]
+            self.lib_dirs = ["src/radarsimcpp/build/Release"]
+            self.libs = []
+            self.nvcc_name = "nvcc.exe"
+            self.cuda_lib_dir = "lib\\x64"
+
+        else:
+            raise OSError(f"Unsupported operating system: {self.os_type}")
+
+        # Add CUDA libraries if GPU build
+        if self.is_gpu:
+            self.libs.append("cudart")
+
+    def _configure_macros(self):
+        """Configure preprocessor macros."""
+        self.macros = [("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]
+
+        if self.is_free:
+            self.macros.append(("_FREETIER_", 1))
+
+        if self.is_gpu:
+            self.macros.append(("_CUDA_", None))
+
+    def _configure_cuda(self):
+        """Configure CUDA-specific settings."""
+        self.cuda_config = None
+        if self.is_gpu:
+            try:
+                self.cuda_config = self._locate_cuda()
+                logger.info("Found CUDA at: %s", self.cuda_config["home"])
+            except (EnvironmentError, OSError) as e:
+                logger.error("Failed to locate CUDA: %s", e)
+                raise
+
+    def _locate_cuda(self) -> Dict[str, str]:
+        """Locate CUDA installation."""
+        if "CUDA_PATH" in os.environ:
+            home = os.environ["CUDA_PATH"]
+            nvcc = os.path.join(home, "bin", self.nvcc_name)
+        else:
+            default_path = os.path.join(os.sep, "usr", "local", "cuda", "bin")
+            nvcc = self._find_in_path(
+                self.nvcc_name, os.environ.get("PATH", "") + os.pathsep + default_path
+            )
+            if nvcc is None:
+                raise EnvironmentError(
+                    f"The {self.nvcc_name} binary could not be located in your $PATH. "
+                    "Either add it to your path, or set $CUDA_PATH"
+                )
+            home = os.path.dirname(os.path.dirname(nvcc))
+
+        cuda_config = {
+            "home": home,
+            "nvcc": nvcc,
+            "include": os.path.join(home, "include"),
+            "lib64": os.path.join(home, self.cuda_lib_dir),
+        }
+
+        # Verify all paths exist
+        for key, path in cuda_config.items():
+            if not os.path.exists(path):
+                raise EnvironmentError(f"CUDA {key} path not found: {path}")
+
+        return cuda_config
+
+    def _find_in_path(self, name: str, path: str) -> Optional[str]:
+        """Find executable in PATH."""
+        for path_dir in path.split(os.pathsep):
+            if not path_dir:
+                continue
+            full_path = os.path.join(path_dir, name)
+            if os.path.exists(full_path):
+                return os.path.abspath(full_path)
+        return None
+
+    def get_include_dirs(self) -> List[str]:
+        """Get include directories."""
+        include_dirs = [
+            "src/radarsimcpp/includes",
+            "src/radarsimcpp/includes/rsvector",
+            numpy.get_include(),
+        ]
+
+        if self.cuda_config:
+            include_dirs.append(self.cuda_config["include"])
+
+        return include_dirs
+
+    def get_library_dirs(self) -> List[str]:
+        """Get library directories."""
+        lib_dirs = self.lib_dirs.copy()
+
+        if self.cuda_config:
+            lib_dirs.append(self.cuda_config["lib64"])
+
+        return lib_dirs
+
+
+def create_extension(name: str, sources: List[str], config: BuildConfig) -> Extension:
+    """Create a Cython extension with the given configuration."""
+    return Extension(
+        name,
+        sources,
+        define_macros=config.macros,
+        include_dirs=config.get_include_dirs(),
+        extra_compile_args=config.compile_args,
+        libraries=["radarsimcpp"] + config.libs,
+        library_dirs=config.get_library_dirs(),
+        extra_link_args=config.link_args,
+    )
+
+
+def get_long_description() -> str:
+    """Get long description from README file."""
+    readme_path = Path("README.md")
+    if readme_path.exists():
+        try:
+            return readme_path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError) as e:
+            logger.warning("Could not read README.md: %s", e)
+    return PACKAGE_DESCRIPTION
+
+
+def main():
+    """Main setup function."""
+    # Parse arguments
+    args = parse_arguments()
+
+    if args.verbose:
+        logger.setLevel(logging.DEBUG)
+
+    logger.info("Building %s with tier=%s, arch=%s", PACKAGE_NAME, args.tier, args.arch)
+
+    # Create build configuration
+    try:
+        config = BuildConfig(args.tier, args.arch)
+    except (EnvironmentError, OSError, ValueError) as e:
+        logger.error("Failed to create build configuration: %s", e)
+        sys.exit(1)
+
+    # Define extension modules
+    ext_modules = [
+        create_extension(
+            "radarsimpy.lib.cp_radarsimc",
+            ["src/radarsimpy/lib/cp_radarsimc.pyx"],
+            config,
+        ),
+        create_extension(
+            "radarsimpy.simulator", ["src/radarsimpy/simulator.pyx"], config
+        ),
     ]
-    LIBS = ["hdf5", "hdf5_cpp", "hdf5_hl", "hdf5_hl_cpp"]
-    if args.arch == "gpu":
-        NVCC = "nvcc"
-        CUDALIB = "lib64"
-        LIBS = LIBS + ["cudart"]
-elif os_type == "Darwin":  # macOS
-    LIBS = []
-    COMPILE_ARGS = ["-std=c++20"]
-    if platform.processor() == "arm":  # M1/M2 processors
-        LINK_ARGS = ["-Wl,-rpath,@loader_path"]
-        LIB_DIRS = ["src/radarsimcpp/build"]
-    else:  # Intel processors
-        LINK_ARGS = ["-Wl,-rpath,@loader_path"]
-        LIB_DIRS = ["src/radarsimcpp/build"]
-elif os_type == "Windows":
-    LINK_ARGS = []
-    COMPILE_ARGS = ["/std:c++20"]
-    LIB_DIRS = ["src/radarsimcpp/build/Release"]
-    LIBS = []
-    if args.arch == "gpu":
-        NVCC = "nvcc.exe"
-        CUDALIB = "lib\\x64"
-        LIBS = ["cudart"]
 
-def find_in_path(name, path):
-    """
-    Iterates over the directories in the search path by splitting the path string using
-    os.pathsep as the delimiter. os.pathsep is a string that represents the separator
-    used in the PATH environment variable on the current operating system
-    (e.g., : on Unix-like systems and ; on Windows).
-
-    :param name: The name of the file
-    :type name: str
-    :param path: The search path
-    :type path: str
-    :return: The absolute path of the file
-    :rtype: str
-    """
-    for path_name in path.split(os.pathsep):
-        binpath = pjoin(path_name, name)
-        if os.path.exists(binpath):
-            return os.path.abspath(binpath)
-    return None
-
-def locate_cuda():
-    """
-    Locate the CUDA installation on the system
-
-    :raises EnvironmentError: The nvcc binary could not be located in your $PATH.
-        Either add it to your path, or set $CUDA_PATH
-    :raises EnvironmentError: The CUDA <key> path could not be located in <val>
-    :return: dict with keys 'home', 'nvcc', 'include', and 'lib64'
-    and values giving the absolute path to each directory.
-    """
-    # The code first checks if the CUDA_PATH environment variable is set.
-    # If it is, it uses the value of CUDA_PATH as the CUDA installation directory
-    # and constructs the path to the nvcc binary (NVIDIA CUDA Compiler) inside that directory.
-    if "CUDA_PATH" in os.environ:
-        home = os.environ["CUDA_PATH"]
-        nvcc = pjoin(home, "bin", NVCC)
-    else:
-        # If the CUDA_PATH environment variable is not set, it searches for the nvcc
-        # binary in the system's PATH environment variable. If nvcc is not found in
-        # the PATH, it raises an EnvironmentError. Otherwise, it sets the home variable
-        # to the parent directory of nvcc.
-        default_path = pjoin(os.sep, "usr", "local", "cuda", "bin")
-        nvcc = find_in_path(NVCC, os.environ["PATH"] + os.pathsep + default_path)
-        if nvcc is None:
-            raise EnvironmentError(
-                "The nvcc binary could not be located in your $PATH. "
-                "Either add it to your path, or set $CUDA_PATH"
+    # Read package requirements
+    requirements = []
+    requirements_path = Path("requirements.txt")
+    if requirements_path.exists():
+        try:
+            requirements = (
+                requirements_path.read_text(encoding="utf-8").strip().split("\n")
             )
-        home = os.path.dirname(os.path.dirname(nvcc))
+            requirements = [req.strip() for req in requirements if req.strip()]
+        except (OSError, UnicodeDecodeError) as e:
+            logger.warning("Could not read requirements.txt: %s", e)
 
-    cudaconfig = {
-        "home": home,
-        "nvcc": nvcc,
-        "include": pjoin(home, "include"),
-        "lib64": pjoin(home, CUDALIB),
-    }
-    for key, val in cudaconfig.items():
-        if not os.path.exists(val):
-            raise EnvironmentError(
-                "The CUDA " + key + " path could not be located in " + val
-            )
+    # Setup configuration
+    setup(
+        name=PACKAGE_NAME,
+        version=PACKAGE_VERSION,
+        description=PACKAGE_DESCRIPTION,
+        long_description=get_long_description(),
+        long_description_content_type="text/markdown",
+        author=AUTHOR,
+        author_email=AUTHOR_EMAIL,
+        url=PACKAGE_URL,
+        packages=find_packages(),
+        install_requires=requirements,
+        python_requires=">=3.9",
+        cmdclass={"build_ext": build_ext},
+        ext_modules=cythonize(
+            ext_modules,
+            annotate=False,
+            compiler_directives={"language_level": "3"},
+        ),
+        classifiers=[
+            "Development Status :: 5 - Production/Stable",
+            "Intended Audience :: Developers",
+            "Intended Audience :: Science/Research",
+            "Operating System :: OS Independent",
+            "Programming Language :: Python :: 3",
+            "Programming Language :: Python :: 3.9",
+            "Programming Language :: Python :: 3.10",
+            "Programming Language :: Python :: 3.11",
+            "Programming Language :: Python :: 3.12",
+            "Programming Language :: Python :: 3.13",
+            "Programming Language :: C++",
+            "Programming Language :: Cython",
+            "Topic :: Scientific/Engineering",
+            "Topic :: Software Development :: Libraries :: Python Modules",
+        ],
+        keywords="radar simulation signal-processing python cython",
+        project_urls={
+            "Bug Reports": f"{PACKAGE_URL}/issues",
+            "Source": PACKAGE_URL,
+            "Documentation": "https://radarsimx.github.io/radarsimpy/",
+        },
+    )
 
-    return cudaconfig
 
-# Configure build macros based on tier and architecture
-if ARG_TIER == "free":
-    if ARG_ARCH == "gpu":
-        MACROS = [
-            ("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION"),  # NumPy API version
-            ("_FREETIER_", 1),                                 # Enable free tier features
-            ("_CUDA_", None),                                  # Enable CUDA support
-        ]
-    elif ARG_ARCH == "cpu":
-        MACROS = [
-            ("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION"),
-            ("_FREETIER_", 1)
-        ]
-else:  # standard tier
-    if ARG_ARCH == "gpu":
-        MACROS = [
-            ("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION"),
-            ("_CUDA_", None)
-        ]
-    elif ARG_ARCH == "cpu":
-        MACROS = [("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]
-
-# Set include directories for header files
-INCLUDE_DIRS = ["src/radarsimcpp/includes", "src/radarsimcpp/includes/rsvector"]
-
-# Add CUDA-specific configurations if GPU build is selected
-if ARG_ARCH == "gpu":
-    CUDA = locate_cuda()
-    INCLUDE_DIRS = INCLUDE_DIRS + [CUDA["include"]]
-    LIB_DIRS = LIB_DIRS + [CUDA["lib64"]]
-
-# Define Cython extension modules to be built
-ext_modules = [
-    # Core radar simulation C++ wrapper
-    Extension(
-        "radarsimpy.lib.cp_radarsimc",
-        ["src/radarsimpy/lib/cp_radarsimc.pyx"],
-        define_macros=MACROS,
-        include_dirs=INCLUDE_DIRS,
-        extra_compile_args=COMPILE_ARGS,
-        libraries=["radarsimcpp"] + LIBS,
-        library_dirs=LIB_DIRS,
-        extra_link_args=LINK_ARGS,
-    ),
-    # High-level simulator interface
-    Extension(
-        "radarsimpy.simulator",
-        ["src/radarsimpy/simulator.pyx"],
-        define_macros=MACROS,
-        include_dirs=INCLUDE_DIRS,
-        extra_compile_args=COMPILE_ARGS,
-        libraries=["radarsimcpp"] + LIBS,
-        library_dirs=LIB_DIRS,
-        extra_link_args=LINK_ARGS,
-    ),
-]
-
-# Configure and run setup
-setup(
-    name="radarsimpy",
-    cmdclass={"build_ext": build_ext},  # Use Cython's build_ext
-    ext_modules=cythonize(
-        ext_modules,
-        annotate=False,  # Don't generate HTML annotation files
-        compiler_directives={"language_level": "3"},  # Use Python 3 syntax
-    ),
-    include_dirs=[numpy.get_include()],  # Include NumPy headers
-)
+if __name__ == "__main__":
+    main()
