@@ -1,9 +1,11 @@
-name: Release on Ubuntu 22.04 x64
+name: Release on Ubuntu
 
 on:
   push:
     tags:
       - "*"
+  # Allow manual trigger from the Actions tab
+  workflow_dispatch:
 
 jobs:
   build:
@@ -13,6 +15,7 @@ jobs:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
         c_compiler: [gcc-11]
         cxx_compiler: [g++-11]
+        tier: [free, standard]
 
     steps:
       - uses: actions/checkout@v4
@@ -34,10 +37,10 @@ jobs:
         run: |
           sudo chown -R $USER:$USER /home/runner/work/radarsimpy
           chmod +x build_linux.sh
-          ./build_linux.sh --tier=standard --arch=cpu --test=off
+          ./build_linux.sh --tier=${{matrix.tier}} --arch=cpu --test=off
       - name: Archive built module
         uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: radarsimpy_ubuntu_22_py${{matrix.python-version}}
+          name: radarsimpy_ubuntu_22_py${{matrix.python-version}}_${{matrix.tier == 'free' && 'freetier' || matrix.tier}}
           path: ./radarsimpy
