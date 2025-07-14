@@ -42,13 +42,13 @@ pip install -r requirements.txt
 
    ```batch
    # Basic CPU build
-   build_win.bat
+   build.bat
    
    # CPU build with custom options
-   build_win.bat --arch=cpu --test=on
+   build.bat --arch=cpu --test=on
    
    # GPU build (requires CUDA)
-   build_win.bat --arch=gpu --test=on
+   build.bat --arch=gpu --test=on
    ```
 
 ### Windows Build Options
@@ -95,20 +95,20 @@ pip install -r requirements.txt
 1. **Make the build script executable**:
 
    ```bash
-   chmod +x build_linux.sh
+   chmod +x build.sh
    ```
 
 2. **Build the project**:
 
    ```bash
    # Basic CPU build
-   ./build_linux.sh
+   ./build.sh
    
    # CPU build with custom options
-   ./build_linux.sh --arch=cpu --test=on
+   ./build.sh --arch=cpu --test=on
    
    # GPU build (requires CUDA)
-   ./build_linux.sh --arch=gpu --test=on
+   ./build.sh --arch=gpu --test=on
    ```
 
 ### Linux Build Options
@@ -139,7 +139,6 @@ pip install -r requirements.txt
 
    ```bash
    # Install required tools
-   brew install gcc
    brew install cmake python3
    ```
 
@@ -148,17 +147,17 @@ pip install -r requirements.txt
 1. **Make the build script executable**:
 
    ```bash
-   chmod +x build_macos.sh
+   chmod +x build.sh
    ```
 
 2. **Build the project**:
 
    ```bash
    # Basic CPU build
-   ./build_macos.sh
+   ./build.sh
    
    # CPU build with custom options
-   ./build_macos.sh --arch=cpu --test=on
+   ./build.sh --arch=cpu --test=on
    ```
 
 ### macOS Build Options
