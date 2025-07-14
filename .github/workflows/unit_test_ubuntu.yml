@@ -48,15 +48,58 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # Ubuntu 22.04, GCC-11
           - runner: ubuntu-22.04
             c_compiler: gcc-11
             cxx_compiler: g++-11
             os_label: ubuntu22
+            python-version: "3.9"
+          - runner: ubuntu-22.04
+            c_compiler: gcc-11
+            cxx_compiler: g++-11
+            os_label: ubuntu22
+            python-version: "3.10"
+          - runner: ubuntu-22.04
+            c_compiler: gcc-11
+            cxx_compiler: g++-11
+            os_label: ubuntu22
+            python-version: "3.11"
+          - runner: ubuntu-22.04
+            c_compiler: gcc-11
+            cxx_compiler: g++-11
+            os_label: ubuntu22
+            python-version: "3.12"
+          - runner: ubuntu-22.04
+            c_compiler: gcc-11
+            cxx_compiler: g++-11
+            os_label: ubuntu22
+            python-version: "3.13"
+          # Ubuntu 24.04, GCC-13
           - runner: ubuntu-24.04
             c_compiler: gcc-13
             cxx_compiler: g++-13
             os_label: ubuntu24
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+            python-version: "3.9"
+          - runner: ubuntu-24.04
+            c_compiler: gcc-13
+            cxx_compiler: g++-13
+            os_label: ubuntu24
+            python-version: "3.10"
+          - runner: ubuntu-24.04
+            c_compiler: gcc-13
+            cxx_compiler: g++-13
+            os_label: ubuntu24
+            python-version: "3.11"
+          - runner: ubuntu-24.04
+            c_compiler: gcc-13
+            cxx_compiler: g++-13
+            os_label: ubuntu24
+            python-version: "3.12"
+          - runner: ubuntu-24.04
+            c_compiler: gcc-13
+            cxx_compiler: g++-13
+            os_label: ubuntu24
+            python-version: "3.13"
 
     steps:
       - name: Checkout repository
@@ -124,5 +167,5 @@ jobs:
         with:
           name: build-logs-python-${{ matrix.python-version }}-${{ matrix.os_label }}
           path: build_logs/
-          retention-days: 7
+          retention-days: 1
           if-no-files-found: warn

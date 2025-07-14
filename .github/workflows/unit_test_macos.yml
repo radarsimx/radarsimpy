@@ -47,17 +47,78 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # MacOS x64, GCC-14, Xcode 15.2
           - arch: x64
             runner: macos-13
             c_compiler: gcc-14
             cxx_compiler: g++-14
             xcode: '15.2'
+            os_label: macosx64
+            python-version: "3.9"
+          - arch: x64
+            runner: macos-13
+            c_compiler: gcc-14
+            cxx_compiler: g++-14
+            xcode: '15.2'
+            os_label: macosx64
+            python-version: "3.10"
+          - arch: x64
+            runner: macos-13
+            c_compiler: gcc-14
+            cxx_compiler: g++-14
+            xcode: '15.2'
+            os_label: macosx64
+            python-version: "3.11"
+          - arch: x64
+            runner: macos-13
+            c_compiler: gcc-14
+            cxx_compiler: g++-14
+            xcode: '15.2'
+            os_label: macosx64
+            python-version: "3.12"
+          - arch: x64
+            runner: macos-13
+            c_compiler: gcc-14
+            cxx_compiler: g++-14
+            xcode: '15.2'
+            os_label: macosx64
+            python-version: "3.13"
+          # MacOS arm64, Clang, Xcode 16.3
           - arch: arm64
             runner: macos-15
             c_compiler: clang
             cxx_compiler: clang++
             xcode: '16.3'
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+            os_label: macosarm64
+            python-version: "3.9"
+          - arch: arm64
+            runner: macos-15
+            c_compiler: clang
+            cxx_compiler: clang++
+            xcode: '16.3'
+            os_label: macosarm64
+            python-version: "3.10"
+          - arch: arm64
+            runner: macos-15
+            c_compiler: clang
+            cxx_compiler: clang++
+            xcode: '16.3'
+            os_label: macosarm64
+            python-version: "3.11"
+          - arch: arm64
+            runner: macos-15
+            c_compiler: clang
+            cxx_compiler: clang++
+            xcode: '16.3'
+            os_label: macosarm64
+            python-version: "3.12"
+          - arch: arm64
+            runner: macos-15
+            c_compiler: clang
+            cxx_compiler: clang++
+            xcode: '16.3'
+            os_label: macosarm64
+            python-version: "3.13"
 
     steps:
       - name: Checkout repository
