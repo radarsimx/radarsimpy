@@ -351,10 +351,10 @@ jobs:
           mkdir -p packed/radarsimpy_macos_all
           
           # Create the directory structure (corrected to match target paths)
-          mkdir -p packed/radarsimpy_macos_all/trial/MacOS_x86_64
-          mkdir -p packed/radarsimpy_macos_all/standard/MacOS_x86_64
-          mkdir -p packed/radarsimpy_macos_all/trial/MacOS_Arm64
-          mkdir -p packed/radarsimpy_macos_all/standard/MacOS_Arm64
+          mkdir -p packed/radarsimpy_macos_all/trial/MacOS_x86_64_CPU/radarsimpy
+          mkdir -p packed/radarsimpy_macos_all/standard/MacOS_x86_64_CPU/radarsimpy
+          mkdir -p packed/radarsimpy_macos_all/trial/MacOS_ARM_CPU/radarsimpy
+          mkdir -p packed/radarsimpy_macos_all/standard/MacOS_ARM_CPU/radarsimpy
           
           # Copy each artifact to appropriate directory based on architecture and tier
           for dir in artifacts/*/; do
@@ -366,16 +366,16 @@ jobs:
               if [[ "$artifact_name" == *"_arm_"* ]]; then
                 # ARM64 builds
                 if [[ "$artifact_name" == *"_freetier"* ]]; then
-                  target_dir="packed/radarsimpy_macos_all/trial/MacOS_Arm64"
+                  target_dir="packed/radarsimpy_macos_all/trial/MacOS_ARM_CPU/radarsimpy"
                 else
-                  target_dir="packed/radarsimpy_macos_all/standard/MacOS_Arm64"
+                  target_dir="packed/radarsimpy_macos_all/standard/MacOS_ARM_CPU/radarsimpy"
                 fi
               else
                 # x64 builds
                 if [[ "$artifact_name" == *"_freetier"* ]]; then
-                  target_dir="packed/radarsimpy_macos_all/trial/MacOS_x86_64"
+                  target_dir="packed/radarsimpy_macos_all/trial/MacOS_x86_64_CPU/radarsimpy"
                 else
-                  target_dir="packed/radarsimpy_macos_all/standard/MacOS_x86_64"
+                  target_dir="packed/radarsimpy_macos_all/standard/MacOS_x86_64_CPU/radarsimpy"
                 fi
               fi
               
