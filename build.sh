@@ -25,7 +25,7 @@
 #   - Xcode Command Line Tools
 #   - CMake 3.18 or higher
 #   - Python 3.9 or higher
-#   - GCC/G++ compiler
+#   - Clang/Clang++ compiler
 #   - Python packages: setuptools, Cython
 #   - pytest (for running tests)
 #
@@ -71,7 +71,7 @@
 #
 # FILES CREATED:
 #   - ./radarsimpy/                        # Output directory with built libraries
-#   - ./build_YYYYMMDD_HHMMSS.log          # Timestamped build log
+#   - ./build_logs/${PLATFORM_NAME}_build_YYYYMMDD_HHMMSS.log          # Timestamped build log
 #
 # PLATFORM-SPECIFIC NOTES:
 #   Linux:
@@ -1026,7 +1026,7 @@ display_summary() {
     echo "    - Tests: $(echo "${TEST}" | tr '[:lower:]' '[:upper:]')"
     echo "    - Parallel Jobs: ${JOBS}"
     echo "  Output Directory: ./radarsimpy"
-    [ "$VERBOSE" != "true" ] && echo "  Log File: ${LOG_FILE}"
+    echo "  Log File: ${LOG_FILE}"
     echo "=========================================="
     echo
 }
