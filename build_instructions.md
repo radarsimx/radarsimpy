@@ -198,8 +198,8 @@ After a successful build, the following structure will be created:
 ```text
 radarsimpy/
   ├── lib
-    ├── __init__.py
-    └── cp_radarsimc.**.pyd
+  │   ├── __init__.py
+  │   └── cp_radarsimc.**.pyd
   ├── __init__.py
   ├── [platform-specific binaries]
   ├── radar.py
