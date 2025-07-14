@@ -72,6 +72,7 @@ os_type = platform.system()  # 'Linux', 'Windows', 'macOS'
 if os_type == "Linux":
     # Linux-specific: Set rpath to find shared libraries in the same directory
     LINK_ARGS = ["-Wl,-rpath,$ORIGIN"]
+    COMPILE_ARGS = ["-std=c++20"]
     LIB_DIRS = [
         "src/radarsimcpp/build",
         "src/radarsimcpp/hdf5-lib-build/libs/lib_linux_gcc11_x86_64/lib",
@@ -83,6 +84,7 @@ if os_type == "Linux":
         LIBS = LIBS + ["cudart"]
 elif os_type == "Darwin":  # macOS
     LIBS = []
+    COMPILE_ARGS = ["-std=c++20"]
     if platform.processor() == "arm":  # M1/M2 processors
         LINK_ARGS = ["-Wl,-rpath,@loader_path"]
         LIB_DIRS = ["src/radarsimcpp/build"]
@@ -91,6 +93,7 @@ elif os_type == "Darwin":  # macOS
         LIB_DIRS = ["src/radarsimcpp/build"]
 elif os_type == "Windows":
     LINK_ARGS = []
+    COMPILE_ARGS = ["/std:c++20"]
     LIB_DIRS = ["src/radarsimcpp/build/Release"]
     LIBS = []
     if args.arch == "gpu":
@@ -193,12 +196,6 @@ if ARG_ARCH == "gpu":
     INCLUDE_DIRS = INCLUDE_DIRS + [CUDA["include"]]
     LIB_DIRS = LIB_DIRS + [CUDA["lib64"]]
 
-# Set platform-specific compiler arguments
-if os_type == "Windows":
-    CPP_STD_FLAG = "/std:c++20"  # MSVC compiler flag
-else:
-    CPP_STD_FLAG = "-std=c++20"  # GCC/Clang compiler flag
-
 # Define Cython extension modules to be built
 ext_modules = [
     # Core radar simulation C++ wrapper
@@ -207,7 +204,7 @@ ext_modules = [
         ["src/radarsimpy/lib/cp_radarsimc.pyx"],
         define_macros=MACROS,
         include_dirs=INCLUDE_DIRS,
-        extra_compile_args=[CPP_STD_FLAG],
+        extra_compile_args=COMPILE_ARGS,
         libraries=["radarsimcpp"] + LIBS,
         library_dirs=LIB_DIRS,
         extra_link_args=LINK_ARGS,
@@ -218,7 +215,7 @@ ext_modules = [
         ["src/radarsimpy/simulator.pyx"],
         define_macros=MACROS,
         include_dirs=INCLUDE_DIRS,
-        extra_compile_args=[CPP_STD_FLAG],
+        extra_compile_args=COMPILE_ARGS,
         libraries=["radarsimcpp"] + LIBS,
         library_dirs=LIB_DIRS,
         extra_link_args=LINK_ARGS,
