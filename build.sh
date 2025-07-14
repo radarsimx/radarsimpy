@@ -1063,52 +1063,62 @@ display_summary() {
 #   - Test failures are captured and reported
 #   - All errors are logged with appropriate messages
 main() {
+    # Initialize return code for tracking overall build status
     local return_code=0
 
-    # Set up signal handlers
+    # Set up signal handlers for graceful error handling and cleanup
     trap cleanup EXIT
     trap 'log_error "Build interrupted by user"; exit 130' INT TERM
 
-    # Parse command line arguments
+    # Parse and validate command line arguments
     parse_arguments "$@"
 
-    # Store current working directory
+    # Store current working directory for reference throughout the build
     readonly WORKPATH=$(pwd)
     log_info "Working directory: ${WORKPATH}"
     log_info "Detected platform: ${PLATFORM_NAME}"
 
-    # Run parameter validation and system checks
+    # Validate all parsed parameters and check system requirements
     validate_parameters
     check_requirements
 
+    # Display build configuration and project banner
     display_banner
 
+    # Clean previous build artifacts if requested
     clean_build_artifacts
 
+    # Build the C++ library (libradarsimcpp.so/.dylib)
     build_cpp_library
 
+    # Build Python extensions using Cython
     build_python_extensions
 
+    # Install all built libraries to the final location
     install_libraries
 
+    # Clean up intermediate build files to save disk space
     cleanup_build_files
 
-    # Run tests and capture return code
+    # Run test suites if enabled and capture any failures
     run_tests
     local test_result=$?
     if [ $test_result -ne 0 ]; then
         return_code=$test_result
+        log_error "Test suite failed - build will be marked as failed"
     fi
     
-    # Display build summary
+    # Display comprehensive build summary with timing and configuration
     display_summary
     
+    # Log final build status and return appropriate exit code
     if [ $return_code -eq 0 ]; then
         log_success "Build completed successfully on ${PLATFORM_NAME}!"
     else
         log_error "Build completed with errors (exit code: $return_code)"
     fi
     
+    # Return the final build status code
     return $return_code
 }
 
