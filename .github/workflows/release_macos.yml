@@ -350,11 +350,11 @@ jobs:
         run: |
           mkdir -p packed/radarsimpy_macos_all
           
-          # Create the directory structure
-          mkdir -p packed/radarsimpy_macos_all/MacOS_x86_64/trial
-          mkdir -p packed/radarsimpy_macos_all/MacOS_x86_64/standard
-          mkdir -p packed/radarsimpy_macos_all/MacOS_Arm64/trial
-          mkdir -p packed/radarsimpy_macos_all/MacOS_Arm64/standard
+          # Create the directory structure (corrected to match target paths)
+          mkdir -p packed/radarsimpy_macos_all/trial/MacOS_x86_64
+          mkdir -p packed/radarsimpy_macos_all/standard/MacOS_x86_64
+          mkdir -p packed/radarsimpy_macos_all/trial/MacOS_Arm64
+          mkdir -p packed/radarsimpy_macos_all/standard/MacOS_Arm64
           
           # Copy each artifact to appropriate directory based on architecture and tier
           for dir in artifacts/*/; do
@@ -379,15 +379,36 @@ jobs:
                 fi
               fi
               
+              # Ensure target directory exists
+              mkdir -p "$target_dir"
+              
               # Copy the radarsimpy module
               if [ -d "$dir/radarsimpy" ]; then
+                echo "Copying radarsimpy module from $dir/radarsimpy to $target_dir/"
                 cp -r "$dir/radarsimpy" "$target_dir/"
               else
+                echo "Copying all contents from $dir to $target_dir/"
                 # If radarsimpy is at root level
                 cp -r "$dir"/* "$target_dir/" 2>/dev/null || true
               fi
             fi
           done
+      
+      - name: Verify artifact structure
+        run: |
+          echo "::group::Artifact Structure Verification"
+          echo "Final directory structure:"
+          find packed/radarsimpy_macos_all -type d | sort
+          echo ""
+          echo "Files in each directory:"
+          for dir in packed/radarsimpy_macos_all/*/MacOS_*; do
+            if [ -d "$dir" ]; then
+              echo "Contents of $dir:"
+              ls -la "$dir" || echo "Directory is empty or doesn't exist"
+              echo ""
+            fi
+          done
+          echo "::endgroup::"
       
       - name: Create README for packed artifacts
         run: |
@@ -425,21 +446,7 @@ jobs:
           - **standard/**: Full-featured builds with all capabilities  
           - **trial/**: Free tier builds with limited features
           - Built on macOS 15 with Clang compiler
-          
-          ## Usage
-          
-          1. Navigate to the appropriate directory for your system:
-             - For Intel Macs: `MacOS_x86_64/`
-             - For Apple Silicon Macs: `MacOS_Arm64/`
-          
-          2. Choose the tier:
-             - `standard/` for full-featured builds
-             - `trial/` for free tier builds
-          
-          3. Select your Python version directory (e.g., `python3.11/`)
-          
-          4. Copy the `radarsimpy/` folder to your Python site-packages or use directly
-          
+
           ## Build Information
           
           - **Total Builds**: 20
@@ -447,21 +454,7 @@ jobs:
           - **Python Versions**: 3.9, 3.10, 3.11, 3.12, 3.13
           - **Tiers**: Standard (full features), Trial (limited features)
           - **Build Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
-          
-          ## Installation
-          
-          ### Option 1: Direct Copy
-          ```bash
-          # Example for Apple Silicon Mac with Python 3.11 (standard tier)
-          cp -r MacOS_Arm64/standard/python3.11/radarsimpy /path/to/your/python/site-packages/
-          ```
-          
-          ### Option 2: Add to Python Path
-          ```python
-          import sys
-          sys.path.insert(0, '/path/to/extracted/MacOS_Arm64/standard/python3.11')
-          import radarsimpy
-          ```
+
           EOF
       
       - name: Create compressed archive
