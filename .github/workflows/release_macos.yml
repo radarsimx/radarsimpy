@@ -423,26 +423,26 @@ jobs:
           
           ```
           standard/
-          ├── MacOS_x86_64/
+          ├── MacOS_x86_64_CPU/
           │   └── radarsimpy/
-          └── MacOS_Arm64/
+          └── MacOS_ARM_CPU/
               └── radarsimpy/
           
           trial/
-          ├── MacOS_x86_64/
+          ├── MacOS_x86_64_CPU/
           │   └── radarsimpy/
-          └── MacOS_Arm64/
+          └── MacOS_ARM_CPU/
               └── radarsimpy/
           ```
           
           ## Architecture and Tier Information
           
-          ### MacOS_x86_64 (Intel-based Macs)
+          ### MacOS_x86_64_CPU (Intel-based Macs)
           - **standard/**: Full-featured builds with all capabilities
           - **trial/**: Free tier builds with limited features
           - Built on macOS 13 with GCC 14 compiler
           
-          ### MacOS_Arm64 (Apple Silicon Macs)
+          ### MacOS_ARM_CPU (Apple Silicon Macs)
           - **standard/**: Full-featured builds with all capabilities  
           - **trial/**: Free tier builds with limited features
           - Built on macOS 15 with Clang compiler
