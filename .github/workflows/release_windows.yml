@@ -1,0 +1,58 @@
+name: Release on Windows
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        tier: ["standard", "free"]
+    outputs:
+      artifact_path: ${{ steps.set-artifact-path.outputs.artifact_path }}
+    steps:
+      # - name: Remove Windows OpenSSH and use the default ssh in git
+      #   run: Remove-WindowsCapability -Online -Name OpenSSH.Client
+      - uses: actions/checkout@v4
+        with:
+          ssh-key: ${{secrets.RADARSIMC}}
+          submodules: recursive
+      - name: Set up Python ${{matrix.python-version}}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{matrix.python-version}}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Build
+        run: |
+          .\build.bat --tier=${{matrix.tier}} --arch=cpu --test=off
+      - name: Copy build output to dist folder
+        run: |
+          mkdir dist 2>nul
+          mkdir dist\${{matrix.tier}} 2>nul
+          xcopy /E /I /Y .\radarsimpy dist\${{matrix.tier}}\radarsimpy
+      - name: Set artifact path output
+        id: set-artifact-path
+        run: echo "artifact_path=dist" >> $GITHUB_OUTPUT
+
+  upload-artifact:
+    runs-on: windows-latest
+    needs: build
+    if: always()
+    steps:
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+      - name: Upload all builds as single artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: radarsimpy_win_all_builds
+          path: dist
