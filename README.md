@@ -3,11 +3,9 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_windows_x64.yml"><img src="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_windows_x64.yml/badge.svg" alt="Windows x64"/></a>
-  <a href="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_ubuntu_22_x64.yml"><img src="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_ubuntu_22_x64.yml/badge.svg" alt="Ubuntu 22.04 x64"/></a>
-  <a href="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_ubuntu_24_x64.yml"><img src="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_ubuntu_24_x64.yml/badge.svg" alt="Ubuntu 24.04 x64"/></a>
-  <a href="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_macos_x64.yml"><img src="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_macos_x64.yml/badge.svg" alt="MacOS x64"/></a>
-  <a href="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_macos_arm64.yml"><img src="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_macos_arm64.yml/badge.svg" alt="MacOS Apple Silicon"/></a>
+  <a href="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_windows.yml"><img src="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_windows.yml/badge.svg" alt="Windows Unit Tests"/></a>
+  <a href="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_ubuntu.yml"><img src="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_ubuntu.yml/badge.svg" alt="Ubuntu Unit Tests"/></a>
+  <a href="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_macos.yml"><img src="https://github.com/radarsimx/radarsimpy/actions/workflows/unit_test_macos.yml/badge.svg" alt="MacOS Unit Tests"/></a>
   <a href="https://radarsimx.github.io/radarsimpy/"><img src="https://img.shields.io/github/v/tag/radarsimx/radarsimpy?label=Documentation&logo=read-the-docs" alt="Documentation"/></a>
   <a href="https://radarsimx.com/product/radarsimpy/"><img src="https://img.shields.io/github/v/tag/radarsimx/radarsimpy?label=Download&logo=python" alt="Download"/></a>
 </p>
