@@ -350,21 +350,41 @@ jobs:
         run: |
           mkdir -p packed/radarsimpy_macos_all
           
-          # Copy each artifact to a subdirectory
+          # Create the directory structure
+          mkdir -p packed/radarsimpy_macos_all/MacOS_x86_64/trial
+          mkdir -p packed/radarsimpy_macos_all/MacOS_x86_64/standard
+          mkdir -p packed/radarsimpy_macos_all/MacOS_Arm64/trial
+          mkdir -p packed/radarsimpy_macos_all/MacOS_Arm64/standard
+          
+          # Copy each artifact to appropriate directory based on architecture and tier
           for dir in artifacts/*/; do
             if [ -d "$dir" ]; then
               artifact_name=$(basename "$dir")
               echo "Processing artifact: $artifact_name"
               
-              # Create subdirectory for this artifact
-              mkdir -p "packed/radarsimpy_macos_all/$artifact_name"
+              # Determine target directory based on artifact name
+              if [[ "$artifact_name" == *"_arm_"* ]]; then
+                # ARM64 builds
+                if [[ "$artifact_name" == *"_freetier"* ]]; then
+                  target_dir="packed/radarsimpy_macos_all/trial/MacOS_Arm64"
+                else
+                  target_dir="packed/radarsimpy_macos_all/standard/MacOS_Arm64"
+                fi
+              else
+                # x64 builds
+                if [[ "$artifact_name" == *"_freetier"* ]]; then
+                  target_dir="packed/radarsimpy_macos_all/trial/MacOS_x86_64"
+                else
+                  target_dir="packed/radarsimpy_macos_all/standard/MacOS_x86_64"
+                fi
+              fi
               
               # Copy the radarsimpy module
               if [ -d "$dir/radarsimpy" ]; then
-                cp -r "$dir/radarsimpy" "packed/radarsimpy_macos_all/$artifact_name/"
+                cp -r "$dir/radarsimpy" "$target_dir/"
               else
                 # If radarsimpy is at root level
-                cp -r "$dir"/* "packed/radarsimpy_macos_all/$artifact_name/" 2>/dev/null || true
+                cp -r "$dir"/* "$target_dir/" 2>/dev/null || true
               fi
             fi
           done
@@ -374,53 +394,74 @@ jobs:
           cat > packed/radarsimpy_macos_all/README.md << 'EOF'
           # RadarSimPy MacOS Build Artifacts
           
-          This archive contains all RadarSimPy builds for macOS platforms.
+          This archive contains all RadarSimPy builds for macOS platforms organized by architecture and tier.
           
           ## Directory Structure
           
-          Each subdirectory contains a complete RadarSimPy build for specific configurations:
+          The builds are organized in the following structure:
           
-          ### x64 (Intel) Standard Builds
-          - `radarsimpy_macos_py3.9/` - Python 3.9 (Standard)
-          - `radarsimpy_macos_py3.10/` - Python 3.10 (Standard)
-          - `radarsimpy_macos_py3.11/` - Python 3.11 (Standard)
-          - `radarsimpy_macos_py3.12/` - Python 3.12 (Standard)
-          - `radarsimpy_macos_py3.13/` - Python 3.13 (Standard)
+          ```
+          standard/
+          ├── MacOS_x86_64/
+          │   └── radarsimpy/
+          └── MacOS_Arm64/
+              └── radarsimpy/
           
-          ### x64 (Intel) Free Tier Builds
-          - `radarsimpy_macos_py3.9_freetier/` - Python 3.9 (Free Tier)
-          - `radarsimpy_macos_py3.10_freetier/` - Python 3.10 (Free Tier)
-          - `radarsimpy_macos_py3.11_freetier/` - Python 3.11 (Free Tier)
-          - `radarsimpy_macos_py3.12_freetier/` - Python 3.12 (Free Tier)
-          - `radarsimpy_macos_py3.13_freetier/` - Python 3.13 (Free Tier)
+          trial/
+          ├── MacOS_x86_64/
+          │   └── radarsimpy/
+          └── MacOS_Arm64/
+              └── radarsimpy/
+          ```
           
-          ### ARM64 (Apple Silicon) Standard Builds
-          - `radarsimpy_macos_arm_py3.9/` - Python 3.9 (Standard)
-          - `radarsimpy_macos_arm_py3.10/` - Python 3.10 (Standard)
-          - `radarsimpy_macos_arm_py3.11/` - Python 3.11 (Standard)
-          - `radarsimpy_macos_arm_py3.12/` - Python 3.12 (Standard)
-          - `radarsimpy_macos_arm_py3.13/` - Python 3.13 (Standard)
+          ## Architecture and Tier Information
           
-          ### ARM64 (Apple Silicon) Free Tier Builds
-          - `radarsimpy_macos_arm_py3.9_freetier/` - Python 3.9 (Free Tier)
-          - `radarsimpy_macos_arm_py3.10_freetier/` - Python 3.10 (Free Tier)
-          - `radarsimpy_macos_arm_py3.11_freetier/` - Python 3.11 (Free Tier)
-          - `radarsimpy_macos_arm_py3.12_freetier/` - Python 3.12 (Free Tier)
-          - `radarsimpy_macos_arm_py3.13_freetier/` - Python 3.13 (Free Tier)
+          ### MacOS_x86_64 (Intel-based Macs)
+          - **standard/**: Full-featured builds with all capabilities
+          - **trial/**: Free tier builds with limited features
+          - Built on macOS 13 with GCC 14 compiler
+          
+          ### MacOS_Arm64 (Apple Silicon Macs)
+          - **standard/**: Full-featured builds with all capabilities  
+          - **trial/**: Free tier builds with limited features
+          - Built on macOS 15 with Clang compiler
           
           ## Usage
           
-          1. Extract the appropriate build for your system and Python version
-          2. Install the module using pip or copy to your Python site-packages
-          3. Import and use RadarSimPy in your Python scripts
+          1. Navigate to the appropriate directory for your system:
+             - For Intel Macs: `MacOS_x86_64/`
+             - For Apple Silicon Macs: `MacOS_Arm64/`
+          
+          2. Choose the tier:
+             - `standard/` for full-featured builds
+             - `trial/` for free tier builds
+          
+          3. Select your Python version directory (e.g., `python3.11/`)
+          
+          4. Copy the `radarsimpy/` folder to your Python site-packages or use directly
           
           ## Build Information
           
           - **Total Builds**: 20
-          - **Architectures**: x64 (Intel), ARM64 (Apple Silicon)
+          - **Architectures**: x86_64 (Intel), Arm64 (Apple Silicon)
           - **Python Versions**: 3.9, 3.10, 3.11, 3.12, 3.13
-          - **Tiers**: Standard, Free Tier
+          - **Tiers**: Standard (full features), Trial (limited features)
           - **Build Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          
+          ## Installation
+          
+          ### Option 1: Direct Copy
+          ```bash
+          # Example for Apple Silicon Mac with Python 3.11 (standard tier)
+          cp -r MacOS_Arm64/standard/python3.11/radarsimpy /path/to/your/python/site-packages/
+          ```
+          
+          ### Option 2: Add to Python Path
+          ```python
+          import sys
+          sys.path.insert(0, '/path/to/extracted/MacOS_Arm64/standard/python3.11')
+          import radarsimpy
+          ```
           EOF
       
       - name: Create compressed archive
