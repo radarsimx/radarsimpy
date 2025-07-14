@@ -174,7 +174,7 @@ pip install -r requirements.txt
 
 - **Apple Silicon (M1/M2/M3)**: Fully supported for CPU builds
 - **Intel Macs**: Fully supported for CPU builds
-- **Compiler**: Uses GCC by default
+- **Compiler**: Uses Clang/Clang++ by default (provided by Xcode Command Line Tools)
 
 ## Build Output
 
