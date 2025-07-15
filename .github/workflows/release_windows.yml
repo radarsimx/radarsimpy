@@ -1,61 +1,376 @@
 name: Release on Windows
 
-# GitHub Actions workflow to build and package radarsimpy for Windows.
-#
-# This workflow is triggered on every push to a tag (release event).
-# It builds the project for multiple Python versions and build tiers.
-# The resulting artifacts are uploaded for each build variant.
-
 on:
-  # Trigger workflow on any push to a tag (release event)
   push:
     tags:
-      - "*" # Matches any tag name
+      - "*"
   # Allow manual trigger from the Actions tab
   workflow_dispatch:
 
+env:
+  # Global environment variables
+  PYTHONUNBUFFERED: 1
+  PYTHONDONTWRITEBYTECODE: 1
+
 jobs:
   build:
-    # Use the latest Windows runner
     runs-on: windows-latest
+    timeout-minutes: 90
     strategy:
+      fail-fast: false
       matrix:
-        # Build for multiple Python versions and tiers
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
-        tier: ["standard", "free"]
+        include:
+          # Windows Standard builds
+          - python-version: "3.9"
+            tier: standard
+            arch: cpu
+            artifact_name: radarsimpy_windows_py3.9
+          - python-version: "3.10"
+            tier: standard
+            arch: cpu
+            artifact_name: radarsimpy_windows_py3.10
+          - python-version: "3.11"
+            tier: standard
+            arch: cpu
+            artifact_name: radarsimpy_windows_py3.11
+          - python-version: "3.12"
+            tier: standard
+            arch: cpu
+            artifact_name: radarsimpy_windows_py3.12
+          - python-version: "3.13"
+            tier: standard
+            arch: cpu
+            artifact_name: radarsimpy_windows_py3.13
+          # Windows Free Tier builds
+          - python-version: "3.9"
+            tier: free
+            arch: cpu
+            artifact_name: radarsimpy_windows_py3.9_freetier
+          - python-version: "3.10"
+            tier: free
+            arch: cpu
+            artifact_name: radarsimpy_windows_py3.10_freetier
+          - python-version: "3.11"
+            tier: free
+            arch: cpu
+            artifact_name: radarsimpy_windows_py3.11_freetier
+          - python-version: "3.12"
+            tier: free
+            arch: cpu
+            artifact_name: radarsimpy_windows_py3.12_freetier
+          - python-version: "3.13"
+            tier: free
+            arch: cpu
+            artifact_name: radarsimpy_windows_py3.13_freetier
 
     steps:
-      # Checkout the repository and submodules using a deploy key (RADARSIMC)
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ssh-key: ${{secrets.RADARSIMC}} # SSH key for private submodules
+          ssh-key: ${{secrets.RADARSIMC}}
           submodules: recursive
-
-      # Set up the required Python version for this build matrix job
-      - name: Set up Python ${{matrix.python-version}}
+          fetch-depth: 0
+      
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: ${{matrix.python-version}}
-
-      # Install Python dependencies from requirements.txt
-      - name: Install dependencies
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+      
+      - name: Cache build dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~\AppData\Local\pip\Cache
+            ~\AppData\Local\ccache
+          key: ${{ runner.os }}-${{ matrix.python-version }}-${{ matrix.tier }}-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.python-version }}-${{ matrix.tier }}-
+            ${{ runner.os }}-${{ matrix.python-version }}-
+            ${{ runner.os }}-
+      
+      - name: Install system dependencies
         run: |
-          python -m pip install --upgrade pip
+          # Install chocolatey if not present
+          if (-not (Get-Command choco -ErrorAction SilentlyContinue)) {
+            Set-ExecutionPolicy Bypass -Scope Process -Force
+            [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+            iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+          }
+          
+          # Install ccache for faster compilation
+          choco install ccache -y
+          
+          # Add ccache to PATH
+          $env:PATH = "C:\ProgramData\chocolatey\bin;$env:PATH"
+          echo "C:\ProgramData\chocolatey\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        shell: powershell
+      
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip wheel setuptools
           pip install -r requirements.txt
-
-      # Build the project using the provided batch script
-      # --tier: build tier (standard/free)
-      # --arch: build architecture (cpu)
-      # --test=off: skip running tests during build
-      - name: Build
+      
+      - name: Display build information
         run: |
-          .\build.bat --tier=${{matrix.tier}} --arch=cpu --test=off
-
-      # Upload the built Python module as an artifact for this build variant
+          echo "::group::Build Information"
+          echo "OS: windows-latest"
+          echo "Python: ${{ matrix.python-version }}"
+          echo "Tier: ${{ matrix.tier }}"
+          echo "Architecture: ${{ matrix.arch }}"
+          echo "::endgroup::"
+          
+          echo "::group::System Information"
+          systeminfo | findstr /C:"OS Name" /C:"OS Version"
+          python --version
+          pip --version
+          echo "::endgroup::"
+        shell: cmd
+      
+      - name: Build RadarSimPy
+        env:
+          CCACHE_DIR: ~\AppData\Local\ccache
+          CCACHE_COMPILERCHECK: content
+        run: |
+          echo "::group::Build Process"
+          .\build.bat --tier=${{ matrix.tier }} --arch=${{ matrix.arch }} --test=off --verbose
+          echo "::endgroup::"
+        shell: cmd
+      
+      - name: Display build statistics
+        if: always()
+        run: |
+          echo "::group::Build Statistics"
+          if (Get-Command ccache -ErrorAction SilentlyContinue) {
+            ccache --show-stats
+          } else {
+            echo "ccache not available"
+          }
+          echo "::endgroup::"
+        shell: powershell
+      
+      - name: Verify build artifacts
+        run: |
+          echo "::group::Build Verification"
+          dir /s .\radarsimpy\
+          if exist ".\radarsimpy\__init__.py" (
+            echo "✓ Python module found"
+          ) else (
+            echo "✗ Python module missing"
+            exit /b 1
+          )
+          
+          # Check for compiled extensions
+          dir /s .\radarsimpy\*.pyd >nul 2>&1
+          if %errorlevel% == 0 (
+            echo "✓ Compiled extensions found:"
+            dir /s .\radarsimpy\*.pyd
+          ) else (
+            echo "✗ No compiled extensions found"
+            exit /b 1
+          )
+          echo "::endgroup::"
+        shell: cmd
+      
+      - name: Create build summary
+        run: |
+          echo "## Build Summary 🛠️" >> $env:GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $env:GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $env:GITHUB_STEP_SUMMARY
+          echo "| OS | windows-latest |" >> $env:GITHUB_STEP_SUMMARY
+          echo "| Python Version | ${{ matrix.python-version }} |" >> $env:GITHUB_STEP_SUMMARY
+          echo "| Tier | ${{ matrix.tier }} |" >> $env:GITHUB_STEP_SUMMARY
+          echo "| Architecture | ${{ matrix.arch }} |" >> $env:GITHUB_STEP_SUMMARY
+          echo "| Artifact Name | ${{ matrix.artifact_name }} |" >> $env:GITHUB_STEP_SUMMARY
+        shell: powershell
+      
       - name: Archive built module
         uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: radarsimpy_win_py${{matrix.python-version}}_${{matrix.tier}}tier
+          name: ${{ matrix.artifact_name }}
           path: .\radarsimpy
+          retention-days: 1
+          compression-level: 6
+      
+      - name: Upload build logs on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: build-logs-${{ matrix.artifact_name }}
+          path: |
+            .\build_logs\
+            *.log
+          retention-days: 1
+
+  # Pack all artifacts into a single file
+  pack-artifacts:
+    needs: build
+    runs-on: windows-latest
+    if: success()
+    steps:
+      - name: Create artifacts directory
+        run: mkdir artifacts
+        shell: cmd
+      
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts\
+      
+      - name: Display downloaded artifacts
+        run: |
+          echo "::group::Downloaded Artifacts"
+          dir /s artifacts\ | findstr /C:".py" /C:".pyd" /C:".dll" | findstr /v "Directory"
+          echo "::endgroup::"
+        shell: cmd
+      
+      - name: Create artifact structure
+        run: |
+          mkdir packed\radarsimpy_windows_all
+          
+          # Create the directory structure for Windows
+          mkdir packed\radarsimpy_windows_all\trial\Windows_x64_CPU\radarsimpy
+          mkdir packed\radarsimpy_windows_all\standard\Windows_x64_CPU\radarsimpy
+          
+          # Copy each artifact to appropriate directory based on tier
+          for /d %%d in (artifacts\*) do (
+            set "artifact_name=%%~nd"
+            echo Processing artifact: !artifact_name!
+            
+            # Determine target directory based on artifact name
+            echo !artifact_name! | findstr "_freetier" >nul
+            if !errorlevel! == 0 (
+              set "target_dir=packed\radarsimpy_windows_all\trial\Windows_x64_CPU\radarsimpy"
+            ) else (
+              set "target_dir=packed\radarsimpy_windows_all\standard\Windows_x64_CPU\radarsimpy"
+            )
+            
+            # Ensure target directory exists
+            if not exist "!target_dir!" mkdir "!target_dir!"
+            
+            # Copy the radarsimpy module
+            if exist "%%d\radarsimpy" (
+              echo Copying radarsimpy module from %%d\radarsimpy to !target_dir!\
+              xcopy "%%d\radarsimpy" "!target_dir!\" /E /I /Y
+            ) else (
+              echo Copying all contents from %%d to !target_dir!\
+              xcopy "%%d\*" "!target_dir!\" /E /I /Y 2>nul
+            )
+          )
+        shell: cmd
+        env:
+          EnableDelayedExpansion: true
+      
+      - name: Verify artifact structure
+        run: |
+          echo "::group::Artifact Structure Verification"
+          echo "Final directory structure:"
+          dir /s packed\radarsimpy_windows_all
+          echo "::endgroup::"
+        shell: cmd
+      
+      - name: Create README for packed artifacts
+        run: |
+          @echo off
+          (
+          echo # RadarSimPy Windows Build Artifacts
+          echo.
+          echo This archive contains all RadarSimPy builds for Windows platforms organized by tier.
+          echo.
+          echo ## Directory Structure
+          echo.
+          echo The builds are organized in the following structure:
+          echo.
+          echo ```
+          echo standard/
+          echo └── Windows_x64_CPU/
+          echo     └── radarsimpy/
+          echo.
+          echo trial/
+          echo └── Windows_x64_CPU/
+          echo     └── radarsimpy/
+          echo ```
+          echo.
+          echo ## Tier Information
+          echo.
+          echo ### Windows_x64_CPU ^(Windows x64^)
+          echo - **standard/**: Full-featured builds with all capabilities
+          echo - **trial/**: Free tier builds with limited features
+          echo - Built on Windows with MSVC compiler
+          echo.
+          echo ## Build Information
+          echo.
+          echo - **Total Builds**: 10
+          echo - **Architecture**: x64
+          echo - **Python Versions**: 3.9, 3.10, 3.11, 3.12, 3.13
+          echo - **Tiers**: Standard ^(full features^), Trial ^(limited features^)
+          echo - **Build Date**: %date% %time%
+          echo.
+          ) > packed\radarsimpy_windows_all\README.md
+        shell: cmd
+      
+      - name: Create compressed archive
+        run: |
+          cd packed
+          # Create zip archive
+          powershell -Command "Compress-Archive -Path 'radarsimpy_windows_all' -DestinationPath 'radarsimpy_windows_all_builds.zip' -Force"
+          
+          echo "::group::Archive Information"
+          dir *.zip
+          echo "::endgroup::"
+        shell: cmd
+      
+      - name: Upload packed artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: radarsimpy_windows_all_builds
+          path: packed\radarsimpy_windows_all_builds.zip
+          retention-days: 1
+          compression-level: 0
+
+  # Summary job that runs after all builds complete
+  build-summary:
+    needs: [build, pack-artifacts]
+    runs-on: windows-latest
+    if: always()
+    steps:
+      - name: Generate build summary
+        run: |
+          echo "# Windows Build Summary 📊" >> $env:GITHUB_STEP_SUMMARY
+          echo "" >> $env:GITHUB_STEP_SUMMARY
+          echo "## Build Matrix Results" >> $env:GITHUB_STEP_SUMMARY
+          echo "Total builds: 10 (5 Python versions × 2 tiers)" >> $env:GITHUB_STEP_SUMMARY
+          echo "" >> $env:GITHUB_STEP_SUMMARY
+          echo "### Architecture Distribution" >> $env:GITHUB_STEP_SUMMARY
+          echo "- **Windows x64**: 10 builds on windows-latest" >> $env:GITHUB_STEP_SUMMARY
+          echo "" >> $env:GITHUB_STEP_SUMMARY
+          echo "### Tier Distribution" >> $env:GITHUB_STEP_SUMMARY
+          echo "- **Standard**: 5 builds" >> $env:GITHUB_STEP_SUMMARY
+          echo "- **Free**: 5 builds" >> $env:GITHUB_STEP_SUMMARY
+          echo "" >> $env:GITHUB_STEP_SUMMARY
+          echo "### Python Versions" >> $env:GITHUB_STEP_SUMMARY
+          echo "- Python 3.9, 3.10, 3.11, 3.12, 3.13" >> $env:GITHUB_STEP_SUMMARY
+          echo "" >> $env:GITHUB_STEP_SUMMARY
+          echo "### Packed Artifacts" >> $env:GITHUB_STEP_SUMMARY
+          if ("${{ needs.pack-artifacts.result }}" -eq "success") {
+            echo "✅ **All artifacts successfully packed into single archive**" >> $env:GITHUB_STEP_SUMMARY
+            echo "- Archive: ``radarsimpy_windows_all_builds``" >> $env:GITHUB_STEP_SUMMARY
+            echo "- Format: zip" >> $env:GITHUB_STEP_SUMMARY
+            echo "- Contains: All 10 build variants organized by configuration" >> $env:GITHUB_STEP_SUMMARY
+          } else {
+            echo "⚠️ **Artifact packing failed or was skipped**" >> $env:GITHUB_STEP_SUMMARY
+          }
+          echo "" >> $env:GITHUB_STEP_SUMMARY
+          echo "### Build Status" >> $env:GITHUB_STEP_SUMMARY
+          echo "Check individual job results above for detailed build information." >> $env:GITHUB_STEP_SUMMARY
+          
+          # Check if any builds failed
+          if ("${{ needs.build.result }}" -ne "success") {
+            echo "" >> $env:GITHUB_STEP_SUMMARY
+            echo "⚠️ **Some builds may have failed. Check individual job logs for details.**" >> $env:GITHUB_STEP_SUMMARY
+          } else {
+            echo "" >> $env:GITHUB_STEP_SUMMARY
+            echo "✅ **All builds completed successfully!**" >> $env:GITHUB_STEP_SUMMARY
+          }
+        shell: powershell
