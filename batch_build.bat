@@ -11,7 +11,10 @@ SET PYTHON_VERSIONS=py39 py310 py311 py312 py313
 SET BUILD_LOG_DATE=%DATE:~-4,4%%DATE:~-7,2%%DATE:~-10,2%
 SET BUILD_LOG_TIME=%TIME:~0,2%%TIME:~3,2%%TIME:~6,2%
 SET BUILD_LOG_TIME=%BUILD_LOG_TIME: =0%
-SET BUILD_LOG=%~dp0build_log_%BUILD_LOG_DATE%_%BUILD_LOG_TIME%.log
+SET BUILD_LOG=%~dp0build_logs\windows_batch_build_log_%BUILD_LOG_DATE%_%BUILD_LOG_TIME%.log
+
+REM Create build_logs directory if it doesn't exist
+IF NOT EXIST "%~dp0build_logs" MD "%~dp0build_logs"
 
 REM Parse command line arguments
 SET TIER=both
@@ -286,9 +289,9 @@ SET ARCH_SUFFIX=CPU
 IF /I "%build_arch%"=="gpu" SET ARCH_SUFFIX=GPU
 
 IF /I "%build_tier%"=="free" (
-    SET dist_folder=.\trial\Windows_x86_64_%ARCH_SUFFIX%
+    SET dist_folder=.\release\trial\Windows_x86_64_%ARCH_SUFFIX%
 ) ELSE (
-    SET dist_folder=.\standard\Windows_x86_64_%ARCH_SUFFIX%
+    SET dist_folder=.\release\standard\Windows_x86_64_%ARCH_SUFFIX%
 )
 
 REM Clean and create distribution folder
