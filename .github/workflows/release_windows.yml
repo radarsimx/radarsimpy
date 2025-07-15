@@ -1,5 +1,36 @@
 name: Release on Windows
 
+# GitHub Actions workflow for building and packaging RadarSimPy on Windows platforms.
+#
+# This workflow builds RadarSimPy for Windows x64 architecture across multiple Python
+# versions and build tiers (standard/free). It uses the latest Windows runner with
+# MSVC compiler and provides comprehensive Windows-specific optimizations.
+#
+# Build Matrix:
+# - Windows x64: MSVC compiler, 10 builds (5 Python × 2 tiers)
+# - Python versions: 3.9, 3.10, 3.11, 3.12, 3.13
+# - Build tiers: standard (full features), free (limited features)
+# - Total builds: 10
+#
+# Features:
+# - Comprehensive caching (pip, ccache)
+# - Build optimization with ccache via Chocolatey
+# - Windows-specific dependency management
+# - Artifact verification and validation
+# - Windows-native artifact packing
+# - Detailed build reporting and summaries
+# - Error handling with build log uploads
+# - PowerShell and CMD integration
+#
+# Outputs:
+# - Individual artifacts for each build configuration
+# - Packed ZIP archive containing all builds organized by tier
+# - Build summaries and statistics
+#
+# Triggers:
+# - Tag pushes (release events)
+# - Manual workflow dispatch
+
 on:
   push:
     tags:

@@ -1,5 +1,37 @@
 name: Release on Ubuntu
 
+# GitHub Actions workflow for building and packaging RadarSimPy on Ubuntu platforms.
+#
+# This workflow builds RadarSimPy across multiple Ubuntu LTS versions, Python versions,
+# and build tiers (standard/free). It supports both Ubuntu 22.04 LTS and Ubuntu 24.04 LTS
+# to provide comprehensive Linux coverage with different GCC compiler versions.
+#
+# Build Matrix:
+# - Ubuntu 22.04 LTS: GCC-11 compiler, 10 builds (5 Python × 2 tiers)
+# - Ubuntu 24.04 LTS: GCC-14 compiler, 10 builds (5 Python × 2 tiers)
+# - Python versions: 3.9, 3.10, 3.11, 3.12, 3.13
+# - Build tiers: standard (full features), free (limited features)
+# - Total builds: 20
+#
+# Features:
+# - Comprehensive caching (pip, ccache)
+# - Build optimization with ccache
+# - System dependency management
+# - Artifact verification and validation
+# - Multi-version artifact packing
+# - Detailed build reporting and summaries
+# - Error handling with build log uploads
+# - Ubuntu-specific optimizations
+#
+# Outputs:
+# - Individual artifacts for each build configuration
+# - Packed archive containing all builds organized by Ubuntu version and tier
+# - Build summaries and statistics
+#
+# Triggers:
+# - Tag pushes (release events)
+# - Manual workflow dispatch
+
 on:
   push:
     tags:

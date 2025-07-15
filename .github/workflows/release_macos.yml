@@ -1,5 +1,36 @@
 name: Release on MacOS
 
+# GitHub Actions workflow for building and packaging RadarSimPy on macOS platforms.
+#
+# This workflow builds RadarSimPy across multiple macOS versions, Python versions,
+# and build tiers (standard/free). It supports both Intel x64 and Apple Silicon ARM64
+# architectures to provide comprehensive macOS coverage.
+#
+# Build Matrix:
+# - macOS 13 (Intel x64): GCC-14 compiler, 10 builds (5 Python × 2 tiers)
+# - macOS 15 (Apple Silicon ARM64): Clang compiler, 10 builds (5 Python × 2 tiers)
+# - Python versions: 3.9, 3.10, 3.11, 3.12, 3.13
+# - Build tiers: standard (full features), free (limited features)
+# - Total builds: 20
+#
+# Features:
+# - Comprehensive caching (pip, Homebrew, ccache)
+# - Build optimization with ccache
+# - Xcode version management
+# - Artifact verification and validation
+# - Multi-architecture artifact packing
+# - Detailed build reporting and summaries
+# - Error handling with build log uploads
+#
+# Outputs:
+# - Individual artifacts for each build configuration
+# - Packed archive containing all builds organized by architecture and tier
+# - Build summaries and statistics
+#
+# Triggers:
+# - Tag pushes (release events)
+# - Manual workflow dispatch
+
 on:
   push:
     tags:
