@@ -363,15 +363,6 @@ IF !ERRORLEVEL! NEQ 0 (
 )
 CALL :log_info "CMake found."
 
-REM Check if conda is available
-@REM CALL :log_info "Checking Conda..."
-@REM conda --version >NUL 2>&1
-@REM IF !ERRORLEVEL! NEQ 0 (
-@REM     CALL :log_error "Conda not found. Please install Anaconda/Miniconda and add it to PATH."
-@REM     EXIT /B 1
-@REM )
-@REM CALL :log_info "Conda found."
-
 REM Check CUDA availability for GPU builds
 IF /I "%ARCH%"=="gpu" (
     CALL :log_info "GPU architecture requested, checking CUDA..."
@@ -385,14 +376,21 @@ IF /I "%ARCH%"=="gpu" (
 
 REM Check Python environments
 CALL :log_info "Checking Python environments..."
+SET missing_envs=false
 FOR %%v IN (%PYTHON_VERSIONS%) DO (
     CALL :log_info "Checking environment %%v..."
     conda info --envs | findstr /C:"%%v" >NUL 2>&1
     IF !ERRORLEVEL! NEQ 0 (
-        CALL :log_warning "Python environment %%v not found. Skipping..."
+        CALL :log_error "Python environment %%v not found. This is required for the build."
+        SET missing_envs=true
     ) ELSE (
         CALL :log_info "Environment %%v found."
     )
+)
+
+IF "%missing_envs%"=="true" (
+    CALL :log_error "One or more required Python environments are missing. Please create all required environments before building."
+    EXIT /B 1
 )
 
 CALL :log_info "Prerequisites check completed."
