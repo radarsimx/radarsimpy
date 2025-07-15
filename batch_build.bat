@@ -314,17 +314,17 @@ REM ============================================================================
 ECHO Usage: %~nx0 [options]
 ECHO.
 ECHO Options:
-ECHO   --tier ^<free^|standard^|both^>  Build tier (default: both)
-ECHO   --arch ^<cpu^|gpu^|both^>        Architecture (default: cpu)
+ECHO   --tier=^<free^|standard^|both^>  Build tier (default: both)
+ECHO   --arch=^<cpu^|gpu^|both^>        Architecture (default: cpu)
 ECHO   --skip-tests                   Skip running unit tests
 ECHO   --verbose                      Enable verbose output
 ECHO   --help                         Show this help message
 ECHO.
 ECHO Examples:
-ECHO   %~nx0 --tier free --arch cpu
-ECHO   %~nx0 --tier standard --arch gpu
-ECHO   %~nx0 --arch both --skip-tests
-ECHO   %~nx0 --tier both --arch both
+ECHO   %~nx0 --tier=free --arch=cpu
+ECHO   %~nx0 --tier=standard --arch=gpu
+ECHO   %~nx0 --arch=both --skip-tests
+ECHO   %~nx0 --tier=both --arch=both
 ECHO   %~nx0 --verbose
 EXIT /B 0
 
