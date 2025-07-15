@@ -61,8 +61,9 @@ RadarSimPy is a powerful and versatile Python-based Radar Simulator that models 
   - GPU version (CUDA12.8) – see [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1)
 - **Generic Linux x86-64**
   - Try Ubuntu 22.04/24.04 module, or [request a custom build](https://radarsimx.com/request-a-custom-build/)
-- **MacOS Intel/Apple Silicon**
-  - GCC 14: `brew install gcc@14`
+- **MacOS**
+  - Intel: GCC 14 (`brew install gcc@14`)
+  - Apple Silicon: use default Clang (no extra dependency)
 
 ---
 
