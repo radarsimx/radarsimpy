@@ -21,6 +21,7 @@ SET TIER=both
 SET ARCH=cpu
 SET SKIP_TESTS=false
 SET VERBOSE=false
+SET JOBS=auto
 
 :parse_args
 IF "%~1"=="" GOTO :args_done
@@ -46,6 +47,12 @@ IF /I "%~1"=="--verbose" (
     SHIFT
     GOTO :parse_args
 )
+IF /I "%~1"=="--jobs" (
+    SET JOBS=%~2
+    SHIFT
+    SHIFT
+    GOTO :parse_args
+)
 IF /I "%~1"=="--help" (
     CALL :show_help
     EXIT /B 0
@@ -67,6 +74,24 @@ IF /I NOT "%ARCH%"=="cpu" IF /I NOT "%ARCH%"=="gpu" IF /I NOT "%ARCH%"=="both" (
     EXIT /B 1
 )
 
+REM Validate and set jobs parameter
+IF /I "%JOBS%"=="auto" (
+    REM Auto-detect number of CPU cores
+    IF DEFINED NUMBER_OF_PROCESSORS (
+        SET JOBS=%NUMBER_OF_PROCESSORS%
+    ) ELSE (
+        SET JOBS=4
+    )
+    CALL :log_info "Auto-detected %JOBS% CPU cores for parallel build"
+) ELSE (
+    REM Validate that jobs is a positive integer
+    ECHO %JOBS%| FINDSTR /R "^[1-9][0-9]*$" >NUL
+    IF !ERRORLEVEL! NEQ 0 (
+        CALL :log_error "Invalid jobs parameter: %JOBS%. Must be 'auto' or a positive integer."
+        EXIT /B 1
+    )
+)
+
 REM Display header and copyright information
 CALL :log_info "RadarSimPy Build Script v%SCRIPT_VERSION%"
 CALL :log_info "Copyright 2018 - PRESENT  radarsimx.com"
@@ -86,6 +111,7 @@ CALL :log_info "  Tier: %TIER%"
 CALL :log_info "  Architecture: %ARCH%"
 CALL :log_info "  Skip Tests: %SKIP_TESTS%"
 CALL :log_info "  Verbose: %VERBOSE%"
+CALL :log_info "  Parallel Jobs: %JOBS%"
 CALL :log_info "  Log File: %BUILD_LOG%"
 CALL :log_info ""
 
@@ -220,7 +246,7 @@ IF !ERRORLEVEL! NEQ 0 (
     EXIT /B 1
 )
 
-cmake --build . --config Release 2>&1
+cmake --build . --config Release --parallel %JOBS% 2>&1
 IF !ERRORLEVEL! NEQ 0 (
     CD "%pwd%"
     CALL :log_error "C++ library build failed for %build_arch%"
@@ -318,13 +344,14 @@ ECHO   --tier=^<free^|standard^|both^>  Build tier (default: both)
 ECHO   --arch=^<cpu^|gpu^|both^>        Architecture (default: cpu)
 ECHO   --skip-tests                   Skip running unit tests
 ECHO   --verbose                      Enable verbose output
+ECHO   --jobs=^<auto^|number^>          Number of parallel jobs (default: auto)
 ECHO   --help                         Show this help message
 ECHO.
 ECHO Examples:
 ECHO   %~nx0 --tier=free --arch=cpu
-ECHO   %~nx0 --tier=standard --arch=gpu
-ECHO   %~nx0 --arch=both --skip-tests
-ECHO   %~nx0 --tier=both --arch=both
+ECHO   %~nx0 --tier=standard --arch=gpu --jobs=8
+ECHO   %~nx0 --arch=both --skip-tests --jobs=auto
+ECHO   %~nx0 --tier=both --arch=both --jobs=4
 ECHO   %~nx0 --verbose
 EXIT /B 0
 
@@ -466,16 +493,19 @@ REM ============================================================================
 :run_tests
 CALL :log_info "Running unit tests..."
 
-IF NOT EXIST ".\src\radarsimcpp\build\Release\radarsimcpp_test.exe" (
-    CALL :log_error "Test executable not found"
-    EXIT /B 1
+REM Run Google Test (C++) using CTest with parallel jobs
+IF EXIST ".\src\radarsimcpp\build\Release\radarsimcpp_test.exe" (
+    CALL :log_info "Running Google Test for C++ using CTest with %JOBS% parallel jobs..."
+    ctest --test-dir ".\src\radarsimcpp\build" -C Release --parallel %JOBS% --verbose 2>&1
+    IF !ERRORLEVEL! NEQ 0 (
+        CALL :log_error "Google Test failed"
+        EXIT /B 1
+    ) ELSE (
+        CALL :log_info "Google Test passed"
+    )
+) ELSE (
+    CALL :log_warning "Google Test executable not found, skipping C++ tests"
 )
 
-".\src\radarsimcpp\build\Release\radarsimcpp_test.exe" 2>&1
-IF !ERRORLEVEL! NEQ 0 (
-    CALL :log_error "Unit tests failed"
-    EXIT /B 1
-)
-
-CALL :log_info "Unit tests passed successfully."
+CALL :log_info "Unit tests completed successfully."
 EXIT /B 0

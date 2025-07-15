@@ -353,6 +353,7 @@ get_cpp_compiler() {
 #   PLATFORM_NAME - Current platform (Linux/macOS)
 # Dependencies Checked:
 #   - cmake: Build system generator
+#   - ctest: Test runner (part of CMake)
 #   - python3: Python interpreter
 #   - Platform-specific compilers (gcc/g++ on Linux, clang++ on macOS)
 #   - nvcc: NVIDIA CUDA compiler (GPU builds only)
@@ -373,6 +374,11 @@ check_requirements() {
             missing_deps+=("$cmd")
         fi
     done
+    
+    # Check for CTest (part of CMake, needed for parallel testing)
+    if ! command_exists ctest; then
+        missing_deps+=("ctest (part of CMake)")
+    fi
     
     # Add gcc for Linux (in addition to g++)
     if [ "${PLATFORM_NAME}" = "Linux" ]; then
@@ -901,19 +907,21 @@ cleanup_build_files() {
 #
 # run_tests() - Executes test suites if testing is enabled
 # Description:
-#   Runs both C++ unit tests (Google Test) and Python unit tests (pytest)
-#   if the TEST flag is set to 'on'. Tracks test failures and provides
-#   comprehensive test result reporting with timing information.
+#   Runs both C++ unit tests (Google Test via CTest) and Python unit tests (pytest)
+#   if the TEST flag is set to 'on'. Uses parallel execution for C++ tests.
+#   Tracks test failures and provides comprehensive test result reporting with timing information.
 # Arguments:
 #   None
 # Global Variables Used:
 #   TEST - Controls whether tests are executed
+#   JOBS - Number of parallel jobs for C++ test execution
 #   VERBOSE - Controls test output verbosity
 #   LOG_FILE - Log file for quiet test runs
 # Test Suites:
 #   1. C++ Unit Tests:
 #      - Executable: ./src/radarsimcpp/build/radarsimcpp_test
-#      - Framework: Google Test
+#      - Framework: Google Test via CTest
+#      - Execution: Parallel using specified number of jobs
 #   2. Python Unit Tests:
 #      - Command: pytest
 #      - Framework: pytest
@@ -932,13 +940,13 @@ run_tests() {
         
         log_info "Running test suite on ${PLATFORM_NAME}..."
         
-        # Run C++ unit tests using Google Test
+        # Run C++ unit tests using CTest with parallel execution
         if [ -f "./src/radarsimcpp/build/radarsimcpp_test" ]; then
-            log_info "Running C++ unit tests..."
+            log_info "Running C++ unit tests with CTest using $JOBS parallel jobs..."
             if [ "$VERBOSE" = "true" ]; then
-                ./src/radarsimcpp/build/radarsimcpp_test
+                ctest --test-dir "./src/radarsimcpp/build" --parallel "$JOBS" --verbose
             else
-                ./src/radarsimcpp/build/radarsimcpp_test >> "${LOG_FILE}" 2>&1
+                ctest --test-dir "./src/radarsimcpp/build" --parallel "$JOBS" --verbose >> "${LOG_FILE}" 2>&1
             fi
             
             local cpp_test_result=$?

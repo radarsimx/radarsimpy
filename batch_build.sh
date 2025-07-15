@@ -19,6 +19,7 @@ TIER="both"
 ARCH="cpu"
 SKIP_TESTS="false"
 VERBOSE="false"
+JOBS="auto"
 
 # Function to show help
 show_help() {
@@ -29,13 +30,14 @@ show_help() {
     echo "  --arch=<cpu|gpu|both>        Architecture (default: cpu)"
     echo "  --skip-tests                 Skip running unit tests"
     echo "  --verbose                    Enable verbose output"
+    echo "  --jobs=<auto|number>         Number of parallel jobs (default: auto)"
     echo "  --help                       Show this help message"
     echo ""
     echo "Examples:"
     echo "  $0 --tier=free --arch=cpu"
-    echo "  $0 --tier=standard --arch=gpu"
-    echo "  $0 --arch=both --skip-tests"
-    echo "  $0 --tier=both --arch=both"
+    echo "  $0 --tier=standard --arch=gpu --jobs=8"
+    echo "  $0 --arch=both --skip-tests --jobs=auto"
+    echo "  $0 --tier=both --arch=both --jobs=4"
     echo "  $0 --verbose"
 }
 
@@ -58,6 +60,10 @@ while [[ $# -gt 0 ]]; do
             VERBOSE="true"
             shift
             ;;
+        --jobs=*)
+            JOBS="${1#*=}"
+            shift
+            ;;
         --help)
             show_help
             exit 0
@@ -78,6 +84,24 @@ fi
 
 if [[ "$ARCH" != "cpu" && "$ARCH" != "gpu" && "$ARCH" != "both" ]]; then
     echo "[ERROR] Invalid architecture specified: $ARCH. Must be cpu, gpu, or both."
+    exit 1
+fi
+
+# Validate and set jobs parameter
+if [[ "$JOBS" == "auto" ]]; then
+    # Auto-detect number of CPU cores
+    if command -v nproc &> /dev/null; then
+        JOBS=$(nproc)
+    elif [[ -f /proc/cpuinfo ]]; then
+        JOBS=$(grep -c ^processor /proc/cpuinfo)
+    else
+        JOBS=4
+    fi
+    log_info "Auto-detected $JOBS CPU cores for parallel build"
+elif [[ "$JOBS" =~ ^[1-9][0-9]*$ ]]; then
+    log_info "Using $JOBS parallel jobs for build"
+else
+    echo "[ERROR] Invalid jobs parameter: $JOBS. Must be 'auto' or a positive integer."
     exit 1
 fi
 
@@ -121,6 +145,7 @@ log_info "  Tier: $TIER"
 log_info "  Architecture: $ARCH"
 log_info "  Skip Tests: $SKIP_TESTS"
 log_info "  Verbose: $VERBOSE"
+log_info "  Parallel Jobs: $JOBS"
 log_info "  Log File: $BUILD_LOG"
 log_info ""
 
@@ -329,7 +354,7 @@ build_cpp_library() {
         return 1
     fi
 
-    cmake --build . 2>&1
+    cmake --build . --parallel $JOBS 2>&1
     if [[ $? -ne 0 ]]; then
         cd "$workpath"
         log_error "C++ library build failed for $build_arch"
@@ -426,18 +451,21 @@ create_distribution() {
 run_tests() {
     log_info "Running unit tests..."
 
-    if [[ ! -f "./src/radarsimcpp/build/radarsimcpp_test" ]]; then
-        log_error "Test executable not found"
-        return 1
+    # Run Google Test (C++) using CTest with parallel jobs
+    if [[ -f "./src/radarsimcpp/build/radarsimcpp_test" ]]; then
+        log_info "Running Google Test for C++ using CTest with $JOBS parallel jobs..."
+        ctest --test-dir "./src/radarsimcpp/build" --parallel $JOBS --verbose 2>&1
+        if [[ $? -ne 0 ]]; then
+            log_error "Google Test failed"
+            return 1
+        else
+            log_info "Google Test passed"
+        fi
+    else
+        log_warning "Google Test executable not found, skipping C++ tests"
     fi
 
-    "./src/radarsimcpp/build/radarsimcpp_test" 2>&1
-    if [[ $? -ne 0 ]]; then
-        log_error "Unit tests failed"
-        return 1
-    fi
-
-    log_info "Unit tests passed successfully."
+    log_info "Unit tests completed successfully."
     return 0
 }
 

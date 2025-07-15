@@ -1,4 +1,5 @@
 @echo off
+SETLOCAL EnableDelayedExpansion
 
 REM ==============================================================================
 REM RadarSimPy Build Script for Windows
