@@ -403,7 +403,7 @@ jobs:
           echo "# Windows Build Summary 📊" >> $env:GITHUB_STEP_SUMMARY
           echo "" >> $env:GITHUB_STEP_SUMMARY
           echo "## Build Matrix Results" >> $env:GITHUB_STEP_SUMMARY
-          echo "Total builds: 10 (5 Python versions × 2 tiers)" >> $env:GITHUB_STEP_SUMMARY
+          echo "Total builds: 10 (5 Python versions x 2 tiers)" >> $env:GITHUB_STEP_SUMMARY
           echo "" >> $env:GITHUB_STEP_SUMMARY
           echo "### Architecture Distribution" >> $env:GITHUB_STEP_SUMMARY
           echo "- **Windows x64**: 10 builds on windows-latest" >> $env:GITHUB_STEP_SUMMARY
