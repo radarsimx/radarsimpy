@@ -273,8 +273,8 @@ jobs:
         run: |
           echo "::group::Build Process"
           sudo chown -R $USER:$USER /home/runner/work/radarsimpy
-          chmod +x build_linux.sh
-          ./build_linux.sh --tier=${{ matrix.tier }} --arch=${{ matrix.arch }} --test=off --verbose
+          chmod +x build.sh
+          ./build.sh --tier=${{ matrix.tier }} --arch=${{ matrix.arch }} --test=off --verbose
           echo "::endgroup::"
       
       - name: Display build statistics
