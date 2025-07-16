@@ -141,7 +141,7 @@ jobs:
         uses: Jimver/cuda-toolkit@v0.2.24
         with:
           method: 'network'
-          sub-packages: '["nvcc", "visual_studio_integration"]'
+          sub-packages: '["nvcc", "visual_studio_integration", "cudart"]'
       
       - name: Verify CUDA installation
         run: |
