@@ -140,7 +140,8 @@ jobs:
       - name: Setup CUDA Toolkit
         uses: Jimver/cuda-toolkit@v0.2.24
         with:
-          method: 'network'
+          cuda: '12.8.1'
+          method: 'local'
           sub-packages: '["nvcc", "visual_studio_integration", "cudart"]'
       
       - name: Verify CUDA installation
@@ -195,7 +196,6 @@ jobs:
           CUDA_TOOLKIT_ROOT_DIR: ${{ env.CUDA_PATH }}
         run: |
           echo "::group::Build Process"
-          echo "Updated PATH: %PATH%"
           .\build.bat --tier=${{ matrix.tier }} --arch=${{ matrix.arch }} --test=off
           echo "::endgroup::"
         shell: cmd
