@@ -244,7 +244,7 @@ jobs:
         with:
           cuda: '12.9.1'
           method: 'network'
-          sub-packages: '["nvcc", "curand", "cufft", "cublas", "cusparse", "cudart"]'
+          sub-packages: '["nvcc"]'
           linux-local-args: '["--toolkit", "--silent"]'
       
       - name: Verify CUDA installation
