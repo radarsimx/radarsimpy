@@ -193,6 +193,7 @@ jobs:
           CUDA_HOME: ${{ env.CUDA_PATH }}
           CUDACXX: ${{ env.CUDA_PATH }}\bin\nvcc.exe
           CUDA_TOOLKIT_ROOT_DIR: ${{ env.CUDA_PATH }}
+          PATH: ${{ env.CUDA_PATH }}\bin;${{ env.PATH }}
         run: |
           echo "::group::Build Process"
           .\build.bat --tier=${{ matrix.tier }} --arch=${{ matrix.arch }} --test=off
