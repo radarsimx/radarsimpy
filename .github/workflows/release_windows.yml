@@ -258,40 +258,36 @@ jobs:
       
       - name: Create artifact structure
         run: |
-          mkdir packed\radarsimpy_windows_all
+          # Create base directory structure
+          New-Item -Path "packed\radarsimpy_windows_all\trial\Windows_x64_CPU\radarsimpy" -ItemType Directory -Force
+          New-Item -Path "packed\radarsimpy_windows_all\standard\Windows_x64_CPU\radarsimpy" -ItemType Directory -Force
           
-          echo # Create the directory structure for Windows
-          mkdir packed\radarsimpy_windows_all\trial\Windows_x64_CPU\radarsimpy
-          mkdir packed\radarsimpy_windows_all\standard\Windows_x64_CPU\radarsimpy
-          
-          echo # Copy each artifact to appropriate directory based on tier
-          for /d %%d in (artifacts\*) do (
-            set "artifact_name=%%~nd"
-            echo Processing artifact: !artifact_name!
+          # Process each artifact directory
+          Get-ChildItem -Path "artifacts" -Directory | ForEach-Object {
+            $artifactName = $_.Name
+            $artifactPath = $_.FullName
+            Write-Host "Processing artifact: $artifactName"
             
-            echo # Determine target directory based on artifact name
-            echo !artifact_name! | findstr "_freetier" >nul
-            if !errorlevel! == 0 (
-              set "target_dir=packed\radarsimpy_windows_all\trial\Windows_x64_CPU\radarsimpy"
-            ) else (
-              set "target_dir=packed\radarsimpy_windows_all\standard\Windows_x64_CPU\radarsimpy"
-            )
+            # Determine target directory based on artifact name
+            if ($artifactName -like "*_freetier*") {
+              $targetDir = "packed\radarsimpy_windows_all\trial\Windows_x64_CPU\radarsimpy"
+            } else {
+              $targetDir = "packed\radarsimpy_windows_all\standard\Windows_x64_CPU\radarsimpy"
+            }
             
-            echo # Ensure target directory exists
-            if not exist "!target_dir!" mkdir "!target_dir!"
+            Write-Host "Target directory: $targetDir"
             
-            echo # Copy the radarsimpy module
-            if exist "%%d\radarsimpy" (
-              echo Copying radarsimpy module from %%d\radarsimpy to !target_dir!\
-              xcopy "%%d\radarsimpy" "!target_dir!\" /E /I /Y
-            ) else (
-              echo Copying all contents from %%d to !target_dir!\
-              xcopy "%%d\*" "!target_dir!\" /E /I /Y 2>nul
-            )
-          )
-        shell: cmd
-        env:
-          EnableDelayedExpansion: true
+            # Copy the radarsimpy module
+            $sourceRadarsimpy = Join-Path $artifactPath "radarsimpy"
+            if (Test-Path $sourceRadarsimpy) {
+              Write-Host "Copying radarsimpy module from $sourceRadarsimpy to $targetDir"
+              Copy-Item -Path "$sourceRadarsimpy\*" -Destination $targetDir -Recurse -Force
+            } else {
+              Write-Host "Copying all contents from $artifactPath to $targetDir"
+              Copy-Item -Path "$artifactPath\*" -Destination $targetDir -Recurse -Force
+            }
+          }
+        shell: powershell
       
       - name: Verify artifact structure
         run: |
