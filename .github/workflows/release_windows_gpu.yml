@@ -149,13 +149,7 @@ jobs:
           nvcc --version
           echo "CUDA_PATH: %CUDA_PATH%"
           echo "PATH: %PATH%"
-          
-          REM Display all CUDA-related environment variables
-          echo "All CUDA environment variables:"
-          set | findstr /i cuda
-          
           if exist "%CUDA_PATH%\bin\" (
-            echo "CUDA bin directory contents:"
             dir "%CUDA_PATH%\bin\" | findstr nvcc
           ) else (
             echo "CUDA bin directory not found"
@@ -165,10 +159,6 @@ jobs:
           ) else (
             echo "CUDA lib directory not found"
           )
-          
-          REM Check for cmake command
-          cmake --version
-          
           echo "::endgroup::"
         shell: cmd
       
@@ -196,40 +186,21 @@ jobs:
         shell: cmd
       
       - name: Build RadarSimPy
-        run: |
-          echo "::group::Build Process"
-          echo "Initial CUDA environment:"
-          echo "CUDA_PATH: %CUDA_PATH%"
-          echo "CUDA_HOME: %CUDA_HOME%"
-          echo "CUDACXX: %CUDACXX%"
-          echo "CMAKE_CUDA_COMPILER: %CMAKE_CUDA_COMPILER%"
-          
-          REM Set additional CUDA environment variables for CMake
-          set "CUDA_HOME=%CUDA_PATH%"
-          set "CUDACXX=%CUDA_PATH%\bin\nvcc.exe"
-          set "CMAKE_CUDA_COMPILER=%CUDA_PATH%\bin\nvcc.exe"
-          set "CUDA_TOOLKIT_ROOT_DIR=%CUDA_PATH%"
-          set "CMAKE_CUDA_TOOLKIT_ROOT_DIR=%CUDA_PATH%"
-          
-          echo "Final CUDA environment variables:"
-          echo "CUDA_PATH: %CUDA_PATH%"
-          echo "CUDA_HOME: %CUDA_HOME%"
-          echo "CUDACXX: %CUDACXX%"
-          echo "CMAKE_CUDA_COMPILER: %CMAKE_CUDA_COMPILER%"
-          echo "CUDA_TOOLKIT_ROOT_DIR: %CUDA_TOOLKIT_ROOT_DIR%"
-          echo "CMAKE_CUDA_TOOLKIT_ROOT_DIR: %CMAKE_CUDA_TOOLKIT_ROOT_DIR%"
-          
-          REM Verify nvcc is accessible
-          echo "Verifying nvcc accessibility:"
-          "%CUDA_PATH%\bin\nvcc.exe" --version || echo "nvcc not accessible at expected path"
-          
-          echo "Starting build..."
-          .\build.bat --tier=${{ matrix.tier }} --arch=${{ matrix.arch }} --test=off
-          echo "::endgroup::"
-        shell: cmd
         env:
           CCACHE_DIR: ~\AppData\Local\ccache
           CCACHE_COMPILERCHECK: content
+          CUDA_PATH: ${{ env.CUDA_PATH }}
+          CUDA_HOME: ${{ env.CUDA_PATH }}
+          CUDACXX: ${{ env.CUDA_PATH }}\bin\nvcc.exe
+          CUDA_TOOLKIT_ROOT_DIR: ${{ env.CUDA_PATH }}
+        run: |
+          echo "::group::Build Process"
+          echo "CUDA_PATH: %CUDA_PATH%"
+          echo "CUDA_HOME: %CUDA_HOME%"
+          echo "CUDACXX: %CUDACXX%"
+          .\build.bat --tier=${{ matrix.tier }} --arch=${{ matrix.arch }} --test=off
+          echo "::endgroup::"
+        shell: cmd
       
       - name: Display build statistics
         if: always()

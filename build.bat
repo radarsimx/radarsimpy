@@ -276,37 +276,6 @@ REM Validate build environment
             set MISSING_DEPS=1
         ) else (
             echo INFO: CUDA toolkit found and available
-            
-            REM Check if CUDA_PATH is set
-            if "%CUDA_PATH%" == "" (
-                echo WARNING: CUDA_PATH environment variable is not set
-                echo Attempting to detect CUDA installation...
-                
-                REM Try to find CUDA installation
-                for /f "tokens=2*" %%i in ('reg query "HKEY_LOCAL_MACHINE\SOFTWARE\NVIDIA Corporation\GPU Computing Toolkit\CUDA" /s /f "InstallDir" 2^>nul') do (
-                    set "DETECTED_CUDA_PATH=%%j"
-                    echo INFO: Detected CUDA installation at: !DETECTED_CUDA_PATH!
-                    set "CUDA_PATH=!DETECTED_CUDA_PATH!"
-                    goto :cuda_found
-                )
-                
-                REM If registry lookup fails, try common installation paths
-                if exist "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.0" (
-                    set "CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.0"
-                    echo INFO: Found CUDA at: !CUDA_PATH!
-                ) else if exist "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8" (
-                    set "CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8"
-                    echo INFO: Found CUDA at: !CUDA_PATH!
-                ) else (
-                    echo ERROR: Could not detect CUDA installation path
-                    echo Please set CUDA_PATH environment variable manually
-                    set MISSING_DEPS=1
-                )
-                
-                :cuda_found
-            ) else (
-                echo INFO: CUDA_PATH is set to: %CUDA_PATH%
-            )
         )
     )
     
@@ -450,30 +419,12 @@ REM   Sets CMAKE_FAILED=1 and exits on any CMake failures
     echo INFO: Configuring CMake build - Architecture: %ARCH%, Tests: %TEST%...
     
     if /I "%ARCH%" == "gpu" (
-        echo INFO: Configuring GPU build with CUDA support...
-        echo INFO: CUDA_PATH environment variable: %CUDA_PATH%
-        echo INFO: CMAKE_CUDA_COMPILER will be set to: %CUDA_PATH%\bin\nvcc.exe
-        echo INFO: CUDA_TOOLKIT_ROOT_DIR will be set to: %CUDA_PATH%
-        
         if /I "%TEST%" == "on" (
-            echo INFO: Running CMake configuration with GPU build and tests enabled...
-            cmake -DGPU_BUILD=ON -DGTEST=ON ^
-                  -DCMAKE_CUDA_COMPILER="%CUDA_PATH%\bin\nvcc.exe" ^
-                  -DCUDA_TOOLKIT_ROOT_DIR="%CUDA_PATH%" ^
-                  -DCUDAToolkit_ROOT="%CUDA_PATH%" ^
-                  -DCMAKE_VERBOSE_MAKEFILE=ON ^
-                  ..
+            cmake -DGPU_BUILD=ON -DGTEST=ON ..
         ) else (
-            echo INFO: Running CMake configuration with GPU build and tests disabled...
-            cmake -DGPU_BUILD=ON -DGTEST=OFF ^
-                  -DCMAKE_CUDA_COMPILER="%CUDA_PATH%\bin\nvcc.exe" ^
-                  -DCUDA_TOOLKIT_ROOT_DIR="%CUDA_PATH%" ^
-                  -DCUDAToolkit_ROOT="%CUDA_PATH%" ^
-                  -DCMAKE_VERBOSE_MAKEFILE=ON ^
-                  ..
+            cmake -DGPU_BUILD=ON -DGTEST=OFF ..
         )
     ) else (
-        echo INFO: Configuring CPU build...
         if /I "%TEST%" == "on" (
             cmake -DGTEST=ON ..
         ) else (
