@@ -1,0 +1,573 @@
+name: Release on Ubuntu GPU
+
+# GitHub Actions workflow for building and packaging RadarSimPy on Ubuntu platforms.
+#
+# This workflow builds RadarSimPy across multiple Ubuntu LTS versions, Python versions,
+# and build tiers (standard/free). It supports both Ubuntu 22.04 LTS and Ubuntu 24.04 LTS
+# to provide comprehensive Linux coverage with different GCC compiler versions.
+#
+# Build Matrix:
+# - Ubuntu 22.04 LTS: GCC-11 compiler, 10 builds (5 Python × 2 tiers)
+# - Ubuntu 24.04 LTS: GCC-14 compiler, 10 builds (5 Python × 2 tiers)
+# - Python versions: 3.9, 3.10, 3.11, 3.12, 3.13
+# - Build tiers: standard (full features), free (limited features)
+# - Total builds: 20
+#
+# Features:
+# - Comprehensive caching (pip, ccache)
+# - Build optimization with ccache
+# - System dependency management
+# - Artifact verification and validation
+# - Multi-version artifact packing
+# - Detailed build reporting and summaries
+# - Error handling with build log uploads
+# - Ubuntu-specific optimizations
+#
+# Outputs:
+# - Individual artifacts for each build configuration
+# - Packed archive containing all builds organized by Ubuntu version and tier
+# - Build summaries and statistics
+#
+# Triggers:
+# - Tag pushes (release events)
+# - Manual workflow dispatch
+
+on:
+  push:
+    tags:
+      - "*"
+  # Allow manual trigger from the Actions tab
+  workflow_dispatch:
+
+env:
+  # Global environment variables
+  PYTHONUNBUFFERED: 1
+  PYTHONDONTWRITEBYTECODE: 1
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Ubuntu 22.04 with GCC-11 Standard builds
+          - os: ubuntu-22.04
+            python-version: "3.9"
+            c_compiler: gcc-11
+            cxx_compiler: g++-11
+            tier: standard
+            arch: gpu
+            artifact_name: radarsimpy_ubuntu_22_04_py3.9
+          - os: ubuntu-22.04
+            python-version: "3.10"
+            c_compiler: gcc-11
+            cxx_compiler: g++-11
+            tier: standard
+            arch: gpu
+            artifact_name: radarsimpy_ubuntu_22_04_py3.10
+          - os: ubuntu-22.04
+            python-version: "3.11"
+            c_compiler: gcc-11
+            cxx_compiler: g++-11
+            tier: standard
+            arch: gpu
+            artifact_name: radarsimpy_ubuntu_22_04_py3.11
+          - os: ubuntu-22.04
+            python-version: "3.12"
+            c_compiler: gcc-11
+            cxx_compiler: g++-11
+            tier: standard
+            arch: gpu
+            artifact_name: radarsimpy_ubuntu_22_04_py3.12
+          - os: ubuntu-22.04
+            python-version: "3.13"
+            c_compiler: gcc-11
+            cxx_compiler: g++-11
+            tier: standard
+            arch: gpu
+            artifact_name: radarsimpy_ubuntu_22_04_py3.13
+          # Ubuntu 22.04 with GCC-11 Free Tier builds
+          - os: ubuntu-22.04
+            python-version: "3.9"
+            c_compiler: gcc-11
+            cxx_compiler: g++-11
+            tier: free
+            arch: gpu
+            artifact_name: radarsimpy_ubuntu_22_04_py3.9_freetier
+          - os: ubuntu-22.04
+            python-version: "3.10"
+            c_compiler: gcc-11
+            cxx_compiler: g++-11
+            tier: free
+            arch: gpu
+            artifact_name: radarsimpy_ubuntu_22_04_py3.10_freetier
+          - os: ubuntu-22.04
+            python-version: "3.11"
+            c_compiler: gcc-11
+            cxx_compiler: g++-11
+            tier: free
+            arch: gpu
+            artifact_name: radarsimpy_ubuntu_22_04_py3.11_freetier
+          - os: ubuntu-22.04
+            python-version: "3.12"
+            c_compiler: gcc-11
+            cxx_compiler: g++-11
+            tier: free
+            arch: gpu
+            artifact_name: radarsimpy_ubuntu_22_04_py3.12_freetier
+          - os: ubuntu-22.04
+            python-version: "3.13"
+            c_compiler: gcc-11
+            cxx_compiler: g++-11
+            tier: free
+            arch: gpu
+            artifact_name: radarsimpy_ubuntu_22_04_py3.13_freetier
+          # Ubuntu 24.04 with GCC-14 Standard builds
+          - os: ubuntu-24.04
+            python-version: "3.9"
+            c_compiler: gcc-14
+            cxx_compiler: g++-14
+            tier: standard
+            arch: gpu
+            artifact_name: radarsimpy_ubuntu_24_04_py3.9
+          - os: ubuntu-24.04
+            python-version: "3.10"
+            c_compiler: gcc-14
+            cxx_compiler: g++-14
+            tier: standard
+            arch: gpu
+            artifact_name: radarsimpy_ubuntu_24_04_py3.10
+          - os: ubuntu-24.04
+            python-version: "3.11"
+            c_compiler: gcc-14
+            cxx_compiler: g++-14
+            tier: standard
+            arch: gpu
+            artifact_name: radarsimpy_ubuntu_24_04_py3.11
+          - os: ubuntu-24.04
+            python-version: "3.12"
+            c_compiler: gcc-14
+            cxx_compiler: g++-14
+            tier: standard
+            arch: gpu
+            artifact_name: radarsimpy_ubuntu_24_04_py3.12
+          - os: ubuntu-24.04
+            python-version: "3.13"
+            c_compiler: gcc-14
+            cxx_compiler: g++-14
+            tier: standard
+            arch: gpu
+            artifact_name: radarsimpy_ubuntu_24_04_py3.13
+          # Ubuntu 24.04 with GCC-14 Free Tier builds
+          - os: ubuntu-24.04
+            python-version: "3.9"
+            c_compiler: gcc-14
+            cxx_compiler: g++-14
+            tier: free
+            arch: gpu
+            artifact_name: radarsimpy_ubuntu_24_04_py3.9_freetier
+          - os: ubuntu-24.04
+            python-version: "3.10"
+            c_compiler: gcc-14
+            cxx_compiler: g++-14
+            tier: free
+            arch: gpu
+            artifact_name: radarsimpy_ubuntu_24_04_py3.10_freetier
+          - os: ubuntu-24.04
+            python-version: "3.11"
+            c_compiler: gcc-14
+            cxx_compiler: g++-14
+            tier: free
+            arch: gpu
+            artifact_name: radarsimpy_ubuntu_24_04_py3.11_freetier
+          - os: ubuntu-24.04
+            python-version: "3.12"
+            c_compiler: gcc-14
+            cxx_compiler: g++-14
+            tier: free
+            arch: gpu
+            artifact_name: radarsimpy_ubuntu_24_04_py3.12_freetier
+          - os: ubuntu-24.04
+            python-version: "3.13"
+            c_compiler: gcc-14
+            cxx_compiler: g++-14
+            tier: free
+            arch: gpu
+            artifact_name: radarsimpy_ubuntu_24_04_py3.13_freetier
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ssh-key: ${{secrets.RADARSIMC}}
+          submodules: recursive
+          fetch-depth: 0
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+      
+      - name: Cache build dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.ccache
+          key: ${{ runner.os }}-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.tier }}-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.tier }}-
+            ${{ runner.os }}-${{ matrix.os }}-${{ matrix.python-version }}-
+            ${{ runner.os }}-${{ matrix.os }}-
+      
+      - name: Install system dependencies
+        run: |
+          # Update package lists
+          sudo apt-get update
+          
+          # Install ccache for faster compilation
+          sudo apt-get install -y ccache
+          echo "/usr/lib/ccache" >> $GITHUB_PATH
+          
+          # Set up ccache
+          ccache --set-config=max_size=2G
+          ccache --set-config=cache_dir=~/.ccache
+          
+          # Install build dependencies
+          sudo apt-get install -y build-essential
+      
+      - name: Setup CUDA Toolkit
+        uses: Jimver/cuda-toolkit@v0.2.26
+        with:
+          cuda: '12.9.1'
+          method: 'network'
+          sub-packages: '["nvcc", "curand", "cufft", "cublas", "cusparse", "cudart"]'
+          linux-local-args: '["--toolkit", "--silent"]'
+      
+      - name: Verify CUDA installation
+        run: |
+          echo "::group::CUDA Verification"
+          nvcc --version
+          echo "CUDA_PATH: $CUDA_PATH"
+          echo "LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
+          ls -la /usr/local/cuda/bin/ || echo "CUDA bin directory not found"
+          ls -la /usr/local/cuda/lib64/ || echo "CUDA lib64 directory not found"
+          echo "::endgroup::"
+      
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip wheel setuptools
+          pip install -r requirements.txt
+      
+      - name: Display build information
+        run: |
+          echo "::group::Build Information"
+          echo "OS: ${{ matrix.os }}"
+          echo "Python: ${{ matrix.python-version }}"
+          echo "Tier: ${{ matrix.tier }}"
+          echo "Architecture: ${{ matrix.arch }}"
+          echo "C Compiler: ${{ matrix.c_compiler }}"
+          echo "C++ Compiler: ${{ matrix.cxx_compiler }}"
+          echo "CUDA Version: $(nvcc --version | grep 'release' | sed 's/.*release //' | sed 's/,.*//')"
+          echo "::endgroup::"
+          
+          echo "::group::System Information"
+          uname -a
+          lsb_release -a
+          python --version
+          pip --version
+          ${{ matrix.c_compiler }} --version
+          ${{ matrix.cxx_compiler }} --version
+          nvcc --version
+          echo "::endgroup::"
+      
+      - name: Build RadarSimPy
+        env:
+          CC: ${{ matrix.c_compiler }}
+          CXX: ${{ matrix.cxx_compiler }}
+          CCACHE_DIR: ~/.ccache
+          CCACHE_COMPILERCHECK: content
+          CUDA_PATH: /usr/local/cuda
+          CUDA_HOME: /usr/local/cuda
+          LD_LIBRARY_PATH: /usr/local/cuda/lib64:$LD_LIBRARY_PATH
+          PATH: /usr/local/cuda/bin:$PATH
+          CUDACXX: /usr/local/cuda/bin/nvcc
+          CUDA_TOOLKIT_ROOT_DIR: /usr/local/cuda
+          CUDA_ARCH_LIST: "5.0;6.0;7.0;7.5;8.0;8.6;9.0"
+        run: |
+          echo "::group::Build Process"
+          sudo chown -R $USER:$USER /home/runner/work/radarsimpy
+          chmod +x build_linux.sh
+          ./build_linux.sh --tier=${{ matrix.tier }} --arch=${{ matrix.arch }} --test=off --verbose
+          echo "::endgroup::"
+      
+      - name: Display build statistics
+        if: always()
+        run: |
+          echo "::group::Build Statistics"
+          ccache --show-stats
+          echo "::endgroup::"
+      
+      - name: Verify build artifacts
+        run: |
+          echo "::group::Build Verification"
+          ls -la ./radarsimpy/
+          if [ -f "./radarsimpy/__init__.py" ]; then
+            echo "✓ Python module found"
+          else
+            echo "✗ Python module missing"
+            exit 1
+          fi
+          
+          # Check for compiled extensions
+          if find ./radarsimpy -name "*.so" -o -name "*.dylib" -o -name "*.pyd" | grep -q .; then
+            echo "✓ Compiled extensions found:"
+            find ./radarsimpy -name "*.so" -o -name "*.dylib" -o -name "*.pyd"
+          else
+            echo "✗ No compiled extensions found"
+            exit 1
+          fi
+          echo "::endgroup::"
+      
+      - name: Create build summary
+        run: |
+          echo "## Build Summary 🛠️" >> $GITHUB_STEP_SUMMARY
+          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| OS | ${{ matrix.os }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Python Version | ${{ matrix.python-version }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tier | ${{ matrix.tier }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Architecture | ${{ matrix.arch }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Compiler | ${{ matrix.c_compiler }}/${{ matrix.cxx_compiler }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Artifact Name | ${{ matrix.artifact_name }} |" >> $GITHUB_STEP_SUMMARY
+      
+      - name: Archive built module
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ./radarsimpy
+          retention-days: 1
+          compression-level: 6
+      
+      - name: Upload build logs on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: build-logs-${{ matrix.artifact_name }}
+          path: |
+            ./build_logs/
+            *.log
+          retention-days: 1
+
+  # Pack all artifacts into a single file
+  pack-artifacts:
+    needs: build
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: Create artifacts directory
+        run: mkdir -p artifacts
+      
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+      
+      - name: Display downloaded artifacts
+        run: |
+          echo "::group::Downloaded Artifacts"
+          find artifacts/ -type f -name "*.py" -o -name "*.so" -o -name "*.dylib" -o -name "*.pyd" | head -20
+          echo "::endgroup::"
+      
+      - name: Create artifact structure
+        run: |
+          mkdir -p packed/radarsimpy_ubuntu_all
+          
+          # Create the directory structure for Ubuntu versions
+          mkdir -p packed/radarsimpy_ubuntu_all/trial/Ubuntu_22_04_GPU/radarsimpy
+          mkdir -p packed/radarsimpy_ubuntu_all/standard/Ubuntu_22_04_GPU/radarsimpy
+          mkdir -p packed/radarsimpy_ubuntu_all/trial/Ubuntu_24_04_GPU/radarsimpy
+          mkdir -p packed/radarsimpy_ubuntu_all/standard/Ubuntu_24_04_GPU/radarsimpy
+          
+          # Copy each artifact to appropriate directory based on Ubuntu version and tier
+          for dir in artifacts/*/; do
+            if [ -d "$dir" ]; then
+              artifact_name=$(basename "$dir")
+              echo "Processing artifact: $artifact_name"
+              
+              # Determine target directory based on artifact name
+              if [[ "$artifact_name" == *"ubuntu_24_04"* ]]; then
+                # Ubuntu 24.04 builds
+                if [[ "$artifact_name" == *"_freetier"* ]]; then
+                  target_dir="packed/radarsimpy_ubuntu_all/trial/Ubuntu_24_04_GPU/radarsimpy"
+                else
+                  target_dir="packed/radarsimpy_ubuntu_all/standard/Ubuntu_24_04_GPU/radarsimpy"
+                fi
+              else
+                # Ubuntu 22.04 builds
+                if [[ "$artifact_name" == *"_freetier"* ]]; then
+                  target_dir="packed/radarsimpy_ubuntu_all/trial/Ubuntu_22_04_GPU/radarsimpy"
+                else
+                  target_dir="packed/radarsimpy_ubuntu_all/standard/Ubuntu_22_04_GPU/radarsimpy"
+                fi
+              fi
+              
+              # Ensure target directory exists
+              mkdir -p "$target_dir"
+              
+              # Copy the radarsimpy module
+              if [ -d "$dir/radarsimpy" ]; then
+                echo "Copying radarsimpy module from $dir/radarsimpy to $target_dir/"
+                cp -r "$dir/radarsimpy" "$target_dir/"
+              else
+                echo "Copying all contents from $dir to $target_dir/"
+                # If radarsimpy is at root level
+                cp -r "$dir"/* "$target_dir/" 2>/dev/null || true
+              fi
+            fi
+          done
+      
+      - name: Verify artifact structure
+        run: |
+          echo "::group::Artifact Structure Verification"
+          echo "Final directory structure:"
+          find packed/radarsimpy_ubuntu_all -type d | sort
+          echo ""
+          echo "Files in each directory:"
+          for dir in packed/radarsimpy_ubuntu_all/*/Ubuntu_*; do
+            if [ -d "$dir" ]; then
+              echo "Contents of $dir:"
+              ls -la "$dir" || echo "Directory is empty or doesn't exist"
+              echo ""
+            fi
+          done
+          echo "::endgroup::"
+      
+      - name: Create README for packed artifacts
+        run: |
+          cat > packed/radarsimpy_ubuntu_all/README.md << 'EOF'
+          # RadarSimPy Ubuntu Build Artifacts
+          
+          This archive contains all RadarSimPy builds for Ubuntu platforms organized by version and tier.
+          
+          ## Directory Structure
+          
+          The builds are organized in the following structure:
+          
+          ```
+          standard/
+          ├── Ubuntu_22_04_GPU/
+          │   └── radarsimpy/
+          └── Ubuntu_24_04_GPU/
+              └── radarsimpy/
+          
+          trial/
+          ├── Ubuntu_22_04_GPU/
+          │   └── radarsimpy/
+          └── Ubuntu_24_04_GPU/
+              └── radarsimpy/
+          ```
+          
+          ## Version and Tier Information
+          
+          ### Ubuntu_22_04_GPU (Ubuntu 22.04 LTS)
+          - **standard/**: Full-featured builds with all capabilities
+          - **trial/**: Free tier builds with limited features
+          - Built with GCC-11 compiler
+          
+          ### Ubuntu_24_04_GPU (Ubuntu 24.04 LTS)
+          - **standard/**: Full-featured builds with all capabilities  
+          - **trial/**: Free tier builds with limited features
+          - Built with GCC-14 compiler
+
+          ## Build Information
+          
+          - **Total Builds**: 20
+          - **Ubuntu Versions**: 22.04 LTS, 24.04 LTS
+          - **Python Versions**: 3.9, 3.10, 3.11, 3.12, 3.13
+          - **Tiers**: Standard (full features), Trial (limited features)
+          - **Build Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+
+          EOF
+      
+      - name: Create compressed archive
+        run: |
+          cd packed
+          tar -czf radarsimpy_ubuntu_all_builds.tar.gz radarsimpy_ubuntu_all/
+          
+          # Create zip version as well
+          zip -r radarsimpy_ubuntu_all_builds.zip radarsimpy_ubuntu_all/
+          
+          echo "::group::Archive Information"
+          ls -lh *.tar.gz *.zip
+          echo "::endgroup::"
+      
+      - name: Upload packed artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: radarsimpy_ubuntu_all_builds
+          path: |
+            packed/radarsimpy_ubuntu_all_builds.tar.gz
+            packed/radarsimpy_ubuntu_all_builds.zip
+          retention-days: 1
+          compression-level: 0
+
+  # Summary job that runs after all builds complete
+  build-summary:
+    needs: [build, pack-artifacts]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Generate build summary
+        run: |
+          echo "# Ubuntu Build Summary 📊" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Build Matrix Results" >> $GITHUB_STEP_SUMMARY
+          echo "Total builds: 20 (5 Python versions × 2 Ubuntu versions × 2 tiers)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Ubuntu Version Distribution" >> $GITHUB_STEP_SUMMARY
+          echo "- **Ubuntu 22.04 LTS**: 10 builds with GCC-11" >> $GITHUB_STEP_SUMMARY
+          echo "- **Ubuntu 24.04 LTS**: 10 builds with GCC-14" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Tier Distribution" >> $GITHUB_STEP_SUMMARY
+          echo "- **Standard**: 10 builds" >> $GITHUB_STEP_SUMMARY
+          echo "- **Free**: 10 builds" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Python Versions" >> $GITHUB_STEP_SUMMARY
+          echo "- Python 3.9, 3.10, 3.11, 3.12, 3.13" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Packed Artifacts" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.pack-artifacts.result }}" == "success" ]; then
+            echo "✅ **All artifacts successfully packed into single archive**" >> $GITHUB_STEP_SUMMARY
+            echo "- Archive: \`radarsimpy_ubuntu_all_builds\`" >> $GITHUB_STEP_SUMMARY
+            echo "- Formats: tar.gz, zip" >> $GITHUB_STEP_SUMMARY
+            echo "- Contains: All 20 build variants organized by configuration" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ **Artifact packing failed or was skipped**" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Build Status" >> $GITHUB_STEP_SUMMARY
+          echo "Check individual job results above for detailed build information." >> $GITHUB_STEP_SUMMARY
+          
+          # Check if any builds failed
+          if [ "${{ needs.build.result }}" != "success" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ **Some builds may have failed. Check individual job logs for details.**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **All builds completed successfully!**" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "Check individual job results above for detailed build information." >> $GITHUB_STEP_SUMMARY
+          
+          # Check if any builds failed
+          if [ "${{ needs.build.result }}" != "success" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ **Some builds may have failed. Check individual job logs for details.**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **All builds completed successfully!**" >> $GITHUB_STEP_SUMMARY
+          fi
