@@ -276,37 +276,6 @@ REM Validate build environment
             set MISSING_DEPS=1
         ) else (
             echo INFO: CUDA toolkit found and available
-            
-            REM Check if CUDA_PATH is set
-            if "%CUDA_PATH%" == "" (
-                echo WARNING: CUDA_PATH environment variable is not set
-                echo Attempting to detect CUDA installation...
-                
-                REM Try to find CUDA installation
-                for /f "tokens=2*" %%i in ('reg query "HKEY_LOCAL_MACHINE\SOFTWARE\NVIDIA Corporation\GPU Computing Toolkit\CUDA" /s /f "InstallDir" 2^>nul') do (
-                    set "DETECTED_CUDA_PATH=%%j"
-                    echo INFO: Detected CUDA installation at: !DETECTED_CUDA_PATH!
-                    set "CUDA_PATH=!DETECTED_CUDA_PATH!"
-                    goto :cuda_found
-                )
-                
-                REM If registry lookup fails, try common installation paths
-                if exist "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.0" (
-                    set "CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.0"
-                    echo INFO: Found CUDA at: !CUDA_PATH!
-                ) else if exist "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8" (
-                    set "CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8"
-                    echo INFO: Found CUDA at: !CUDA_PATH!
-                ) else (
-                    echo ERROR: Could not detect CUDA installation path
-                    echo Please set CUDA_PATH environment variable manually
-                    set MISSING_DEPS=1
-                )
-                
-                :cuda_found
-            ) else (
-                echo INFO: CUDA_PATH is set to: %CUDA_PATH%
-            )
         )
     )
     
