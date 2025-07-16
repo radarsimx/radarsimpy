@@ -5,19 +5,43 @@ REM ============================================================================
 REM RadarSimPy Build Script for Windows
 REM ==============================================================================
 REM
-REM This script builds the RadarSimPy radar simulation library for Windows.
-REM It supports both CPU (OpenMP) and GPU (CUDA) architectures with optional
-REM unit testing using Google Test and pytest.
+REM DESCRIPTION:
+REM   This script automates the build process for RadarSimPy on Windows systems.
+REM   It compiles the C++ library (radarsimcpp.dll) and builds Python extensions 
+REM   using Cython, providing a complete build pipeline with comprehensive error 
+REM   handling and logging optimized for Windows platforms.
 REM
-REM Requirements:
+REM REQUIREMENTS:
 REM   - CMake 3.18 or higher
 REM   - Visual Studio 2019 or higher (with C++ tools)
-REM   - Python 3.7 or higher with Cython
-REM   - CUDA SDK (for GPU builds)
-REM   - pytest (for Python tests)
+REM   - Python 3.9 or higher
+REM   - MSVC compiler (Visual Studio Build Tools)
+REM   - CUDA toolkit (for GPU builds)
+REM   - Python packages: check requirements.txt for details
 REM
-REM Usage:
-REM   build_win.bat [--tier=<standard|free>] [--arch=<cpu|gpu>] [--test=<on|off>] [--jobs=<auto|number>]
+REM USAGE:
+REM   build.bat [OPTIONS]
+REM
+REM OPTIONS:
+REM   --help              Show help message
+REM   --tier=TIER         Build tier: 'standard' or 'free' (default: standard)
+REM   --arch=ARCH         Build architecture: 'cpu' or 'gpu' (default: cpu)
+REM   --test=TEST         Enable unit tests: 'on' or 'off' (default: on)
+REM   --jobs=N            Number of parallel build jobs (default: auto-detect)
+REM
+REM EXAMPLES:
+REM   build.bat                                    REM Default build
+REM   build.bat --tier=free --arch=gpu           REM GPU build with free tier
+REM   build.bat --jobs=8 --test=off              REM 8-core parallel build, no tests
+REM   build.bat --arch=cpu --tier=standard       REM CPU build with standard tier
+REM
+REM EXIT CODES:
+REM   0  - Success
+REM   1  - General error (missing dependencies, validation failure, etc.)
+REM
+REM FILES CREATED:
+REM   - .\radarsimpy\                             REM Output directory with built libraries
+REM   - .\build_logs\windows_batch_build_log_YYYYMMDD_HHMMSS.log  REM Timestamped build log
 REM
 REM ==============================================================================
 
@@ -34,32 +58,72 @@ REM Initialize error tracking
 set CMAKE_FAILED=0
 set PYTHON_BUILD_FAILED=0
 set TEST_FAILED=0
+set MISSING_DEPS=0
 
 goto GETOPTS
 
 REM Help section - displays command line parameter usage
 :Help
     echo.
-    echo RadarSimPy Build Script for Windows
+    echo Usage: build.bat [OPTIONS]
     echo.
-    echo Usage:
-    echo   build_win.bat [OPTIONS]
+    echo Cross-platform build script for RadarSimPy - A Radar Simulator Built with Python
+    echo Optimized for Windows platforms with automatic dependency detection.
     echo.
-    echo Options:
-    echo   --help    Show this help message
-    echo   --tier    Build tier: 'standard' or 'free' - default: standard
-    echo   --arch    Build architecture: 'cpu' or 'gpu' - default: cpu
-    echo   --test    Enable unit tests: 'on' or 'off' - default: on
-    echo   --jobs    Number of parallel jobs: 'auto' or number - default: auto
+    echo Current Platform: Windows
     echo.
-    echo Examples:
-    echo   build_win.bat --arch=gpu --test=off
-    echo   build_win.bat --tier=free --arch=cpu --jobs=4
-    echo   build_win.bat --jobs=auto
+    echo OPTIONS:
+    echo   --help              Show this help message
+    echo   --tier=TIER         Build tier: 'standard' or 'free' (default: standard)
+    echo   --arch=ARCH         Build architecture: 'cpu' or 'gpu' (default: cpu)
+    echo   --test=TEST         Enable unit tests: 'on' or 'off' (default: on)
+    echo   --jobs=N            Number of parallel build jobs (default: auto-detect)
+    echo.
+    echo EXAMPLES:
+    echo   %~nx0                                    # Default build
+    echo   %~nx0 --tier=free --arch=gpu           # GPU build with free tier
+    echo   %~nx0 --jobs=8 --test=off              # 8-core parallel build, no tests
+    echo   %~nx0 --arch=cpu --tier=standard       # CPU build with standard tier
+    echo.
+    echo WINDOWS-SPECIFIC NOTES:
+    echo   - Uses MSVC compiler, creates .dll files
+    echo   - Requires Visual Studio Build Tools or Visual Studio
+    echo   - Supports both x64 and x86 architectures
+    echo   - GPU builds require CUDA toolkit
+    echo.
+    echo EXIT CODES:
+    echo   0  - Success
+    echo   1  - General error (missing dependencies, validation failure, etc.)
+    echo.
+    echo FILES CREATED:
+    echo   - .\radarsimpy\                           # Output directory with built libraries
+    echo   - .\build_logs\windows_batch_build_log_YYYYMMDD_HHMMSS.log  # Timestamped build log
     echo.
     goto EOF
 
 REM Command line parameter parsing section
+REM
+REM GETOPTS() - Parses command line arguments and sets global configuration
+REM Description:
+REM   Processes all command line arguments passed to the script and sets global
+REM   configuration variables. Handles both parameter validation and default value
+REM   assignment. Also handles special cases like --help and automatic CPU detection.
+REM Arguments:
+REM   %1, %2, ... - Command line arguments passed to the script
+REM Global Variables Set:
+REM   TIER - Build tier (standard/free)
+REM   ARCH - Build architecture (cpu/gpu)
+REM   TEST - Unit test flag (on/off)
+REM   JOBS - Number of parallel build jobs
+REM Supported Options:
+REM   --help: Shows help and exits
+REM   --tier=VALUE: Sets build tier
+REM   --arch=VALUE: Sets architecture
+REM   --test=VALUE: Enables/disables tests
+REM   --jobs=VALUE: Sets parallel job count
+REM Exit:
+REM   Exits with code 0 on --help
+REM   Exits with code 1 on unknown options or validation errors
 :GETOPTS
     REM Parse command line arguments
     if /I "%1" == "--help" goto Help
@@ -141,22 +205,37 @@ REM Command line parameter parsing section
 
 REM Validate build environment
 :VALIDATE_ENVIRONMENT
-    echo INFO: Validating build environment...
+    echo INFO: Validating build environment for Windows...
+    set MISSING_DEPS=0
     
     REM Check for CMake
     cmake --version >nul 2>&1
     if %errorlevel% neq 0 (
         echo ERROR: CMake is not installed or not in PATH
         echo Please install CMake 3.18 or higher
-        goto ERROR_EXIT
+        set MISSING_DEPS=1
+    ) else (
+        echo INFO: CMake found and available
     )
     
     REM Check for Python
     python --version >nul 2>&1
     if %errorlevel% neq 0 (
         echo ERROR: Python is not installed or not in PATH
-        echo Please install Python 3.7 or higher
-        goto ERROR_EXIT
+        echo Please install Python 3.9 or higher
+        set MISSING_DEPS=1
+    ) else (
+        echo INFO: Python found and available
+    )
+    
+    REM Check for MSVC compiler (Visual Studio Build Tools)
+    cl.exe >nul 2>&1
+    if %errorlevel% neq 0 (
+        echo WARNING: MSVC compiler not found in PATH
+        echo Make sure Visual Studio Build Tools are installed and properly configured
+        echo You may need to run this script from a Visual Studio Command Prompt
+    ) else (
+        echo INFO: MSVC compiler found and available
     )
     
     REM Check for CUDA if GPU build is requested
@@ -165,7 +244,9 @@ REM Validate build environment
         if %errorlevel% neq 0 (
             echo ERROR: CUDA toolkit is not installed or not in PATH
             echo Please install CUDA SDK for GPU builds
-            goto ERROR_EXIT
+            set MISSING_DEPS=1
+        ) else (
+            echo INFO: CUDA toolkit found and available
         )
     )
     
@@ -175,8 +256,26 @@ REM Validate build environment
         if %errorlevel% neq 0 (
             echo WARNING: pytest is not installed or not in PATH
             echo Python tests will be skipped
+        ) else (
+            echo INFO: pytest found and available
         )
     )
+    
+    REM Check for Python packages
+    python -c "import setuptools, Cython" >nul 2>&1
+    if %errorlevel% neq 0 (
+        echo WARNING: Python setuptools or Cython not found
+        echo Please install required Python packages: pip install setuptools Cython
+    ) else (
+        echo INFO: Required Python packages found
+    )
+    
+    if %MISSING_DEPS% equ 1 (
+        echo ERROR: Missing required dependencies. Please install them and try again.
+        goto ERROR_EXIT
+    )
+    
+    echo INFO: All system requirements satisfied for Windows
 
 REM Display banner and copyright information
 :DISPLAY_BANNER
@@ -188,12 +287,14 @@ REM Display banner and copyright information
     echo Website: https://radarsimx.com
     echo ====================================================================
     echo.
-    echo Build Configuration:
-    echo   Tier: %TIER%
-    echo   Architecture: %ARCH%
-    echo   Tests: %TEST%
-    echo   Build Type: %BUILD_TYPE%
-    echo   Parallel Jobs: %JOBS%
+    echo Build Configuration (Windows):
+    echo   - Platform: Windows
+    echo   - Tier: %TIER%
+    echo   - Architecture: %ARCH%
+    echo   - Tests: %TEST%
+    echo   - Build Type: %BUILD_TYPE%
+    echo   - Parallel Jobs: %JOBS%
+    echo   - Script Directory: %SCRIPT_DIR%
     echo.
     echo ######                               #####           #     # 
     echo #     #   ##   #####    ##   #####  #     # # #    #  #   #  
@@ -213,6 +314,20 @@ REM Start build process
     echo INFO: Current directory: %PWD%
 
 REM Clean up previous build artifacts
+REM
+REM CLEAN_BUILD() - Removes all previous build artifacts and temporary files
+REM Description:
+REM   Performs comprehensive cleanup of all build-related directories and files
+REM   to ensure a clean build environment. This includes C++ build directories,
+REM   Python module directories, and temporary build files.
+REM Arguments:
+REM   None
+REM Directories Cleaned:
+REM   - .\src\radarsimcpp\build - C++ build directory
+REM   - .\radarsimpy - Python module output directory
+REM   - .\build - Python build temporary directory
+REM Error Handling:
+REM   Continues on cleanup failures with warnings (non-fatal)
 :CLEAN_BUILD
     echo INFO: Cleaning previous build artifacts...
     
@@ -238,6 +353,24 @@ REM Clean up previous build artifacts
     )
 
 REM Build C++ library
+REM
+REM BUILD_CPP() - Builds the RadarSimCpp C++ library using CMake
+REM Description:
+REM   Configures and builds the C++ library component using CMake with appropriate
+REM   settings for the target architecture (CPU/GPU) and test configuration.
+REM   Uses Visual Studio generators for Windows compatibility.
+REM Arguments:
+REM   None
+REM Global Variables Used:
+REM   ARCH - Determines GPU_BUILD CMake option
+REM   TEST - Determines GTEST CMake option
+REM   BUILD_TYPE - CMake build configuration (Release/Debug)
+REM   JOBS - Number of parallel build jobs
+REM Output:
+REM   - radarsimcpp.dll in .\src\radarsimcpp\build\%BUILD_TYPE%\
+REM   - radarsimcpp_test.exe (if tests enabled)
+REM Error Handling:
+REM   Sets CMAKE_FAILED=1 and exits on any CMake failures
 :BUILD_CPP
     echo INFO: Building RadarSimCpp library...
     
@@ -292,6 +425,21 @@ REM Build C++ library
     echo INFO: C++ library build completed successfully
 
 REM Build Python extensions
+REM
+REM BUILD_PYTHON() - Builds Python extensions using Cython and setup.py
+REM Description:
+REM   Compiles Python extensions using Cython, linking against the previously
+REM   built C++ library. Uses setup.py with tier and architecture parameters.
+REM Arguments:
+REM   None
+REM Global Variables Used:
+REM   TIER - Build tier passed to setup.py
+REM   ARCH - Architecture passed to setup.py
+REM   PWD - Working directory for build context
+REM Output:
+REM   - Python extension files (.pyd) in current directory
+REM Error Handling:
+REM   Sets PYTHON_BUILD_FAILED=1 and exits on setup.py failures
 :BUILD_PYTHON
     echo INFO: Building Python extensions with Cython...
     
@@ -380,6 +528,23 @@ REM Clean up intermediate build files
     echo INFO: Intermediate files cleaned
 
 REM Run tests if enabled
+REM
+REM RUN_TESTS() - Executes unit tests for both C++ and Python components
+REM Description:
+REM   Runs comprehensive test suites including Google Test for C++ components
+REM   and pytest for Python components. Tests are only executed if enabled
+REM   via the --test=on parameter.
+REM Arguments:
+REM   None
+REM Global Variables Used:
+REM   TEST - Determines if tests should be executed
+REM   BUILD_TYPE - Used to locate test executables
+REM Tests Executed:
+REM   - Google Test (radarsimcpp_test.exe) via CTest
+REM   - Python tests via pytest
+REM Error Handling:
+REM   Sets TEST_FAILED=1 on any test failures
+REM   Continues with warnings if test tools are not available
 :RUN_TESTS
     if /I "%TEST%" == "off" (
         echo INFO: Tests are disabled, skipping test execution
@@ -432,22 +597,27 @@ REM Build completion
     echo BUILD COMPLETED SUCCESSFULLY
     echo ====================================================================
     echo.
-    echo Build Summary:
-    echo   Tier: %TIER%
-    echo   Architecture: %ARCH%
-    echo   Tests: %TEST%
-    echo   Build Type: %BUILD_TYPE%
-    echo   Parallel Jobs: %JOBS%
+    echo Build Summary (Windows):
+    echo   - Platform: Windows
+    echo   - Tier: %TIER%
+    echo   - Architecture: %ARCH%
+    echo   - Tests: %TEST%
+    echo   - Build Type: %BUILD_TYPE%
+    echo   - Parallel Jobs: %JOBS%
+    echo   - Script Directory: %SCRIPT_DIR%
     echo.
-    echo Output Location:
-    echo   C++ Library: .\src\radarsimcpp\build\%BUILD_TYPE%\
-    echo   Python Module: .\radarsimpy\
+    echo Output Locations:
+    echo   - C++ Library: .\src\radarsimcpp\build\%BUILD_TYPE%\
+    echo   - Python Module: .\radarsimpy\
+    echo   - DLL File: .\radarsimpy\radarsimcpp.dll
     echo.
     if /I "%TEST%" == "on" (
-        echo All tests passed successfully
+        echo Test Results: All tests passed successfully
     ) else (
-        echo Tests were skipped - disabled
+        echo Test Results: Tests were skipped (disabled)
     )
+    echo.
+    echo Build completed at: %DATE% %TIME%
     echo.
     echo ====================================================================
     
@@ -460,12 +630,28 @@ REM Error handling
     echo BUILD FAILED
     echo ====================================================================
     echo.
-    echo Error Summary:
-    if %CMAKE_FAILED% neq 0 echo   - CMake build failed
-    if %PYTHON_BUILD_FAILED% neq 0 echo   - Python build failed
-    if %TEST_FAILED% neq 0 echo   - Tests failed
+    echo Build Configuration (Windows):
+    echo   - Platform: Windows
+    echo   - Tier: %TIER%
+    echo   - Architecture: %ARCH%
+    echo   - Tests: %TEST%
+    echo   - Build Type: %BUILD_TYPE%
+    echo   - Parallel Jobs: %JOBS%
     echo.
-    echo Please check the error messages above and fix the issues.
+    echo Error Summary:
+    if %CMAKE_FAILED% neq 0 echo   - CMake configuration or build failed
+    if %PYTHON_BUILD_FAILED% neq 0 echo   - Python extension build failed
+    if %TEST_FAILED% neq 0 echo   - Unit tests failed
+    if %MISSING_DEPS% neq 0 echo   - Missing required dependencies
+    echo.
+    echo Troubleshooting:
+    echo   - Ensure all required dependencies are installed
+    echo   - Check that Visual Studio Build Tools are properly configured
+    echo   - For GPU builds, verify CUDA toolkit installation
+    echo   - Try running from a Visual Studio Command Prompt
+    echo   - Check the build logs for detailed error messages
+    echo.
+    echo Build failed at: %DATE% %TIME%
     echo.
     echo ====================================================================
     
