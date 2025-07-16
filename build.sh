@@ -12,37 +12,18 @@
 #
 # REQUIREMENTS:
 #   Linux:
-#   - Linux operating system
 #   - CMake 3.18 or higher
 #   - Python 3.9 or higher
 #   - GCC/G++ compiler
 #   - CUDA toolkit (for GPU builds)
-#   - Python packages: setuptools, Cython
-#   - pytest (for running tests)
+#   - Python packages: check requirements.txt for details
 #
 #   macOS:
-#   - macOS 10.14 (Mojave) or later
 #   - Xcode Command Line Tools
 #   - CMake 3.18 or higher
 #   - Python 3.9 or higher
 #   - Clang/Clang++ compiler
-#   - Python packages: setuptools, Cython
-#   - pytest (for running tests)
-#
-# FEATURES:
-#   - Cross-platform compatibility (Linux and macOS)
-#   - Automatic platform detection and adaptation
-#   - Platform-specific dependency checking
-#   - Parallel build support with auto-detection of CPU cores
-#   - Comprehensive logging with timestamped log files
-#   - Color-coded console output
-#   - Robust error handling with cleanup procedures
-#   - Support for both CPU and GPU architectures
-#   - Configurable build tiers (standard/free)
-#   - Optional unit testing with Google Test and pytest
-#   - Customizable CMake arguments
-#   - Build artifact management
-#   - Platform-specific library handling (.so/.dylib files)
+#   - Python packages: check requirements.txt for details
 #
 # USAGE:
 #   ./build.sh [OPTIONS]
@@ -72,27 +53,6 @@
 # FILES CREATED:
 #   - ./radarsimpy/                        # Output directory with built libraries
 #   - ./build_logs/${PLATFORM_NAME}_build_YYYYMMDD_HHMMSS.log          # Timestamped build log
-#
-# PLATFORM-SPECIFIC NOTES:
-#   Linux:
-#   - Uses GCC/G++ compiler
-#   - Creates .so files
-#   - Uses nproc for CPU core detection
-#   
-#   macOS:
-#   - Uses Clang/Clang++ compiler
-#   - Creates .dylib files instead of .so files
-#   - Requires Xcode Command Line Tools for development headers
-#   - Uses sysctl for CPU core detection
-#   - Optimized for Apple Silicon and Intel processors
-#
-# NOTES:
-#   - The script uses 'set -euo pipefail' for strict error handling
-#   - All build artifacts are cleaned up automatically on failure
-#   - Log files are preserved for debugging purposes
-#   - GPU builds require NVIDIA CUDA toolkit to be installed
-#   - The script validates all parameters before starting the build
-#   - Compatible with both Intel and Apple Silicon Macs
 #
 #===============================================================================
 
