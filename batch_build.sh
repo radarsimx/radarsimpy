@@ -241,16 +241,16 @@ cleanup_temp_files() {
     log_info "Cleaning temporary files..."
 
     # Clean generated files
-    rm -f "./src/radarsimpy/*.c"
-    rm -f "./src/radarsimpy/*.cpp"
-    rm -f "./src/radarsimpy/*.html"
-    rm -f "./src/radarsimpy/raytracing/*.c"
-    rm -f "./src/radarsimpy/raytracing/*.cpp"
-    rm -f "./src/radarsimpy/raytracing/*.html"
-    rm -f "./src/radarsimpy/lib/*.cpp"
-    rm -f "./src/radarsimpy/lib/*.html"
-    rm -f "./src/*.cpp"
-    rm -f "./src/*.html"
+    rm -f ./src/radarsimpy/*.c
+    rm -f ./src/radarsimpy/*.cpp
+    rm -f ./src/radarsimpy/*.html
+    rm -f ./src/radarsimpy/raytracing/*.c
+    rm -f ./src/radarsimpy/raytracing/*.cpp
+    rm -f ./src/radarsimpy/raytracing/*.html
+    rm -f ./src/radarsimpy/lib/*.cpp
+    rm -f ./src/radarsimpy/lib/*.html
+    rm -f ./src/*.cpp
+    rm -f ./src/*.html
     return 0
 }
 
