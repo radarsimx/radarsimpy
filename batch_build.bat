@@ -23,6 +23,16 @@ SET SKIP_TESTS=false
 SET VERBOSE=false
 SET JOBS=auto
 
+REM ===============================================================================
+REM :parse_args - Parse command line arguments into script variables
+REM Description:
+REM   Processes switches (--tier, --arch, --skip-tests, --verbose, --jobs, --help)
+REM   and assigns corresponding environment variables.
+REM   Unknown options trigger help and exit.
+REM Arguments:
+REM   %1, %2 - Current and next CLI tokens
+REM Returns:
+REM   Exits on --help or invalid argument with appropriate code.
 :parse_args
 IF "%~1"=="" GOTO :args_done
 IF /I "%~1"=="--tier" (
@@ -158,6 +168,13 @@ REM ============================================================================
 REM CORE BUILD FUNCTIONS
 REM ============================================================================
 
+REM ===============================================================================
+REM :build_all_combinations - Build all requested tier/architecture combos
+REM Description:
+REM   Determines arch_list (cpu,gpu) and tier_list (free,standard), then loops
+REM   over each combination invoking :build_single_combination.
+REM Returns:
+REM   Exits with error if any build fails; otherwise continues.
 :build_all_combinations
 CALL :log_info "Building all requested combinations..."
 
@@ -187,6 +204,15 @@ FOR %%a IN (%arch_list%) DO (
 
 EXIT /B 0
 
+REM ===============================================================================
+REM :build_single_combination - Build one tier/architecture combination
+REM Description:
+REM   Calls C++ build, Python extension build, copy, cleanup, and distribution.
+REM Arguments:
+REM   %~1 = architecture (cpu|gpu)
+REM   %~2 = tier (free|standard)
+REM Returns:
+REM   Exits with nonzero on any step failure.
 :build_single_combination
 SET build_arch=%~1
 SET build_tier=%~2
@@ -216,6 +242,14 @@ RMDIR /Q/S ".\radarsimpy" 2>NUL
 
 EXIT /B 0
 
+REM ===============================================================================
+REM :build_cpp_library - Compile C++ library for specified architecture
+REM Description:
+REM   Configures and invokes CMake to build the radarsimcpp project.
+REM Arguments:
+REM   %~1 = architecture (cpu|gpu) to determine GPU flags.
+REM Returns:
+REM   Exits nonzero if configuration or build fails.
 :build_cpp_library
 SET build_arch=%~1
 CALL :log_info "Building C++ library for %build_arch% architecture..."
@@ -257,6 +291,15 @@ CD "%pwd%"
 CALL :log_info "C++ library built successfully for %build_arch%."
 EXIT /B 0
 
+REM ===============================================================================
+REM :build_python_extensions - Build Python extensions via setup.py
+REM Description:
+REM   Iterates over defined conda envs, runs `python setup.py build_ext` with
+REM   tier and arch flags. Warnings on per-env failure.
+REM Arguments:
+REM   %~1 = tier, %~2 = architecture
+REM Returns:
+REM   Always exits 0 (warnings only).
 :build_python_extensions
 SET build_tier=%~1
 SET build_arch=%~2
@@ -277,6 +320,12 @@ FOR %%v IN (%PYTHON_VERSIONS%) DO (
 )
 EXIT /B 0
 
+REM ===============================================================================
+REM :copy_built_files - Copy compiled artifacts to radarsimpy folder
+REM Description:
+REM   Copies DLL, .py modules, and lib\__init__.py into output directory.
+REM Returns:
+REM   Exits nonzero on any copy error.
 :copy_built_files
 CALL :log_info "Copying built files..."
 
@@ -305,6 +354,14 @@ IF !ERRORLEVEL! NEQ 0 (
 
 EXIT /B 0
 
+REM ===============================================================================
+REM :create_distribution - Package into release\<tier>\Windows_x86_64_<ARCH>
+REM Description:
+REM   Cleans or creates dist folder, then XCOPY radarsimpy tree into it.
+REM Arguments:
+REM   %~1 = tier, %~2 = architecture
+REM Returns:
+REM   Exits nonzero on any copy error.
 :create_distribution
 SET build_tier=%~1
 SET build_arch=%~2
@@ -336,6 +393,14 @@ REM ============================================================================
 REM UTILITY FUNCTIONS
 REM ============================================================================
 
+REM ===============================================================================
+REM :show_help - Display script usage, options, and examples
+REM Description:
+REM   Prints detailed help text and exits with code 0.
+REM Arguments:
+REM   None
+REM Returns:
+REM   0
 :show_help
 ECHO Usage: %~nx0 [options]
 ECHO.
@@ -359,18 +424,42 @@ REM ============================================================================
 REM LOGGING FUNCTIONS
 REM ============================================================================
 
+REM ===============================================================================
+REM :log_info - Log informational message
+REM Description:
+REM   Echoes [INFO] prefix to console and appends to %BUILD_LOG%.
+REM Arguments:
+REM   %~1 = message text
+REM Returns:
+REM   Always exits 0.
 :log_info
 SET msg=%~1
 ECHO [INFO] %msg%
 ECHO [%DATE% %TIME%] [INFO] %msg% >> "%BUILD_LOG%"
 EXIT /B 0
 
+REM ===============================================================================
+REM :log_error - Log error message
+REM Description:
+REM   Echoes [ERROR] prefix to console and appends to %BUILD_LOG%.
+REM Arguments:
+REM   %~1 = message text
+REM Returns:
+REM   Always exits 0.
 :log_error
 SET msg=%~1
 ECHO [ERROR] %msg%
 ECHO [%DATE% %TIME%] [ERROR] %msg% >> "%BUILD_LOG%"
 EXIT /B 0
 
+REM ===============================================================================
+REM :log_warning - Log warning message
+REM Description:
+REM   Echoes [WARNING] prefix to console and appends to %BUILD_LOG%.
+REM Arguments:
+REM   %~1 = message text
+REM Returns:
+REM   Always exits 0.
 :log_warning
 SET msg=%~1
 ECHO [WARNING] %msg%
@@ -381,6 +470,12 @@ REM ============================================================================
 REM PREREQUISITE CHECK FUNCTIONS
 REM ============================================================================
 
+REM ===============================================================================
+REM :check_prerequisites - Verify required tools and Python envs
+REM Description:
+REM   Checks CMake, CUDA (if needed), and each conda environment.
+REM Returns:
+REM   Exits nonzero if any requirement is missing.
 :check_prerequisites
 CALL :log_info "Checking prerequisites..."
 
@@ -426,6 +521,12 @@ IF "%missing_envs%"=="true" (
 CALL :log_info "Prerequisites check completed."
 EXIT /B 0
 
+REM ===============================================================================
+REM :check_cuda_prerequisites - Verify CUDA toolkit availability
+REM Description:
+REM   Checks nvcc and nvidia-smi presence for GPU builds.
+REM Returns:
+REM   Exits nonzero on missing CUDA tools.
 :check_cuda_prerequisites
 CALL :log_info "Checking CUDA prerequisites..."
 
@@ -454,6 +555,12 @@ REM ============================================================================
 REM CLEANUP FUNCTIONS
 REM ============================================================================
 
+REM ===============================================================================
+REM :cleanup_build_artifacts - Remove previous build outputs
+REM Description:
+REM   Deletes build directories, radarsimpy output, and calls cleanup_temp_files.
+REM Returns:
+REM   Always exits 0.
 :cleanup_build_artifacts
 CALL :log_info "Cleaning up previous build artifacts..."
 
@@ -471,6 +578,12 @@ IF EXIST ".\build" (
 CALL :cleanup_temp_files
 EXIT /B 0
 
+REM ===============================================================================
+REM :cleanup_temp_files - Remove generated source and HTML files
+REM Description:
+REM   Deletes .c, .cpp, and .html files from src\radsimpy tree.
+REM Returns:
+REM   Always exits 0.
 :cleanup_temp_files
 CALL :log_info "Cleaning temporary files..."
 
@@ -490,6 +603,12 @@ REM ============================================================================
 REM TEST FUNCTIONS
 REM ============================================================================
 
+REM ===============================================================================
+REM :run_tests - Execute unit tests using CTest
+REM Description:
+REM   Runs Google Test via CTest if executable exists; logs pass/fail.
+REM Returns:
+REM   Exits nonzero on test failure.
 :run_tests
 CALL :log_info "Running unit tests..."
 

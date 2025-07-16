@@ -13,9 +13,9 @@ REM   handling and logging optimized for Windows platforms.
 REM
 REM REQUIREMENTS:
 REM   - CMake 3.18 or higher
-REM   - Visual Studio 2019 or higher (with C++ tools)
+REM   - Visual Studio 2017 or later (with C++ tools) or Visual Studio Build Tools
 REM   - Python 3.9 or higher
-REM   - MSVC compiler (Visual Studio Build Tools)
+REM   - MSVC compiler (automatically detected via vswhere)
 REM   - CUDA toolkit (for GPU builds)
 REM   - Python packages: check requirements.txt for details
 REM
@@ -59,6 +59,7 @@ set CMAKE_FAILED=0
 set PYTHON_BUILD_FAILED=0
 set TEST_FAILED=0
 set MISSING_DEPS=0
+set VS_FOUND=0
 
 goto GETOPTS
 
@@ -87,7 +88,8 @@ REM Help section - displays command line parameter usage
     echo.
     echo WINDOWS-SPECIFIC NOTES:
     echo   - Uses MSVC compiler, creates .dll files
-    echo   - Requires Visual Studio Build Tools or Visual Studio
+    echo   - Automatically detects Visual Studio installations using vswhere
+    echo   - Requires Visual Studio 2017 or later with C++ development tools
     echo   - Supports both x64 and x86 architectures
     echo   - GPU builds require CUDA toolkit
     echo.
@@ -228,14 +230,41 @@ REM Validate build environment
         echo INFO: Python found and available
     )
     
-    REM Check for MSVC compiler (Visual Studio Build Tools)
-    cl.exe >nul 2>&1
-    if %errorlevel% neq 0 (
-        echo WARNING: MSVC compiler not found in PATH
-        echo Make sure Visual Studio Build Tools are installed and properly configured
-        echo You may need to run this script from a Visual Studio Command Prompt
+    REM Check for MSVC compiler (Visual Studio Build Tools) using vswhere
+    set VS_FOUND=0
+    set VSWHERE_PATH="%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
+    
+    REM Check if vswhere exists
+    if exist %VSWHERE_PATH% (
+        REM Use vswhere to find Visual Studio installations with C++ tools
+        for /f "usebackq tokens=*" %%i in (`%VSWHERE_PATH% -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath 2^>nul`) do (
+            set "VS_INSTALL_PATH=%%i"
+            set VS_FOUND=1
+        )
+        
+        if !VS_FOUND! equ 1 (
+            echo INFO: Visual Studio found at: !VS_INSTALL_PATH!
+            REM Check if vcvarsall.bat exists
+            if exist "!VS_INSTALL_PATH!\VC\Auxiliary\Build\vcvarsall.bat" (
+                echo INFO: MSVC compiler tools available
+            ) else (
+                echo WARNING: MSVC compiler tools not found in Visual Studio installation
+            )
+        ) else (
+            echo WARNING: No Visual Studio installation with C++ tools found
+            echo Please install Visual Studio 2019 or later with C++ development tools
+        )
     ) else (
-        echo INFO: MSVC compiler found and available
+        REM Fallback to checking cl.exe in PATH
+        echo INFO: vswhere not found, checking for cl.exe in PATH...
+        cl.exe >nul 2>&1
+        if %errorlevel% neq 0 (
+            echo WARNING: MSVC compiler not found in PATH
+            echo Make sure Visual Studio Build Tools are installed and properly configured
+            echo You may need to run this script from a Visual Studio Command Prompt
+        ) else (
+            echo INFO: MSVC compiler found and available in PATH
+        )
     )
     
     REM Check for CUDA if GPU build is requested
@@ -646,9 +675,10 @@ REM Error handling
     echo.
     echo Troubleshooting:
     echo   - Ensure all required dependencies are installed
-    echo   - Check that Visual Studio Build Tools are properly configured
+    echo   - Install Visual Studio 2017 or later with C++ development tools
+    echo   - Script uses vswhere for automatic Visual Studio detection
     echo   - For GPU builds, verify CUDA toolkit installation
-    echo   - Try running from a Visual Studio Command Prompt
+    echo   - Try running from a Visual Studio Command Prompt if detection fails
     echo   - Check the build logs for detailed error messages
     echo.
     echo Build failed at: %DATE% %TIME%

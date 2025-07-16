@@ -1,8 +1,37 @@
 #!/bin/bash
-# ============================================================================
-# RadarSimPy Linux Build Script
-# Copyright (C) 2018 - PRESENT  radarsimx.com
-# ============================================================================
+#
+# batch_build.sh - Linux Batch Build Script for RadarSimPy
+#
+# DESCRIPTION:
+#   Automates the RadarSimPy build across multiple Python conda environments
+#   on Linux. Compiles the C++ library, builds Python extensions, and packages
+#   distributions for different tiers (free/standard) and architectures (CPU/GPU).
+#
+# USAGE:
+#   ./batch_build.sh [OPTIONS]
+#
+# OPTIONS:
+#   --tier=<free|standard|both>   Build tier (default: both)
+#   --arch=<cpu|gpu|both>         Target architecture (default: cpu)
+#   --skip-tests                  Skip running unit tests (default: off)
+#   --verbose                     Enable verbose logging (default: off)
+#   --jobs=<auto|N>               Number of parallel jobs (default: auto)
+#   --help                        Show this help message and exit
+#
+# EXAMPLES:
+#   ./batch_build.sh --tier=free --arch=gpu --jobs=8
+#   ./batch_build.sh --arch=both --skip-tests
+#   ./batch_build.sh --tier=both --arch=both --verbose
+#
+# EXIT CODES:
+#   0   Success
+#   1   General error (invalid args, missing deps, build failure)
+#  >1   Test failures (number of failed test suites)
+#
+# FILES GENERATED:
+#   build_logs/linux_batch_build_log_YYYYMMDD_HHMMSS.log
+#
+#===============================================================================
 
 # Configuration
 SCRIPT_VERSION="2.0"
@@ -22,23 +51,39 @@ VERBOSE="false"
 JOBS="auto"
 
 # Function to show help
+# show_help() - Display usage information, options, and examples
+# Description:
+#   Prints detailed help text including script usage, options, examples,
+#   and exit codes.
+# Arguments:
+#   None
+# Exit:
+#   Exits with code 0 when invoked.
 show_help() {
-    echo "Usage: $0 [options]"
-    echo ""
-    echo "Options:"
-    echo "  --tier=<free|standard|both>  Build tier (default: both)"
-    echo "  --arch=<cpu|gpu|both>        Architecture (default: cpu)"
-    echo "  --skip-tests                 Skip running unit tests"
-    echo "  --verbose                    Enable verbose output"
-    echo "  --jobs=<auto|number>         Number of parallel jobs (default: auto)"
-    echo "  --help                       Show this help message"
-    echo ""
-    echo "Examples:"
-    echo "  $0 --tier=free --arch=cpu"
-    echo "  $0 --tier=standard --arch=gpu --jobs=8"
-    echo "  $0 --arch=both --skip-tests --jobs=auto"
-    echo "  $0 --tier=both --arch=both --jobs=4"
-    echo "  $0 --verbose"
+    cat << EOF
+Usage: $0 [OPTIONS]
+
+OPTIONS:
+  --tier=<free|standard|both>   Build tier (default: both)
+  --arch=<cpu|gpu|both>         Target architecture (default: cpu)
+  --skip-tests                  Skip running unit tests
+  --verbose                     Enable verbose output
+  --jobs=<auto|N>               Number of parallel jobs (default: auto)
+  --help                        Show this help message and exit
+
+EXAMPLES:
+  $0 --tier=free --arch=cpu
+  $0 --tier=standard --arch=gpu --jobs=8
+  $0 --arch=both --skip-tests --jobs=auto
+  $0 --tier=both --arch=both --jobs=4
+  $0 --verbose
+
+EXIT CODES:
+  0   Success
+  1   Invalid arguments or build failure
+ >1   Number of failed test suites
+
+EOF
 }
 
 # Parse arguments
@@ -109,18 +154,33 @@ fi
 # LOGGING FUNCTIONS
 # ============================================================================
 
+# log_info() - Log an informational message
+# Arguments:
+#   $1: Message string
+# Behavior:
+#   Prints the message prefixed with [INFO] to stdout and appends to the build log.
 log_info() {
     local msg="$1"
     echo "[INFO] $msg"
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] [INFO] $msg" >> "$BUILD_LOG"
 }
 
+# log_error() - Log an error message
+# Arguments:
+#   $1: Message string
+# Behavior:
+#   Prints the message prefixed with [ERROR] to stdout and appends to the build log.
 log_error() {
     local msg="$1"
     echo "[ERROR] $msg"
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] [ERROR] $msg" >> "$BUILD_LOG"
 }
 
+# log_warning() - Log a warning message
+# Arguments:
+#   $1: Message string
+# Behavior:
+#   Prints the message prefixed with [WARNING] to stdout and appends to the build log.
 log_warning() {
     local msg="$1"
     echo "[WARNING] $msg"
@@ -156,6 +216,12 @@ workpath=$(pwd)
 # PREREQUISITE CHECK FUNCTIONS
 # ============================================================================
 
+# check_prerequisites() - Verify required commands and environments
+# Description:
+#   Ensures CMake is installed, checks CUDA if GPU builds are requested,
+#   and verifies that all required Python conda environments exist.
+# Returns:
+#   0 if all prerequisites are met; non-zero otherwise.
 check_prerequisites() {
     log_info "Checking prerequisites..."
 
@@ -198,6 +264,11 @@ check_prerequisites() {
     return 0
 }
 
+# check_cuda_prerequisites() - Verify CUDA toolkit prerequisites
+# Description:
+#   Checks for nvcc and nvidia-smi availability to support GPU builds.
+# Returns:
+#   0 if CUDA prerequisites are met; non-zero otherwise.
 check_cuda_prerequisites() {
     log_info "Checking CUDA prerequisites..."
 
@@ -225,6 +296,11 @@ check_cuda_prerequisites() {
 # CLEANUP FUNCTIONS
 # ============================================================================
 
+# cleanup_build_artifacts() - Remove previous build artifacts
+# Description:
+#   Deletes C++ build directories, the radarsimpy output directory, and general build folders.
+# Returns:
+#   Always returns 0.
 cleanup_build_artifacts() {
     log_info "Cleaning up previous build artifacts..."
 
@@ -237,6 +313,11 @@ cleanup_build_artifacts() {
     return 0
 }
 
+# cleanup_temp_files() - Remove temporary generated files
+# Description:
+#   Deletes generated C/C++/HTML files in the Python source tree.
+# Returns:
+#   Always returns 0.
 cleanup_temp_files() {
     log_info "Cleaning temporary files..."
 
@@ -258,6 +339,11 @@ cleanup_temp_files() {
 # CORE BUILD FUNCTIONS
 # ============================================================================
 
+# build_all_combinations() - Build for all requested tier/architecture combinations
+# Description:
+#   Determines the list of tiers and architectures to build and invokes build_single_combination().
+# Returns:
+#   0 on success; non-zero if any combination fails.
 build_all_combinations() {
     log_info "Building all requested combinations..."
 
@@ -290,6 +376,12 @@ build_all_combinations() {
     return 0
 }
 
+# build_single_combination() - Build a specific tier and architecture
+# Arguments:
+#   $1: Architecture ("cpu" or "gpu")
+#   $2: Tier ("free" or "standard")
+# Returns:
+#   0 on success; non-zero on failure.
 build_single_combination() {
     local build_arch="$1"
     local build_tier="$2"
@@ -328,6 +420,11 @@ build_single_combination() {
     return 0
 }
 
+# build_cpp_library() - Compile the C++ library for a given architecture
+# Arguments:
+#   $1: Architecture ("cpu" or "gpu")
+# Returns:
+#   0 on success; non-zero on failure.
 build_cpp_library() {
     local build_arch="$1"
     log_info "Building C++ library for $build_arch architecture..."
@@ -366,6 +463,12 @@ build_cpp_library() {
     return 0
 }
 
+# build_python_extensions() - Build Python extension modules
+# Arguments:
+#   $1: Tier ("free" or "standard")
+#   $2: Architecture ("cpu" or "gpu")
+# Returns:
+#   Always returns 0 (warnings on individual env failures).
 build_python_extensions() {
     local build_tier="$1"
     local build_arch="$2"
@@ -385,6 +488,12 @@ build_python_extensions() {
     return 0
 }
 
+# copy_built_files() - Copy built artifacts to the radarsimpy directory
+# Description:
+#   Copies shared libraries, Python modules, and the lib/__init__.py file
+#   into the distribution directory.
+# Returns:
+#   0 on success; non-zero on failure.
 copy_built_files() {
     log_info "Copying built files..."
 
@@ -410,6 +519,12 @@ copy_built_files() {
     return 0
 }
 
+# create_distribution() - Package build into release directory
+# Arguments:
+#   $1: Tier ("free" or "standard")
+#   $2: Architecture ("cpu" or "gpu")
+# Returns:
+#   0 on success; non-zero on failure.
 create_distribution() {
     local build_tier="$1"
     local build_arch="$2"
@@ -448,6 +563,11 @@ create_distribution() {
 # TEST FUNCTIONS
 # ============================================================================
 
+# run_tests() - Execute unit tests
+# Description:
+#   Runs Google Test via CTest for the C++ library and reports pass/fail.
+# Returns:
+#   0 if tests pass or are skipped; non-zero if tests fail.
 run_tests() {
     log_info "Running unit tests..."
 
@@ -473,6 +593,11 @@ run_tests() {
 # UTILITY FUNCTIONS
 # ============================================================================
 
+# detect_linux_distribution() - Identify the Linux distribution ID
+# Description:
+#   Reads /etc/os-release (or fallbacks) to compute a sanitized distro identifier.
+# Output:
+#   Echoes a string like "Ubuntu22", "Debian10", "Arch", or "Linux".
 detect_linux_distribution() {
     local distro_id=""
     
