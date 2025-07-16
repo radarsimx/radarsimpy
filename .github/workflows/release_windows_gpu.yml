@@ -195,9 +195,6 @@ jobs:
           CUDA_TOOLKIT_ROOT_DIR: ${{ env.CUDA_PATH }}
         run: |
           echo "::group::Build Process"
-          echo "CUDA_PATH: %CUDA_PATH%"
-          echo "CUDA_HOME: %CUDA_HOME%"
-          echo "CUDACXX: %CUDACXX%"
           .\build.bat --tier=${{ matrix.tier }} --arch=${{ matrix.arch }} --test=off
           echo "::endgroup::"
         shell: cmd
