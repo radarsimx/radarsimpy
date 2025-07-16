@@ -237,7 +237,7 @@ jobs:
       
       - name: Create build summary
         run: |
-          echo "## Build Summary 🛠️" >> $env:GITHUB_STEP_SUMMARY
+          echo "## Build Summary" >> $env:GITHUB_STEP_SUMMARY
           echo "| Property | Value |" >> $env:GITHUB_STEP_SUMMARY
           echo "|----------|-------|" >> $env:GITHUB_STEP_SUMMARY
           echo "| OS | windows-latest |" >> $env:GITHUB_STEP_SUMMARY
@@ -400,10 +400,10 @@ jobs:
     steps:
       - name: Generate build summary
         run: |
-          echo "# Windows Build Summary 📊" >> $env:GITHUB_STEP_SUMMARY
+          echo "# Windows Build Summary" >> $env:GITHUB_STEP_SUMMARY
           echo "" >> $env:GITHUB_STEP_SUMMARY
           echo "## Build Matrix Results" >> $env:GITHUB_STEP_SUMMARY
-          echo "Total builds: 10 (5 Python versions x 2 tiers)" >> $env:GITHUB_STEP_SUMMARY
+          echo "Total builds: 10 [5 Python versions x 2 tiers]" >> $env:GITHUB_STEP_SUMMARY
           echo "" >> $env:GITHUB_STEP_SUMMARY
           echo "### Architecture Distribution" >> $env:GITHUB_STEP_SUMMARY
           echo "- **Windows x64**: 10 builds on windows-latest" >> $env:GITHUB_STEP_SUMMARY
@@ -417,12 +417,12 @@ jobs:
           echo "" >> $env:GITHUB_STEP_SUMMARY
           echo "### Packed Artifacts" >> $env:GITHUB_STEP_SUMMARY
           if ("${{ needs.pack-artifacts.result }}" -eq "success") {
-            echo "✅ **All artifacts successfully packed into single archive**" >> $env:GITHUB_STEP_SUMMARY
+            echo "**All artifacts successfully packed into single archive**" >> $env:GITHUB_STEP_SUMMARY
             echo "- Archive: ``radarsimpy_windows_all_builds``" >> $env:GITHUB_STEP_SUMMARY
             echo "- Format: zip" >> $env:GITHUB_STEP_SUMMARY
             echo "- Contains: All 10 build variants organized by configuration" >> $env:GITHUB_STEP_SUMMARY
           } else {
-            echo "⚠️ **Artifact packing failed or was skipped**" >> $env:GITHUB_STEP_SUMMARY
+            echo "**Artifact packing failed or was skipped**" >> $env:GITHUB_STEP_SUMMARY
           }
           echo "" >> $env:GITHUB_STEP_SUMMARY
           echo "### Build Status" >> $env:GITHUB_STEP_SUMMARY
@@ -431,9 +431,9 @@ jobs:
           # Check if any builds failed
           if ("${{ needs.build.result }}" -ne "success") {
             echo "" >> $env:GITHUB_STEP_SUMMARY
-            echo "⚠️ **Some builds may have failed. Check individual job logs for details.**" >> $env:GITHUB_STEP_SUMMARY
+            echo "**Some builds may have failed. Check individual job logs for details.**" >> $env:GITHUB_STEP_SUMMARY
           } else {
             echo "" >> $env:GITHUB_STEP_SUMMARY
-            echo "✅ **All builds completed successfully!**" >> $env:GITHUB_STEP_SUMMARY
+            echo "**All builds completed successfully!**" >> $env:GITHUB_STEP_SUMMARY
           }
         shell: powershell
