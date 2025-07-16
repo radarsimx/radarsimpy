@@ -296,10 +296,9 @@ jobs:
           PATH: /usr/local/cuda/bin:$PATH
           CUDACXX: /usr/local/cuda/bin/nvcc
           CUDA_TOOLKIT_ROOT_DIR: /usr/local/cuda
-          CUDA_ARCH_LIST: "5.0;6.0;7.0;7.5;8.0;8.6;9.0"
         run: |
           echo "::group::Build Process"
-          sudo chown -R $USER:$USER /home/runner/work/radarsimpy
+          chown -R $USER:$USER /home/runner/work/radarsimpy || true
           chmod +x build.sh
           ./build.sh --tier=${{ matrix.tier }} --arch=${{ matrix.arch }} --test=off --verbose
           echo "::endgroup::"
