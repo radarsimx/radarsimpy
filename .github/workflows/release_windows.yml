@@ -164,7 +164,7 @@ jobs:
           CCACHE_COMPILERCHECK: content
         run: |
           echo "::group::Build Process"
-          .\build.bat --tier=${{ matrix.tier }} --arch=${{ matrix.arch }} --test=off --verbose
+          .\build.bat --tier=${{ matrix.tier }} --arch=${{ matrix.arch }} --test=off
           echo "::endgroup::"
         shell: cmd
       
