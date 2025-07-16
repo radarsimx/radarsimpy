@@ -272,7 +272,7 @@ jobs:
           CCACHE_COMPILERCHECK: content
         run: |
           echo "::group::Build Process"
-          sudo chown -R $USER:$USER /home/runner/work/radarsimpy
+          chown -R $USER:$USER /home/runner/work/radarsimpy || true
           chmod +x build.sh
           ./build.sh --tier=${{ matrix.tier }} --arch=${{ matrix.arch }} --test=off --verbose
           echo "::endgroup::"

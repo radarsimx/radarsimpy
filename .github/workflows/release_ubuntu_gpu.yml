@@ -292,8 +292,8 @@ jobs:
           CCACHE_COMPILERCHECK: content
           CUDA_PATH: /usr/local/cuda
           CUDA_HOME: /usr/local/cuda
-          LD_LIBRARY_PATH: /usr/local/cuda/lib64:$LD_LIBRARY_PATH
-          PATH: /usr/local/cuda/bin:$PATH
+          LD_LIBRARY_PATH: /usr/local/cuda/lib64:${{ env.LD_LIBRARY_PATH }}
+          PATH: /usr/local/cuda/bin:${{ env.PATH }}
           CUDACXX: /usr/local/cuda/bin/nvcc
           CUDA_TOOLKIT_ROOT_DIR: /usr/local/cuda
         run: |
