@@ -260,16 +260,16 @@ jobs:
         run: |
           mkdir packed\radarsimpy_windows_all
           
-          # Create the directory structure for Windows
+          echo # Create the directory structure for Windows
           mkdir packed\radarsimpy_windows_all\trial\Windows_x64_CPU\radarsimpy
           mkdir packed\radarsimpy_windows_all\standard\Windows_x64_CPU\radarsimpy
           
-          # Copy each artifact to appropriate directory based on tier
+          echo # Copy each artifact to appropriate directory based on tier
           for /d %%d in (artifacts\*) do (
             set "artifact_name=%%~nd"
             echo Processing artifact: !artifact_name!
             
-            # Determine target directory based on artifact name
+            echo # Determine target directory based on artifact name
             echo !artifact_name! | findstr "_freetier" >nul
             if !errorlevel! == 0 (
               set "target_dir=packed\radarsimpy_windows_all\trial\Windows_x64_CPU\radarsimpy"
@@ -277,10 +277,10 @@ jobs:
               set "target_dir=packed\radarsimpy_windows_all\standard\Windows_x64_CPU\radarsimpy"
             )
             
-            # Ensure target directory exists
+            echo # Ensure target directory exists
             if not exist "!target_dir!" mkdir "!target_dir!"
             
-            # Copy the radarsimpy module
+            echo # Copy the radarsimpy module
             if exist "%%d\radarsimpy" (
               echo Copying radarsimpy module from %%d\radarsimpy to !target_dir!\
               xcopy "%%d\radarsimpy" "!target_dir!\" /E /I /Y
@@ -344,7 +344,7 @@ jobs:
       - name: Create compressed archive
         run: |
           cd packed
-          # Create zip archive
+          echo # Create zip archive
           powershell -Command "Compress-Archive -Path 'radarsimpy_windows_all' -DestinationPath 'radarsimpy_windows_all_builds.zip' -Force"
           
           echo "::group::Archive Information"
