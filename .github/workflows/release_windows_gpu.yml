@@ -291,8 +291,8 @@ jobs:
       - name: Create artifact structure
         run: |
           # Create base directory structure
-          New-Item -Path "packed\radarsimpy_windows_all\trial\Windows_x64_GPU\radarsimpy" -ItemType Directory -Force
-          New-Item -Path "packed\radarsimpy_windows_all\standard\Windows_x64_GPU\radarsimpy" -ItemType Directory -Force
+          New-Item -Path "packed\radarsimpy_windows_gpu_all\trial\Windows_x64_GPU\radarsimpy" -ItemType Directory -Force
+          New-Item -Path "packed\radarsimpy_windows_gpu_all\standard\Windows_x64_GPU\radarsimpy" -ItemType Directory -Force
           
           # Process each artifact directory
           Get-ChildItem -Path "artifacts" -Directory | ForEach-Object {
@@ -302,9 +302,9 @@ jobs:
             
             # Determine target directory based on artifact name
             if ($artifactName -like "*_freetier*") {
-              $targetDir = "packed\radarsimpy_windows_all\trial\Windows_x64_GPU\radarsimpy"
+              $targetDir = "packed\radarsimpy_windows_gpu_all\trial\Windows_x64_GPU\radarsimpy"
             } else {
-              $targetDir = "packed\radarsimpy_windows_all\standard\Windows_x64_GPU\radarsimpy"
+              $targetDir = "packed\radarsimpy_windows_gpu_all\standard\Windows_x64_GPU\radarsimpy"
             }
             
             Write-Host "Target directory: $targetDir"
@@ -325,7 +325,7 @@ jobs:
         run: |
           echo "::group::Artifact Structure Verification"
           echo "Final directory structure:"
-          dir /s packed\radarsimpy_windows_all
+          dir /s packed\radarsimpy_windows_gpu_all
           echo "::endgroup::"
         shell: cmd
       
@@ -366,14 +366,14 @@ jobs:
           echo - **Tiers**: Standard ^(full features^), Trial ^(limited features^)
           echo - **Build Date**: %date% %time%
           echo.
-          ) > packed\radarsimpy_windows_all\README.md
+          ) > packed\radarsimpy_windows_gpu_all\README.md
         shell: cmd
       
       - name: Create compressed archive
         run: |
           cd packed
           echo # Create zip archive
-          powershell -Command "Compress-Archive -Path 'radarsimpy_windows_all' -DestinationPath 'radarsimpy_windows_all_builds.zip' -Force"
+          powershell -Command "Compress-Archive -Path 'radarsimpy_windows_gpu_all' -DestinationPath 'radarsimpy_windows_gpu_all_builds.zip' -Force"
           
           echo "::group::Archive Information"
           dir *.zip
@@ -383,8 +383,8 @@ jobs:
       - name: Upload packed artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: radarsimpy_windows_all_builds
-          path: packed\radarsimpy_windows_all_builds.zip
+          name: radarsimpy_windows_gpu_all_builds
+          path: packed\radarsimpy_windows_gpu_all_builds.zip
           retention-days: 1
           compression-level: 0
 
@@ -414,7 +414,7 @@ jobs:
           echo "### Packed Artifacts" >> $env:GITHUB_STEP_SUMMARY
           if ("${{ needs.pack-artifacts.result }}" -eq "success") {
             echo "**All artifacts successfully packed into single archive**" >> $env:GITHUB_STEP_SUMMARY
-            echo "- Archive: ``radarsimpy_windows_all_builds``" >> $env:GITHUB_STEP_SUMMARY
+            echo "- Archive: ``radarsimpy_windows_gpu_all_builds``" >> $env:GITHUB_STEP_SUMMARY
             echo "- Format: zip" >> $env:GITHUB_STEP_SUMMARY
             echo "- Contains: All 10 build variants organized by configuration" >> $env:GITHUB_STEP_SUMMARY
           } else {

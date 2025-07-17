@@ -358,13 +358,13 @@ jobs:
       
       - name: Create artifact structure
         run: |
-          mkdir -p packed/radarsimpy_ubuntu_all
+          mkdir -p packed/radarsimpy_ubuntu_cpu_all
           
           # Create the directory structure for Ubuntu versions
-          mkdir -p packed/radarsimpy_ubuntu_all/trial/Ubuntu_22_04_CPU/radarsimpy
-          mkdir -p packed/radarsimpy_ubuntu_all/standard/Ubuntu_22_04_CPU/radarsimpy
-          mkdir -p packed/radarsimpy_ubuntu_all/trial/Ubuntu_24_04_CPU/radarsimpy
-          mkdir -p packed/radarsimpy_ubuntu_all/standard/Ubuntu_24_04_CPU/radarsimpy
+          mkdir -p packed/radarsimpy_ubuntu_cpu_all/trial/Ubuntu_22_04_CPU/radarsimpy
+          mkdir -p packed/radarsimpy_ubuntu_cpu_all/standard/Ubuntu_22_04_CPU/radarsimpy
+          mkdir -p packed/radarsimpy_ubuntu_cpu_all/trial/Ubuntu_24_04_CPU/radarsimpy
+          mkdir -p packed/radarsimpy_ubuntu_cpu_all/standard/Ubuntu_24_04_CPU/radarsimpy
           
           # Copy each artifact to appropriate directory based on Ubuntu version and tier
           for dir in artifacts/*/; do
@@ -376,16 +376,16 @@ jobs:
               if [[ "$artifact_name" == *"ubuntu_24_04"* ]]; then
                 # Ubuntu 24.04 builds
                 if [[ "$artifact_name" == *"_freetier"* ]]; then
-                  target_dir="packed/radarsimpy_ubuntu_all/trial/Ubuntu_24_04_CPU/radarsimpy"
+                  target_dir="packed/radarsimpy_ubuntu_cpu_all/trial/Ubuntu_24_04_CPU/radarsimpy"
                 else
-                  target_dir="packed/radarsimpy_ubuntu_all/standard/Ubuntu_24_04_CPU/radarsimpy"
+                  target_dir="packed/radarsimpy_ubuntu_cpu_all/standard/Ubuntu_24_04_CPU/radarsimpy"
                 fi
               else
                 # Ubuntu 22.04 builds
                 if [[ "$artifact_name" == *"_freetier"* ]]; then
-                  target_dir="packed/radarsimpy_ubuntu_all/trial/Ubuntu_22_04_CPU/radarsimpy"
+                  target_dir="packed/radarsimpy_ubuntu_cpu_all/trial/Ubuntu_22_04_CPU/radarsimpy"
                 else
-                  target_dir="packed/radarsimpy_ubuntu_all/standard/Ubuntu_22_04_CPU/radarsimpy"
+                  target_dir="packed/radarsimpy_ubuntu_cpu_all/standard/Ubuntu_22_04_CPU/radarsimpy"
                 fi
               fi
               
@@ -408,10 +408,10 @@ jobs:
         run: |
           echo "::group::Artifact Structure Verification"
           echo "Final directory structure:"
-          find packed/radarsimpy_ubuntu_all -type d | sort
+          find packed/radarsimpy_ubuntu_cpu_all -type d | sort
           echo ""
           echo "Files in each directory:"
-          for dir in packed/radarsimpy_ubuntu_all/*/Ubuntu_*; do
+          for dir in packed/radarsimpy_ubuntu_cpu_all/*/Ubuntu_*; do
             if [ -d "$dir" ]; then
               echo "Contents of $dir:"
               ls -la "$dir" || echo "Directory is empty or doesn't exist"
@@ -422,7 +422,7 @@ jobs:
       
       - name: Create README for packed artifacts
         run: |
-          cat > packed/radarsimpy_ubuntu_all/README.md << 'EOF'
+          cat > packed/radarsimpy_ubuntu_cpu_all/README.md << 'EOF'
           # RadarSimPy Ubuntu Build Artifacts
           
           This archive contains all RadarSimPy builds for Ubuntu platforms organized by version and tier.
@@ -470,10 +470,10 @@ jobs:
       - name: Create compressed archive
         run: |
           cd packed
-          tar -czf radarsimpy_ubuntu_all_builds.tar.gz radarsimpy_ubuntu_all/
+          tar -czf radarsimpy_ubuntu_cpu_all_builds.tar.gz radarsimpy_ubuntu_cpu_all/
           
           # Create zip version as well
-          zip -r radarsimpy_ubuntu_all_builds.zip radarsimpy_ubuntu_all/
+          zip -r radarsimpy_ubuntu_cpu_all_builds.zip radarsimpy_ubuntu_cpu_all/
           
           echo "::group::Archive Information"
           ls -lh *.tar.gz *.zip
@@ -482,10 +482,10 @@ jobs:
       - name: Upload packed artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: radarsimpy_ubuntu_all_builds
+          name: radarsimpy_ubuntu_cpu_all_builds
           path: |
-            packed/radarsimpy_ubuntu_all_builds.tar.gz
-            packed/radarsimpy_ubuntu_all_builds.zip
+            packed/radarsimpy_ubuntu_cpu_all_builds.tar.gz
+            packed/radarsimpy_ubuntu_cpu_all_builds.zip
           retention-days: 1
           compression-level: 0
 
@@ -516,7 +516,7 @@ jobs:
           echo "### Packed Artifacts" >> $GITHUB_STEP_SUMMARY
           if [ "${{ needs.pack-artifacts.result }}" == "success" ]; then
             echo "✅ **All artifacts successfully packed into single archive**" >> $GITHUB_STEP_SUMMARY
-            echo "- Archive: \`radarsimpy_ubuntu_all_builds\`" >> $GITHUB_STEP_SUMMARY
+            echo "- Archive: \`radarsimpy_ubuntu_cpu_all_builds\`" >> $GITHUB_STEP_SUMMARY
             echo "- Formats: tar.gz, zip" >> $GITHUB_STEP_SUMMARY
             echo "- Contains: All 20 build variants organized by configuration" >> $GITHUB_STEP_SUMMARY
           else
