@@ -57,7 +57,11 @@ DEFAULT_ARCH = "cpu"
 
 
 def parse_arguments() -> argparse.Namespace:
-    """Parse command line arguments for build configuration."""
+    """Parse command line arguments for build configuration.
+
+    :return: Parsed command line arguments containing tier, arch, and verbose flags
+    :rtype: argparse.Namespace
+    """
     parser = argparse.ArgumentParser(
         description="Build script for RadarSimPy with configurable options",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -90,7 +94,14 @@ def parse_arguments() -> argparse.Namespace:
 class BuildConfig:
     """Configuration class for build settings."""
 
-    def __init__(self, tier: str, arch: str):
+    def __init__(self, tier: str, arch: str) -> None:
+        """Initialize BuildConfig with tier and architecture settings.
+
+        :param tier: Build tier ('free' or 'standard')
+        :type tier: str
+        :param arch: Build architecture ('cpu' or 'gpu')
+        :type arch: str
+        """
         self.tier = tier
         self.arch = arch
         self.os_type = platform.system()
@@ -102,8 +113,12 @@ class BuildConfig:
         self._configure_macros()
         self._configure_cuda()
 
-    def _configure_platform(self):
-        """Configure platform-specific build settings."""
+    def _configure_platform(self) -> None:
+        """Configure platform-specific build settings.
+
+        Sets up compile args, link args, library directories, and libraries
+        based on the current operating system (Linux, macOS, or Windows).
+        """
         if self.os_type == "Linux":
             self.link_args = ["-Wl,-rpath,$ORIGIN"]
             self.compile_args = ["-std=c++20"]
@@ -138,8 +153,12 @@ class BuildConfig:
         if self.is_gpu:
             self.libs.append("cudart")
 
-    def _configure_macros(self):
-        """Configure preprocessor macros."""
+    def _configure_macros(self) -> None:
+        """Configure preprocessor macros.
+
+        Sets up macros for compilation including NumPy compatibility,
+        free tier, and CUDA support based on configuration.
+        """
         self.macros = [("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]
 
         if self.is_free:
@@ -148,8 +167,12 @@ class BuildConfig:
         if self.is_gpu:
             self.macros.append(("_CUDA_", None))
 
-    def _configure_cuda(self):
-        """Configure CUDA-specific settings."""
+    def _configure_cuda(self) -> None:
+        """Configure CUDA-specific settings.
+
+        Locates CUDA installation and configures CUDA-related settings
+        if GPU architecture is specified.
+        """
         self.cuda_config = None
         if self.is_gpu:
             try:
@@ -160,7 +183,15 @@ class BuildConfig:
                 raise
 
     def _locate_cuda(self) -> Dict[str, str]:
-        """Locate CUDA installation."""
+        """Locate CUDA installation.
+
+        Searches for CUDA installation in standard locations and environment
+        variables, then validates the installation paths.
+
+        :return: Dictionary containing CUDA installation paths
+        :rtype: Dict[str, str]
+        :raises EnvironmentError: If CUDA installation cannot be found or is invalid
+        """
         if "CUDA_PATH" in os.environ:
             home = os.environ["CUDA_PATH"]
             nvcc = os.path.join(home, "bin", self.nvcc_name)
@@ -191,7 +222,17 @@ class BuildConfig:
         return cuda_config
 
     def _find_in_path(self, name: str, path: str) -> Optional[str]:
-        """Find executable in PATH."""
+        """Find executable in PATH.
+
+        Searches for an executable file in the given PATH string.
+
+        :param name: Name of the executable to find
+        :type name: str
+        :param path: PATH string to search in
+        :type path: str
+        :return: Absolute path to the executable if found, None otherwise
+        :rtype: Optional[str]
+        """
         for path_dir in path.split(os.pathsep):
             if not path_dir:
                 continue
@@ -201,7 +242,14 @@ class BuildConfig:
         return None
 
     def get_include_dirs(self) -> List[str]:
-        """Get include directories."""
+        """Get include directories.
+
+        Returns a list of include directories for compilation,
+        including C++ source includes, NumPy includes, and CUDA includes if applicable.
+
+        :return: List of include directory paths
+        :rtype: List[str]
+        """
         include_dirs = [
             "src/radarsimcpp/includes",
             "src/radarsimcpp/includes/rsvector",
@@ -214,7 +262,14 @@ class BuildConfig:
         return include_dirs
 
     def get_library_dirs(self) -> List[str]:
-        """Get library directories."""
+        """Get library directories.
+
+        Returns a list of library directories for linking,
+        including platform-specific lib directories and CUDA lib directories if applicable.
+
+        :return: List of library directory paths
+        :rtype: List[str]
+        """
         lib_dirs = self.lib_dirs.copy()
 
         if self.cuda_config:
@@ -224,7 +279,17 @@ class BuildConfig:
 
 
 def create_extension(name: str, sources: List[str], config: BuildConfig) -> Extension:
-    """Create a Cython extension with the given configuration."""
+    """Create a Cython extension with the given configuration.
+
+    :param name: Name of the extension module
+    :type name: str
+    :param sources: List of source files for the extension
+    :type sources: List[str]
+    :param config: Build configuration object
+    :type config: BuildConfig
+    :return: Configured Cython extension
+    :rtype: Extension
+    """
     return Extension(
         name,
         sources,
@@ -238,7 +303,14 @@ def create_extension(name: str, sources: List[str], config: BuildConfig) -> Exte
 
 
 def get_long_description() -> str:
-    """Get long description from README file."""
+    """Get long description from README file.
+
+    Reads the README.md file and returns its content as the long description.
+    Falls back to the package description if README.md is not available or readable.
+
+    :return: Long description text for the package
+    :rtype: str
+    """
     readme_path = Path("README.md")
     if readme_path.exists():
         try:
@@ -248,8 +320,12 @@ def get_long_description() -> str:
     return PACKAGE_DESCRIPTION
 
 
-def main():
-    """Main setup function."""
+def main() -> None:
+    """Main setup function.
+
+    Parses command line arguments, creates build configuration,
+    defines extension modules, and runs the setup process.
+    """
     # Parse arguments
     args = parse_arguments()
 
