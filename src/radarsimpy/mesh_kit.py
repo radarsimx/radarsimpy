@@ -34,7 +34,20 @@ def check_module_installed(module_name: str) -> bool:
     :return: True if module is installed, False otherwise
     :rtype: bool
     """
-    return importlib.util.find_spec(module_name) is not None
+    try:
+        # Try using importlib.util first (more precise)
+        spec = importlib.util.find_spec(module_name)
+        if spec is not None:
+            return True
+    except (ImportError, AttributeError, ValueError, ModuleNotFoundError):
+        pass
+
+    # Fallback to direct import attempt
+    try:
+        __import__(module_name)
+        return True
+    except ImportError:
+        return False
 
 
 def safe_import(module_name: str) -> object:
