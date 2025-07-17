@@ -9,10 +9,15 @@ Python Requirements
 * ``SciPy`` >= 1.11.0
 * One of the following mesh processing libraries:
 
-  * ``PyMeshLab`` >= 2022.2
-  * ``PyVista`` >= 0.43.0
-  * ``trimesh`` >= 4.0.0
-  * ``meshio`` >= 5.3.0
+    * ``PyMeshLab`` >= 2022.2
+    * ``PyVista`` >= 0.43.0
+    * ``trimesh`` >= 4.0.0
+    * ``meshio`` >= 5.3.0
+
+.. code-block:: bash
+
+    pip install -r requirements.txt
+
 
 System Requirements
 -------------------
@@ -40,6 +45,5 @@ MacOS
 
 **Intel/Apple Silicon**
 
-* GCC 14 installation::
-
-    brew install gcc@14
+* Intel: GCC 14 (`brew install gcc@14`)
+* Apple Silicon: use default Clang (no extra dependency)
