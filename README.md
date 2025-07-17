@@ -48,6 +48,10 @@ RadarSimPy is a powerful and versatile Python-based Radar Simulator that models 
 - SciPy
 - PyMeshLab, PyVista, trimesh, or meshio
 
+```bash
+pip install -r requirements.txt
+```
+
 **Platform-specific requirements:**
 
 - **Windows**

@@ -217,7 +217,7 @@ jobs:
           path: |
             ~/.cache/pip
             ~/.ccache
-          key: ${{ runner.os }}-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.tier }}-${{ hashFiles('requirements.txt') }}
+          key: ${{ runner.os }}-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.tier }}-${{ hashFiles('requirements-dev.txt') }}
           restore-keys: |
             ${{ runner.os }}-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.tier }}-
             ${{ runner.os }}-${{ matrix.os }}-${{ matrix.python-version }}-
@@ -260,7 +260,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip wheel setuptools
-          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
 
       - name: Display build information
         run: |

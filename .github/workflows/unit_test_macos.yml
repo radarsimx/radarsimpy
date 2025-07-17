@@ -141,7 +141,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/Library/Caches/pip
-          key: ${{ matrix.arch == 'arm64' && format('{0}-arm64-pip-{1}', runner.os, hashFiles('**/requirements.txt')) || format('{0}-pip-{1}', runner.os, hashFiles('**/requirements.txt')) }}
+          key: ${{ matrix.arch == 'arm64' && format('{0}-arm64-pip-{1}', runner.os, hashFiles('**/requirements-dev.txt')) || format('{0}-pip-{1}', runner.os, hashFiles('**/requirements-dev.txt')) }}
           restore-keys: |
             ${{ runner.os }}-pip-
             ${{ runner.os }}-arm64-pip-
@@ -149,7 +149,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
 
       - name: Display system information
         run: |

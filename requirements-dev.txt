@@ -1,0 +1,25 @@
+# Development Requirements for RadarSimPy
+# Install with: pip install -r requirements-dev.txt
+
+# Include base requirements
+-r requirements.txt
+
+# Build Dependencies
+cython>=0.29.0
+setuptools>=65.0.0
+
+# Testing
+pytest>=7.0.0
+pytest-cov>=4.0.0
+pytest-xdist>=3.0.0
+
+# Code Quality
+black>=22.0.0
+flake8>=5.0.0
+isort>=5.10.0
+mypy>=0.991
+pylint>=2.15.0
+
+# Documentation
+sphinx>=5.0.0
+pydata-sphinx-theme>=0.16.0

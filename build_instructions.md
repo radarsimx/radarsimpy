@@ -19,7 +19,7 @@ RadarSimPy is a radar simulation library that provides both CPU and GPU accelera
 Install the required Python packages:
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
 ```
 
 ## Validate Build Environment

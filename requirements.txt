@@ -1,6 +1,16 @@
-numpy
-scipy
-trimesh
-cython
-setuptools
-pytest
+# RadarSimPy Requirements
+# This file contains the core dependencies for RadarSimPy
+
+# Core Scientific Computing
+numpy>=2.0.0
+scipy>=1.9.0
+
+# Optional Dependencies for Mesh Processing
+# Install one or more of these for 3D model support:
+# trimesh>=3.15.0        # Lightweight mesh processing
+# pymeshlab>=2022.2      # Advanced mesh processing
+# pyvista>=0.36.0        # 3D visualization and mesh processing
+# meshio>=5.0.0          # Mesh I/O operations
+
+# Currently included for basic mesh support
+trimesh>=3.15.0
