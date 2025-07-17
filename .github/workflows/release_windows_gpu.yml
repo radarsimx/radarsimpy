@@ -291,8 +291,8 @@ jobs:
       - name: Create artifact structure
         run: |
           # Create base directory structure
-          New-Item -Path "packed\radarsimpy_windows_gpu_all\trial\Windows_x64_GPU\radarsimpy" -ItemType Directory -Force
-          New-Item -Path "packed\radarsimpy_windows_gpu_all\standard\Windows_x64_GPU\radarsimpy" -ItemType Directory -Force
+          New-Item -Path "packed\radarsimpy_windows_gpu_all\trial\Windows_x86_64_GPU\radarsimpy" -ItemType Directory -Force
+          New-Item -Path "packed\radarsimpy_windows_gpu_all\standard\Windows_x86_64_GPU\radarsimpy" -ItemType Directory -Force
           
           # Process each artifact directory
           Get-ChildItem -Path "artifacts" -Directory | ForEach-Object {
@@ -302,9 +302,9 @@ jobs:
             
             # Determine target directory based on artifact name
             if ($artifactName -like "*_freetier*") {
-              $targetDir = "packed\radarsimpy_windows_gpu_all\trial\Windows_x64_GPU\radarsimpy"
+              $targetDir = "packed\radarsimpy_windows_gpu_all\trial\Windows_x86_64_GPU\radarsimpy"
             } else {
-              $targetDir = "packed\radarsimpy_windows_gpu_all\standard\Windows_x64_GPU\radarsimpy"
+              $targetDir = "packed\radarsimpy_windows_gpu_all\standard\Windows_x86_64_GPU\radarsimpy"
             }
             
             Write-Host "Target directory: $targetDir"
@@ -343,17 +343,17 @@ jobs:
           echo.
           echo ```
           echo standard/
-          echo └── Windows_x64_GPU/
+          echo └── Windows_x86_64_GPU/
           echo     └── radarsimpy/
           echo.
           echo trial/
-          echo └── Windows_x64_GPU/
+          echo └── Windows_x86_64_GPU/
           echo     └── radarsimpy/
           echo ```
           echo.
           echo ## Tier Information
           echo.
-          echo ### Windows_x64_GPU ^(Windows x64^)
+          echo ### Windows_x86_64_GPU ^(Windows x64^)
           echo - **standard/**: Full-featured builds with all capabilities
           echo - **trial/**: Free tier builds with limited features
           echo - Built on Windows with MSVC compiler
