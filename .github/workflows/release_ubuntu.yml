@@ -204,13 +204,13 @@ jobs:
           ssh-key: ${{secrets.RADARSIMC}}
           submodules: recursive
           fetch-depth: 0
-      
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
-      
+          cache: "pip"
+
       - name: Cache build dependencies
         uses: actions/cache@v4
         with:
@@ -222,28 +222,28 @@ jobs:
             ${{ runner.os }}-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.tier }}-
             ${{ runner.os }}-${{ matrix.os }}-${{ matrix.python-version }}-
             ${{ runner.os }}-${{ matrix.os }}-
-      
+
       - name: Install system dependencies
         run: |
           # Update package lists
           sudo apt-get update
-          
+
           # Install ccache for faster compilation
           sudo apt-get install -y ccache
           echo "/usr/lib/ccache" >> $GITHUB_PATH
-          
+
           # Set up ccache
           ccache --set-config=max_size=2G
           ccache --set-config=cache_dir=~/.ccache
-          
+
           # Install build dependencies
           sudo apt-get install -y build-essential
-      
+
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip wheel setuptools
           pip install -r requirements.txt
-      
+
       - name: Display build information
         run: |
           echo "::group::Build Information"
@@ -254,7 +254,7 @@ jobs:
           echo "C Compiler: ${{ matrix.c_compiler }}"
           echo "C++ Compiler: ${{ matrix.cxx_compiler }}"
           echo "::endgroup::"
-          
+
           echo "::group::System Information"
           uname -a
           lsb_release -a
@@ -263,7 +263,7 @@ jobs:
           ${{ matrix.c_compiler }} --version
           ${{ matrix.cxx_compiler }} --version
           echo "::endgroup::"
-      
+
       - name: Build RadarSimPy
         env:
           CC: ${{ matrix.c_compiler }}
@@ -276,14 +276,14 @@ jobs:
           chmod +x build.sh
           ./build.sh --tier=${{ matrix.tier }} --arch=${{ matrix.arch }} --test=off --verbose
           echo "::endgroup::"
-      
+
       - name: Display build statistics
         if: always()
         run: |
           echo "::group::Build Statistics"
           ccache --show-stats
           echo "::endgroup::"
-      
+
       - name: Verify build artifacts
         run: |
           echo "::group::Build Verification"
@@ -294,7 +294,7 @@ jobs:
             echo "✗ Python module missing"
             exit 1
           fi
-          
+
           # Check for compiled extensions
           if find ./radarsimpy -name "*.so" -o -name "*.dylib" -o -name "*.pyd" | grep -q .; then
             echo "✓ Compiled extensions found:"
@@ -304,7 +304,7 @@ jobs:
             exit 1
           fi
           echo "::endgroup::"
-      
+
       - name: Create build summary
         run: |
           echo "## Build Summary 🛠️" >> $GITHUB_STEP_SUMMARY
@@ -316,7 +316,7 @@ jobs:
           echo "| Architecture | ${{ matrix.arch }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Compiler | ${{ matrix.c_compiler }}/${{ matrix.cxx_compiler }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Artifact Name | ${{ matrix.artifact_name }} |" >> $GITHUB_STEP_SUMMARY
-      
+
       - name: Archive built module
         uses: actions/upload-artifact@v4
         if: success()
@@ -325,7 +325,7 @@ jobs:
           path: ./radarsimpy
           retention-days: 1
           compression-level: 6
-      
+
       - name: Upload build logs on failure
         uses: actions/upload-artifact@v4
         if: failure()
@@ -344,28 +344,28 @@ jobs:
     steps:
       - name: Create artifacts directory
         run: mkdir -p artifacts
-      
+
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: artifacts/
-      
+
       - name: Display downloaded artifacts
         run: |
           echo "::group::Downloaded Artifacts"
           find artifacts/ -type f -name "*.py" -o -name "*.so" -o -name "*.dylib" -o -name "*.pyd" | head -20
           echo "::endgroup::"
-      
+
       - name: Create artifact structure
         run: |
           mkdir -p packed/radarsimpy_ubuntu_cpu_all
-          
+
           # Create the directory structure for Ubuntu versions
           mkdir -p packed/radarsimpy_ubuntu_cpu_all/trial/Ubuntu22_x86_64_CPU/radarsimpy
           mkdir -p packed/radarsimpy_ubuntu_cpu_all/standard/Ubuntu22_x86_64_CPU/radarsimpy
           mkdir -p packed/radarsimpy_ubuntu_cpu_all/trial/Ubuntu24_x86_64_CPU/radarsimpy
           mkdir -p packed/radarsimpy_ubuntu_cpu_all/standard/Ubuntu24_x86_64_CPU/radarsimpy
-          
+
           # Copy each artifact to appropriate directory based on Ubuntu version and tier
           for dir in artifacts/*/; do
             if [ -d "$dir" ]; then
@@ -403,7 +403,7 @@ jobs:
               fi
             fi
           done
-      
+
       - name: Verify artifact structure
         run: |
           echo "::group::Artifact Structure Verification"
@@ -419,46 +419,46 @@ jobs:
             fi
           done
           echo "::endgroup::"
-      
+
       - name: Create README for packed artifacts
         run: |
           cat > packed/radarsimpy_ubuntu_cpu_all/README.md << 'EOF'
           # RadarSimPy Ubuntu Build Artifacts
-          
+
           This archive contains all RadarSimPy builds for Ubuntu platforms organized by version and tier.
-          
+
           ## Directory Structure
-          
+
           The builds are organized in the following structure:
-          
+
           ```
           standard/
           ├── Ubuntu22_x86_64_CPU/
           │   └── radarsimpy/
           └── Ubuntu24_x86_64_CPU/
               └── radarsimpy/
-          
+
           trial/
           ├── Ubuntu22_x86_64_CPU/
           │   └── radarsimpy/
           └── Ubuntu24_x86_64_CPU/
               └── radarsimpy/
           ```
-          
+
           ## Version and Tier Information
-          
+
           ### Ubuntu22_x86_64_CPU (Ubuntu 22.04 LTS)
           - **standard/**: Full-featured builds with all capabilities
           - **trial/**: Free tier builds with limited features
           - Built with GCC-11 compiler
-          
+
           ### Ubuntu24_x86_64_CPU (Ubuntu 24.04 LTS)
           - **standard/**: Full-featured builds with all capabilities  
           - **trial/**: Free tier builds with limited features
           - Built with GCC-14 compiler
 
           ## Build Information
-          
+
           - **Total Builds**: 20
           - **Ubuntu Versions**: 22.04 LTS, 24.04 LTS
           - **Python Versions**: 3.9, 3.10, 3.11, 3.12, 3.13
@@ -466,19 +466,19 @@ jobs:
           - **Build Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
 
           EOF
-      
+
       - name: Create compressed archive
         run: |
           cd packed
           tar -czf radarsimpy_ubuntu_cpu_all_builds.tar.gz radarsimpy_ubuntu_cpu_all/
-          
+
           # Create zip version as well
           zip -r radarsimpy_ubuntu_cpu_all_builds.zip radarsimpy_ubuntu_cpu_all/
-          
+
           echo "::group::Archive Information"
           ls -lh *.tar.gz *.zip
           echo "::endgroup::"
-      
+
       - name: Upload packed artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -525,7 +525,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Build Status" >> $GITHUB_STEP_SUMMARY
           echo "Check individual job results above for detailed build information." >> $GITHUB_STEP_SUMMARY
-          
+
           # Check if any builds failed
           if [ "${{ needs.build.result }}" != "success" ]; then
             echo "" >> $GITHUB_STEP_SUMMARY

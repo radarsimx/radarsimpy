@@ -1,8 +1,8 @@
-# ============================================================================== 
+# ==============================================================================
 # GitHub Actions Workflow: MacOS Unit Testing (x64 & ARM64)
 # ==============================================================================
 #
-# This workflow performs continuous integration testing for RadarSimPy on 
+# This workflow performs continuous integration testing for RadarSimPy on
 # both MacOS x64 and ARM64 (Apple Silicon) platforms. It builds and tests the
 # radar simulation library across multiple Python versions to ensure compatibility
 # and reliability.
@@ -29,7 +29,7 @@
 #   - Xcode 15.2 (x64), Xcode 16.3 (arm64), CMake, GCC/Clang, and Python dependencies
 #   - build.sh script
 #
-# ============================================================================== 
+# ==============================================================================
 
 name: MacOS Unit Tests
 
@@ -52,35 +52,35 @@ jobs:
             runner: macos-13
             c_compiler: gcc-14
             cxx_compiler: g++-14
-            xcode: '15.2'
+            xcode: "15.2"
             os_label: macosx64
             python-version: "3.9"
           - arch: x64
             runner: macos-13
             c_compiler: gcc-14
             cxx_compiler: g++-14
-            xcode: '15.2'
+            xcode: "15.2"
             os_label: macosx64
             python-version: "3.10"
           - arch: x64
             runner: macos-13
             c_compiler: gcc-14
             cxx_compiler: g++-14
-            xcode: '15.2'
+            xcode: "15.2"
             os_label: macosx64
             python-version: "3.11"
           - arch: x64
             runner: macos-13
             c_compiler: gcc-14
             cxx_compiler: g++-14
-            xcode: '15.2'
+            xcode: "15.2"
             os_label: macosx64
             python-version: "3.12"
           - arch: x64
             runner: macos-13
             c_compiler: gcc-14
             cxx_compiler: g++-14
-            xcode: '15.2'
+            xcode: "15.2"
             os_label: macosx64
             python-version: "3.13"
           # MacOS arm64, Clang, Xcode 16.3
@@ -88,35 +88,35 @@ jobs:
             runner: macos-15
             c_compiler: clang
             cxx_compiler: clang++
-            xcode: '16.3'
+            xcode: "16.3"
             os_label: macosarm64
             python-version: "3.9"
           - arch: arm64
             runner: macos-15
             c_compiler: clang
             cxx_compiler: clang++
-            xcode: '16.3'
+            xcode: "16.3"
             os_label: macosarm64
             python-version: "3.10"
           - arch: arm64
             runner: macos-15
             c_compiler: clang
             cxx_compiler: clang++
-            xcode: '16.3'
+            xcode: "16.3"
             os_label: macosarm64
             python-version: "3.11"
           - arch: arm64
             runner: macos-15
             c_compiler: clang
             cxx_compiler: clang++
-            xcode: '16.3'
+            xcode: "16.3"
             os_label: macosarm64
             python-version: "3.12"
           - arch: arm64
             runner: macos-15
             c_compiler: clang
             cxx_compiler: clang++
-            xcode: '16.3'
+            xcode: "16.3"
             os_label: macosarm64
             python-version: "3.13"
 
