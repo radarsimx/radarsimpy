@@ -68,8 +68,8 @@ jobs:
         run: |
           set -e
           sudo chown -R $USER:$USER /home/runner/work/radarsimpy
-          chmod +x build_linux.sh
-          ./build_linux.sh --tier=standard --arch=cpu --test=off
+          chmod +x build.sh
+          ./build.sh --tier=standard --arch=cpu --test=off
         shell: bash
 
       - name: Generate Sphinx documentation
