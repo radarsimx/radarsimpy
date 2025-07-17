@@ -243,7 +243,7 @@ jobs:
         uses: Jimver/cuda-toolkit@v0.2.26
         with:
           cuda: '12.9.1'
-          method: 'local'
+          method: 'network'
           sub-packages: '["nvcc"]'
           linux-local-args: '["--toolkit", "--silent"]'
       
