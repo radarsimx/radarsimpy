@@ -371,6 +371,14 @@ jobs:
         with:
           path: artifacts/
 
+      - name: Delete downloaded artifacts
+        uses: geekyeggo/delete-artifact@v2
+        with:
+          failOnError: false
+          name: |
+            radarsimpy_macos_py*
+            radarsimpy_macos_arm_py*
+
       - name: Display downloaded artifacts
         run: |
           echo "::group::Downloaded Artifacts"
