@@ -683,6 +683,7 @@ cdef Target[float_t] cp_RCS_Target(target, mesh_module):
 
     # add a deprecated warning for target["is_ground"] has been replaced with target["skip_diffusion"]
     if "is_ground" in target:
+        target["skip_diffusion"] = target["is_ground"]
         warnings.warn("Deprecated: 'is_ground' has been replaced with 'skip_diffusion'", DeprecationWarning)
 
     return Target[float_t](&points_mv[0, 0],
