@@ -372,7 +372,7 @@ jobs:
           path: artifacts/
 
       - name: Delete downloaded artifacts
-        uses: geekyeggo/delete-artifact@v2
+        uses: geekyeggo/delete-artifact@v5
         with:
           failOnError: false
           name: |
