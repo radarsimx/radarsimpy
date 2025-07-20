@@ -350,6 +350,14 @@ jobs:
         with:
           path: artifacts/
 
+      - name: Delete downloaded artifacts
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          failOnError: false
+          name: |
+            radarsimpy_ubuntu_24_04*
+            radarsimpy_ubuntu_22_04*
+
       - name: Display downloaded artifacts
         run: |
           echo "::group::Downloaded Artifacts"

@@ -281,6 +281,13 @@ jobs:
         with:
           path: artifacts\
 
+      - name: Delete downloaded artifacts
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          failOnError: false
+          name: |
+            radarsimpy_windows_py*
+
       - name: Display downloaded artifacts
         run: |
           echo "::group::Downloaded Artifacts"
