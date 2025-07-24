@@ -586,8 +586,9 @@ REM   Continues with warnings if test tools are not available
     if exist ".\src\radarsimcpp\build\%BUILD_TYPE%\radarsimcpp_test.exe" (
         echo INFO: Running Google Test for C++ using CTest...
         ctest --test-dir ".\src\radarsimcpp\build" -C %BUILD_TYPE% --verbose
-        if %errorlevel% neq 0 (
-            echo ERROR: Google Test failed
+        set CTEST_EXIT_CODE=!errorlevel!
+        if !CTEST_EXIT_CODE! neq 0 (
+            echo ERROR: Google Test failed with exit code !CTEST_EXIT_CODE!
             set TEST_FAILED=1
         ) else (
             echo INFO: Google Test passed
@@ -601,8 +602,9 @@ REM   Continues with warnings if test tools are not available
     if %errorlevel% equ 0 (
         echo INFO: Running Python tests with pytest...
         pytest
-        if %errorlevel% neq 0 (
-            echo ERROR: Python tests failed
+        set PYTEST_EXIT_CODE=!errorlevel!
+        if !PYTEST_EXIT_CODE! neq 0 (
+            echo ERROR: Python tests failed with exit code !PYTEST_EXIT_CODE!
             set TEST_FAILED=1
         ) else (
             echo INFO: Python tests passed
