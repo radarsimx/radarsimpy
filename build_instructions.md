@@ -6,6 +6,51 @@ RadarSimPy is a radar simulation library that provides both CPU and GPU accelera
 
 > Building `radarsimpy` requires to access the source code of `radarsimcpp`. If you don't have access to `radarsimcpp`, please use the [pre-built module](https://radarsimx.com/product/radarsimpy/). For organizations seeking full source code access for customization or advanced integration, please submit [Quote for Source Code](https://radarsimx.com/quote-for-source-code/).
 
+## Project Structure
+
+The RadarSimPy repository has the following structure:
+
+```text
+radarsimpy/
+├── assets/                       # Documentation assets and diagrams
+├── gen_docs/                     # Documentation generation files
+├── models/                       # 3D model files for simulation
+├── references/                   # Research papers and documentation
+├── src/                          # Source code
+│   ├── radarsimcpp/              # C++ source code
+│   │   ├── gtest/                # Google Test framework
+│   │   ├── hdf5-lib-build/       # HDF5 library build files
+│   │   ├── includes/             # Header files
+│   │   │   ├── libs/             # Core library headers
+│   │   │   ├── rsvector/         # Custom vector implementations
+│   │   ├── src/                  # C++/CUDA implementation files
+│   │   ├── CMakeLists.txt        # CMake configuration
+│   │   └── README.md
+│   └── radarsimpy/               # Python source code
+├── tests/                        # Test suite
+├── batch_build.bat               # Windows batch build script
+├── batch_build.sh                # Linux/macOS batch build script
+├── build.bat                     # Windows build script
+├── build.sh                      # Linux/macOS build script
+├── build_config.py               # Build configuration validation
+├── build_instructions.md         # This file
+├── LICENSE                       # License file
+├── README.md                     # Project overview
+├── requirements-dev.txt          # Development dependencies
+├── requirements.txt              # Runtime dependencies
+└── setup.py                      # Python package setup
+```
+
+### Key Directories
+
+- **`src/`**: Contains the source code for both Python and C++ components
+- **`radarsimpy/`**: The built Python package with compiled extensions
+- **`tests/`**: Comprehensive test suite covering all functionality
+- **`models/`**: 3D mesh files (STL format) for radar simulation scenarios
+- **`references/`**: Academic papers and technical documentation
+- **`assets/`**: SVG diagrams and visual documentation
+- **`gen_docs/`**: Sphinx documentation configuration and source files
+
 ## Prerequisites for All Platforms
 
 ### System Requirements
