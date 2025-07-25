@@ -55,11 +55,7 @@ radarsimpy/
 ### Key Directories
 
 - **`src/`**: Contains the source code for both Python and C++ components
-- **`radarsimpy/`**: The built Python package with compiled extensions
 - **`tests/`**: Comprehensive test suite covering all functionality
-- **`models/`**: 3D mesh files (STL format) for radar simulation scenarios
-- **`references/`**: Academic papers and technical documentation
-- **`assets/`**: SVG diagrams and visual documentation
 - **`gen_docs/`**: Sphinx documentation configuration and source files
 
 ## Prerequisites for All Platforms
