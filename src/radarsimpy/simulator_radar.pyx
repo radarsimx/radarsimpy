@@ -51,7 +51,7 @@ from radarsimpy.includes.radarsimc cimport (
     PointSimulator,
     InterferenceSimulator,
     IsFreeTier,
-    ErrorType
+    RadarSimErrorCode
 )
 
 # RadarSimX library components
@@ -70,10 +70,10 @@ def raise_err(err):
     This function handles error reporting for various simulation scenarios,
     providing detailed error messages and potential solutions.
 
-    :param ErrorType err: The error type encountered during simulation
+    :param RadarSimErrorCode err: The error type encountered during simulation
     :raises RuntimeError: When a simulation error is encountered, with detailed message
     """
-    if err == ErrorType.ERROR_TOO_MANY_RAYS_PER_GRID:
+    if err == RadarSimErrorCode.ERROR_TOO_MANY_RAYS_PER_GRID:
         raise RuntimeError(f"[ERROR_TOO_MANY_RAYS_PER_GRID] The simulation is attempting to launch an excessive number of rays in a grid, which exceeds system's memory limitations. To resolve this issue, please try one or both of the following solutions:\n\
     1. Reduce the `grid` dimensions for the Transmitter (Tx) Channel.\n\
     2. Decrease the `density` parameter value in your `sim_radar()` function call.")
@@ -175,7 +175,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None
     :rtype: dict
     """
 
-    err = ErrorType.NO_ERROR
+    err = RadarSimErrorCode.SUCCESS
 
     #----------------------
     # C++ Object Declarations

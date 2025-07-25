@@ -42,8 +42,13 @@ cdef extern from "libs/free_tier.hpp":
     cdef int IsFreeTier() except +
 
 cdef extern from "type_def.hpp":
-    cdef enum ErrorType:
-        NO_ERROR
+    cdef enum RadarSimErrorCode:
+        SUCCESS
+        ERROR_NULL_POINTER
+        ERROR_INVALID_PARAMETER
+        ERROR_MEMORY_ALLOCATION
+        ERROR_FREE_TIER_LIMIT
+        ERROR_EXCEPTION
         ERROR_TOO_MANY_RAYS_PER_GRID
 
 #------------------------------------------------------------------------------
@@ -211,14 +216,14 @@ cdef extern from "simulator_point.hpp":
 cdef extern from "simulator_mesh.hpp":
     cdef cppclass MeshSimulator[H, L]:
         MeshSimulator() except +
-        ErrorType Run(Radar[H, L] & radar,
-                      vector[Target[L]] & targets,
-                      int level,
-                      L density,
-                      Vec2[int_t] ray_filter,
-                      bool back_propagating,
-                      string log_path,
-                      bool debug)
+        RadarSimErrorCode Run(Radar[H, L] & radar,
+                              vector[Target[L]] & targets,
+                              int level,
+                              L density,
+                              Vec2[int_t] ray_filter,
+                              bool back_propagating,
+                              string log_path,
+                              bool debug)
 
 cdef extern from "simulator_interference.hpp":
     cdef cppclass InterferenceSimulator[H, L]:
