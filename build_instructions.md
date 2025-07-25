@@ -20,13 +20,24 @@ radarsimpy/
 │   ├── radarsimcpp/              # C++ source code
 │   │   ├── gtest/                # Google Test framework
 │   │   ├── hdf5-lib-build/       # HDF5 library build files
+│   │   │   ├── hdf5/             # HDF5 source code (HDF Group)
+│   │   │   ├── libs/             # Platform-specific precompiled libraries
+│   │   │   │   ├── lib_linux_gcc11_x86_64/
+│   │   │   │   ├── lib_macos_arm64/
+│   │   │   │   ├── lib_macos_x86_64/
+│   │   │   │   └── lib_win_x86_64/
+│   │   │   ├── build.bat         # Windows build script
+│   │   │   ├── build.sh          # Linux/macOS build script
+│   │   │   └── README.md
 │   │   ├── includes/             # Header files
 │   │   │   ├── libs/             # Core library headers
-│   │   │   ├── rsvector/         # Custom vector implementations
+│   │   │   └── rsvector/         # Custom vector implementations
 │   │   ├── src/                  # C++/CUDA implementation files
 │   │   ├── CMakeLists.txt        # CMake configuration
 │   │   └── README.md
 │   └── radarsimpy/               # Python source code
+│       ├── includes/             # Cython declaration files
+│       └── lib/                  # Cython wrapper library
 ├── tests/                        # Test suite
 ├── batch_build.bat               # Windows batch build script
 ├── batch_build.sh                # Linux/macOS batch build script
