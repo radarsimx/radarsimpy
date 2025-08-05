@@ -210,14 +210,26 @@ class BuildConfig:
         cuda_config = {
             "home": home,
             "nvcc": nvcc,
-            "include": os.path.join(home, "include"),
+            "include": [
+                os.path.join(home, "include"),
+                os.path.join(home, "include", "cccl"),
+            ],
             "lib64": os.path.join(home, self.cuda_lib_dir),
         }
 
         # Verify all paths exist
         for key, path in cuda_config.items():
-            if not os.path.exists(path):
-                raise EnvironmentError(f"CUDA {key} path not found: {path}")
+            if key == "include":
+                # Handle include paths array
+                for include_path in path:
+                    if not os.path.exists(include_path):
+                        raise EnvironmentError(
+                            f"CUDA include path not found: {include_path}"
+                        )
+            else:
+                # Handle single paths
+                if not os.path.exists(path):
+                    raise EnvironmentError(f"CUDA {key} path not found: {path}")
 
         return cuda_config
 
@@ -257,7 +269,7 @@ class BuildConfig:
         ]
 
         if self.cuda_config:
-            include_dirs.append(self.cuda_config["include"])
+            include_dirs.extend(self.cuda_config["include"])
 
         return include_dirs
 
