@@ -244,6 +244,141 @@ python build_config.py
 - `--tier`: Build tier (`standard` or `free`)
 - `--cmake-args`: Additional CMake arguments
 
+## Building Documentation
+
+RadarSimPy includes comprehensive documentation built with Sphinx. The documentation source files are located in the `gen_docs/` directory and include API references, user guides, and examples.
+
+### Documentation Prerequisites
+
+Install the required documentation dependencies:
+
+```bash
+# Install all development dependencies (includes Sphinx and extensions)
+pip install -r requirements-dev.txt
+```
+
+The `requirements-dev.txt` file includes all necessary documentation tools:
+
+- `sphinx`: Documentation generation framework
+- `pydata-sphinx-theme`: PyData community theme for professional documentation
+- Other required extensions and dependencies
+
+### Documentation Structure
+
+The documentation system includes:
+
+```text
+gen_docs/
+├── conf.py                       # Sphinx configuration
+├── index.rst                     # Main documentation index
+├── make.bat                      # Windows build script
+├── Makefile                      # Linux/macOS build script
+├── api/                          # API documentation
+├── user_guide/                   # User guides and tutorials
+├── _build/                       # Generated documentation output
+└── _static/                      # Static assets (images, CSS, etc.)
+```
+
+### Building Documentation
+
+#### Prerequisites Check
+
+Before building documentation, ensure RadarSimPy is properly built:
+
+```bash
+# Validate build environment
+python build_config.py
+
+# Build the project first (required for API documentation)
+./build.sh --tier=standard --arch=cpu --test=off    # Linux/macOS
+# OR
+build.bat --tier=standard --arch=cpu --test=off     # Windows
+```
+
+#### Linux/macOS Documentation Build
+
+1. **Navigate to the documentation directory**:
+
+   ```bash
+   cd gen_docs
+   ```
+
+2. **Build HTML documentation**:
+
+   ```bash
+   make html
+   ```
+
+3. **Build other formats** (optional):
+
+   ```bash
+   # Clean previous builds
+   make clean
+
+   # Build PDF documentation (requires LaTeX)
+   make latexpdf
+
+   # Build EPUB format
+   make epub
+
+   # Build for single-page HTML
+   make singlehtml
+
+   # Check external links
+   make linkcheck
+
+   # Run doctests
+   make doctest
+   ```
+
+#### Windows Documentation Build
+
+1. **Navigate to the documentation directory**:
+
+   ```cmd
+   cd gen_docs
+   ```
+
+2. **Build HTML documentation**:
+
+   ```cmd
+   make.bat html
+   ```
+
+3. **Build other formats** (optional):
+
+   ```cmd
+   # Clean previous builds
+   make.bat clean
+
+   # Build PDF documentation (requires LaTeX)
+   make.bat latexpdf
+
+   # Build EPUB format
+   make.bat epub
+
+   # Build for single-page HTML
+   make.bat singlehtml
+   ```
+
+### Viewing the Documentation
+
+After building, the documentation will be available in:
+
+- **HTML**: `gen_docs/_build/html/index.html`
+- **PDF**: `gen_docs/_build/latex/radarsimpy.pdf` (if built)
+- **EPUB**: `gen_docs/_build/epub/RadarSimPy.epub` (if built)
+
+Open the HTML version in your web browser:
+
+```bash
+# Linux/macOS
+open gen_docs/_build/html/index.html
+
+# Windows
+start gen_docs/_build/html/index.html
+```
+
 ## Build Output
 
 ### Output Structure
