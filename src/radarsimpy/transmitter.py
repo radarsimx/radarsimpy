@@ -264,7 +264,7 @@ class Transmitter:
             else:
                 # Scalar case - expand to all pulses
                 f_offset = f_offset + np.zeros(pulses)
-            
+
             if len(f_offset) != pulses:
                 raise ValueError(
                     f"f_offset length ({len(f_offset)}) must match pulses ({pulses})"
