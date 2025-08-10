@@ -49,20 +49,103 @@ cdef int_t MAX_FREE_TIER_FACES = 8
 
 # Helper functions for validation and error handling
 cdef inline void _validate_vector_3d(object vector, str name) except *:
-    """Validate that a vector has exactly 3 elements."""
+    """
+    Validate that a vector has exactly 3 elements for 3D operations.
+    
+    Parameters
+    ----------
+    vector : array_like
+        Input vector to validate (should have 3 elements for [x, y, z]).
+    name : str
+        Parameter name for clear error messages.
+        
+    Raises
+    ------
+    TypeError
+        If vector is not array-like (missing __len__ method).
+    ValueError
+        If vector doesn't have exactly 3 elements.
+        
+    Examples
+    --------
+    Valid usage:
+        _validate_vector_3d([1, 2, 3], "location")
+        _validate_vector_3d(np.array([0, 0, 1]), "direction")
+        
+    Invalid usage (will raise):
+        _validate_vector_3d([1, 2], "location")  # ValueError: wrong size
+        _validate_vector_3d(5, "location")       # TypeError: not array-like
+    """
     if not hasattr(vector, '__len__'):
         raise TypeError(f"{name} must be array-like")
     if len(vector) != 3:
         raise ValueError(f"{name} must have 3 elements [x, y, z], got {len(vector)}")
 
 cdef inline float_t _safe_unit_conversion(str unit) except *:
-    """Safely convert unit string to scale factor."""
+    """
+    Safely convert unit string to scale factor with validation.
+    
+    Parameters
+    ----------
+    unit : str
+        Unit string specifying distance units. Supported values:
+        - 'm': meters (scale factor 1.0)
+        - 'cm': centimeters (scale factor 100.0)  
+        - 'mm': millimeters (scale factor 1000.0)
+        
+    Returns
+    -------
+    float_t
+        Scale factor for converting from specified unit to meters.
+        
+    Raises
+    ------
+    ValueError
+        If unit is not one of the supported values.
+        
+    Examples
+    --------
+    >>> _safe_unit_conversion('m')   # Returns 1.0
+    >>> _safe_unit_conversion('cm')  # Returns 100.0
+    >>> _safe_unit_conversion('mm')  # Returns 1000.0
+    >>> _safe_unit_conversion('ft')  # Raises ValueError
+    """
     if unit not in UNIT_SCALE:
         raise ValueError(f"Invalid unit '{unit}'. Supported units: {list(UNIT_SCALE.keys())}")
     return <float_t>UNIT_SCALE[unit]
 
 cdef inline void _validate_mesh_for_free_tier(int_t num_faces) except *:
-    """Check mesh size limits for free tier with detailed error message."""
+    """
+    Check mesh size limits for free tier with detailed error message.
+    
+    Validates that the number of mesh faces doesn't exceed the FreeTier
+    limitation. If the limit is exceeded, provides a detailed error message
+    with guidance on upgrading.
+    
+    Parameters
+    ----------
+    num_faces : int_t
+        Number of mesh faces in the target model.
+        
+    Raises
+    ------
+    RuntimeError
+        If FreeTier is active and num_faces exceeds MAX_FREE_TIER_FACES (8).
+        The error message includes:
+        - Current limitation value
+        - Actual number of faces in the model
+        - Number of faces that need to be reduced
+        - Link to upgrade information
+        
+    Notes
+    -----
+    This function only performs validation when IsFreeTier() returns True.
+    For full/standard versions, this function does nothing and returns
+    immediately without any checks.
+    
+    The limitation helps maintain reasonable simulation times in the trial
+    version while encouraging users to upgrade for larger simulations.
+    """
     if IsFreeTier() and num_faces > MAX_FREE_TIER_FACES:
         raise RuntimeError(
             f"\n{'='*60}\n"
@@ -276,17 +359,37 @@ cdef Transmitter[double, float_t] cp_Transmitter(radar):
 cdef TxChannel[float_t] cp_TxChannel(tx,
                                      tx_idx):
     """
-    TxChannel(tx, tx_idx)
+    cp_TxChannel(tx, tx_idx)
 
-    Creat TxChannel object in Cython
+    Create TxChannel object in Cython with complete antenna pattern processing
+
+    Converts Python transmitter channel configuration into a C++ TxChannel object.
+    Handles antenna patterns, polarization, pulse modulation, and waveform modulation
+    for a single transmitter channel.
 
     :param Transmitter tx:
-        Radar transmitter
+        Python transmitter object containing channel configurations including:
+        - Antenna patterns (azimuth and elevation)
+        - Polarization vector [x, y, z] (complex)
+        - Pulse modulation coefficients (complex array)
+        - Waveform modulation parameters
+        - Channel locations and gains
+        - Timing delays and grid orientation
     :param int tx_idx:
-        Tx channel index
+        Transmitter channel index (0-based) for multi-channel systems
 
     :return: C++ object of a transmitter channel
-    :rtype: TxChannel
+    :rtype: TxChannel[float_t]
+    
+    :raises ValueError: If channel index is out of range or pattern data is invalid
+    :raises RuntimeError: If antenna pattern conversion fails
+    
+    Notes
+    -----
+    - Azimuth patterns are converted from degrees to radians
+    - Elevation patterns are flipped (90° - elevation) and reversed for C++ convention
+    - Complex polarization vectors are properly converted to C++ complex types
+    - Modulation data is validated for correct dimensions
     """
     cdef int_t pulses_c = tx.waveform_prop["pulses"]
 
@@ -363,15 +466,34 @@ cdef RxChannel[float_t] cp_RxChannel(rx,
     """
     cp_RxChannel(rx, rx_idx)
 
-    Creat RxChannel object in Cython
+    Create RxChannel object in Cython with antenna pattern processing
+
+    Converts Python receiver channel configuration into a C++ RxChannel object.
+    Handles antenna patterns (azimuth and elevation), polarization, and channel
+    properties for a single receiver channel.
 
     :param Receiver rx:
-        Radar receiver
+        Python receiver object containing channel configurations including:
+        - Antenna patterns (azimuth and elevation angles and gains)
+        - Polarization vector [x, y, z] (complex)
+        - Channel locations and antenna gains
+        - Receiver-specific properties
     :param int rx_idx:
-        Rx channel index
+        Receiver channel index (0-based) for multi-channel receiver systems
 
-    :return: C++ object of a receiver channel
-    :rtype: RxChannel
+    :return: C++ object of a receiver channel for simulation
+    :rtype: RxChannel[float_t]
+    
+    :raises ValueError: If channel index is out of range or pattern data is invalid
+    :raises RuntimeError: If antenna pattern conversion fails
+    
+    Notes
+    -----
+    - Similar to TxChannel but for receiver-specific processing
+    - Azimuth patterns are converted from degrees to radians
+    - Elevation patterns are flipped (90° - elevation) and reversed for C++ convention
+    - Complex polarization vectors are properly converted to C++ complex types
+    - No modulation processing needed for receiver channels
     """
     cdef vector[float_t] az_ang_vt, az_ptn_vt
     cdef vector[float_t] el_ang_vt, el_ptn_vt
@@ -413,10 +535,61 @@ cdef RxChannel[float_t] cp_RxChannel(rx,
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cdef Radar[double, float_t] cp_Radar(radar, frame_start_time):
+    """
+    cp_Radar(radar, frame_start_time)
+
+    Create a complete Radar system object for simulation with enhanced configuration
+
+    Converts Python radar configuration into a comprehensive C++ Radar object.
+    This function orchestrates the creation of transmitter and receiver systems,
+    handles multi-frame timing, and manages complex radar positioning and motion.
+
+    :param Radar radar:
+        Python radar object containing complete system configuration:
+        
+        Array Properties:
+        - size: Number of channels in the radar array
+        
+        Transmitter Properties:
+        - waveform: Signal parameters (frequency, timing, modulation)
+        - channels: Individual transmitter channel configurations
+        - power levels and antenna patterns
+        
+        Receiver Properties: 
+        - gain settings and noise characteristics
+        - channels: Individual receiver channel configurations
+        - sampling parameters
+        
+        Radar Motion:
+        - location: Radar position [x, y, z] (can be time-varying)
+        - speed: Radar velocity [x, y, z] in m/s
+        - rotation: Radar orientation [roll, pitch, yaw] in degrees
+        - rotation_rate: Angular velocity [x, y, z] in deg/s
+
+    :param frame_start_time:
+        Timing information for multi-frame simulations:
+        - Single value for single-frame simulation
+        - Array for multi-frame with timing offsets
+
+    :return: Complete C++ Radar object ready for simulation
+    :rtype: Radar[double, float_t]
+    
+    :raises ValueError: If radar configuration is incomplete or invalid
+    :raises RuntimeError: If transmitter/receiver setup fails
+    
+    Notes
+    -----
+    - Automatically handles single vs. multi-frame configurations
+    - Processes both static and time-varying radar parameters
+    - Creates and links transmitter and receiver channel objects
+    - Handles coordinate transformations and unit conversions
+    - Optimized for high-performance simulation engine interface
+    """
     cdef Transmitter[double, float_t] tx_c
     cdef Receiver[float_t] rx_c
     cdef Radar[double, float_t] radar_c
 
+    # Extract key system dimensions from radar configuration
     cdef int_t txsize_c = radar.radar_prop["transmitter"].txchannel_prop["size"]
     cdef int_t rxsize_c = radar.radar_prop["receiver"].rxchannel_prop["size"]
     cdef int_t frames_c = np.size(frame_start_time)
@@ -424,11 +597,14 @@ cdef Radar[double, float_t] cp_Radar(radar, frame_start_time):
     cdef int_t pulses_c = radar.radar_prop["transmitter"].waveform_prop["pulses"]
     cdef int_t samples_c = radar.sample_prop["samples_per_pulse"]
 
+    # Calculate total buffer size for simulation data
     cdef int_t bbsize_c = channles_c*frames_c*pulses_c*samples_c
 
+    # Memory views for time-varying position and orientation
     cdef float_t[:, :, :] locx_mv, locy_mv, locz_mv
     cdef float_t[:, :, :] rotx_mv, roty_mv, rotz_mv
 
+    # Vector storage for C++ radar object construction
     cdef vector[double] t_frame_vt
     cdef vector[Vec3[float_t]] loc_vt
     cdef Vec3[float_t] spd_vt
