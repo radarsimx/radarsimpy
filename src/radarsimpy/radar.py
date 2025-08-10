@@ -641,37 +641,101 @@ class Radar:
         """
         shape = self.time_prop["timestamp_shape"]
 
-        if any(np.size(var) > 1 for var in list(location) + list(rotation)):
+        # Check if any location or rotation parameters are time-varying (arrays)
+        has_time_varying_motion = any(
+            np.size(var) > 1 for var in list(location) + list(rotation)
+        )
+
+        if has_time_varying_motion:
             self.validate_radar_motion(location, speed, rotation, rotation_rate)
-            self.radar_prop["location"] = np.zeros(shape + (3,))
-            self.radar_prop["rotation"] = np.zeros(shape + (3,))
-
-            self.radar_prop["speed"] = np.array(speed)
-            self.radar_prop["rotation_rate"] = np.radians(np.array(rotation_rate))
-
-            for idx in range(0, 3):
-                if np.size(location[idx]) > 1:
-                    self.radar_prop["location"][:, :, :, idx] = location[idx]
-                else:
-                    self.radar_prop["location"][:, :, :, idx] = (
-                        location[idx] + speed[idx] * self.time_prop["timestamp"]
-                    )
-
-                if np.size(rotation[idx]) > 1:
-                    self.radar_prop["rotation"][:, :, :, idx] = np.radians(
-                        rotation[idx]
-                    )
-                else:
-                    self.radar_prop["rotation"][:, :, :, idx] = (
-                        np.radians(rotation[idx])
-                        + np.radians(rotation_rate[idx]) * self.time_prop["timestamp"]
-                    )
-
+            self._setup_time_varying_motion(
+                location, speed, rotation, rotation_rate, shape
+            )
         else:
-            self.radar_prop["speed"] = np.array(speed)
-            self.radar_prop["location"] = np.array(location)
-            self.radar_prop["rotation"] = np.radians(np.array(rotation))
-            self.radar_prop["rotation_rate"] = np.radians(np.array(rotation_rate))
+            self._setup_static_motion(location, speed, rotation, rotation_rate)
+
+    def _setup_time_varying_motion(
+        self,
+        location: List[Union[float, NDArray]],
+        speed: List[Union[float, NDArray]],
+        rotation: List[Union[float, NDArray]],
+        rotation_rate: List[Union[float, NDArray]],
+        shape: Tuple[int, ...],
+    ) -> None:
+        """
+        Setup radar motion parameters for time-varying motion.
+
+        :param location: 3D location parameters
+        :param speed: Velocity parameters
+        :param rotation: Rotation angle parameters
+        :param rotation_rate: Angular velocity parameters
+        :param shape: Shape of the timestamp array
+        """
+        # Initialize arrays for time-varying motion
+        self.radar_prop["location"] = np.zeros(shape + (3,))
+        self.radar_prop["rotation"] = np.zeros(shape + (3,))
+
+        # Convert speed and rotation_rate to arrays (these are constant for time-varying case)
+        self.radar_prop["speed"] = np.array(speed)
+        self.radar_prop["rotation_rate"] = np.radians(np.array(rotation_rate))
+
+        # Process each spatial dimension (x, y, z)
+        for idx in range(3):
+            self._process_location_dimension(location, speed, idx)
+            self._process_rotation_dimension(rotation, rotation_rate, idx)
+
+    def _process_location_dimension(
+        self,
+        location: List[Union[float, NDArray]],
+        speed: List[Union[float, NDArray]],
+        idx: int,
+    ) -> None:
+        """Process a single dimension of location (x, y, or z)."""
+        if np.size(location[idx]) > 1:
+            # Time-varying position directly specified
+            self.radar_prop["location"][:, :, :, idx] = location[idx]
+        else:
+            # Calculate position from initial location + velocity * time
+            self.radar_prop["location"][:, :, :, idx] = (
+                location[idx] + speed[idx] * self.time_prop["timestamp"]
+            )
+
+    def _process_rotation_dimension(
+        self,
+        rotation: List[Union[float, NDArray]],
+        rotation_rate: List[Union[float, NDArray]],
+        idx: int,
+    ) -> None:
+        """Process a single dimension of rotation (yaw, pitch, or roll)."""
+        if np.size(rotation[idx]) > 1:
+            # Time-varying rotation directly specified
+            self.radar_prop["rotation"][:, :, :, idx] = np.radians(rotation[idx])
+        else:
+            # Calculate rotation from initial angle + angular velocity * time
+            self.radar_prop["rotation"][:, :, :, idx] = (
+                np.radians(rotation[idx])
+                + np.radians(rotation_rate[idx]) * self.time_prop["timestamp"]
+            )
+
+    def _setup_static_motion(
+        self,
+        location: List[Union[float, NDArray]],
+        speed: List[Union[float, NDArray]],
+        rotation: List[Union[float, NDArray]],
+        rotation_rate: List[Union[float, NDArray]],
+    ) -> None:
+        """
+        Setup radar motion parameters for static (non-time-varying) motion.
+
+        :param location: 3D location parameters
+        :param speed: Velocity parameters
+        :param rotation: Rotation angle parameters
+        :param rotation_rate: Angular velocity parameters
+        """
+        self.radar_prop["speed"] = np.array(speed)
+        self.radar_prop["location"] = np.array(location)
+        self.radar_prop["rotation"] = np.radians(np.array(rotation))
+        self.radar_prop["rotation_rate"] = np.radians(np.array(rotation_rate))
 
     @property
     def num_channels(self) -> int:
