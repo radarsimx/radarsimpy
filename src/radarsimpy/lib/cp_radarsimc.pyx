@@ -43,6 +43,67 @@ from radarsimpy.mesh_kit import load_mesh
 np.import_array()
 np_float = np.float32
 
+# Constants for unit conversion and validation
+cdef dict UNIT_SCALE = {"m": 1.0, "cm": 100.0, "mm": 1000.0}
+cdef int_t MAX_FREE_TIER_FACES = 8
+
+# Helper functions for validation and error handling
+cdef inline void _validate_vector_3d(object vector, str name) except *:
+    """Validate that a vector has exactly 3 elements."""
+    if not hasattr(vector, '__len__'):
+        raise TypeError(f"{name} must be array-like")
+    if len(vector) != 3:
+        raise ValueError(f"{name} must have 3 elements [x, y, z], got {len(vector)}")
+
+cdef inline float_t _safe_unit_conversion(str unit) except *:
+    """Safely convert unit string to scale factor."""
+    if unit not in UNIT_SCALE:
+        raise ValueError(f"Invalid unit '{unit}'. Supported units: {list(UNIT_SCALE.keys())}")
+    return <float_t>UNIT_SCALE[unit]
+
+cdef inline void _validate_mesh_for_free_tier(int_t num_faces) except *:
+    """Check mesh size limits for free tier with detailed error message."""
+    if IsFreeTier() and num_faces > MAX_FREE_TIER_FACES:
+        raise RuntimeError(
+            f"\n{'='*60}\n"
+            f"TRIAL VERSION LIMITATION - Mesh Size\n"
+            f"{'='*60}\n"
+            f"Current limitation: Maximum {MAX_FREE_TIER_FACES} mesh faces\n"
+            f"Your model: {num_faces} faces\n"
+            f"Reduction needed: {num_faces - MAX_FREE_TIER_FACES} faces\n\n"
+            f"This limitation helps maintain reasonable simulation times in the trial version.\n"
+            f"To simulate larger meshes, please upgrade to the Standard Version:\n"
+            f"→ https://radarsimx.com/product/radarsimpy/\n"
+            f"{'='*60}\n"
+        )
+
+cdef inline cpp_complex[float_t] _convert_permittivity(object permittivity) except *:
+    """Convert permittivity value to complex float with validation."""
+    if permittivity == "PEC":
+        return cpp_complex[float_t](<float_t>1e38, <float_t>0.0)
+    else:
+        try:
+            return cpp_complex[float_t](<float_t>np.real(permittivity), <float_t>np.imag(permittivity))
+        except (TypeError, ValueError) as e:
+            raise ValueError(f"Invalid permittivity value: {e}")
+
+cdef inline cpp_complex[float_t] _convert_permeability(object permeability) except *:
+    """Convert permeability value to complex float with validation."""
+    try:
+        return cpp_complex[float_t](<float_t>np.real(permeability), <float_t>np.imag(permeability))
+    except (TypeError, ValueError) as e:
+        raise ValueError(f"Invalid permeability value: {e}")
+
+cdef inline void _warn_deprecated_parameter(str old_param, str new_param) except *:
+    """Issue a deprecation warning for renamed parameters."""
+    warnings.warn(
+        f"Deprecated: '{old_param}' parameter has been replaced with '{new_param}'. "
+        f"Please update your code to use '{new_param}' instead. "
+        f"Support for '{old_param}' will be removed in a future version.",
+        DeprecationWarning,
+        stacklevel=3
+    )
+
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -54,11 +115,10 @@ cdef Point[float_t] cp_Point(location,
     """
     cp_Point(location, speed, rcs, phase, shape)
 
-    Creat Point object in Cython
+    Create Point object in Cython with enhanced input validation and error handling
 
     :param list location:
         Target's location (m), [x, y, z]
-
         *Note*: Target's parameters can be specified with
         ``Radar.timestamp`` to customize the time varying property.
         Example: ``location=(1e-3*np.sin(2*np.pi*1*radar.timestamp), 0, 0)``
@@ -66,32 +126,43 @@ cdef Point[float_t] cp_Point(location,
         Target's velocity (m/s), [x, y, z]
     :param float rcs:
         Target's RCS (dBsm)
-
         *Note*: Target's RCS can be specified with
         ``Radar.timestamp`` to customize the time varying property.
     :param float phase:
         Target's phase (deg)
-
         *Note*: Target's phase can be specified with
         ``Radar.timestamp`` to customize the time varying property.
     :param tuple shape:
-        Shape of the time matrix
+        Shape of the time matrix (channels, frames, pulses)
 
     :return: C++ object of a point target
     :rtype: Point
+    :raises: ValueError for invalid input dimensions or types
     """
+    # Input validation - check basic requirements
+    if not hasattr(location, '__len__') or len(location) != 3:
+        raise ValueError("location must be a 3-element array [x, y, z]")
+    if not hasattr(speed, '__len__') or len(speed) != 3:
+        raise ValueError("speed must be a 3-element array [x, y, z]")
+    if not hasattr(shape, '__len__') or len(shape) != 3:
+        raise ValueError("shape must be a 3-element tuple (channels, frames, pulses)")
+    
+    # Variable declarations for C++ vector storage
     cdef vector[Vec3[float_t]] loc_vt
     cdef vector[float_t] rcs_vt, phs_vt
 
+    # Memory view declarations for time-varying parameters
     cdef float_t[:, :, :] locx_mv, locy_mv, locz_mv
     cdef float_t[:, :, :] rcs_mv, phs_mv
 
+    # Calculate total buffer size for time-varying arrays
     cdef int_t bbsize_c = <int_t>(shape[0]*shape[1]*shape[2])
 
+    # Convert speed to memory view (constant for all time steps)
     cdef float_t[:] speed_mv = np.array(speed, dtype=np_float)
     cdef float_t[:] location_mv
 
-    # check if there are any time varying parameters
+    # Check if there are any time varying parameters
     if any(np.size(var) > 1 for var in list(location) + [rcs, phase]):
 
         if np.size(location[0]) > 1:
@@ -145,18 +216,21 @@ cdef Transmitter[double, float_t] cp_Transmitter(radar):
     """
     cp_Transmitter(radar)
 
-    Creat Transmitter object in Cython
+    Create Transmitter object in Cython with comprehensive parameter processing
 
     :param Radar radar:
-        Radar object
+        Radar object containing transmitter configuration
 
     :return: C++ object of a radar transmitter
     :rtype: Transmitter
+    :raises: ValueError for invalid radar configuration
     """
+    # Extract key dimensions from radar configuration
     cdef int_t channles_c = radar.array_prop["size"]
     cdef int_t pulses_c = radar.radar_prop["transmitter"].waveform_prop["pulses"]
     cdef int_t samples_c = radar.sample_prop["samples_per_pulse"]
 
+    # Vector declarations for transmitter parameters
     cdef vector[double] f_vt, t_vt
     cdef vector[double] f_offset_vt
     cdef vector[double] t_pstart_vt
@@ -475,25 +549,22 @@ cdef Target[float_t] cp_Target(radar,
     cdef float_t[:, :] points_mv
     cdef int_t[:, :] cells_mv
 
+    # Enhanced mesh validation and loading with improved error messages
     unit = target.get("unit", "m")
-    scale = {"m": 1, "cm": 100, "mm": 1000}.get(unit, 1)
+    try:
+        scale = _safe_unit_conversion(unit)
+    except ValueError as e:
+        raise ValueError(f"Invalid unit in target configuration: {e}")
 
-    mesh_data = load_mesh(target["model"], scale, mesh_module)
-    points_mv = mesh_data["points"].astype(np_float)
-    cells_mv = mesh_data["cells"].astype(np.int32)
+    try:
+        mesh_data = load_mesh(target["model"], scale, mesh_module)
+        points_mv = mesh_data["points"].astype(np_float)
+        cells_mv = mesh_data["cells"].astype(np.int32)
+    except Exception as e:
+        raise RuntimeError(f"Failed to load mesh model '{target.get('model', 'unknown')}': {e}")
     
-    if IsFreeTier():
-        if cells_mv.shape[0] > 8:
-            raise RuntimeError(
-                "\nTrial Version Limitation - Mesh Size\n"
-                "-----------------------------------\n"
-                "Current limitation: Maximum 8 mesh faces\n"
-                "Your model: {} faces\n\n"
-                "This limitation helps maintain reasonable simulation times in the trial version.\n"
-                "To simulate larger meshes, please upgrade to the Standard Version:\n"
-                "→ https://radarsimx.com/product/radarsimpy/\n"
-                .format(cells_mv.shape[0])
-            )
+    # Enhanced FreeTier validation using helper function
+    _validate_mesh_for_free_tier(cells_mv.shape[0])
 
     cdef float_t[:] origin_mv = np.array(target.get("origin", (0, 0, 0)), dtype=np_float)
 
@@ -595,10 +666,10 @@ cdef Target[float_t] cp_Target(radar,
         rotation_rate_mv = np.radians(np.array(rotation_rate, dtype=np_float)).astype(np_float)
         rrt_vt.push_back(Vec3[float_t](&rotation_rate_mv[0]))
     
-    # add a deprecated warning for target["is_ground"] has been replaced with target["skip_diffusion"]
+    # Handle deprecated parameter with enhanced warning
     if "is_ground" in target:
         target["skip_diffusion"] = target["is_ground"]
-        warnings.warn("Deprecated: 'is_ground' has been replaced with 'skip_diffusion'", DeprecationWarning)
+        _warn_deprecated_parameter("is_ground", "skip_diffusion")
 
     return Target[float_t](&points_mv[0, 0],
                            &cells_mv[0, 0],
@@ -617,15 +688,18 @@ cdef Target[float_t] cp_Target(radar,
 @cython.wraparound(False)
 cdef Target[float_t] cp_RCS_Target(target, mesh_module):
     """
-    cp_RCS_Target((radar, target, shape)
+    cp_RCS_Target(target, mesh_module)
 
-    Creat Target object in Cython for RCS calculation
+    Create Target object in Cython for RCS calculation with enhanced validation
 
     :param dict target:
-        Target properties
-
-    :return: C++ object of a target
+        Target properties dictionary
+    :param mesh_module:
+        Mesh loading module
+        
+    :return: C++ object of a target for RCS computation
     :rtype: Target
+    :raises: RuntimeError on mesh limitations, ValueError on invalid target
     """
     # Vector declarations
     cdef vector[Vec3[float_t]] loc_vt, spd_vt, rot_vt, rrt_vt
@@ -634,27 +708,22 @@ cdef Target[float_t] cp_RCS_Target(target, mesh_module):
     cdef float_t[:, :] points_mv
     cdef int_t[:, :] cells_mv
 
-    # Set scale based on units
+    # Enhanced mesh validation and loading with improved error messages  
     unit = target.get("unit", "m")
-    scale = {"m": 1, "cm": 100, "mm": 1000}.get(unit, 1)
+    try:
+        scale = _safe_unit_conversion(unit)
+    except ValueError as e:
+        raise ValueError(f"Invalid unit in target configuration: {e}")
 
-    mesh_data = load_mesh(target["model"], scale, mesh_module)
-    points_mv = mesh_data["points"].astype(np_float)
-    cells_mv = mesh_data["cells"].astype(np.int32)
+    try:
+        mesh_data = load_mesh(target["model"], scale, mesh_module)
+        points_mv = mesh_data["points"].astype(np_float)
+        cells_mv = mesh_data["cells"].astype(np.int32)
+    except Exception as e:
+        raise RuntimeError(f"Failed to load mesh model '{target.get('model', 'unknown')}': {e}")
 
-    # Check FreeTier mesh size limit
-    if IsFreeTier():
-        if cells_mv.shape[0] > 8:
-            raise RuntimeError(
-                "\nTrial Version Limitation - Mesh Size\n"
-                "-----------------------------------\n"
-                "Current limitation: Maximum 8 mesh faces\n"
-                "Your model: {} faces\n\n"
-                "This limitation helps maintain reasonable simulation times in the trial version.\n"
-                "To simulate larger meshes, please upgrade to the Standard Version:\n"
-                "→ https://radarsimx.com/product/radarsimpy/\n"
-                .format(cells_mv.shape[0])
-            )
+    # Enhanced FreeTier validation using helper function
+    _validate_mesh_for_free_tier(cells_mv.shape[0])
 
     cdef float_t[:] origin_mv = np.array(target.get("origin", (0, 0, 0)), dtype=np_float)
 
@@ -686,10 +755,10 @@ cdef Target[float_t] cp_RCS_Target(target, mesh_module):
     rotation_rate_mv = np.radians(rotation_rate.astype(np_float)).astype(np_float)
     rrt_vt.push_back(Vec3[float_t](&rotation_rate_mv[0]))
 
-    # add a deprecated warning for target["is_ground"] has been replaced with target["skip_diffusion"]
+    # Handle deprecated parameter with enhanced warning
     if "is_ground" in target:
         target["skip_diffusion"] = target["is_ground"]
-        warnings.warn("Deprecated: 'is_ground' has been replaced with 'skip_diffusion'", DeprecationWarning)
+        _warn_deprecated_parameter("is_ground", "skip_diffusion")
 
     return Target[float_t](&points_mv[0, 0],
                            &cells_mv[0, 0],
