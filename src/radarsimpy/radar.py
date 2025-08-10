@@ -25,9 +25,96 @@ including phase noise and noise amplitudes.
 
 """
 
-from typing import List, Dict, Union, Tuple, Optional
+from typing import List, Union, Tuple, Optional, Any, TYPE_CHECKING
 import numpy as np
 from numpy.typing import NDArray
+
+if TYPE_CHECKING:
+    from .transmitter import Transmitter
+    from .receiver import Receiver
+
+# Constants
+BOLTZMANN_CONSTANT = 1.38064852e-23  # J/K
+REALMIN_FALLBACK = 1e-30
+SQRT_HALF = 0.5**0.5
+MILLIWATTS_TO_WATTS = 1e-3
+
+
+def _interpolate_phase_noise_power(
+    freq: NDArray, power: NDArray, f_grid: NDArray, realmin: float
+) -> NDArray:
+    """
+    Interpolate phase noise power in log-scale.
+
+    :param freq: Frequency array
+    :param power: Power array
+    :param f_grid: Frequency grid for interpolation
+    :param realmin: Minimum value to avoid log(0)
+    :return: Interpolated power values
+    """
+    intrvl_num = len(freq)
+    log_p = np.zeros(len(f_grid))
+
+    for intrvl_index in range(intrvl_num):
+        left_bound = freq[intrvl_index]
+        t1 = power[intrvl_index]
+
+        if intrvl_index == intrvl_num - 1:
+            right_bound = f_grid[-1] * 2  # fs/2
+            t2 = power[-1]
+            inside = np.where(
+                np.logical_and(f_grid >= left_bound, f_grid <= right_bound)
+            )
+        else:
+            right_bound = freq[intrvl_index + 1]
+            t2 = power[intrvl_index + 1]
+            inside = np.where(
+                np.logical_and(f_grid >= left_bound, f_grid < right_bound)
+            )
+
+        log_p[inside] = t1 + (
+            np.log10(f_grid[inside] + realmin) - np.log10(left_bound + realmin)
+        ) / (np.log10(right_bound + 2 * realmin) - np.log10(left_bound + realmin)) * (
+            t2 - t1
+        )
+
+    return 10 ** (np.real(log_p) / 10)
+
+
+def _generate_noise_spectrum(
+    p_interp: NDArray,
+    delta_f: NDArray,
+    shape: Tuple[int, int],
+    rng,
+    validation: bool = False,
+) -> NDArray:
+    """
+    Generate noise spectrum with proper shape.
+
+    :param p_interp: Interpolated power values
+    :param delta_f: Frequency spacing array
+    :param shape: Shape (row, num_f_points)
+    :param rng: Random number generator
+    :param validation: Use deterministic values for validation
+    :return: Generated noise spectrum
+    """
+    row, num_f_points = shape
+
+    # Generate AWGN of power 1
+    if validation:
+        awgn_p1 = SQRT_HALF * (
+            np.ones((row, num_f_points)) + 1j * np.ones((row, num_f_points))
+        )
+    else:
+        awgn_p1 = SQRT_HALF * (
+            rng.standard_normal((row, num_f_points))
+            + 1j * rng.standard_normal((row, num_f_points))
+        )
+
+    # Shape the noise on the positive spectrum [0, fs/2] including bounds
+    spec_noise = num_f_points * np.sqrt(delta_f * p_interp) * awgn_p1
+
+    return spec_noise
 
 
 def cal_phase_noise(  # pylint: disable=too-many-arguments, too-many-locals
@@ -117,6 +204,16 @@ def cal_phase_noise(  # pylint: disable=too-many-arguments, too-many-locals
         █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █ █
 
     """
+    # Input validation
+    if fs <= 0:
+        raise ValueError("Sampling frequency must be positive")
+    if len(freq) != len(power):
+        raise ValueError(
+            f"freq and power arrays must have same length: "
+            f"freq={len(freq)}, power={len(power)}"
+        )
+    if np.any(freq < 0):
+        raise ValueError("All frequency values must be non-negative")
 
     if seed is None:
         rng = np.random.default_rng()
@@ -167,37 +264,10 @@ def cal_phase_noise(  # pylint: disable=too-many-arguments, too-many-locals
     f_grid = np.linspace(0, fs / 2, int(num_f_points))  # Freq. Grid
     delta_f = np.concatenate((np.diff(f_grid), [f_grid[-1] - f_grid[-2]]))  # Delta F
 
-    realmin = np.finfo(np.float64).tiny
-    # realmin = 1e-30
-
     # Perform interpolation of power in log-scale
-    intrvl_num = len(freq)
-    log_p = np.zeros(int(num_f_points))
-    # for intrvl_index = 1 : intrvl_num,
-    for intrvl_index in range(0, intrvl_num):
-        left_bound = freq[intrvl_index]
-        t1 = power[intrvl_index]
-        if intrvl_index == intrvl_num - 1:
-            right_bound = fs / 2
-            t2 = power[-1]
-            inside = np.where(
-                np.logical_and(f_grid >= left_bound, f_grid <= right_bound)
-            )
-        else:
-            right_bound = freq[intrvl_index + 1]
-            t2 = power[intrvl_index + 1]
-            inside = np.where(
-                np.logical_and(f_grid >= left_bound, f_grid < right_bound)
-            )
-
-        log_p[inside] = t1 + (
-            np.log10(f_grid[inside] + realmin) - np.log10(left_bound + realmin)
-        ) / (np.log10(right_bound + 2 * realmin) - np.log10(left_bound + realmin)) * (
-            t2 - t1
-        )
-
-    # Interpolated P ( half spectrum [0 fs/2] ) [ dBc/Hz ]
-    p_interp = 10 ** (np.real(log_p) / 10)
+    realmin = float(np.finfo(np.float64).tiny)
+    # Alternative: realmin = REALMIN_FALLBACK
+    p_interp = _interpolate_phase_noise_power(freq, power, f_grid, realmin)
 
     # Now we will generate AWGN of power 1 in frequency domain and shape
     # it by the desired shape as follows:
@@ -220,23 +290,10 @@ def cal_phase_noise(  # pylint: disable=too-many-arguments, too-many-locals
     # we have to compensate normalization factor (1/K) multiplying spec_noise(k)
     # by K. In our case K = 2*num_f_points-2.
 
-    # Generate AWGN of power 1
-    if validation:
-        awgn_p1 = np.sqrt(0.5) * (
-            np.ones((row, num_f_points)) + 1j * np.ones((row, num_f_points))
-        )
-    else:
-        awgn_p1 = np.sqrt(0.5) * (
-            rng.standard_normal((row, num_f_points))
-            + 1j * rng.standard_normal((row, num_f_points))
-        )
-
-    # Shape the noise on the positive spectrum [0, fs/2] including bounds
-    # ( num_f_points points )
-    # spec_noise = (2*num_f_points-2) * np.sqrt(delta_f * p_interp) * awgn_p1
-    spec_noise = num_f_points * np.sqrt(delta_f * p_interp) * awgn_p1
-    ## NOTE: this normalization should be num_f_points vs. (2*num_f_points-2)
-    # since on line 222 he creates the two-sided spectrum by adding the negative frequency spectrum.
+    # Generate shaped noise spectrum
+    spec_noise = _generate_noise_spectrum(
+        p_interp, delta_f, (row, num_f_points), rng, validation
+    )
 
     # spec_noise = np.transpose(spec_noise)
     # Complete symmetrical negative spectrum  (fs/2, fs) not including
@@ -334,14 +391,14 @@ class Radar:
         self,
         transmitter: "Transmitter",
         receiver: "Receiver",
-        location: Tuple[float, float, float] = (0, 0, 0),
-        speed: Tuple[float, float, float] = (0, 0, 0),
-        rotation: Tuple[float, float, float] = (0, 0, 0),
-        rotation_rate: Tuple[float, float, float] = (0, 0, 0),
+        location: Union[Tuple[float, float, float], List[float]] = (0, 0, 0),
+        speed: Union[Tuple[float, float, float], List[float]] = (0, 0, 0),
+        rotation: Union[Tuple[float, float, float], List[float]] = (0, 0, 0),
+        rotation_rate: Union[Tuple[float, float, float], List[float]] = (0, 0, 0),
         seed: Optional[int] = None,
         **kwargs,
     ):
-        self.time_prop = {}
+        self.time_prop: dict[str, Any] = {}
 
         # Calculate samples per pulse and validate
         samples_per_pulse = int(
@@ -357,8 +414,10 @@ class Radar:
                 f"Either increase the pulse_length or increase the sampling frequency."
             )
 
-        self.sample_prop = {"samples_per_pulse": samples_per_pulse}
-        self.array_prop = {
+        self.sample_prop: dict[str, Union[int, float, NDArray, None]] = {
+            "samples_per_pulse": samples_per_pulse
+        }
+        self.array_prop: dict[str, Union[int, NDArray]] = {
             "size": (
                 transmitter.txchannel_prop["size"] * receiver.rxchannel_prop["size"]
             ),
@@ -372,7 +431,7 @@ class Radar:
                 (transmitter.txchannel_prop["size"], 1),
             ),
         }
-        self.radar_prop = {
+        self.radar_prop: dict[str, Any] = {
             "transmitter": transmitter,
             "receiver": receiver,
         }
@@ -416,10 +475,10 @@ class Radar:
             self.sample_prop["phase_noise"] = None
 
         self.process_radar_motion(
-            location,
-            speed,
-            rotation,
-            rotation_rate,
+            list(location),
+            list(speed),
+            list(rotation),
+            list(rotation_rate),
         )
 
     def gen_timestamp(self) -> NDArray:
@@ -429,14 +488,18 @@ class Radar:
         :return:
             Timestamp for each samples. Frame start time is
             defined in ``time``.
-            ``[channes/frames, pulses, samples]``
+            Shape: ``[channels/frames, pulses, samples]``
         :rtype: numpy.3darray
         """
 
-        channel_size = self.array_prop["size"]
-        rx_channel_size = self.radar_prop["receiver"].rxchannel_prop["size"]
+        channel_size = int(self.array_prop["size"])
+        rx_channel_size = int(self.radar_prop["receiver"].rxchannel_prop["size"])
         pulses = self.radar_prop["transmitter"].waveform_prop["pulses"]
-        samples = self.sample_prop["samples_per_pulse"]
+        samples_per_pulse = self.sample_prop["samples_per_pulse"]
+        assert isinstance(
+            samples_per_pulse, int
+        ), "samples_per_pulse must be an integer"
+        samples = samples_per_pulse
         crp = self.radar_prop["transmitter"].waveform_prop["prp"]
         delay = self.radar_prop["transmitter"].txchannel_prop["delay"]
         fs = self.radar_prop["receiver"].bb_prop["fs"]
@@ -468,14 +531,15 @@ class Radar:
         """
         Calculate noise amplitudes
 
+        :param float noise_temp: Noise temperature in Kelvin
         :return:
             Peak to peak amplitude of noise.
         :rtype: float
         """
 
-        boltzmann_const = 1.38064852e-23
-
-        input_noise_dbm = 10 * np.log10(boltzmann_const * noise_temp * 1000)  # dBm/Hz
+        input_noise_dbm = 10 * np.log10(
+            BOLTZMANN_CONSTANT * noise_temp * 1000
+        )  # dBm/Hz
         receiver_noise_dbm = (
             input_noise_dbm
             + self.radar_prop["receiver"].rf_prop["rf_gain"]
@@ -483,7 +547,9 @@ class Radar:
             + 10 * np.log10(self.radar_prop["receiver"].bb_prop["noise_bandwidth"])
             + self.radar_prop["receiver"].bb_prop["baseband_gain"]
         )  # dBm/Hz
-        receiver_noise_watts = 1e-3 * 10 ** (receiver_noise_dbm / 10)  # Watts/sqrt(hz)
+        receiver_noise_watts = MILLIWATTS_TO_WATTS * 10 ** (
+            receiver_noise_dbm / 10
+        )  # Watts/sqrt(hz)
         noise_amplitude_mixer = np.sqrt(
             receiver_noise_watts * self.radar_prop["receiver"].bb_prop["load_resistor"]
         )
@@ -511,38 +577,49 @@ class Radar:
         :raises ValueError: rotation_rate[x] must be a scalar or have the same shape as timestamp
         :raises ValueError: rotation[x] must be a scalar or have the same shape as timestamp
         """
+        # Validate input lengths
+        if len(location) != 3:
+            raise ValueError(f"location must have 3 elements, got {len(location)}")
+        if len(speed) != 3:
+            raise ValueError(f"speed must have 3 elements, got {len(speed)}")
+        if len(rotation) != 3:
+            raise ValueError(f"rotation must have 3 elements, got {len(rotation)}")
+        if len(rotation_rate) != 3:
+            raise ValueError(
+                f"rotation_rate must have 3 elements, got {len(rotation_rate)}"
+            )
 
-        for idx in range(0, 3):
+        for idx in range(3):
+            # More descriptive coordinate names
+            coord_names = ["x", "y", "z"]
+            coord = coord_names[idx]
+
             if np.size(speed[idx]) > 1:
                 if np.shape(speed[idx]) != self.time_prop["timestamp_shape"]:
                     raise ValueError(
-                        "speed ["
-                        + str(idx)
-                        + "] must be a scalar or have the same shape as timestamp"
+                        f"speed[{coord}] must be a scalar or have the same shape as timestamp. "
+                        f"Got shape {np.shape(speed[idx])}, expected {self.time_prop['timestamp_shape']}"
                     )
 
             if np.size(location[idx]) > 1:
                 if np.shape(location[idx]) != self.time_prop["timestamp_shape"]:
                     raise ValueError(
-                        "location["
-                        + str(idx)
-                        + "] must be a scalar or have the same shape as timestamp"
+                        f"location[{coord}] must be a scalar or have the same shape as timestamp. "
+                        f"Got shape {np.shape(location[idx])}, expected {self.time_prop['timestamp_shape']}"
                     )
 
             if np.size(rotation_rate[idx]) > 1:
                 if np.shape(rotation_rate[idx]) != self.time_prop["timestamp_shape"]:
                     raise ValueError(
-                        "rotation_rate["
-                        + str(idx)
-                        + "] must be a scalar or have the same shape as timestamp"
+                        f"rotation_rate[{coord}] must be a scalar or have the same shape as timestamp. "
+                        f"Got shape {np.shape(rotation_rate[idx])}, expected {self.time_prop['timestamp_shape']}"
                     )
 
             if np.size(rotation[idx]) > 1:
                 if np.shape(rotation[idx]) != self.time_prop["timestamp_shape"]:
                     raise ValueError(
-                        "rotation["
-                        + str(idx)
-                        + "] must be a scalar or have the same shape as timestamp"
+                        f"rotation[{coord}] must be a scalar or have the same shape as timestamp. "
+                        f"Got shape {np.shape(rotation[idx])}, expected {self.time_prop['timestamp_shape']}"
                     )
 
     def process_radar_motion(
@@ -570,7 +647,7 @@ class Radar:
             self.radar_prop["rotation"] = np.zeros(shape + (3,))
 
             self.radar_prop["speed"] = np.array(speed)
-            self.radar_prop["rotation_rate"] = np.radians(rotation_rate)
+            self.radar_prop["rotation_rate"] = np.radians(np.array(rotation_rate))
 
             for idx in range(0, 3):
                 if np.size(location[idx]) > 1:
@@ -593,5 +670,51 @@ class Radar:
         else:
             self.radar_prop["speed"] = np.array(speed)
             self.radar_prop["location"] = np.array(location)
-            self.radar_prop["rotation"] = np.radians(rotation)
-            self.radar_prop["rotation_rate"] = np.radians(rotation_rate)
+            self.radar_prop["rotation"] = np.radians(np.array(rotation))
+            self.radar_prop["rotation_rate"] = np.radians(np.array(rotation_rate))
+
+    @property
+    def num_channels(self) -> int:
+        """Get the total number of virtual array channels."""
+        return int(self.array_prop["size"])
+
+    @property
+    def samples_per_pulse(self) -> int:
+        """Get the number of samples per pulse."""
+        samples = self.sample_prop["samples_per_pulse"]
+        assert isinstance(samples, int)
+        return samples
+
+    @property
+    def transmitter(self):
+        """Get the transmitter instance."""
+        return self.radar_prop["transmitter"]
+
+    @property
+    def receiver(self):
+        """Get the receiver instance."""
+        return self.radar_prop["receiver"]
+
+    @property
+    def virtual_array_locations(self) -> NDArray:
+        """Get the 3D locations of virtual array elements."""
+        virtual_array = self.array_prop["virtual_array"]
+        assert isinstance(virtual_array, np.ndarray)
+        return virtual_array
+
+    def __str__(self) -> str:
+        """String representation of the Radar."""
+        return (
+            f"Radar(channels={self.num_channels}, "
+            f"samples_per_pulse={self.samples_per_pulse}, "
+            f"fs={self.receiver.bb_prop['fs']/1e6:.1f} MHz)"
+        )
+
+    def __repr__(self) -> str:
+        """Detailed string representation of the Radar."""
+        return (
+            f"Radar(transmitter={self.transmitter.__class__.__name__}, "
+            f"receiver={self.receiver.__class__.__name__}, "
+            f"channels={self.num_channels}, "
+            f"samples_per_pulse={self.samples_per_pulse})"
+        )
