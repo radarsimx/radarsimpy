@@ -594,6 +594,11 @@ cdef Target[float_t] cp_Target(radar,
 
         rotation_rate_mv = np.radians(np.array(rotation_rate, dtype=np_float)).astype(np_float)
         rrt_vt.push_back(Vec3[float_t](&rotation_rate_mv[0]))
+    
+    # add a deprecated warning for target["is_ground"] has been replaced with target["skip_diffusion"]
+    if "is_ground" in target:
+        target["skip_diffusion"] = target["is_ground"]
+        warnings.warn("Deprecated: 'is_ground' has been replaced with 'skip_diffusion'", DeprecationWarning)
 
     return Target[float_t](&points_mv[0, 0],
                            &cells_mv[0, 0],
