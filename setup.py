@@ -207,13 +207,16 @@ class BuildConfig:
                 )
             home = os.path.dirname(os.path.dirname(nvcc))
 
+        # Build include paths, only adding cccl if it exists
+        include_paths = [os.path.join(home, "include")]
+        cccl_path = os.path.join(home, "include", "cccl")
+        if os.path.exists(cccl_path):
+            include_paths.append(cccl_path)
+
         cuda_config = {
             "home": home,
             "nvcc": nvcc,
-            "include": [
-                os.path.join(home, "include"),
-                os.path.join(home, "include", "cccl"),
-            ],
+            "include": include_paths,
             "lib64": os.path.join(home, self.cuda_lib_dir),
         }
 
