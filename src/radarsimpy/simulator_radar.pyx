@@ -63,7 +63,57 @@ from radarsimpy.lib.cp_radarsimc cimport (
 
 from radarsimpy.mesh_kit import import_mesh_module
 
-def raise_err(err):
+# Constants for better maintainability
+cdef:
+    int_t MAX_RAY_REFLECTIONS = 10
+    int_t DEFAULT_MIN_REFLECTIONS = 0
+    float_t SQRT_2 = 1.4142135623730951
+
+cdef inline void validate_free_tier_limits(radar, list targets):
+    """
+    Validates limitations for the free tier version.
+    
+    :param radar: The radar configuration object
+    :param targets: List of targets to simulate
+    :raises RuntimeError: If free tier limitations are exceeded
+    """
+    if not IsFreeTier():
+        return
+        
+    if len(targets) > 2:
+        raise RuntimeError(
+            "\nTrial Version Limitation - Target Count\n"
+            "----------------------------------------\n"
+            "Current limitation: Maximum 2 targets\n"
+            "Your scene: {} targets\n\n"
+            "To simulate more targets, please upgrade to the Standard Version:\n"
+            "→ https://radarsimx.com/product/radarsimpy/\n"
+            .format(len(targets))
+        )
+
+    if radar.radar_prop["transmitter"].txchannel_prop["size"] > 1:
+        raise RuntimeError(
+            "\nTrial Version Limitation - Transmitter Channels\n"
+            "----------------------------------------------\n"
+            "Current limitation: 1 transmitter channel\n"
+            "Your configuration: {} channels\n\n"
+            "To use multiple transmitter channels, please upgrade to the Standard Version:\n"
+            "→ https://radarsimx.com/product/radarsimpy/\n"
+            .format(radar.radar_prop["transmitter"].txchannel_prop["size"])
+        )
+
+    if radar.radar_prop["receiver"].rxchannel_prop["size"] > 1:
+        raise RuntimeError(
+            "\nTrial Version Limitation - Receiver Channels\n"
+            "-------------------------------------------\n"
+            "Current limitation: 1 receiver channel\n"
+            "Your configuration: {} channels\n\n"
+            "To use multiple receiver channels, please upgrade to the Standard Version:\n"
+            "→ https://radarsimx.com/product/radarsimpy/\n"
+            .format(radar.radar_prop["receiver"].rxchannel_prop["size"])
+        )
+
+cdef inline raise_err(RadarSimErrorCode err):
     """
     Raises appropriate runtime errors based on simulation error types.
 
@@ -74,9 +124,15 @@ def raise_err(err):
     :raises RuntimeError: When a simulation error is encountered, with detailed message
     """
     if err == RadarSimErrorCode.ERROR_TOO_MANY_RAYS_PER_GRID:
-        raise RuntimeError(f"[ERROR_TOO_MANY_RAYS_PER_GRID] The simulation is attempting to launch an excessive number of rays in a grid, which exceeds system's memory limitations. To resolve this issue, please try one or both of the following solutions:\n\
-    1. Reduce the `grid` dimensions for the Transmitter (Tx) Channel.\n\
-    2. Decrease the `density` parameter value in your `sim_radar()` function call.")
+        raise RuntimeError(
+            "[ERROR_TOO_MANY_RAYS_PER_GRID] The simulation is attempting to launch an "
+            "excessive number of rays in a grid, which exceeds system's memory limitations. "
+            "To resolve this issue, please try one or both of the following solutions:\n"
+            "1. Reduce the `grid` dimensions for the Transmitter (Tx) Channel.\n"
+            "2. Decrease the `density` parameter value in your `sim_radar()` function call."
+        )
+    else:
+        raise RuntimeError(f"Simulation error occurred with code: {err}")
 
 
 @cython.cdivision(True)
@@ -173,8 +229,12 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None
         - **timestamp** (*numpy.ndarray*): Timestamp array, directly derived from ``Radar.timestamp``.
 
     :rtype: dict
+
+    :raises RuntimeError: When simulation limitations are exceeded or errors occur
+    :raises ValueError: When invalid simulation parameters are provided
     """
 
+    # Initialize error tracking
     err = RadarSimErrorCode.SUCCESS
 
     #----------------------
@@ -199,50 +259,24 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None
         int_t level_id = 0
         int_t ps_idx
         int_t frames_c = np.size(frame_time)
-        int_t channles_c = radar.array_prop["size"]
+        int_t channels_c = radar.array_prop["size"]  # Fixed typo: channles_c -> channels_c
         int_t rxsize_c = radar.radar_prop["receiver"].rxchannel_prop["size"]
         int_t txsize_c = radar.radar_prop["transmitter"].txchannel_prop["size"]
         string log_path_c
+        
+        # Pre-declare variables for better performance
+        int_t frame_idx, ch_idx, rx_ch
+        float_t t0
+        int_t f_ch_idx
+        int_t num_noise_samples
 
     #----------------------
     # Initialization
     #----------------------
-    # FreeTier validation
-    if IsFreeTier():
-        if len(targets) > 2:
-            raise RuntimeError(
-                "\nTrial Version Limitation - Target Count\n"
-                "----------------------------------------\n"
-                "Current limitation: Maximum 2 targets\n"
-                "Your scene: {} targets\n\n"
-                "To simulate more targets, please upgrade to the Standard Version:\n"
-                "→ https://radarsimx.com/product/radarsimpy/\n"
-                .format(len(targets))
-            )
+    # Validate free tier limitations
+    validate_free_tier_limits(radar, targets)
 
-        if radar.radar_prop["transmitter"].txchannel_prop["size"] > 1:
-            raise RuntimeError(
-                "\nTrial Version Limitation - Transmitter Channels\n"
-                "----------------------------------------------\n"
-                "Current limitation: 1 transmitter channel\n"
-                "Your configuration: {} channels\n\n"
-                "To use multiple transmitter channels, please upgrade to the Standard Version:\n"
-                "→ https://radarsimx.com/product/radarsimpy/\n"
-                .format(radar.radar_prop["transmitter"].txchannel_prop["size"])
-            )
-
-        if radar.radar_prop["receiver"].rxchannel_prop["size"] > 1:
-            raise RuntimeError(
-                "\nTrial Version Limitation - Receiver Channels\n"
-                "-------------------------------------------\n"
-                "Current limitation: 1 receiver channel\n"
-                "Your configuration: {} channels\n\n"
-                "To use multiple receiver channels, please upgrade to the Standard Version:\n"
-                "→ https://radarsimx.com/product/radarsimpy/\n"
-                .format(radar.radar_prop["receiver"].rxchannel_prop["size"])
-            )
-
-    # Basic setup
+    # Basic setup with type safety
     frame_start_time = np.array(frame_time, dtype=np.float64)
     log_path_c = str.encode(log_path) if log_path is not None else str.encode("")
 
@@ -265,7 +299,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None
                     radar_ts_shape[2],
                 ),
             ),
-            channles_c,
+            channels_c,
             axis=0,
         )
 
@@ -277,9 +311,9 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None
 
     ts_shape = np.shape(timestamp)
 
-    # Set ray filter
+    # Set ray filter with constants
     if ray_filter is None:
-        ray_filter_c = Vec2[int_t](0, 10)
+        ray_filter_c = Vec2[int_t](DEFAULT_MIN_REFLECTIONS, MAX_RAY_REFLECTIONS)
     else:
         ray_filter_c = Vec2[int_t](<int_t>ray_filter[0], <int_t>ray_filter[1])
 
@@ -288,14 +322,21 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None
     #----------------------
     cdef double[:, :, :] timestamp_mv = timestamp.astype(np.float64)
 
-    # Process each target
+    # Process each target with optimized loop
     mesh_module = None
-    for _, tgt in enumerate(targets):
+    cdef int_t target_count = len(targets)
+    # cdef dict tgt
+    # cdef tuple loc, spd
+    # cdef float_t rcs, phs
+    
+    for target_idx in range(target_count):
+        tgt = targets[target_idx]
         if "model" in tgt:
             if mesh_module is None:
                 mesh_module = import_mesh_module()
             target_vt.push_back(cp_Target(radar, tgt, timestamp, mesh_module))
         else:
+            # Extract point target parameters with defaults
             loc = tgt["location"]
             spd = tgt.get("speed", (0, 0, 0))
             rcs = tgt["rcs"]
@@ -373,59 +414,76 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None
     #----------------------
     # Noise Generation
     #----------------------
-    # Generate noise matrix
+    # Calculate noise parameters
     max_ts = np.max(radar_ts)
     min_ts = np.min(radar_ts)
-    num_noise_samples = int(np.ceil((max_ts-min_ts)* radar.radar_prop["receiver"].bb_prop["fs"]))+1
+    num_noise_samples = int(np.ceil((max_ts - min_ts) * radar.radar_prop["receiver"].bb_prop["fs"])) + 1
 
-    if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
+    # Initialize noise matrix based on baseband type
+    cdef str bb_type = radar.radar_prop["receiver"].bb_prop["bb_type"]
+    if bb_type == "real":
         noise_mat = np.zeros(ts_shape, dtype=np.float64)
-    elif radar.radar_prop["receiver"].bb_prop["bb_type"] == "complex":
+    elif bb_type == "complex":
         noise_mat = np.zeros(ts_shape, dtype=complex)
+    else:
+        raise ValueError(f"Unsupported baseband type: {bb_type}")
 
-    # Add noise to each frame
-    for frame_idx in range(0, frames_c):
-        if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
-            noise_per_frame_rx = radar.sample_prop["noise"] * np.random.randn(rxsize_c, num_noise_samples)
-        elif radar.radar_prop["receiver"].bb_prop["bb_type"] == "complex":
-            noise_per_frame_rx = radar.sample_prop["noise"]/ np.sqrt(2) * (np.random.randn(rxsize_c, num_noise_samples) + 1j*np.random.randn(rxsize_c, num_noise_samples))
+    # Generate noise for each frame
+    cdef float_t noise_level = radar.sample_prop["noise"]
+    cdef float_t sqrt_2_inv = 1.0 / SQRT_2
+    
+    for frame_idx in range(frames_c):
+        if bb_type == "real":
+            noise_per_frame_rx = noise_level * np.random.randn(rxsize_c, num_noise_samples)
+        elif bb_type == "complex":
+            noise_per_frame_rx = (noise_level * sqrt_2_inv * 
+                                 (np.random.randn(rxsize_c, num_noise_samples) + 
+                                  1j * np.random.randn(rxsize_c, num_noise_samples)))
 
-        for ch_idx in range(0, radar_ts_shape[0]):
-            for ps_idx in range(0, radar_ts_shape[1]):
-                f_ch_idx = ch_idx+frame_idx*radar_ts_shape[0]
-                t0 = (radar_ts[ch_idx, ps_idx, 0] - min_ts)*radar.radar_prop["receiver"].bb_prop["fs"]
-                rx_ch = ch_idx%rxsize_c
-                noise_mat[f_ch_idx, ps_idx, :] = noise_per_frame_rx[rx_ch, int(t0):(int(t0)+radar_ts_shape[2])]
+        for ch_idx in range(radar_ts_shape[0]):
+            for ps_idx in range(radar_ts_shape[1]):
+                f_ch_idx = ch_idx + frame_idx * radar_ts_shape[0]
+                t0 = (radar_ts[ch_idx, ps_idx, 0] - min_ts) * radar.radar_prop["receiver"].bb_prop["fs"]
+                rx_ch = ch_idx % rxsize_c
+                noise_mat[f_ch_idx, ps_idx, :] = noise_per_frame_rx[rx_ch, int(t0):(int(t0) + radar_ts_shape[2])]
 
     #----------------------
     # Interference Processing
     #----------------------
+    cdef object interference = None
+    
     # Run interference simulation if interference radar is provided
     if interf is not None:
+        # Use main radar frame time if interference frame time not specified
         if interf_frame_time is None:
             interf_frame_time = frame_time
         
-        interf_frame_start_time= np.array(interf_frame_time, dtype=np.float64)
+        interf_frame_start_time = np.array(interf_frame_time, dtype=np.float64)
         interf_radar_c = cp_Radar(interf, interf_frame_start_time)
-        radar_c.InitBaseband(&bb_real[0][0][0],
-                             &bb_imag[0][0][0])
+        
+        # Initialize baseband for interference calculation
+        radar_c.InitBaseband(&bb_real[0][0][0], &bb_imag[0][0][0])
 
+        # Run interference simulation
         interf_sim_c.Run(radar_c, interf_radar_c)
         radar_c.SyncBaseband()
 
-        if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
+        # Extract interference data based on baseband type
+        if bb_type == "real":
             interference = np.asarray(bb_real)
         else:
-            interference = np.asarray(bb_real)+1j*np.asarray(bb_imag)
+            interference = np.asarray(bb_real) + 1j * np.asarray(bb_imag)
 
+        # Clean up interference radar memory
         interf_radar_c.FreeDeviceMemory()
-    else:
-        interference = None
 
+    # Clean up main radar memory
     radar_c.FreeDeviceMemory()
 
-    # Return the simulation results
-    return {"baseband": baseband,
-            "noise": noise_mat,
-            "timestamp": timestamp,
-            "interference": interference}
+    # Return the simulation results as a structured dictionary
+    return {
+        "baseband": baseband,
+        "noise": noise_mat,
+        "timestamp": timestamp,
+        "interference": interference
+    }
