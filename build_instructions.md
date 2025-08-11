@@ -18,7 +18,7 @@ radarsimpy/
 ├── references/                   # Research papers and documentation
 ├── src/                          # Source code
 │   ├── radarsimcpp/              # C++ source code
-│   │   ├── gtest/                # Google Test framework
+│   │   ├── gtest/                # Google Test framework (RadarSimCpp)
 │   │   ├── hdf5-lib-build/       # HDF5 library build files
 │   │   │   ├── hdf5/             # HDF5 source code (HDF Group)
 │   │   │   ├── libs/             # Platform-specific precompiled libraries
@@ -29,6 +29,8 @@ radarsimpy/
 │   │   │   ├── build.bat         # Windows build script
 │   │   │   ├── build.sh          # Linux/macOS build script
 │   │   │   └── README.md
+│   │   │   # Note: RadarSimCpp uses precompiled HDF5 libraries.
+│   │   │   # To build HDF5 from source, see: https://github.com/radarsimx/hdf5-lib-build
 │   │   ├── includes/             # Header files
 │   │   │   ├── libs/             # Core library headers
 │   │   │   └── rsvector/         # Custom vector implementations
@@ -38,14 +40,14 @@ radarsimpy/
 │   └── radarsimpy/               # Python source code
 │       ├── includes/             # Cython declaration files
 │       └── lib/                  # Cython wrapper library
-├── tests/                        # Test suite
+├── tests/                        # Test suite (RadarSimPy)
 ├── batch_build.bat               # Windows batch build script
 ├── batch_build.sh                # Linux/macOS batch build script
 ├── build.bat                     # Windows build script
 ├── build.sh                      # Linux/macOS build script
 ├── build_config.py               # Build configuration validation
 ├── build_instructions.md         # This file
-├── LICENSE                       # License file
+├── LICENSE                       # License file (RadarSimPy)
 ├── README.md                     # Project overview
 ├── requirements-dev.txt          # Development dependencies
 ├── requirements.txt              # Runtime dependencies
@@ -406,4 +408,4 @@ radarsimpy/
 ---
 
 **RadarSimPy** - A Radar Simulator Built with Python
-Copyright (C) 2018 - PRESENT radarsimx.com
+Copyright © 2018 - PRESENT radarsimx.com
