@@ -391,6 +391,7 @@ class Radar:
         self,
         transmitter: "Transmitter",
         receiver: "Receiver",
+        frame_time=0,
         location: Union[Tuple[float, float, float], List[float]] = (0, 0, 0),
         speed: Union[Tuple[float, float, float], List[float]] = (0, 0, 0),
         rotation: Union[Tuple[float, float, float], List[float]] = (0, 0, 0),
@@ -437,7 +438,43 @@ class Radar:
         }
 
         # timing properties
-        self.time_prop["timestamp"] = self.gen_timestamp()
+        self.time_prop["origin_timestamp"] = self.gen_origin_timestamp()
+        self.time_prop["origin_timestamp_shape"] = np.shape(
+            self.time_prop["origin_timestamp"]
+        )
+        self.time_prop["frame_start_time"] = np.array(frame_time, dtype=np.float64)
+
+        if np.size(self.time_prop["frame_start_time"]) > 1:
+            toffset = np.repeat(
+                np.tile(
+                    np.expand_dims(
+                        np.expand_dims(self.time_prop["frame_start_time"], axis=1),
+                        axis=2,
+                    ),
+                    (
+                        1,
+                        self.time_prop["origin_timestamp_shape"][1],
+                        self.time_prop["origin_timestamp_shape"][2],
+                    ),
+                ),
+                self.array_prop["size"],
+                axis=0,
+            )
+
+            self.time_prop["timestamp"] = (
+                np.tile(
+                    self.time_prop["origin_timestamp_shape"],
+                    (np.size(self.time_prop["frame_start_time"]), 1, 1),
+                )
+                + toffset
+            )
+        elif np.size(self.time_prop["frame_start_time"]) == 1:
+            self.time_prop["timestamp"] = (
+                self.time_prop["origin_timestamp_shape"]
+                + self.time_prop["frame_start_time"]
+            )
+
+        self.time_prop["timestamp"] = self.gen_origin_timestamp()
         self.time_prop["timestamp_shape"] = np.shape(self.time_prop["timestamp"])
 
         # sample properties
@@ -450,8 +487,8 @@ class Radar:
             num_pn_samples = (
                 np.ceil(
                     (
-                        np.max(self.time_prop["timestamp"])
-                        - np.min(self.time_prop["timestamp"])
+                        np.max(self.time_prop["origin_timestamp"])
+                        - np.min(self.time_prop["origin_timestamp"])
                     )
                     * self.radar_prop["receiver"].bb_prop["fs"]
                 ).astype(int)
@@ -481,7 +518,7 @@ class Radar:
             list(rotation_rate),
         )
 
-    def gen_timestamp(self) -> NDArray:
+    def gen_origin_timestamp(self) -> NDArray:
         """
         Generate timestamp
 
@@ -515,7 +552,7 @@ class Radar:
             (1, pulses, samples),
         )
 
-        timestamp = (
+        origin_timestamp = (
             tx_delay
             + chirp_delay
             + np.tile(
@@ -525,7 +562,7 @@ class Radar:
             / fs
         )
 
-        return timestamp
+        return origin_timestamp
 
     def cal_noise(self, noise_temp: float = 290) -> float:
         """
