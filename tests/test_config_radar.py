@@ -83,6 +83,48 @@ class TestRadar:
         assert np.allclose(timestamp[0, 0, 0], 0)
         assert np.allclose(timestamp[0, 9, 9], 1.89e-05)
 
+    def test_final_timestamp(self, radar_setup):
+        """Test final timestamp generation with frame start time."""
+        radar = radar_setup
+
+        # Test single frame case (default frame_time=0)
+        timestamp = radar.time_prop["timestamp"]
+        origin_timestamp = radar.time_prop["origin_timestamp"]
+        assert timestamp.shape == (1, 10, 10)
+        # With frame_time=0, final timestamp should equal origin timestamp
+        np.testing.assert_allclose(timestamp, origin_timestamp)
+
+        # Test with non-zero frame start time
+        tx = Transmitter(f=10e9, t=1e-6, tx_power=10, pulses=10, prp=2e-6)
+        rx = Receiver(fs=10e6)
+        radar_with_offset = Radar(transmitter=tx, receiver=rx, frame_time=1e-3)  # type: ignore
+
+        timestamp_offset = radar_with_offset.time_prop["timestamp"]
+        origin_timestamp_offset = radar_with_offset.time_prop["origin_timestamp"]
+        frame_start_time = radar_with_offset.time_prop["frame_start_time"]
+
+        # Final timestamp should be origin timestamp + frame start time
+        expected_timestamp = origin_timestamp_offset + frame_start_time
+        np.testing.assert_allclose(timestamp_offset, expected_timestamp)
+
+        # Verify specific values
+        assert np.allclose(
+            timestamp_offset[0, 0, 0], 1e-3
+        )  # First sample at frame start time
+        assert np.allclose(timestamp_offset[0, 9, 9], 1e-3 + 1.89e-05)  # Last sample
+
+        # Test multi-frame case
+        radar_multi_frame = Radar(transmitter=tx, receiver=rx, frame_time=[0, 1e-3, 2e-3])  # type: ignore
+        timestamp_multi = radar_multi_frame.time_prop["timestamp"]
+
+        # Should have shape [3*channels, pulses, samples] for 3 frames
+        assert timestamp_multi.shape == (3, 10, 10)
+
+        # Verify frame timing
+        assert np.allclose(timestamp_multi[0, 0, 0], 0)  # Frame 0 start
+        assert np.allclose(timestamp_multi[1, 0, 0], 1e-3)  # Frame 1 start
+        assert np.allclose(timestamp_multi[2, 0, 0], 2e-3)  # Frame 2 start
+
     def test_cal_noise(self, radar_setup):
         """Test noise calculation."""
         radar = radar_setup
