@@ -474,7 +474,6 @@ class Radar:
                 + self.time_prop["frame_start_time"]
             )
 
-        self.time_prop["timestamp"] = self.gen_origin_timestamp()
         self.time_prop["timestamp_shape"] = np.shape(self.time_prop["timestamp"])
 
         # sample properties
