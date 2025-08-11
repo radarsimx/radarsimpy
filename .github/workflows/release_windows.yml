@@ -13,8 +13,7 @@ name: Release on Windows
 # - Total builds: 10
 #
 # Features:
-# - Comprehensive caching (pip, ccache)
-# - Build optimization with ccache via Chocolatey
+# - Comprehensive caching (pip)
 # - Windows-specific dependency management
 # - Artifact verification and validation
 # - Windows-native artifact packing
@@ -113,29 +112,11 @@ jobs:
         with:
           path: |
             ~\AppData\Local\pip\Cache
-            ~\AppData\Local\ccache
           key: ${{ runner.os }}-${{ matrix.python-version }}-${{ matrix.tier }}-${{ hashFiles('requirements-dev.txt') }}
           restore-keys: |
             ${{ runner.os }}-${{ matrix.python-version }}-${{ matrix.tier }}-
             ${{ runner.os }}-${{ matrix.python-version }}-
             ${{ runner.os }}-
-
-      - name: Install system dependencies
-        run: |
-          # Install chocolatey if not present
-          if (-not (Get-Command choco -ErrorAction SilentlyContinue)) {
-            Set-ExecutionPolicy Bypass -Scope Process -Force
-            [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-            iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-          }
-
-          # Install ccache for faster compilation
-          choco install ccache -y
-
-          # Add ccache to PATH
-          $env:PATH = "C:\ProgramData\chocolatey\bin;$env:PATH"
-          echo "C:\ProgramData\chocolatey\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        shell: powershell
 
       - name: Install Python dependencies
         run: |
@@ -159,26 +140,11 @@ jobs:
         shell: cmd
 
       - name: Build RadarSimPy
-        env:
-          CCACHE_DIR: ~\AppData\Local\ccache
-          CCACHE_COMPILERCHECK: content
         run: |
           echo "::group::Build Process"
           .\build.bat --tier=${{ matrix.tier }} --arch=${{ matrix.arch }} --test=off
           echo "::endgroup::"
         shell: cmd
-
-      - name: Display build statistics
-        if: always()
-        run: |
-          echo "::group::Build Statistics"
-          if (Get-Command ccache -ErrorAction SilentlyContinue) {
-            ccache --show-stats
-          } else {
-            echo "ccache not available"
-          }
-          echo "::endgroup::"
-        shell: powershell
 
       - name: Verify build artifacts
         run: |
