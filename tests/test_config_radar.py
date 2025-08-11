@@ -129,6 +129,50 @@ class TestRadar:
                 rotation_rate=[0, 0, 0],
             )
 
+    def test_time_varying_motion_requires_zero_velocities(self, radar_setup):
+        """Test that time-varying motion requires zero speed and rotation_rate."""
+        radar = radar_setup
+
+        # Create a time-varying location array with the correct shape
+        timestamp_shape = radar.time_prop["timestamp_shape"]
+        time_varying_location = np.ones(timestamp_shape)
+
+        # Test that non-zero speed is rejected with time-varying location
+        with pytest.raises(ValueError, match="speed must be \\[0, 0, 0\\]"):
+            radar.validate_radar_motion(
+                location=[time_varying_location, 0, 0],
+                speed=[1, 0, 0],  # Non-zero speed should be rejected
+                rotation=[0, 0, 0],
+                rotation_rate=[0, 0, 0],
+            )
+
+        # Test that non-zero rotation_rate is rejected with time-varying location
+        with pytest.raises(ValueError, match="rotation_rate must be \\[0, 0, 0\\]"):
+            radar.validate_radar_motion(
+                location=[time_varying_location, 0, 0],
+                speed=[0, 0, 0],
+                rotation=[0, 0, 0],
+                rotation_rate=[1, 0, 0],  # Non-zero rotation_rate should be rejected
+            )
+
+        # Test that non-zero speed is rejected with time-varying rotation
+        time_varying_rotation = np.ones(timestamp_shape)
+        with pytest.raises(ValueError, match="speed must be \\[0, 0, 0\\]"):
+            radar.validate_radar_motion(
+                location=[0, 0, 0],
+                speed=[1, 0, 0],  # Non-zero speed should be rejected
+                rotation=[time_varying_rotation, 0, 0],
+                rotation_rate=[0, 0, 0],
+            )
+
+        # Test that zero velocities are accepted with time-varying motion
+        radar.validate_radar_motion(
+            location=[time_varying_location, 0, 0],
+            speed=[0, 0, 0],  # Zero speed should be accepted
+            rotation=[0, 0, 0],
+            rotation_rate=[0, 0, 0],  # Zero rotation_rate should be accepted
+        )
+
     def test_process_radar_motion_scalar(self, radar_setup):
         """Test processing of radar motion with scalar inputs."""
         radar = radar_setup
@@ -217,7 +261,7 @@ class TestRadar:
         """Test that error messages are properly formatted and informative."""
         radar = radar_setup
 
-        # Test coordinate name in error messages
+        # Test that speed arrays are not supported (only scalars allowed)
         with pytest.raises(ValueError) as exc_info:
             wrong_shape_array = np.ones((2, 3, 4))
             radar.validate_radar_motion(
@@ -228,9 +272,9 @@ class TestRadar:
             )
 
         error_msg = str(exc_info.value)
-        assert "speed[x]" in error_msg
-        assert "Got shape" in error_msg
-        assert "expected" in error_msg
+        assert "speed[x] must be a scalar" in error_msg
+        assert "Time-varying speed arrays are not supported" in error_msg
+        assert "Use time-varying location arrays instead" in error_msg
 
     def test_constants(self):
         """Test that constants are properly defined and have expected values."""

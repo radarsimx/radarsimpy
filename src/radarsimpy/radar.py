@@ -572,10 +572,8 @@ class Radar:
         :param list rotation_rate: Radar's rotation rate (deg/s),
         [yaw rate, pitch rate, roll rate]
 
-        :raises ValueError: speed[x] must be a scalar or have the same shape as timestamp
-        :raises ValueError: location[x] must be a scalar or have the same shape as timestamp
-        :raises ValueError: rotation_rate[x] must be a scalar or have the same shape as timestamp
-        :raises ValueError: rotation[x] must be a scalar or have the same shape as timestamp
+        :raises ValueError: If input arrays have incorrect lengths or shapes
+        :raises ValueError: If time-varying motion is used with non-zero velocities
         """
         # Validate input lengths
         if len(location) != 3:
@@ -589,18 +587,37 @@ class Radar:
                 f"rotation_rate must have 3 elements, got {len(rotation_rate)}"
             )
 
+        # Check for time-varying parameters
+        has_time_varying_location = any(np.size(location[idx]) > 1 for idx in range(3))
+        has_time_varying_rotation = any(np.size(rotation[idx]) > 1 for idx in range(3))
+
+        # If using time-varying motion, speed and rotation_rate must be zero
+        if has_time_varying_location or has_time_varying_rotation:
+            # Check if speed is non-zero
+            speed_array = np.array(speed)
+            if np.any(speed_array != 0):
+                raise ValueError(
+                    "When using time-varying location or rotation, speed must be [0, 0, 0]. "
+                    f"Got speed={speed}. Time-varying motion should be specified directly "
+                    "in the location/rotation arrays, not through constant velocities."
+                )
+
+            # Check if rotation_rate is non-zero
+            rotation_rate_array = np.array(rotation_rate)
+            if np.any(rotation_rate_array != 0):
+                raise ValueError(
+                    "When using time-varying location or rotation, rotation_rate must be [0, 0, 0]. "
+                    f"Got rotation_rate={rotation_rate}. Time-varying motion should be specified "
+                    "directly in the location/rotation arrays, not through constant angular velocities."
+                )
+
+        # Validate shapes for time-varying parameters
+        # Note: speed and rotation_rate are already validated to be [0,0,0] if time-varying motion is used
         for idx in range(3):
-            # More descriptive coordinate names
             coord_names = ["x", "y", "z"]
             coord = coord_names[idx]
 
-            if np.size(speed[idx]) > 1:
-                if np.shape(speed[idx]) != self.time_prop["timestamp_shape"]:
-                    raise ValueError(
-                        f"speed[{coord}] must be a scalar or have the same shape as timestamp. "
-                        f"Got shape {np.shape(speed[idx])}, expected {self.time_prop['timestamp_shape']}"
-                    )
-
+            # Validate location array shapes (only relevant for time-varying motion)
             if np.size(location[idx]) > 1:
                 if np.shape(location[idx]) != self.time_prop["timestamp_shape"]:
                     raise ValueError(
@@ -608,19 +625,27 @@ class Radar:
                         f"Got shape {np.shape(location[idx])}, expected {self.time_prop['timestamp_shape']}"
                     )
 
-            if np.size(rotation_rate[idx]) > 1:
-                if np.shape(rotation_rate[idx]) != self.time_prop["timestamp_shape"]:
-                    raise ValueError(
-                        f"rotation_rate[{coord}] must be a scalar or have the same shape as timestamp. "
-                        f"Got shape {np.shape(rotation_rate[idx])}, expected {self.time_prop['timestamp_shape']}"
-                    )
-
+            # Validate rotation array shapes (only relevant for time-varying motion)
             if np.size(rotation[idx]) > 1:
                 if np.shape(rotation[idx]) != self.time_prop["timestamp_shape"]:
                     raise ValueError(
                         f"rotation[{coord}] must be a scalar or have the same shape as timestamp. "
                         f"Got shape {np.shape(rotation[idx])}, expected {self.time_prop['timestamp_shape']}"
                     )
+
+            # Speed and rotation_rate should only be scalars (arrays not supported)
+            # This is enforced by the earlier validation requiring [0,0,0] for time-varying motion
+            if np.size(speed[idx]) > 1:
+                raise ValueError(
+                    f"speed[{coord}] must be a scalar. Time-varying speed arrays are not supported. "
+                    f"Use time-varying location arrays instead."
+                )
+
+            if np.size(rotation_rate[idx]) > 1:
+                raise ValueError(
+                    f"rotation_rate[{coord}] must be a scalar. Time-varying rotation_rate arrays are not supported. "
+                    f"Use time-varying rotation arrays instead."
+                )
 
     def process_radar_motion(
         self,
