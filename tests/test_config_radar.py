@@ -75,10 +75,10 @@ class TestRadar:
         assert isinstance(radar.transmitter, type(radar.radar_prop["transmitter"]))
         assert isinstance(radar.receiver, type(radar.radar_prop["receiver"]))
 
-    def test_gen_timestamp(self, radar_setup):
+    def test_origin_timestamp(self, radar_setup):
         """Test timestamp generation."""
         radar = radar_setup
-        timestamp = radar.gen_timestamp()
+        timestamp = radar.time_prop["origin_timestamp"]
         assert timestamp.shape == (1, 10, 10)
         assert np.allclose(timestamp[0, 0, 0], 0)
         assert np.allclose(timestamp[0, 9, 9], 1.89e-05)

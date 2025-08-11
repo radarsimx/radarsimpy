@@ -438,41 +438,14 @@ class Radar:
         }
 
         # timing properties
-        self.time_prop["origin_timestamp"] = self.gen_origin_timestamp()
+        self.time_prop["origin_timestamp"] = self._generate_origin_timestamp()
         self.time_prop["origin_timestamp_shape"] = np.shape(
             self.time_prop["origin_timestamp"]
         )
         self.time_prop["frame_start_time"] = np.array(frame_time, dtype=np.float64)
 
-        if np.size(self.time_prop["frame_start_time"]) > 1:
-            toffset = np.repeat(
-                np.tile(
-                    np.expand_dims(
-                        np.expand_dims(self.time_prop["frame_start_time"], axis=1),
-                        axis=2,
-                    ),
-                    (
-                        1,
-                        self.time_prop["origin_timestamp_shape"][1],
-                        self.time_prop["origin_timestamp_shape"][2],
-                    ),
-                ),
-                self.array_prop["size"],
-                axis=0,
-            )
-
-            self.time_prop["timestamp"] = (
-                np.tile(
-                    self.time_prop["origin_timestamp_shape"],
-                    (np.size(self.time_prop["frame_start_time"]), 1, 1),
-                )
-                + toffset
-            )
-        elif np.size(self.time_prop["frame_start_time"]) == 1:
-            self.time_prop["timestamp"] = (
-                self.time_prop["origin_timestamp_shape"]
-                + self.time_prop["frame_start_time"]
-            )
+        # Generate final timestamp by adding frame start times to origin timestamp
+        self.time_prop["timestamp"] = self._generate_timestamp()
 
         self.time_prop["timestamp_shape"] = np.shape(self.time_prop["timestamp"])
 
@@ -517,51 +490,96 @@ class Radar:
             list(rotation_rate),
         )
 
-    def gen_origin_timestamp(self) -> NDArray:
+    def _generate_origin_timestamp(self) -> NDArray:
         """
-        Generate timestamp
+        Generate origin timestamp for each sample in the radar system.
+
+        The timestamp accounts for:
+        - Transmitter channel delays
+        - Pulse repetition period (chirp timing)
+        - Sample timing within each pulse
 
         :return:
-            Timestamp for each samples. Frame start time is
-            defined in ``time``.
-            Shape: ``[channels/frames, pulses, samples]``
-        :rtype: numpy.3darray
+            Origin timestamp array with shape [channels, pulses, samples].
+            Each timestamp represents the time offset from frame start.
+        :rtype: numpy.ndarray
         """
-
+        # Extract radar system parameters
         channel_size = int(self.array_prop["size"])
         rx_channel_size = int(self.radar_prop["receiver"].rxchannel_prop["size"])
-        pulses = self.radar_prop["transmitter"].waveform_prop["pulses"]
         samples_per_pulse = self.sample_prop["samples_per_pulse"]
-        assert isinstance(
-            samples_per_pulse, int
-        ), "samples_per_pulse must be an integer"
-        samples = samples_per_pulse
-        crp = self.radar_prop["transmitter"].waveform_prop["prp"]
-        delay = self.radar_prop["transmitter"].txchannel_prop["delay"]
+
+        # Validate samples_per_pulse
+        if not isinstance(samples_per_pulse, int) or samples_per_pulse <= 0:
+            raise ValueError(
+                f"samples_per_pulse must be a positive integer, got {samples_per_pulse}"
+            )
+
+        # Get timing parameters
+        prp = self.radar_prop["transmitter"].waveform_prop[
+            "prp"
+        ]  # Pulse repetition period
+        tx_delays = self.radar_prop["transmitter"].txchannel_prop["delay"]
         fs = self.radar_prop["receiver"].bb_prop["fs"]
 
-        chirp_delay = np.tile(
-            np.expand_dims(np.expand_dims(np.cumsum(crp) - crp[0], axis=1), axis=0),
-            (channel_size, 1, samples),
-        )
+        # 1. Calculate sample timing within each pulse (fastest varying dimension)
+        sample_times = np.arange(samples_per_pulse, dtype=np.float64) / fs
 
-        tx_idx = np.arange(0, channel_size) / rx_channel_size
-        tx_delay = np.tile(
-            np.expand_dims(np.expand_dims(delay[tx_idx.astype(int)], axis=1), axis=2),
-            (1, pulses, samples),
-        )
+        # 2. Calculate pulse timing (chirp repetition timing)
+        pulse_start_times = np.cumsum(prp) - prp[0]  # Start from 0
 
+        # 3. Calculate transmitter channel delays
+        # Map virtual channels to transmitter indices
+        tx_indices = np.arange(channel_size) // rx_channel_size
+        channel_delays = tx_delays[tx_indices]
+
+        # 4. Build timestamp array using broadcasting
+        # Shape: [channels, pulses, samples]
         origin_timestamp = (
-            tx_delay
-            + chirp_delay
-            + np.tile(
-                np.expand_dims(np.expand_dims(np.arange(0, samples), axis=0), axis=0),
-                (channel_size, pulses, 1),
-            )
-            / fs
+            channel_delays[:, np.newaxis, np.newaxis]  # TX delays: [channels, 1, 1]
+            + pulse_start_times[
+                np.newaxis, :, np.newaxis
+            ]  # Pulse timing: [1, pulses, 1]
+            + sample_times[np.newaxis, np.newaxis, :]  # Sample timing: [1, 1, samples]
         )
 
         return origin_timestamp
+
+    def _generate_timestamp(self) -> NDArray:
+        """
+        Generate final timestamp by adding frame start times to origin timestamp.
+
+        This method handles both single frame and multi-frame scenarios.
+
+        :return: Final timestamp array with frame start times added
+        :rtype: numpy.ndarray
+        """
+        frame_start_time = self.time_prop["frame_start_time"]
+        origin_timestamp = self.time_prop["origin_timestamp"]
+
+        if np.size(frame_start_time) > 1:
+            # Multi-frame case: create time offset array for each frame
+            num_frames = np.size(frame_start_time)
+            channels, pulses, samples = self.time_prop["origin_timestamp_shape"]
+
+            # Create offset array with proper broadcasting
+            time_offset = np.broadcast_to(
+                frame_start_time.reshape(num_frames, 1, 1),
+                (num_frames, pulses, samples),
+            )
+
+            # Repeat for all channels
+            time_offset = np.repeat(
+                time_offset[:, np.newaxis, :, :], channels, axis=1
+            ).reshape(num_frames * channels, pulses, samples)
+
+            # Tile origin timestamp for all frames and add offset
+            timestamp = np.tile(origin_timestamp, (num_frames, 1, 1)) + time_offset
+        else:
+            # Single frame case: simple scalar addition
+            timestamp = origin_timestamp + frame_start_time
+
+        return timestamp
 
     def cal_noise(self, noise_temp: float = 290) -> float:
         """
