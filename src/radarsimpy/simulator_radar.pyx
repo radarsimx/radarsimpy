@@ -301,10 +301,10 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
     # Timestamp Processing
     #----------------------
     radar_ts = radar.time_prop["origin_timestamp"]
-    radar_ts_shape = np.shape(radar_ts)
+    radar_ts_shape = radar.time_prop["origin_timestamp_shape"]
 
     timestamp = radar.time_prop["timestamp"]
-    ts_shape = np.shape(timestamp)
+    ts_shape = radar.time_prop["timestamp_shape"]
 
     # Set ray filter with constants
     if ray_filter is None:
@@ -346,8 +346,7 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
     cdef double[:,:,::1] bb_real = np.empty(ts_shape, order='C', dtype=np.float64)
     cdef double[:,:,::1] bb_imag = np.empty(ts_shape, order='C', dtype=np.float64)
 
-    radar_c.InitBaseband(&bb_real[0][0][0],
-                         &bb_imag[0][0][0])
+    radar_c.InitBaseband(&bb_real[0][0][0], &bb_imag[0][0][0])
 
     #----------------------
     # Simulation Execution
