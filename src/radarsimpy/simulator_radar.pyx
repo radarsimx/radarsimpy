@@ -194,6 +194,8 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
     :param Radar or None interf:
         Interference radar object. Default: ``None``.
     :param float or list or None interf_frame_time:
+        **DEPRECATED**: This parameter has been moved to the Radar constructor and is no longer used. 
+        **This parameter is ignored and will be removed in a future version.** 
         Frame times for interference radar simulation. If None, uses the same frame_time as the main radar.
         Default: ``None``.
     :param list or None ray_filter:
@@ -262,7 +264,7 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
         int_t level_id = 0
         int_t ps_idx
         int_t frames_c = np.size(radar.time_prop["frame_start_time"])
-        int_t channels_c = radar.array_prop["size"]  # Fixed typo: channles_c -> channels_c
+        int_t channels_c = radar.array_prop["size"]
         int_t rxsize_c = radar.radar_prop["receiver"].rxchannel_prop["size"]
         int_t txsize_c = radar.radar_prop["transmitter"].txchannel_prop["size"]
         string log_path_c
