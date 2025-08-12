@@ -329,6 +329,11 @@ class Radar:
 
     :param Transmitter transmitter: The radar transmitter instance.
     :param Receiver receiver: The radar receiver instance.
+    :param frame_time:
+        Frame start times for radar simulation. Can be a single value for one frame,
+        or a sequence of values for multiple frames. Specified in seconds.
+        Default: ``0``.
+    :type frame_time: float, int, list, tuple, or numpy.ndarray
     :param list location:
         The 3D location of the radar relative to a global coordinate system [x, y, z] in meters (m).
         Default: ``[0, 0, 0]``.
@@ -344,6 +349,12 @@ class Radar:
         Default: ``[0, 0, 0]``.
     :param int seed:
         Seed for the random noise generator to ensure reproducibility.
+
+    .. note::
+        For time-varying motion (location/rotation changes over time), initialize the Radar object 
+        first with the desired frame_time, then use the :meth:`set_motion` method to configure 
+        time-varying motions using ``radar.time_prop["timestamp"]`` as the time variable.
+        **See the documentation of** :meth:`set_motion` **for detailed workflow and examples.**
 
     :ivar dict time_prop:
         Time-related properties of the radar system:
@@ -391,7 +402,9 @@ class Radar:
         self,
         transmitter: "Transmitter",
         receiver: "Receiver",
-        frame_time=0,
+        frame_time: Union[
+            float, int, List[Union[float, int]], Tuple[Union[float, int], ...], NDArray
+        ] = 0,
         location: Union[Tuple[float, float, float], List[float]] = (0, 0, 0),
         speed: Union[Tuple[float, float, float], List[float]] = (0, 0, 0),
         rotation: Union[Tuple[float, float, float], List[float]] = (0, 0, 0),
@@ -450,7 +463,7 @@ class Radar:
         self.time_prop["timestamp_shape"] = np.shape(self.time_prop["timestamp"])
 
         # sample properties
-        self.sample_prop["noise"] = self.cal_noise()
+        self.sample_prop["noise"] = self._calculate_noise_amp()
 
         if (
             transmitter.rf_prop["pn_f"] is not None
@@ -483,7 +496,57 @@ class Radar:
         else:
             self.sample_prop["phase_noise"] = None
 
-        self.process_radar_motion(
+        self._process_radar_motion(
+            list(location),
+            list(speed),
+            list(rotation),
+            list(rotation_rate),
+        )
+
+    def set_motion(
+        self,
+        location: Union[Tuple[float, float, float], List[float]] = (0, 0, 0),
+        speed: Union[Tuple[float, float, float], List[float]] = (0, 0, 0),
+        rotation: Union[Tuple[float, float, float], List[float]] = (0, 0, 0),
+        rotation_rate: Union[Tuple[float, float, float], List[float]] = (0, 0, 0),
+    ) -> None:
+        """
+        Set the motion parameters for the radar.
+
+        This method allows updating radar motion after initialization. For time-varying motions,
+        follow this workflow:
+
+        1. **Initialize the Radar object first** with desired frame_time:
+           ``radar = Radar(transmitter, receiver, frame_time=[0, 1e-3, 2e-3])``
+
+        2. **Use radar.time_prop["timestamp"] as the time variable** for motion calculations:
+           ``location_x = 10 * np.sin(2 * np.pi * radar.time_prop["timestamp"])``
+
+        3. **Call set_motion() to update time-varying motions**:
+           ``radar.set_motion(location=[location_x, 0, 0], speed=[0, 0, 0])``
+
+        **Note**: For time-varying motions, speed and rotation_rate must be [0, 0, 0] since
+        motion is specified directly through time-varying location/rotation arrays.
+
+        :param list location:
+            The 3D location of the radar relative to a global coordinate system [x, y, z] in meters (m).
+            For time-varying motion, provide arrays with shape matching ``radar.time_prop["timestamp"]``.
+            Default: ``[0, 0, 0]``.
+        :param list speed:
+            The velocity of the radar in meters per second (m/s), specified as [vx, vy, vz].
+            Must be [0, 0, 0] when using time-varying location arrays.
+            Default: ``[0, 0, 0]``.
+        :param list rotation:
+            The radar's orientation in degrees (°), specified as [yaw, pitch, roll].
+            For time-varying motion, provide arrays with shape matching ``radar.time_prop["timestamp"]``.
+            Default: ``[0, 0, 0]``.
+        :param list rotation_rate:
+            The radar's angular velocity in degrees per second (°/s),
+            specified as [yaw rate, pitch rate, roll rate].
+            Must be [0, 0, 0] when using time-varying rotation arrays.
+            Default: ``[0, 0, 0]``.
+        """
+        self._process_radar_motion(
             list(location),
             list(speed),
             list(rotation),
@@ -581,7 +644,7 @@ class Radar:
 
         return timestamp
 
-    def cal_noise(self, noise_temp: float = 290) -> float:
+    def _calculate_noise_amp(self, noise_temp: float = 290) -> float:
         """
         Calculate noise amplitudes
 
@@ -610,7 +673,7 @@ class Radar:
         # noise_amplitude_peak = np.sqrt(2) * noise_amplitude_mixer
         return noise_amplitude_mixer
 
-    def validate_radar_motion(
+    def _validate_radar_motion(
         self,
         location: List[Union[float, NDArray]],
         speed: List[Union[float, NDArray]],
@@ -701,7 +764,7 @@ class Radar:
                     f"Use time-varying rotation arrays instead."
                 )
 
-    def process_radar_motion(
+    def _process_radar_motion(
         self,
         location: List[Union[float, NDArray]],
         speed: List[Union[float, NDArray]],
@@ -718,6 +781,7 @@ class Radar:
         [yaw rate, pitch rate, roll rate]
 
         """
+        self._validate_radar_motion(location, speed, rotation, rotation_rate)
         shape = self.time_prop["timestamp_shape"]
 
         # Check if any location or rotation parameters are time-varying (arrays)
@@ -726,7 +790,6 @@ class Radar:
         )
 
         if has_time_varying_motion:
-            self.validate_radar_motion(location, speed, rotation, rotation_rate)
             self._setup_time_varying_motion(
                 location, speed, rotation, rotation_rate, shape
             )

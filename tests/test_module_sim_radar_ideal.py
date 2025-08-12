@@ -11,8 +11,8 @@ A Python module for radar simulation
 
     ██████╗  █████╗ ██████╗  █████╗ ██████╗ ███████╗██╗███╗   ███╗██╗  ██╗
     ██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔════╝██║████╗ ████║╚██╗██╔╝
-    ██████╔╝███████║██║  ██║███████║██████╔╝███████╗██║██╔████╔██║ ╚███╔╝ 
-    ██╔══██╗██╔══██║██║  ██║██╔══██║██╔══██╗╚════██║██║██║╚██╔╝██║ ██╔██╗ 
+    ██████╔╝███████║██║  ██║███████║██████╔╝███████╗██║██╔████╔██║ ╚███╔╝
+    ██╔══██╗██╔══██║██║  ██║██╔══██║██╔══██╗╚════██║██║██║╚██╔╝██║ ██╔██╗
     ██║  ██║██║  ██║██████╔╝██║  ██║██║  ██║███████║██║██║ ╚═╝ ██║██╔╝ ██╗
     ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝
 
@@ -861,7 +861,7 @@ def test_simc_2_frames_moving_target():
             }
         ],
     )
-    radar = Radar(transmitter=tx, receiver=rx)
+    radar = Radar(transmitter=tx, receiver=rx, frame_time=[0, 1])
 
     targets = [
         {
@@ -870,7 +870,7 @@ def test_simc_2_frames_moving_target():
             "rcs": 20,
         }
     ]
-    result = sim_radar(radar, targets, frame_time=[0, 1])
+    result = sim_radar(radar, targets)
 
     assert np.allclose(
         result["baseband"],
@@ -967,7 +967,7 @@ def test_simc_2_frames_moving_radar():
             }
         ],
     )
-    radar = Radar(transmitter=tx, receiver=rx, speed=[5, 0, 0])
+    radar = Radar(transmitter=tx, receiver=rx, speed=[5, 0, 0], frame_time=[0, 1])
 
     targets = [
         {
@@ -976,7 +976,7 @@ def test_simc_2_frames_moving_radar():
             "rcs": 20,
         }
     ]
-    result = sim_radar(radar, targets, frame_time=[0, 1])
+    result = sim_radar(radar, targets)
 
     assert np.allclose(
         result["baseband"],

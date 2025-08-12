@@ -786,7 +786,7 @@ def test_scene_2_frames_moving_target():
             }
         ],
     )
-    radar = Radar(transmitter=tx, receiver=rx)
+    radar = Radar(transmitter=tx, receiver=rx, frame_time=[0, 1])
 
     targets = [
         {
@@ -795,7 +795,7 @@ def test_scene_2_frames_moving_target():
             "speed": np.array([-5, 0, 0]),
         }
     ]
-    result = sim_radar(radar, targets, frame_time=[0, 1], density=0.4)
+    result = sim_radar(radar, targets, density=0.4)
 
     assert np.allclose(
         result["baseband"],
@@ -892,7 +892,7 @@ def test_scene_2_frames_moving_radar():
             }
         ],
     )
-    radar = Radar(transmitter=tx, receiver=rx, speed=[5, 0, 0])
+    radar = Radar(transmitter=tx, receiver=rx, speed=[5, 0, 0], frame_time=[0, 1])
 
     targets = [
         {
@@ -901,7 +901,7 @@ def test_scene_2_frames_moving_radar():
             "speed": np.array([0, 0, 0]),
         }
     ]
-    result = sim_radar(radar, targets, frame_time=[0, 1], density=0.4)
+    result = sim_radar(radar, targets, density=0.4)
 
     assert np.allclose(
         result["baseband"],

@@ -69,7 +69,7 @@ def test_sim_fmcw():
         channels=[rx_channel],
     )
 
-    radar = Radar(transmitter=tx, receiver=rx)
+    radar = Radar(transmitter=tx, receiver=rx, frame_time=[0, 1])
     target_1 = {"location": (200, 0, 0), "speed": (-5, 0, 0), "rcs": 20, "phase": 0}
     target_2 = {"location": (95, 20, 0), "speed": (-50, 0, 0), "rcs": 15, "phase": 0}
     target_3 = {"location": (30, -5, 0), "speed": (-22, 0, 0), "rcs": 5, "phase": 0}
@@ -98,7 +98,7 @@ def test_sim_fmcw():
 
     targets = [target_1, target_2, target_3]
 
-    data = sim_radar(radar, targets, frame_time=[0, 1])
+    data = sim_radar(radar, targets)
     timestamp = data["timestamp"]
     baseband = data["baseband"]
 
@@ -248,7 +248,7 @@ def test_fmcw_raytracing():
         channels=[rx_channel],
     )
 
-    radar = Radar(transmitter=tx, receiver=rx)
+    radar = Radar(transmitter=tx, receiver=rx, frame_time=[0, 1])
 
     target_1 = {
         "model": "./models/plate5x5.stl",
@@ -259,7 +259,7 @@ def test_fmcw_raytracing():
 
     targets = [target_1]
 
-    data = sim_radar(radar, targets, frame_time=[0, 1], density=0.4, level="pulse")
+    data = sim_radar(radar, targets, density=0.4, level="pulse")
 
     baseband = data["baseband"]
 
@@ -706,6 +706,7 @@ def test_fmcw_raytracing_radar_speed():
     radar = Radar(
         transmitter=tx,
         receiver=rx,
+        frame_time=[0, 1],
         location=(-20, 0, 0),
         speed=(20, 0, 0),
         rotation=(0, 45, 0),
@@ -720,9 +721,7 @@ def test_fmcw_raytracing_radar_speed():
 
     targets = [target_1]
 
-    data = sim_radar(
-        radar, targets, frame_time=[0, 1], density=1, level="pulse", debug=False
-    )
+    data = sim_radar(radar, targets, density=1, level="pulse", debug=False)
 
     baseband = data["baseband"]
 

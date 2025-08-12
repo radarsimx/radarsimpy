@@ -138,10 +138,10 @@ cdef inline raise_err(RadarSimErrorCode err):
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None, interf_frame_time=None,
+cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=None, interf_frame_time=None,
                 ray_filter=None, back_propagating=False, log_path=None, debug=False):
     """
-    sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None, ray_filter=None, back_propagating=False, log_path=None, debug=False)
+    sim_radar(radar, targets, density=1, level=None, interf=None, ray_filter=None, back_propagating=False, log_path=None, debug=False)
 
     Simulates the radar's baseband response for a given scene.
 
@@ -179,7 +179,10 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None
         ``location = (1e-3 * np.sin(2 * np.pi * 1 * radar.timestamp), 0, 0)``
 
     :param float or list frame_time:
-        Radar firing times or frame instances, specified as a float or a list of time values. Default: ``0``.
+        **DEPRECATED**: This parameter has been moved to the Radar constructor and is no longer used. 
+        **This parameter is ignored and will be removed in a future version.** 
+        Set frame_time when creating the Radar object: ``Radar(transmitter, receiver, frame_time=your_value)``.
+        Default: ``None`` (ignored).
     :param float density:
         Ray density, defined as the number of rays per wavelength. Default: ``1.0``.
     :param str or None level:
@@ -247,7 +250,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None
         vector[Point[float_t]] point_vt
         vector[Target[float_t]] target_vt
         Vec2[int_t] ray_filter_c
-        
+
     # Simulator instances
     cdef:
         MeshSimulator[double, float_t] mesh_sim_c
@@ -258,12 +261,12 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None
     cdef:
         int_t level_id = 0
         int_t ps_idx
-        int_t frames_c = np.size(frame_time)
+        int_t frames_c = np.size(radar.time_prop["frame_start_time"])
         int_t channels_c = radar.array_prop["size"]  # Fixed typo: channles_c -> channels_c
         int_t rxsize_c = radar.radar_prop["receiver"].rxchannel_prop["size"]
         int_t txsize_c = radar.radar_prop["transmitter"].txchannel_prop["size"]
         string log_path_c
-        
+
         # Pre-declare variables for better performance
         int_t frame_idx, ch_idx, rx_ch
         float_t t0
@@ -273,42 +276,32 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None
     #----------------------
     # Initialization
     #----------------------
+    # Check for deprecated frame_time parameter
+    if frame_time is not None or interf_frame_time is not None:
+        import warnings
+        warnings.warn(
+            "The 'frame_time' and 'interf_frame_time' parameters in sim_radar() have been moved to the Radar constructor and are no longer used here. "
+            "These parameters will be ignored. Please set frame_time and interf_frame_time when creating the Radar object: "
+            "Radar(transmitter, receiver, frame_time=your_value). "
+            "These parameters will be removed in a future version.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+
     # Validate free tier limitations
     validate_free_tier_limits(radar, targets)
 
     # Basic setup with type safety
-    frame_start_time = np.array(frame_time, dtype=np.float64)
+    frame_start_time = radar.time_prop["frame_start_time"]
     log_path_c = str.encode(log_path) if log_path is not None else str.encode("")
 
     #----------------------
     # Timestamp Processing
     #----------------------
-    radar_ts = radar.time_prop["timestamp"]
-    radar_ts_shape = np.shape(radar.time_prop["timestamp"])
+    radar_ts = radar.time_prop["origin_timestamp"]
+    radar_ts_shape = np.shape(radar_ts)
 
-    if frames_c > 1:
-        toffset = np.repeat(
-            np.tile(
-                np.expand_dims(
-                    np.expand_dims(frame_start_time, axis=1),
-                    axis=2,
-                ),
-                (
-                    1,
-                    radar_ts_shape[1],
-                    radar_ts_shape[2],
-                ),
-            ),
-            channels_c,
-            axis=0,
-        )
-
-        timestamp = (
-            np.tile(radar_ts, (frames_c, 1, 1)) + toffset
-        )
-    elif frames_c == 1:
-        timestamp = radar_ts + frame_start_time
-
+    timestamp = radar.time_prop["timestamp"]
     ts_shape = np.shape(timestamp)
 
     # Set ray filter with constants
@@ -328,7 +321,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None
     # cdef dict tgt
     # cdef tuple loc, spd
     # cdef float_t rcs, phs
-    
+
     for target_idx in range(target_count):
         tgt = targets[target_idx]
         if "model" in tgt:
@@ -431,7 +424,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None
     # Generate noise for each frame
     cdef float_t noise_level = radar.sample_prop["noise"]
     cdef float_t sqrt_2_inv = 1.0 / SQRT_2
-    
+
     for frame_idx in range(frames_c):
         if bb_type == "real":
             noise_per_frame_rx = noise_level * np.random.randn(rxsize_c, num_noise_samples)
@@ -455,10 +448,7 @@ cpdef sim_radar(radar, targets, frame_time=0, density=1, level=None, interf=None
     # Run interference simulation if interference radar is provided
     if interf is not None:
         # Use main radar frame time if interference frame time not specified
-        if interf_frame_time is None:
-            interf_frame_time = frame_time
-        
-        interf_frame_start_time = np.array(interf_frame_time, dtype=np.float64)
+        interf_frame_start_time = np.array(interf.time_prop["frame_start_time"], dtype=np.float64)
         interf_radar_c = cp_Radar(interf, interf_frame_start_time)
         
         # Initialize baseband for interference calculation
