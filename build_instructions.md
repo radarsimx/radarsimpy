@@ -35,7 +35,7 @@ radarsimpy/
 │   │   │   ├── libs/             # Core library headers
 │   │   │   └── rsvector/         # Custom vector implementations
 │   │   ├── src/                  # C++/CUDA implementation files
-│   │   ├── CMakeLists.txt        # CMake configuration
+│   │   ├── CMakeLists.txt        # CMake configuration (Config path to precomipled HDF5 library)
 │   │   └── README.md
 │   └── radarsimpy/               # Python source code
 │       ├── includes/             # Cython declaration files
