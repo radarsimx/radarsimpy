@@ -329,7 +329,7 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
         if "model" in tgt:
             if mesh_module is None:
                 mesh_module = import_mesh_module()
-            target_vt.push_back(cp_Target(radar, tgt, timestamp, mesh_module))
+            target_vt.emplace_back(cp_Target(radar, tgt, timestamp, mesh_module))
         else:
             # Extract point target parameters with defaults
             loc = tgt["location"]
@@ -337,7 +337,7 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
             rcs = tgt["rcs"]
             phs = tgt.get("phase", 0)
 
-            point_vt.push_back(
+            point_vt.emplace_back(
                 cp_Point(loc, spd, rcs, phs, ts_shape)
             )
 
