@@ -97,7 +97,9 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
         numpy.ndarray - A structured array representing the Lidar ray interactions with the scene, including details such as ray origins, directions, and intersections.
     """
     cdef LidarSimulator[float_t] lidar_sim_c
-    
+
+    cdef vector[Target[float_t]] targets_vt
+
     # Memory view declarations
     cdef float_t[:, :] points_mv
     cdef int_t[:, :] cells_mv
@@ -133,7 +135,7 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
         )
 
         # Add target to pointcloud
-        lidar_sim_c.AddTarget(Target[float_t](&points_mv[0, 0],
+        targets_vt.emplace_back(Target[float_t](&points_mv[0, 0],
                                              &cells_mv[0, 0],
                                              <int_t> cells_mv.shape[0],
                                              Vec3[float_t](&origin_mv[0]),
@@ -155,9 +157,10 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
     Mem_Copy(&theta_mv[0], <int_t>(theta_mv.shape[0]), theta_vt)
 
     # Perform ray tracing
-    lidar_sim_c.Run(phi_vt,
-                     theta_vt,
-                     Vec3[float_t](&position_mv[0]))
+    lidar_sim_c.Run(targets_vt,
+                    phi_vt,
+                    theta_vt,
+                    Vec3[float_t](&position_mv[0]))
 
     # Prepare output
     ray_type = np.dtype([("positions", np_float, (3,)),

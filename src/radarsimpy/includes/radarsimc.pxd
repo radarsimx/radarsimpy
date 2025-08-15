@@ -151,12 +151,10 @@ cdef extern from "simulator_rcs.hpp":
 cdef extern from "simulator_lidar.hpp":
     cdef cppclass LidarSimulator[T]:
         LidarSimulator() except +
-        
-        # Add a target to the scene
-        void AddTarget(const Target[T] & target)
-        
+
         # Generate point cloud by ray casting
-        void Run(const vector[T] & phi,      # Azimuth angles (radians)
+        void Run(vector[Target[T]] & targets,
+                 const vector[T] & phi,      # Azimuth angles (radians)
                  const vector[T] & theta,    # Elevation angles (radians)
                  const Vec3[T] & position)   # LiDAR sensor position
 
