@@ -136,7 +136,7 @@ cdef extern from "simulator_rcs.hpp":
         RcsSimulator() except +
         
         # Calculate RCS for multiple targets and observation angles
-        vector[T] Run(vector[Target[float]] & targets,          # Array of target objects
+        vector[T] Run(vector[Target[float]] targets,           # Array of target objects
                      vector[Vec3[T]] inc_dir_array,            # Incident wave directions
                      vector[Vec3[T]] obs_dir_array,            # Observation directions
                      Vec3[cpp_complex[T]] inc_polarization,    # Incident wave polarization
@@ -153,7 +153,7 @@ cdef extern from "simulator_lidar.hpp":
         LidarSimulator() except +
 
         # Generate point cloud by ray casting
-        void Run(vector[Target[T]] & targets,
+        void Run(vector[Target[T]] targets,
                  const vector[T] & phi,      # Azimuth angles (radians)
                  const vector[T] & theta,    # Elevation angles (radians)
                  const Vec3[T] & position)   # LiDAR sensor position
@@ -294,10 +294,10 @@ cdef extern from "simulator_mesh.hpp":
         
         # Run mesh simulation with configurable fidelity
         RadarSimErrorCode Run(Radar[H, L] & radar,               # Radar configuration
-                              vector[Target[L]] & targets,       # Array of mesh targets
+                              vector[Target[L]] targets,         # Array of mesh targets
                               int level,                         # Simulation level (0=LOW, 1=MEDIUM, 2=HIGH)
                               L density,                         # Ray density for physical optics
-                              Vec2[int_t] ray_filter,           # Ray index filter [min, max]
+                              Vec2[int_t] ray_filter,            # Ray index filter [min, max]
                               bool back_propagating,             # Enable back-propagation
                               string log_path,                   # Debug log file path
                               bool debug)                        # Enable debug output
