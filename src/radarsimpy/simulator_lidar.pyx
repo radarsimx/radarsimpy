@@ -22,13 +22,14 @@ This module provides tools for simulating a lidar system in complex 3D environme
 """
 
 # Core imports
+from libcpp.memory cimport shared_ptr, make_shared
 from libcpp cimport bool
 import numpy as np
 cimport numpy as np
 cimport cython
 
 # RadarSimX imports
-from radarsimpy.includes.radarsimc cimport Target, LidarSimulator
+from radarsimpy.includes.radarsimc cimport Target, LidarSimulator, TargetsManager
 from radarsimpy.includes.radarsimc cimport Mem_Copy
 from radarsimpy.includes.rsvector cimport Vec3
 from radarsimpy.includes.type_def cimport float_t, int_t, vector
@@ -98,7 +99,7 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
     """
     cdef LidarSimulator[float_t] lidar_sim_c
 
-    cdef vector[Target[float_t]] targets_vt
+    cdef shared_ptr[TargetsManager[float_t]] targets_manager = make_shared[TargetsManager[float_t]]()
 
     # Memory view declarations
     cdef float_t[:, :] points_mv
@@ -134,16 +135,15 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
             np.array(targets[idx_c].get("rotation_rate", (0, 0, 0)), dtype=np_float)
         )
 
-        # Add target to pointcloud
-        targets_vt.emplace_back(Target[float_t](&points_mv[0, 0],
-                                             &cells_mv[0, 0],
-                                             <int_t> cells_mv.shape[0],
-                                             Vec3[float_t](&origin_mv[0]),
-                                             Vec3[float_t](&location_mv[0]),
-                                             Vec3[float_t](&speed_mv[0]),
-                                             Vec3[float_t](&rotation_mv[0]),
-                                             Vec3[float_t](&rotation_rate_mv[0]),
-                                             <bool> targets[idx_c].get("skip_diffusion", False)))
+        targets_manager.get()[0].AddTargetSimple(&points_mv[0, 0],
+                                    &cells_mv[0, 0],
+                                    <int_t> cells_mv.shape[0],
+                                    Vec3[float_t](&origin_mv[0]),
+                                    Vec3[float_t](&location_mv[0]),
+                                    Vec3[float_t](&speed_mv[0]),
+                                    Vec3[float_t](&rotation_mv[0]),
+                                    Vec3[float_t](&rotation_rate_mv[0]),
+                                    <bool> targets[idx_c].get("skip_diffusion", False))
 
     # Lidar parameters
     cdef float_t[:] phi_mv = np.radians(np.array(lidar["phi"], dtype=np_float))
@@ -157,7 +157,7 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
     Mem_Copy(&theta_mv[0], <int_t>(theta_mv.shape[0]), theta_vt)
 
     # Perform ray tracing
-    lidar_sim_c.Run(targets_vt,
+    lidar_sim_c.Run(targets_manager,
                     phi_vt,
                     theta_vt,
                     Vec3[float_t](&position_mv[0]))

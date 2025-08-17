@@ -1041,7 +1041,7 @@ cdef void cp_AddTarget(radar,
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef Target[float_t] cp_RCS_Target(target, mesh_module):
+cdef void cp_RCS_Target(target, mesh_module, TargetsManager[float_t] * targets_manager):
     """
     cp_RCS_Target(target, mesh_module)
 
@@ -1115,7 +1115,7 @@ cdef Target[float_t] cp_RCS_Target(target, mesh_module):
         target["skip_diffusion"] = target["is_ground"]
         _warn_deprecated_parameter("is_ground", "skip_diffusion")
 
-    return Target[float_t](&points_mv[0, 0],
+    targets_manager[0].AddTarget(&points_mv[0, 0],
                            &cells_mv[0, 0],
                            <int_t> cells_mv.shape[0],
                            Vec3[float_t](&origin_mv[0]),

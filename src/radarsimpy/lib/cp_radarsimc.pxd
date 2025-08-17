@@ -61,7 +61,7 @@ cdef Target[float_t] cp_Target(radar, target, timestamp, mesh_module) except *
 # Create a Target object specifically optimized for RCS calculations
 # Simplified target object without full dynamic simulation requirements
 # Raises ValueError for invalid params, RuntimeError for mesh/FreeTier issues
-cdef Target[float_t] cp_RCS_Target(target, mesh_module) except *
+cdef void cp_RCS_Target(target, mesh_module, TargetsManager[float_t] * targets_manager) except *
 
 cdef void cp_AddTarget(radar,
                        target,

@@ -118,6 +118,36 @@ cdef extern from "target.hpp":
                const bool & skip_diffusion) except +
 
 #------------------------------------------------------------------------------
+# Targets Manager
+# Container for managing multiple 3D mesh targets in radar simulation
+#------------------------------------------------------------------------------
+cdef extern from "targets_manager.hpp":
+    cdef cppclass TargetsManager[T]:
+        TargetsManager() except +
+        # Add a new target
+        void AddTarget(const T * points,              # Vertex coordinates array
+               const int_t * cells,           # Cell connectivity array
+               const int_t & cell_size,       # Number of cells in mesh
+               const Vec3[T] & origin,        # Target reference origin
+               const vector[Vec3[T]] & location_array,    # Time-varying locations
+               const vector[Vec3[T]] & speed_array,       # Time-varying velocities
+               const vector[Vec3[T]] & rotation_array,    # Time-varying rotations
+               const vector[Vec3[T]] & rotation_rate_array,  # Time-varying rotation rates
+               const cpp_complex[T] & ep,     # Relative permittivity (material property)
+               const cpp_complex[T] & mu,     # Relative permeability (material property)
+               const bool & skip_diffusion) except +
+        
+        void AddTargetSimple(const T * points,
+               const int_t * cells,
+               const int_t & cell_size,
+               const Vec3[T] & origin,
+               const Vec3[T] & location,
+               const Vec3[T] & speed,
+               const Vec3[T] & rotation,
+               const Vec3[T] & rotation_rate,
+               const bool & skip_diffusion) except +
+
+#------------------------------------------------------------------------------
 # Ray Tracing Primitives
 # Ray representation for LiDAR and ray tracing operations
 #------------------------------------------------------------------------------
@@ -137,7 +167,7 @@ cdef extern from "simulator_rcs.hpp":
         RcsSimulator() except +
         
         # Calculate RCS for multiple targets and observation angles
-        vector[T] Run(vector[Target[float]] targets,           # Array of target objects
+        vector[T] Run(const shared_ptr[TargetsManager[float]] & targets_manager,    # Targets manager
                      vector[Vec3[T]] inc_dir_array,            # Incident wave directions
                      vector[Vec3[T]] obs_dir_array,            # Observation directions
                      Vec3[cpp_complex[T]] inc_polarization,    # Incident wave polarization
@@ -154,7 +184,7 @@ cdef extern from "simulator_lidar.hpp":
         LidarSimulator() except +
 
         # Generate point cloud by ray casting
-        void Run(vector[Target[T]] targets,
+        void Run(const shared_ptr[TargetsManager[T]] & targets_manager,  # Targets manager
                  const vector[T] & phi,      # Azimuth angles (radians)
                  const vector[T] & theta,    # Elevation angles (radians)
                  const Vec3[T] & position)   # LiDAR sensor position
@@ -285,24 +315,6 @@ cdef extern from "simulator_point.hpp":
         void Run(Radar[H, L] & radar,                            # Radar configuration
                  vector[Point[L]] & points)                      # Array of point targets
 
-# Targets Manager
-# Manager class for handling multiple mesh targets in simulations
-cdef extern from "targets_manager.hpp":
-    cdef cppclass TargetsManager[T]:
-        TargetsManager() except +
-        # Add a new target
-        void AddTarget(const T * points,              # Vertex coordinates array
-               const int_t * cells,           # Cell connectivity array
-               const int_t & cell_size,       # Number of cells in mesh
-               const Vec3[T] & origin,        # Target reference origin
-               const vector[Vec3[T]] & location_array,    # Time-varying locations
-               const vector[Vec3[T]] & speed_array,       # Time-varying velocities
-               const vector[Vec3[T]] & rotation_array,    # Time-varying rotations
-               const vector[Vec3[T]] & rotation_rate_array,  # Time-varying rotation rates
-               const cpp_complex[T] & ep,     # Relative permittivity (material property)
-               const cpp_complex[T] & mu,     # Relative permeability (material property)
-               const bool & skip_diffusion) except +
-
 # Mesh-based Ray Tracing Simulation
 # Physics-based 3D mesh target simulation using ray tracing and physical optics
 # Usage: For realistic simulation of complex targets with detailed geometry.
@@ -313,7 +325,7 @@ cdef extern from "simulator_mesh.hpp":
         
         # Run mesh simulation with configurable fidelity
         RadarSimErrorCode Run(Radar[H, L] & radar,               # Radar configuration
-                              const shared_ptr[TargetsManager[L]] & targets_manager,         # Array of mesh targets
+                              const shared_ptr[TargetsManager[L]] & targets_manager,         # Targets manager
                               int level,                         # Simulation level (0=LOW, 1=MEDIUM, 2=HIGH)
                               L density,                         # Ray density for physical optics
                               Vec2[int_t] ray_filter,            # Ray index filter [min, max]

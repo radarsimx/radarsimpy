@@ -22,6 +22,7 @@ This module provides tools for simulating and calculating the Radar Cross Sectio
 
 """
 
+from libcpp.memory cimport shared_ptr, make_shared
 # Standard library imports
 import numpy as np
 
@@ -32,7 +33,7 @@ cimport numpy as np
 # Local imports
 from radarsimpy.includes.rsvector cimport Vec3
 from radarsimpy.includes.type_def cimport vector
-from radarsimpy.includes.radarsimc cimport Target, RcsSimulator, IsFreeTier
+from radarsimpy.includes.radarsimc cimport Target, RcsSimulator, IsFreeTier, TargetsManager
 from radarsimpy.lib.cp_radarsimc cimport cp_RCS_Target
 from libcpp.complex cimport complex as cpp_complex
 
@@ -128,7 +129,7 @@ cpdef sim_rcs(
                 .format(len(targets))
             )
 
-    cdef vector[Target[float]] targets_vt
+    cdef shared_ptr[TargetsManager[float]] targets_manager = make_shared[TargetsManager[float]]()
     cdef Vec3[cpp_complex[double]] inc_pol_cpp
     cdef Vec3[cpp_complex[double]] obs_pol_cpp
 
@@ -188,7 +189,7 @@ cpdef sim_rcs(
     # Process targets
     mesh_module = import_mesh_module()
     for idx_c in range(0, len(targets)):
-        targets_vt.push_back(cp_RCS_Target(targets[idx_c], mesh_module))
+       cp_RCS_Target(targets[idx_c], mesh_module, targets_manager.get())
 
     # Convert angles to radians
     inc_phi_rad = np.radians(inc_phi)
@@ -226,7 +227,7 @@ cpdef sim_rcs(
     cdef RcsSimulator[double] rcs_sim_c
 
     cdef vector[double] rcs_vect = rcs_sim_c.Run(
-        targets_vt,
+        targets_manager,
         inc_dir,
         obs_dir,
         inc_pol_cpp,
