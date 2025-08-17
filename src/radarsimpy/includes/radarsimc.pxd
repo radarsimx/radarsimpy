@@ -312,7 +312,7 @@ cdef extern from "simulator_point.hpp":
         PointSimulator() except +
         
         # Run point target simulation
-        void Run(Radar[H, L] & radar,                            # Radar configuration
+        void Run(const shared_ptr[Radar[H, L]] & radar,                            # Radar configuration
                  vector[Point[L]] & points)                      # Array of point targets
 
 # Mesh-based Ray Tracing Simulation
@@ -324,7 +324,7 @@ cdef extern from "simulator_mesh.hpp":
         MeshSimulator() except +
         
         # Run mesh simulation with configurable fidelity
-        RadarSimErrorCode Run(Radar[H, L] & radar,               # Radar configuration
+        RadarSimErrorCode Run(const shared_ptr[Radar[H, L]] & radar,               # Radar configuration
                               const shared_ptr[TargetsManager[L]] & targets_manager,         # Targets manager
                               int level,                         # Simulation level (0=LOW, 1=MEDIUM, 2=HIGH)
                               L density,                         # Ray density for physical optics
@@ -342,8 +342,8 @@ cdef extern from "simulator_interference.hpp":
         InterferenceSimulator() except +
         
         # Run interference simulation
-        void Run(Radar[H, L] & radar,                            # Victim radar
-                 Radar[H, L] & interf_radar)                     # Interfering radar
+        void Run(const shared_ptr[Radar[H, L]] & radar,                            # Victim radar
+                 const shared_ptr[Radar[H, L]] & interf_radar)                     # Interfering radar
 
 
 #------------------------------------------------------------------------------

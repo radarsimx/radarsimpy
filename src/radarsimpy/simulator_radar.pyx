@@ -250,8 +250,8 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
     #----------------------
     # Core simulation objects
     cdef:
-        Radar[double, float_t] radar_c
-        Radar[double, float_t] interf_radar_c
+        shared_ptr[Radar[double, float_t]] radar_c
+        shared_ptr[Radar[double, float_t]] interf_radar_c
         vector[Point[float_t]] point_vt
         vector[Target[float_t]] target_vt
         Vec2[int_t] ray_filter_c
@@ -348,12 +348,12 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
                 cp_Point(loc, spd, rcs, phs, ts_shape)
             )
 
-    radar_c = cp_Radar(radar, frame_start_time)
+    radar_c = make_shared[Radar[double, float_t]](cp_Radar(radar, frame_start_time))
 
     cdef double[:,:,::1] bb_real = np.empty(ts_shape, order='C', dtype=np.float64)
     cdef double[:,:,::1] bb_imag = np.empty(ts_shape, order='C', dtype=np.float64)
 
-    radar_c.InitBaseband(&bb_real[0][0][0], &bb_imag[0][0][0])
+    radar_c.get()[0].InitBaseband(&bb_real[0][0][0], &bb_imag[0][0][0])
 
     #----------------------
     # Simulation Execution
@@ -402,10 +402,10 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
             debug)
 
         if err:
-            radar_c.FreeDeviceMemory()
+            radar_c.get()[0].FreeDeviceMemory()
             raise_err(err)
 
-    radar_c.SyncBaseband()
+    radar_c.get()[0].SyncBaseband()
 
     if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
         baseband = np.asarray(bb_real)
@@ -457,14 +457,14 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
     if interf is not None:
         # Use main radar frame time if interference frame time not specified
         interf_frame_start_time = np.array(interf.time_prop["frame_start_time"], dtype=np.float64)
-        interf_radar_c = cp_Radar(interf, interf_frame_start_time)
+        interf_radar_c = make_shared[Radar[double, float_t]](cp_Radar(interf, interf_frame_start_time))
         
         # Initialize baseband for interference calculation
-        radar_c.InitBaseband(&bb_real[0][0][0], &bb_imag[0][0][0])
+        radar_c.get()[0].InitBaseband(&bb_real[0][0][0], &bb_imag[0][0][0])
 
         # Run interference simulation
         interf_sim_c.Run(radar_c, interf_radar_c)
-        radar_c.SyncBaseband()
+        radar_c.get()[0].SyncBaseband()
 
         # Extract interference data based on baseband type
         if bb_type == "real":
@@ -473,10 +473,10 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
             interference = np.asarray(bb_real) + 1j * np.asarray(bb_imag)
 
         # Clean up interference radar memory
-        interf_radar_c.FreeDeviceMemory()
+        interf_radar_c.get()[0].FreeDeviceMemory()
 
     # Clean up main radar memory
-    radar_c.FreeDeviceMemory()
+    radar_c.get()[0].FreeDeviceMemory()
 
     # Return the simulation results as a structured dictionary
     return {
