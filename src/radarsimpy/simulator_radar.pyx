@@ -35,6 +35,7 @@ cimport cython
 
 # C++ type definitions
 from libcpp.string cimport string
+from libcpp.memory cimport shared_ptr, make_shared
 from radarsimpy.includes.type_def cimport (
     vector,
     float_t,
@@ -47,6 +48,7 @@ from radarsimpy.includes.radarsimc cimport (
     Radar,
     Point,
     Target,
+    TargetsManager,
     MeshSimulator,
     PointSimulator,
     InterferenceSimulator,
@@ -58,7 +60,8 @@ from radarsimpy.includes.radarsimc cimport (
 from radarsimpy.lib.cp_radarsimc cimport (
     cp_Radar,
     cp_Target,
-    cp_Point
+    cp_Point,
+    cp_AddTarget
 )
 
 from radarsimpy.mesh_kit import import_mesh_module
@@ -252,6 +255,8 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
         vector[Point[float_t]] point_vt
         vector[Target[float_t]] target_vt
         Vec2[int_t] ray_filter_c
+        
+    cdef shared_ptr[TargetsManager[float_t]] targets_manager = make_shared[TargetsManager[float_t]]()
 
     # Simulator instances
     cdef:
@@ -330,6 +335,8 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
             if mesh_module is None:
                 mesh_module = import_mesh_module()
             target_vt.emplace_back(cp_Target(radar, tgt, timestamp, mesh_module))
+
+            cp_AddTarget(radar, tgt, timestamp, mesh_module, targets_manager.get())
         else:
             # Extract point target parameters with defaults
             loc = tgt["location"]
@@ -386,7 +393,7 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
         # Run scene simulation
         err = mesh_sim_c.Run(
             radar_c,
-            target_vt,
+            targets_manager,
             level_id,
             <float_t> density,
             ray_filter_c,

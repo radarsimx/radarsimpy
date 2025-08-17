@@ -34,6 +34,7 @@ with support for both trial and full versions with appropriate limitations.
 from radarsimpy.includes.radarsimc cimport Radar
 from radarsimpy.includes.radarsimc cimport Target
 from radarsimpy.includes.radarsimc cimport Point
+from radarsimpy.includes.radarsimc cimport TargetsManager
 from radarsimpy.includes.type_def cimport float_t, int_t
 from libcpp.complex cimport complex as cpp_complex
 
@@ -62,6 +63,11 @@ cdef Target[float_t] cp_Target(radar, target, timestamp, mesh_module) except *
 # Raises ValueError for invalid params, RuntimeError for mesh/FreeTier issues
 cdef Target[float_t] cp_RCS_Target(target, mesh_module) except *
 
+cdef void cp_AddTarget(radar,
+                       target,
+                       timestamp,
+                       mesh_module,
+                       TargetsManager[float_t] * targets_manager) except *
 
 # ============================================================================
 # Helper Functions for Internal Use

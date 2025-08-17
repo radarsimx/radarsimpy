@@ -32,7 +32,7 @@ from libcpp cimport bool
 # Local imports
 from radarsimpy.includes.radarsimc cimport (
     Transmitter, Receiver, TxChannel, RxChannel, 
-    Radar, Target, Point, Mem_Copy, Mem_Copy_Vec3,
+    Radar, Target, Point, TargetsManager, Mem_Copy, Mem_Copy_Vec3,
     Mem_Copy_Complex, IsFreeTier
 )
 from radarsimpy.includes.rsvector cimport Vec3
@@ -848,6 +848,185 @@ cdef Target[float_t] cp_Target(radar,
         _warn_deprecated_parameter("is_ground", "skip_diffusion")
 
     return Target[float_t](&points_mv[0, 0],
+                           &cells_mv[0, 0],
+                           <int_t> cells_mv.shape[0],
+                           Vec3[float_t](&origin_mv[0]),
+                           loc_vt,
+                           spd_vt,
+                           rot_vt,
+                           rrt_vt,
+                           ep_c,
+                           mu_c,
+                           <bool> target.get("skip_diffusion", False))
+
+
+@cython.cdivision(True)
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef void cp_AddTarget(radar,
+                  target,
+                  timestamp,
+                  mesh_module,
+                  TargetsManager[float_t] * targets_manager):
+    """
+    cp_Target((radar, target, ts_shape)
+
+    Creat Target object in Cython
+
+    :param Radar radar:
+        Radar object
+    :param dict target:
+        Target properties
+    :param tuple ts_shape:
+        Shape of the time matrix
+
+    :return: C++ object of a target
+    :rtype: Target
+    """
+    # vector of location, speed, rotation, rotation rate
+    cdef vector[Vec3[float_t]] loc_vt
+    cdef vector[Vec3[float_t]] spd_vt
+    cdef vector[Vec3[float_t]] rot_vt
+    cdef vector[Vec3[float_t]] rrt_vt
+
+    cdef float_t[:, :, :] locx_mv, locy_mv, locz_mv
+    cdef float_t[:, :, :] spdx_mv, spdy_mv, spdz_mv
+    cdef float_t[:, :, :] rotx_mv, roty_mv, rotz_mv
+    cdef float_t[:, :, :] rrtx_mv, rrty_mv, rrtz_mv
+
+    cdef cpp_complex[float_t] ep_c, mu_c
+
+    cdef int_t ch_idx, ps_idx, sp_idx
+    ts_shape = np.shape(timestamp)
+    cdef int_t bbsize_c = <int_t>(ts_shape[0]*ts_shape[1]*ts_shape[2])
+
+    cdef float_t scale
+    cdef float_t[:, :] points_mv
+    cdef int_t[:, :] cells_mv
+
+    # Enhanced mesh validation and loading with improved error messages
+    unit = target.get("unit", "m")
+    try:
+        scale = _safe_unit_conversion(unit)
+    except ValueError as e:
+        raise ValueError(f"Invalid unit in target configuration: {e}")
+
+    try:
+        mesh_data = load_mesh(target["model"], scale, mesh_module)
+        points_mv = mesh_data["points"].astype(np_float)
+        cells_mv = mesh_data["cells"].astype(np.int32)
+    except Exception as e:
+        raise RuntimeError(f"Failed to load mesh model '{target.get('model', 'unknown')}': {e}")
+    
+    # Enhanced FreeTier validation using helper function
+    _validate_mesh_for_free_tier(cells_mv.shape[0])
+
+    cdef float_t[:] origin_mv = np.array(target.get("origin", (0, 0, 0)), dtype=np_float)
+
+    location = list(target.get("location", [0, 0, 0]))
+    speed = list(target.get("speed", [0, 0, 0]))
+    rotation = list(target.get("rotation", [0, 0, 0]))
+    rotation_rate = list(target.get( "rotation_rate", [0, 0, 0]))
+
+    cdef float_t[:] location_mv, speed_mv, rotation_mv, rotation_rate_mv
+
+    permittivity = target.get("permittivity", 1e38)
+    permeability = target.get("permeability", 1)
+    if permittivity == "PEC":
+        ep_c = cpp_complex[float_t](<float_t>1e38, <float_t>0.0)
+        mu_c = cpp_complex[float_t](<float_t>1.0, <float_t>0.0)
+    else:
+        ep_c = cpp_complex[float_t](<float_t>np.real(permittivity), <float_t>np.imag(permittivity))
+        mu_c = cpp_complex[float_t](<float_t>np.real(permeability), <float_t>np.imag(permeability))
+
+    if any(np.size(var) > 1 for var in location + speed + rotation + rotation_rate):
+        if np.size(location[0]) > 1:
+            locx_mv = location[0].astype(np_float)
+        else:
+            locx_mv = (location[0] + speed[0]*timestamp).astype(np_float)
+
+        if np.size(location[1]) > 1:
+            locy_mv = location[1].astype(np_float)
+        else:
+            locy_mv = (location[1] + speed[1]*timestamp).astype(np_float)
+
+        if np.size(location[2]) > 1:
+            locz_mv = location[2].astype(np_float)
+        else:
+            locz_mv = (location[2] + speed[2]*timestamp).astype(np_float)
+
+        if np.size(speed[0]) > 1:
+            spdx_mv = speed[0].astype(np_float)
+        else:
+            spdx_mv = np.full(ts_shape, speed[0], dtype=np_float)
+
+        if np.size(speed[1]) > 1:
+            spdy_mv = speed[1].astype(np_float)
+        else:
+            spdy_mv = np.full(ts_shape, speed[1], dtype=np_float)
+
+        if np.size(speed[2]) > 1:
+            spdz_mv = speed[2].astype(np_float)
+        else:
+            spdz_mv = np.full(ts_shape, speed[2], dtype=np_float)
+
+        if np.size(rotation[0]) > 1:
+            rotx_mv = np.radians(rotation[0]).astype(np_float)
+        else:
+            rotx_mv = np.radians(
+                rotation[0] + rotation_rate[0]*timestamp).astype(np_float)
+
+        if np.size(rotation[1]) > 1:
+            roty_mv = np.radians(rotation[1]).astype(np_float)
+        else:
+            roty_mv = np.radians(
+                rotation[1] + rotation_rate[1]*timestamp).astype(np_float)
+
+        if np.size(rotation[2]) > 1:
+            rotz_mv = np.radians(rotation[2]).astype(np_float)
+        else:
+            rotz_mv = np.radians(
+                rotation[2] + rotation_rate[2]*timestamp).astype(np_float)
+
+        if np.size(rotation_rate[0]) > 1:
+            rrtx_mv = np.radians(rotation_rate[0]).astype(np_float)
+        else:
+            rrtx_mv = np.full(ts_shape, np.radians(rotation_rate[0]), dtype=np_float)
+
+        if np.size(rotation_rate[1]) > 1:
+            rrty_mv = np.radians(rotation_rate[1]).astype(np_float)
+        else:
+            rrty_mv = np.full(ts_shape, np.radians(rotation_rate[1]), dtype=np_float)
+
+        if np.size(rotation_rate[2]) > 1:
+            rrtz_mv = np.radians(rotation_rate[2]).astype(np_float)
+        else:
+            rrtz_mv = np.full(ts_shape, np.radians(rotation_rate[2]), dtype=np_float)
+
+        Mem_Copy_Vec3(&locx_mv[0,0,0], &locy_mv[0,0,0], &locz_mv[0,0,0], bbsize_c, loc_vt)
+        Mem_Copy_Vec3(&spdx_mv[0,0,0], &spdy_mv[0,0,0], &spdz_mv[0,0,0], bbsize_c, spd_vt)
+        Mem_Copy_Vec3(&rotx_mv[0,0,0], &roty_mv[0,0,0], &rotz_mv[0,0,0], bbsize_c, rot_vt)
+        Mem_Copy_Vec3(&rrtx_mv[0,0,0], &rrty_mv[0,0,0], &rrtz_mv[0,0,0], bbsize_c, rrt_vt)
+
+    else:
+        location_mv = np.array(location, dtype=np_float)
+        loc_vt.push_back(Vec3[float_t](&location_mv[0]))
+
+        speed_mv = np.array(speed, dtype=np_float)
+        spd_vt.push_back(Vec3[float_t](&speed_mv[0]))
+
+        rotation_mv = np.radians(np.array(rotation, dtype=np_float)).astype(np_float)
+        rot_vt.push_back(Vec3[float_t](&rotation_mv[0]))
+
+        rotation_rate_mv = np.radians(np.array(rotation_rate, dtype=np_float)).astype(np_float)
+        rrt_vt.push_back(Vec3[float_t](&rotation_rate_mv[0]))
+    
+    # Handle deprecated parameter with enhanced warning
+    if "is_ground" in target:
+        target["skip_diffusion"] = target["is_ground"]
+        _warn_deprecated_parameter("is_ground", "skip_diffusion")
+
+    targets_manager[0].AddTarget(&points_mv[0, 0],
                            &cells_mv[0, 0],
                            <int_t> cells_mv.shape[0],
                            Vec3[float_t](&origin_mv[0]),

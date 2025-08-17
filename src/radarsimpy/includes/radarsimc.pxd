@@ -39,6 +39,7 @@ Template Parameters:
 from libcpp cimport bool
 from libcpp.complex cimport complex as cpp_complex
 from libcpp.string cimport string
+from libcpp.memory cimport shared_ptr
 
 #------------------------------------------------------------------------------
 # RadarSimPy Type Definitions
@@ -284,6 +285,24 @@ cdef extern from "simulator_point.hpp":
         void Run(Radar[H, L] & radar,                            # Radar configuration
                  vector[Point[L]] & points)                      # Array of point targets
 
+# Targets Manager
+# Manager class for handling multiple mesh targets in simulations
+cdef extern from "targets_manager.hpp":
+    cdef cppclass TargetsManager[T]:
+        TargetsManager() except +
+        # Add a new target
+        void AddTarget(const T * points,              # Vertex coordinates array
+               const int_t * cells,           # Cell connectivity array
+               const int_t & cell_size,       # Number of cells in mesh
+               const Vec3[T] & origin,        # Target reference origin
+               const vector[Vec3[T]] & location_array,    # Time-varying locations
+               const vector[Vec3[T]] & speed_array,       # Time-varying velocities
+               const vector[Vec3[T]] & rotation_array,    # Time-varying rotations
+               const vector[Vec3[T]] & rotation_rate_array,  # Time-varying rotation rates
+               const cpp_complex[T] & ep,     # Relative permittivity (material property)
+               const cpp_complex[T] & mu,     # Relative permeability (material property)
+               const bool & skip_diffusion) except +
+
 # Mesh-based Ray Tracing Simulation
 # Physics-based 3D mesh target simulation using ray tracing and physical optics
 # Usage: For realistic simulation of complex targets with detailed geometry.
@@ -294,7 +313,7 @@ cdef extern from "simulator_mesh.hpp":
         
         # Run mesh simulation with configurable fidelity
         RadarSimErrorCode Run(Radar[H, L] & radar,               # Radar configuration
-                              vector[Target[L]] targets,         # Array of mesh targets
+                              const shared_ptr[TargetsManager[L]] & targets_manager,         # Array of mesh targets
                               int level,                         # Simulation level (0=LOW, 1=MEDIUM, 2=HIGH)
                               L density,                         # Ray density for physical optics
                               Vec2[int_t] ray_filter,            # Ray index filter [min, max]
@@ -313,6 +332,7 @@ cdef extern from "simulator_interference.hpp":
         # Run interference simulation
         void Run(Radar[H, L] & radar,                            # Victim radar
                  Radar[H, L] & interf_radar)                     # Interfering radar
+
 
 #------------------------------------------------------------------------------
 # End of RadarSimPy C++ Interface Declarations
