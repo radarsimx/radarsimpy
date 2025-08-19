@@ -49,6 +49,7 @@ from radarsimpy.includes.radarsimc cimport (
     Point,
     Target,
     TargetsManager,
+    PointsManager,
     MeshSimulator,
     PointSimulator,
     InterferenceSimulator,
@@ -59,9 +60,8 @@ from radarsimpy.includes.radarsimc cimport (
 # RadarSimX library components
 from radarsimpy.lib.cp_radarsimc cimport (
     cp_Radar,
-    cp_Target,
-    cp_Point,
-    cp_AddTarget
+    cp_AddTarget,
+    cp_AddPoint
 )
 
 from radarsimpy.mesh_kit import import_mesh_module
@@ -252,11 +252,10 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
     cdef:
         shared_ptr[Radar[double, float_t]] radar_c
         shared_ptr[Radar[double, float_t]] interf_radar_c
-        vector[Point[float_t]] point_vt
-        vector[Target[float_t]] target_vt
         Vec2[int_t] ray_filter_c
         
     cdef shared_ptr[TargetsManager[float_t]] targets_manager = make_shared[TargetsManager[float_t]]()
+    cdef shared_ptr[PointsManager[float_t]] points_manager = make_shared[PointsManager[float_t]]()
 
     # Simulator instances
     cdef:
@@ -331,7 +330,6 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
         if "model" in tgt:
             if mesh_module is None:
                 mesh_module = import_mesh_module()
-            target_vt.emplace_back(cp_Target(radar, tgt, timestamp, mesh_module))
 
             cp_AddTarget(radar, tgt, timestamp, mesh_module, targets_manager.get())
         else:
@@ -341,9 +339,7 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
             rcs = tgt["rcs"]
             phs = tgt.get("phase", 0)
 
-            point_vt.emplace_back(
-                cp_Point(loc, spd, rcs, phs, ts_shape)
-            )
+            cp_AddPoint(loc, spd, rcs, phs, ts_shape, points_manager.get())
 
     radar_c = make_shared[Radar[double, float_t]](cp_Radar(radar, frame_start_time))
 
@@ -356,51 +352,49 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
     # Simulation Execution
     #----------------------
     # Run ideal point target simulation
-    if point_vt.size() > 0:
-        point_sim_c.Run(radar_c, point_vt)
+    point_sim_c.Run(radar_c, points_manager)
 
     # Run scene simulation if there are 3D mesh targets
-    if target_vt.size() > 0:
-        level_map = {None: 0, "frame": 0, "pulse": 1, "sample": 2}
-        try:
-            level_id = level_map[level]
-        except KeyError:
-            raise ValueError(
-                "\nInvalid Simulation Fidelity Level\n"
-                "------------------------------\n"
-                "The specified simulation fidelity level is not recognized.\n\n"
-                "Available levels:\n"
-                "- None or 'frame': One ray tracing simulation per frame\n"
-                "    • Assumes linear motion during the frame\n"
-                "    • Best performance, suitable for most scenarios\n"
-                "- 'pulse': Ray tracing for each pulse\n"
-                "    • Assumes linear motion during the pulse\n"
-                "    • Increased computation time\n"
-                "- 'sample': Ray tracing for each sample\n"
-                "    • Highest accuracy for complex motion\n"
-                "    • Significantly longer computation time\n\n"
-                "Your input: '{}'\n\n"
-                "Choose the appropriate level based on:\n"
-                "1. Target motion complexity\n"
-                "2. Required accuracy\n"
-                "3. Available computation time\n"
-                .format(level)
-            )
+    level_map = {None: 0, "frame": 0, "pulse": 1, "sample": 2}
+    try:
+        level_id = level_map[level]
+    except KeyError:
+        raise ValueError(
+            "\nInvalid Simulation Fidelity Level\n"
+            "------------------------------\n"
+            "The specified simulation fidelity level is not recognized.\n\n"
+            "Available levels:\n"
+            "- None or 'frame': One ray tracing simulation per frame\n"
+            "    • Assumes linear motion during the frame\n"
+            "    • Best performance, suitable for most scenarios\n"
+            "- 'pulse': Ray tracing for each pulse\n"
+            "    • Assumes linear motion during the pulse\n"
+            "    • Increased computation time\n"
+            "- 'sample': Ray tracing for each sample\n"
+            "    • Highest accuracy for complex motion\n"
+            "    • Significantly longer computation time\n\n"
+            "Your input: '{}'\n\n"
+            "Choose the appropriate level based on:\n"
+            "1. Target motion complexity\n"
+            "2. Required accuracy\n"
+            "3. Available computation time\n"
+            .format(level)
+        )
 
-        # Run scene simulation
-        err = mesh_sim_c.Run(
-            radar_c,
-            targets_manager,
-            level_id,
-            <float_t> density,
-            ray_filter_c,
-            back_propagating,
-            log_path_c,
-            debug)
+    # Run scene simulation
+    err = mesh_sim_c.Run(
+        radar_c,
+        targets_manager,
+        level_id,
+        <float_t> density,
+        ray_filter_c,
+        back_propagating,
+        log_path_c,
+        debug)
 
-        if err:
-            radar_c.get()[0].FreeDeviceMemory()
-            raise_err(err)
+    if err:
+        radar_c.get()[0].FreeDeviceMemory()
+        raise_err(err)
 
     radar_c.get()[0].SyncBaseband()
 

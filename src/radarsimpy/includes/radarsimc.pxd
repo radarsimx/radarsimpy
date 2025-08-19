@@ -206,6 +206,26 @@ cdef extern from "point.hpp":
               const vector[T] & phs) except + # Time-varying phase values (radians)
 
 #------------------------------------------------------------------------------
+# Points Manager
+# Container for managing collections of radar point targets
+#------------------------------------------------------------------------------
+cdef extern from "points_manager.hpp":
+    cdef cppclass PointsManager[T]:
+        PointsManager() except +
+        
+        # Add a new point to the points collection
+        void AddPoint(const vector[Vec3[T]] & location_array,    # Spatial positions over time
+                      const Vec3[T] & speed_array,               # Velocity vectors over time
+                      const vector[T] & rcs_array,               # RCS values over time (dBsm)
+                      const vector[T] & phase_array) except +    # Phase values over time (rad)
+        
+        # Add a simple point to the points collection
+        void AddPointSimple(const Vec3[T] & location,            # Point location
+                            const Vec3[T] & speed,               # Point velocity
+                            const T & rcs,                       # Point RCS value (dBsm)
+                            const T & phase) except +            # Point phase value (rad)
+
+#------------------------------------------------------------------------------
 # Transmitter Components
 # Radar transmitter components including antenna patterns and waveform modulation
 #------------------------------------------------------------------------------
@@ -313,7 +333,7 @@ cdef extern from "simulator_point.hpp":
         
         # Run point target simulation
         void Run(const shared_ptr[Radar[H, L]] & radar,                            # Radar configuration
-                 vector[Point[L]] & points)                      # Array of point targets
+                 const shared_ptr[PointsManager[L]] & points_manager)                      # Array of point targets
 
 # Mesh-based Ray Tracing Simulation
 # Physics-based 3D mesh target simulation using ray tracing and physical optics
