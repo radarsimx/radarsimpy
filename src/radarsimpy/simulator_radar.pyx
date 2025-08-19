@@ -325,9 +325,6 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
     # Process each target with optimized loop
     mesh_module = None
     cdef int_t target_count = len(targets)
-    # cdef dict tgt
-    # cdef tuple loc, spd
-    # cdef float_t rcs, phs
 
     for target_idx in range(target_count):
         tgt = targets[target_idx]
