@@ -33,7 +33,7 @@ cimport numpy as np
 # Local imports
 from radarsimpy.includes.rsvector cimport Vec3
 from radarsimpy.includes.type_def cimport vector
-from radarsimpy.includes.radarsimc cimport Target, RcsSimulator, IsFreeTier, TargetsManager
+from radarsimpy.includes.radarsimc cimport RcsSimulator, IsFreeTier, TargetsManager
 from radarsimpy.lib.cp_radarsimc cimport cp_RCS_Target
 from libcpp.complex cimport complex as cpp_complex
 

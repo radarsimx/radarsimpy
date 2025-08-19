@@ -80,44 +80,6 @@ cdef extern from "type_def.hpp":
         ERROR_TOO_MANY_RAYS_PER_GRID  # Ray density exceeds grid capacity
 
 #------------------------------------------------------------------------------
-# Target Geometry and Physics
-# 3D mesh target representation with material properties and motion dynamics
-#------------------------------------------------------------------------------
-cdef extern from "target.hpp":
-    cdef cppclass Target[T]:
-        # Default constructor
-        Target() except +
-        
-        # Full constructor with material properties and motion arrays
-        Target(const T * points,              # Vertex coordinates array
-               const int_t * cells,           # Cell connectivity array
-               const int_t & cell_size,       # Number of cells in mesh
-               const Vec3[T] & origin,        # Target reference origin
-               const vector[Vec3[T]] & location_array,    # Time-varying locations
-               const vector[Vec3[T]] & speed_array,       # Time-varying velocities
-               const vector[Vec3[T]] & rotation_array,    # Time-varying rotations
-               const vector[Vec3[T]] & rotation_rate_array,  # Time-varying rotation rates
-               const cpp_complex[T] & ep,     # Relative permittivity (material property)
-               const cpp_complex[T] & mu,     # Relative permeability (material property)
-               const bool & skip_diffusion) except +  # Skip diffuse scattering calculation
-               
-        # Simplified constructor for static mesh
-        Target(const T * points,
-               const int_t * cells,
-               const int_t & cell_size) except +
-               
-        # Constructor with single motion state
-        Target(const T * points,
-               const int_t * cells,
-               const int_t & cell_size,
-               const Vec3[T] & origin,
-               const Vec3[T] & location,
-               const Vec3[T] & speed,
-               const Vec3[T] & rotation,
-               const Vec3[T] & rotation_rate,
-               const bool & skip_diffusion) except +
-
-#------------------------------------------------------------------------------
 # Targets Manager
 # Container for managing multiple 3D mesh targets in radar simulation
 #------------------------------------------------------------------------------
@@ -190,20 +152,6 @@ cdef extern from "simulator_lidar.hpp":
                  const Vec3[T] & position)   # LiDAR sensor position
 
         vector[Ray[T]] cloud_  # Generated point cloud rays
-
-#------------------------------------------------------------------------------
-# Point Target Model
-# Ideal point target for radar simulation with time-varying properties
-#------------------------------------------------------------------------------
-cdef extern from "point.hpp":
-    cdef cppclass Point[T]:
-        Point() except +
-        
-        # Constructor with dynamic properties
-        Point(const vector[Vec3[T]] & loc,    # Time-varying locations
-              const Vec3[T] & speed,          # Constant velocity
-              const vector[T] & rcs,          # Time-varying RCS values (linear scale)
-              const vector[T] & phs) except + # Time-varying phase values (radians)
 
 #------------------------------------------------------------------------------
 # Points Manager

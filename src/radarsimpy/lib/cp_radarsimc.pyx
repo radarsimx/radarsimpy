@@ -32,7 +32,7 @@ from libcpp cimport bool
 # Local imports
 from radarsimpy.includes.radarsimc cimport (
     Transmitter, Receiver, TxChannel, RxChannel, 
-    Radar, Target, Point, TargetsManager, PointsManager,Mem_Copy, Mem_Copy_Vec3,
+    Radar, TargetsManager, PointsManager, Mem_Copy, Mem_Copy_Vec3,
     Mem_Copy_Complex, IsFreeTier
 )
 from radarsimpy.includes.rsvector cimport Vec3

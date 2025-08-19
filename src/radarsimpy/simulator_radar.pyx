@@ -46,8 +46,6 @@ from radarsimpy.includes.type_def cimport (
 from radarsimpy.includes.rsvector cimport Vec2
 from radarsimpy.includes.radarsimc cimport (
     Radar,
-    Point,
-    Target,
     TargetsManager,
     PointsManager,
     MeshSimulator,

@@ -32,8 +32,6 @@ with support for both trial and full versions with appropriate limitations.
 """
 
 from radarsimpy.includes.radarsimc cimport Radar
-from radarsimpy.includes.radarsimc cimport Target
-from radarsimpy.includes.radarsimc cimport Point
 from radarsimpy.includes.radarsimc cimport TargetsManager
 from radarsimpy.includes.radarsimc cimport PointsManager
 from radarsimpy.includes.type_def cimport float_t, int_t

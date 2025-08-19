@@ -29,7 +29,7 @@ cimport numpy as np
 cimport cython
 
 # RadarSimX imports
-from radarsimpy.includes.radarsimc cimport Target, LidarSimulator, TargetsManager
+from radarsimpy.includes.radarsimc cimport LidarSimulator, TargetsManager
 from radarsimpy.includes.radarsimc cimport Mem_Copy
 from radarsimpy.includes.rsvector cimport Vec3
 from radarsimpy.includes.type_def cimport float_t, int_t, vector
