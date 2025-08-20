@@ -48,7 +48,7 @@ cdef void cp_AddPoint(location, speed, rcs, phase, shape, PointsManager[float_t]
 # Create a Radar system object for simulation 
 # Converts Python radar config to C++ with complete transmitter/receiver setup
 # Raises ValueError for invalid config, RuntimeError for setup failures
-cdef Radar[double, float_t] cp_Radar(radar, frame_start_time) except *
+cdef void cp_ConfigureRadar(radar, frame_start_time, Radar[double, float_t] * cptr_radar) except *
 
 # Create a Target object specifically optimized for RCS calculations
 # Simplified target object without full dynamic simulation requirements

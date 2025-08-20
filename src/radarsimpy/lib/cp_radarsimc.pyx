@@ -530,7 +530,7 @@ cdef RxChannel[float_t] cp_RxChannel(rx,
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef Radar[double, float_t] cp_Radar(radar, frame_start_time):
+cdef void cp_ConfigureRadar(radar, frame_start_time, Radar[double, float_t] * cptr_radar):
     """
     cp_Radar(radar, frame_start_time)
 
@@ -583,7 +583,6 @@ cdef Radar[double, float_t] cp_Radar(radar, frame_start_time):
     """
     cdef Transmitter[double, float_t] tx_c
     cdef Receiver[float_t] rx_c
-    cdef Radar[double, float_t] radar_c
 
     # Extract key system dimensions from radar configuration
     cdef int_t txsize_c = radar.radar_prop["transmitter"].txchannel_prop["size"]
@@ -667,15 +666,13 @@ cdef Radar[double, float_t] cp_Radar(radar, frame_start_time):
     spd_vt = Vec3[float_t](<float_t>radar.radar_prop["speed"][0], <float_t>radar.radar_prop["speed"][1], <float_t>radar.radar_prop["speed"][2])
     rrt_vt = Vec3[float_t](<float_t>radar.radar_prop["rotation_rate"][0], <float_t>radar.radar_prop["rotation_rate"][1], <float_t>radar.radar_prop["rotation_rate"][2])
 
-    radar_c = Radar[double, float_t](tx_c,
-                             rx_c,
-                             t_frame_vt,
-                             loc_vt,
-                             spd_vt,
-                             rot_vt,
-                             rrt_vt)
-    
-    return radar_c
+    cptr_radar[0].Configure(tx_c,
+                            rx_c,
+                            t_frame_vt,
+                            loc_vt,
+                            spd_vt,
+                            rot_vt,
+                            rrt_vt)
 
 @cython.cdivision(True)
 @cython.boundscheck(False)
