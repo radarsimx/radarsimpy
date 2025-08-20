@@ -36,6 +36,7 @@ from radarsimpy.includes.radarsimc cimport TargetsManager
 from radarsimpy.includes.radarsimc cimport PointsManager
 from radarsimpy.includes.type_def cimport float_t, int_t
 from libcpp.complex cimport complex as cpp_complex
+from libcpp.memory cimport shared_ptr
 
 
 # ============================================================================
@@ -48,7 +49,7 @@ cdef void cp_AddPoint(location, speed, rcs, phase, shape, PointsManager[float_t]
 # Create a Radar system object for simulation 
 # Converts Python radar config to C++ with complete transmitter/receiver setup
 # Raises ValueError for invalid config, RuntimeError for setup failures
-cdef void cp_ConfigureRadar(radar, frame_start_time, Radar[double, float_t] * cptr_radar) except *
+cdef shared_ptr[Radar[double, float_t]] cp_Radar(radar, frame_start_time) except *
 
 # Create a Target object specifically optimized for RCS calculations
 # Simplified target object without full dynamic simulation requirements

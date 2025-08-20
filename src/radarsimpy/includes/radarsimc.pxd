@@ -261,14 +261,6 @@ cdef extern from "radar.hpp":
               vector[Vec3[L]] & rotation_array,                  # Platform orientations
               Vec3[L] rotrate_array) except +                    # Platform rotation rates
 
-        void Configure(Transmitter[H, L] & tx,                            # Transmitter configuration
-                       Receiver[L] & rx,                                  # Receiver configuration
-                       vector[H] & frame_start_time,                      # Frame timing array (s)
-                       vector[Vec3[L]] & location_array,                  # Platform locations
-                       Vec3[L] speed_array,                               # Platform velocity
-                       vector[Vec3[L]] & rotation_array,                  # Platform orientations
-                       Vec3[L] rotrate_array) except +                    # Platform rotation rates
-              
         # Memory management for baseband data
         void InitBaseband(H *bb_real,                            # Real baseband buffer
                           H *bb_imag) except +                   # Imaginary baseband buffer

@@ -57,7 +57,7 @@ from radarsimpy.includes.radarsimc cimport (
 
 # RadarSimX library components
 from radarsimpy.lib.cp_radarsimc cimport (
-    cp_ConfigureRadar,
+    cp_Radar,
     cp_AddTarget,
     cp_AddPoint
 )
@@ -339,7 +339,7 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
 
             cp_AddPoint(loc, spd, rcs, phs, ts_shape, points_manager.get())
 
-    cp_ConfigureRadar(radar, frame_start_time, radar_c.get())
+    radar_c = cp_Radar(radar, frame_start_time)
 
     cdef double[:,:,::1] bb_real = np.empty(ts_shape, order='C', dtype=np.float64)
     cdef double[:,:,::1] bb_imag = np.empty(ts_shape, order='C', dtype=np.float64)
@@ -446,8 +446,8 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
     if interf is not None:
         # Use main radar frame time if interference frame time not specified
         interf_frame_start_time = np.array(interf.time_prop["frame_start_time"], dtype=np.float64)
-        cp_ConfigureRadar(interf, interf_frame_start_time, interf_radar_c.get())
-        
+        interf_radar_c = cp_Radar(interf, interf_frame_start_time)
+
         # Initialize baseband for interference calculation
         radar_c.get()[0].InitBaseband(&bb_real[0][0][0], &bb_imag[0][0][0])
 

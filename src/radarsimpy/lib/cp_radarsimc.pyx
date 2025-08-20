@@ -28,6 +28,7 @@ cimport cython
 cimport numpy as np
 from libcpp.complex cimport complex as cpp_complex
 from libcpp cimport bool
+from libcpp.memory cimport shared_ptr, make_shared
 
 # Local imports
 from radarsimpy.includes.radarsimc cimport (
@@ -530,7 +531,7 @@ cdef RxChannel[float_t] cp_RxChannel(rx,
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef void cp_ConfigureRadar(radar, frame_start_time, Radar[double, float_t] * cptr_radar):
+cdef shared_ptr[Radar[double, float_t]] cp_Radar(radar, frame_start_time):
     """
     cp_Radar(radar, frame_start_time)
 
@@ -666,13 +667,13 @@ cdef void cp_ConfigureRadar(radar, frame_start_time, Radar[double, float_t] * cp
     spd_vt = Vec3[float_t](<float_t>radar.radar_prop["speed"][0], <float_t>radar.radar_prop["speed"][1], <float_t>radar.radar_prop["speed"][2])
     rrt_vt = Vec3[float_t](<float_t>radar.radar_prop["rotation_rate"][0], <float_t>radar.radar_prop["rotation_rate"][1], <float_t>radar.radar_prop["rotation_rate"][2])
 
-    cptr_radar[0].Configure(tx_c,
-                            rx_c,
-                            t_frame_vt,
-                            loc_vt,
-                            spd_vt,
-                            rot_vt,
-                            rrt_vt)
+    return make_shared[Radar[double, float_t]](tx_c,
+                                               rx_c,
+                                               t_frame_vt,
+                                               loc_vt,
+                                               spd_vt,
+                                               rot_vt,
+                                               rrt_vt)
 
 @cython.cdivision(True)
 @cython.boundscheck(False)
