@@ -253,7 +253,13 @@ cdef extern from "receiver.hpp":
                  const T & baseband_gain,                        # Baseband gain (dB)
                  const T & baseband_bw) except +                 # Baseband bandwidth (Hz)
                  
-        void AddChannel(const RxChannel[T] & channel)  # Add receiver channel
+        void AddChannel(const Vec3[T] & location,                # Antenna location
+                        const Vec3[cpp_complex[T]] & polar,      # Polarization vector
+                        const vector[T] & phi,                   # Azimuth angle array
+                        const vector[T] & phi_ptn,               # Azimuth pattern
+                        const vector[T] & theta,                 # Elevation angle array
+                        const vector[T] & theta_ptn,             # Elevation pattern
+                        const T & antenna_gain)                  # Antenna gain (dB)
 
 #------------------------------------------------------------------------------
 # Radar System Configuration

@@ -32,8 +32,9 @@ from libcpp.memory cimport shared_ptr, make_shared
 
 # Local imports
 from radarsimpy.includes.radarsimc cimport (
-    Transmitter, Receiver, TxChannel, RxChannel, 
-    Radar, TargetsManager, PointsManager, Mem_Copy, Mem_Copy_Vec3,
+    Transmitter, Receiver, 
+    Radar, TargetsManager, PointsManager,
+    Mem_Copy, Mem_Copy_Vec3,
     Mem_Copy_Complex, IsFreeTier
 )
 from radarsimpy.includes.rsvector cimport Vec3
@@ -457,8 +458,7 @@ cdef void cp_AddTxChannel(tx, tx_idx, Transmitter[double, float_t] * tx_c):
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef RxChannel[float_t] cp_RxChannel(rx,
-                                     rx_idx):
+cdef void cp_AddRxChannel(rx, rx_idx, Receiver[float_t] * rx_c):
     """
     cp_RxChannel(rx, rx_idx)
 
@@ -516,7 +516,7 @@ cdef RxChannel[float_t] cp_RxChannel(rx,
     polar = rx.rxchannel_prop["polarization"][rx_idx]
     cdef Vec3[cpp_complex[float_t]] polarization_vt = Vec3[cpp_complex[float_t]](cpp_complex[float_t](np.real(polar[0]), np.imag(polar[0])), cpp_complex[float_t](np.real(polar[1]), np.imag(polar[1])), cpp_complex[float_t](np.real(polar[2]), np.imag(polar[2])))
     # cdef float_t[:] polarization_mv = rx.rxchannel_prop["polarization"][rx_idx].astype(np_float)
-    return RxChannel[float_t](
+    rx_c[0].AddChannel(
         Vec3[float_t](&location_mv[0]),
         polarization_vt,
         az_ang_vt,
@@ -634,9 +634,7 @@ cdef shared_ptr[Radar[double, float_t]] cp_Radar(radar, frame_start_time):
         <float_t> radar.radar_prop["receiver"].bb_prop["noise_bandwidth"]
     )
     for idx_c in range(0, rxsize_c):
-        rx_c.get()[0].AddChannel(
-            cp_RxChannel(radar.radar_prop["receiver"], idx_c)
-        )
+        cp_AddRxChannel(radar.radar_prop["receiver"], idx_c, rx_c.get())
 
     """
     Radar
