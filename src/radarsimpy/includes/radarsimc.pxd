@@ -253,8 +253,8 @@ cdef extern from "radar.hpp":
         Radar() except +
         
         # Radar system constructor
-        Radar(Transmitter[H, L] & tx,                            # Transmitter configuration
-              Receiver[L] & rx,                                  # Receiver configuration
+        Radar(const shared_ptr[Transmitter[H, L]] & tx,          # Transmitter configuration
+              const shared_ptr[Receiver[L]] & rx,                # Receiver configuration
               vector[H] & frame_start_time,                      # Frame timing array (s)
               vector[Vec3[L]] & location_array,                  # Platform locations
               Vec3[L] speed_array,                               # Platform velocity

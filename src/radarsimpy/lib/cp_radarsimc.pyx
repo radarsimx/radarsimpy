@@ -292,7 +292,7 @@ cdef void cp_AddPoint(location, speed, rcs, phase, shape, PointsManager[float_t]
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef Transmitter[double, float_t] cp_Transmitter(radar):
+cdef shared_ptr[Transmitter[double, float_t]] cp_Transmitter(radar):
     """
     cp_Transmitter(radar)
 
@@ -340,7 +340,7 @@ cdef Transmitter[double, float_t] cp_Transmitter(radar):
         pn_imag_mv = np.imag(radar.sample_prop["phase_noise"]).astype(np.float64)
         Mem_Copy_Complex(&pn_real_mv[0], &pn_imag_mv[0], <int_t>(np.size(radar.sample_prop["phase_noise"])), pn_vt)
 
-    return Transmitter[double, float_t](
+    return make_shared[Transmitter[double, float_t]](
         <float_t> radar.radar_prop["transmitter"].rf_prop["tx_power"],
         f_vt,
         t_vt,
@@ -582,8 +582,8 @@ cdef shared_ptr[Radar[double, float_t]] cp_Radar(radar, frame_start_time):
     - Handles coordinate transformations and unit conversions
     - Optimized for high-performance simulation engine interface
     """
-    cdef Transmitter[double, float_t] tx_c
-    cdef Receiver[float_t] rx_c
+    cdef shared_ptr[Transmitter[double, float_t]] tx_c
+    cdef shared_ptr[Receiver[float_t]] rx_c
 
     # Extract key system dimensions from radar configuration
     cdef int_t txsize_c = radar.radar_prop["transmitter"].txchannel_prop["size"]
@@ -622,14 +622,14 @@ cdef shared_ptr[Radar[double, float_t]] cp_Radar(radar, frame_start_time):
     """
     tx_c = cp_Transmitter(radar)
     for idx_c in range(0, txsize_c):
-        tx_c.AddChannel(
+        tx_c.get()[0].AddChannel(
             cp_TxChannel(radar.radar_prop["transmitter"], idx_c)
         )
 
     """
     Receiver
     """
-    rx_c = Receiver[float_t](
+    rx_c = make_shared[Receiver[float_t]](
         <float_t> radar.radar_prop["receiver"].bb_prop["fs"],
         <float_t> radar.radar_prop["receiver"].rf_prop["rf_gain"],
         <float_t> radar.radar_prop["receiver"].bb_prop["load_resistor"],
@@ -637,7 +637,7 @@ cdef shared_ptr[Radar[double, float_t]] cp_Radar(radar, frame_start_time):
         <float_t> radar.radar_prop["receiver"].bb_prop["noise_bandwidth"]
     )
     for idx_c in range(0, rxsize_c):
-        rx_c.AddChannel(
+        rx_c.get()[0].AddChannel(
             cp_RxChannel(radar.radar_prop["receiver"], idx_c)
         )
 
