@@ -213,7 +213,18 @@ cdef extern from "transmitter.hpp":
                     const vector[H] & pulse_start_time,
                     const vector[cpp_complex[H]] & phase_noise) except +  # Phase noise samples
                     
-        void AddChannel(const TxChannel[L] & channel)  # Add transmitter channel
+        void AddChannel(const Vec3[L] & location,                      # Antenna location
+                        const Vec3[cpp_complex[L]] & polar,            # Polarization vector
+                        const vector[L] & phi,                         # Azimuth angle array
+                        const vector[L] & phi_ptn,                     # Azimuth pattern
+                        const vector[L] & theta,                       # Elevation angle array
+                        const vector[L] & theta_ptn,                   # Elevation pattern
+                        const L & antenna_gain,                        # Antenna gain (dB)
+                        const vector[L] & mod_t,                       # Modulation time array
+                        const vector[cpp_complex[L]] & mod_var,        # Modulation variables
+                        const vector[cpp_complex[L]] & pulse_mod,      # Pulse modulation
+                        const L & delay,                               # Channel delay (s)
+                        const L & grid) except +                       # Time grid resolution
 
 #------------------------------------------------------------------------------
 # Receiver Components

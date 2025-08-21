@@ -353,10 +353,9 @@ cdef shared_ptr[Transmitter[double, float_t]] cp_Transmitter(radar):
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef TxChannel[float_t] cp_TxChannel(tx,
-                                     tx_idx):
+cdef void cp_AddTxChannel(tx, tx_idx, Transmitter[double, float_t] * tx_c):
     """
-    cp_TxChannel(tx, tx_idx)
+    cp_AddTxChannel(tx, tx_idx)
 
     Create TxChannel object in Cython with complete antenna pattern processing
 
@@ -439,7 +438,7 @@ cdef TxChannel[float_t] cp_TxChannel(tx,
     polar = tx.txchannel_prop["polarization"][tx_idx]
     cdef Vec3[cpp_complex[float_t]] polarization_vt = Vec3[cpp_complex[float_t]](cpp_complex[float_t](np.real(polar[0]), np.imag(polar[0])), cpp_complex[float_t](np.real(polar[1]), np.imag(polar[1])), cpp_complex[float_t](np.real(polar[2]), np.imag(polar[2])))
 
-    return TxChannel[float_t](
+    tx_c[0].AddChannel(
         Vec3[float_t](&location_mv[0]),
         polarization_vt,
         az_ang_vt,
@@ -622,9 +621,7 @@ cdef shared_ptr[Radar[double, float_t]] cp_Radar(radar, frame_start_time):
     """
     tx_c = cp_Transmitter(radar)
     for idx_c in range(0, txsize_c):
-        tx_c.get()[0].AddChannel(
-            cp_TxChannel(radar.radar_prop["transmitter"], idx_c)
-        )
+        cp_AddTxChannel(radar.radar_prop["transmitter"], idx_c, tx_c.get())
 
     """
     Receiver
