@@ -39,8 +39,8 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.13"]
-        c_compiler: [gcc-14]
-        cxx_compiler: [g++-14]
+        c_compiler: [gcc-13]
+        cxx_compiler: [g++-13]
 
     steps:
       - name: Checkout repository and submodules

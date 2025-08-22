@@ -8,7 +8,7 @@ name: Release on Ubuntu
 #
 # Build Matrix:
 # - Ubuntu 22.04 LTS: GCC-11 compiler, 10 builds (5 Python × 2 tiers)
-# - Ubuntu 24.04 LTS: GCC-14 compiler, 10 builds (5 Python × 2 tiers)
+# - Ubuntu 24.04 LTS: GCC-13 compiler, 10 builds (5 Python × 2 tiers)
 # - Python versions: 3.9, 3.10, 3.11, 3.12, 3.13
 # - Build tiers: standard (full features), free (limited features)
 # - Total builds: 20
@@ -124,75 +124,75 @@ jobs:
             tier: free
             arch: cpu
             artifact_name: radarsimpy_ubuntu_22_04_py3.13_freetier
-          # Ubuntu 24.04 with GCC-14 Standard builds
+          # Ubuntu 24.04 with GCC-13 Standard builds
           - os: ubuntu-24.04
             python-version: "3.9"
-            c_compiler: gcc-14
-            cxx_compiler: g++-14
+            c_compiler: gcc-13
+            cxx_compiler: g++-13
             tier: standard
             arch: cpu
             artifact_name: radarsimpy_ubuntu_24_04_py3.9
           - os: ubuntu-24.04
             python-version: "3.10"
-            c_compiler: gcc-14
-            cxx_compiler: g++-14
+            c_compiler: gcc-13
+            cxx_compiler: g++-13
             tier: standard
             arch: cpu
             artifact_name: radarsimpy_ubuntu_24_04_py3.10
           - os: ubuntu-24.04
             python-version: "3.11"
-            c_compiler: gcc-14
-            cxx_compiler: g++-14
+            c_compiler: gcc-13
+            cxx_compiler: g++-13
             tier: standard
             arch: cpu
             artifact_name: radarsimpy_ubuntu_24_04_py3.11
           - os: ubuntu-24.04
             python-version: "3.12"
-            c_compiler: gcc-14
-            cxx_compiler: g++-14
+            c_compiler: gcc-13
+            cxx_compiler: g++-13
             tier: standard
             arch: cpu
             artifact_name: radarsimpy_ubuntu_24_04_py3.12
           - os: ubuntu-24.04
             python-version: "3.13"
-            c_compiler: gcc-14
-            cxx_compiler: g++-14
+            c_compiler: gcc-13
+            cxx_compiler: g++-13
             tier: standard
             arch: cpu
             artifact_name: radarsimpy_ubuntu_24_04_py3.13
-          # Ubuntu 24.04 with GCC-14 Free Tier builds
+          # Ubuntu 24.04 with GCC-13 Free Tier builds
           - os: ubuntu-24.04
             python-version: "3.9"
-            c_compiler: gcc-14
-            cxx_compiler: g++-14
+            c_compiler: gcc-13
+            cxx_compiler: g++-13
             tier: free
             arch: cpu
             artifact_name: radarsimpy_ubuntu_24_04_py3.9_freetier
           - os: ubuntu-24.04
             python-version: "3.10"
-            c_compiler: gcc-14
-            cxx_compiler: g++-14
+            c_compiler: gcc-13
+            cxx_compiler: g++-13
             tier: free
             arch: cpu
             artifact_name: radarsimpy_ubuntu_24_04_py3.10_freetier
           - os: ubuntu-24.04
             python-version: "3.11"
-            c_compiler: gcc-14
-            cxx_compiler: g++-14
+            c_compiler: gcc-13
+            cxx_compiler: g++-13
             tier: free
             arch: cpu
             artifact_name: radarsimpy_ubuntu_24_04_py3.11_freetier
           - os: ubuntu-24.04
             python-version: "3.12"
-            c_compiler: gcc-14
-            cxx_compiler: g++-14
+            c_compiler: gcc-13
+            cxx_compiler: g++-13
             tier: free
             arch: cpu
             artifact_name: radarsimpy_ubuntu_24_04_py3.12_freetier
           - os: ubuntu-24.04
             python-version: "3.13"
-            c_compiler: gcc-14
-            cxx_compiler: g++-14
+            c_compiler: gcc-13
+            cxx_compiler: g++-13
             tier: free
             arch: cpu
             artifact_name: radarsimpy_ubuntu_24_04_py3.13_freetier
@@ -463,7 +463,7 @@ jobs:
           ### Ubuntu24_x86_64_CPU (Ubuntu 24.04 LTS)
           - **standard/**: Full-featured builds with all capabilities  
           - **trial/**: Free tier builds with limited features
-          - Built with GCC-14 compiler
+          - Built with GCC-13 compiler
 
           ## Build Information
 
@@ -512,7 +512,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Ubuntu Version Distribution" >> $GITHUB_STEP_SUMMARY
           echo "- **Ubuntu 22.04 LTS**: 10 builds with GCC-11" >> $GITHUB_STEP_SUMMARY
-          echo "- **Ubuntu 24.04 LTS**: 10 builds with GCC-14" >> $GITHUB_STEP_SUMMARY
+          echo "- **Ubuntu 24.04 LTS**: 10 builds with GCC-13" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Tier Distribution" >> $GITHUB_STEP_SUMMARY
           echo "- **Standard**: 10 builds" >> $GITHUB_STEP_SUMMARY
