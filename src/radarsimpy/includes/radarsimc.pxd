@@ -178,23 +178,6 @@ cdef extern from "points_manager.hpp":
 # Radar transmitter components including antenna patterns and waveform modulation
 #------------------------------------------------------------------------------
 cdef extern from "transmitter.hpp":
-    cdef cppclass TxChannel[T]:
-        TxChannel() except +
-        
-        # Full transmitter channel constructor
-        TxChannel(const Vec3[T] & location,                      # Antenna location
-                  const Vec3[cpp_complex[T]] & polar,            # Polarization vector
-                  const vector[T] & phi,                         # Azimuth angle array
-                  const vector[T] & phi_ptn,                     # Azimuth pattern
-                  const vector[T] & theta,                       # Elevation angle array
-                  const vector[T] & theta_ptn,                   # Elevation pattern
-                  const T & antenna_gain,                        # Antenna gain (dB)
-                  const vector[T] & mod_t,                       # Modulation time array
-                  const vector[cpp_complex[T]] & mod_var,        # Modulation variables
-                  const vector[cpp_complex[T]] & pulse_mod,      # Pulse modulation
-                  const T & delay,                               # Channel delay (s)
-                  const T & grid) except +                       # Time grid resolution
-
     cdef cppclass Transmitter[H, L]:
         Transmitter() except +
         
@@ -231,18 +214,6 @@ cdef extern from "transmitter.hpp":
 # Radar receiver components including antenna patterns and RF/baseband processing
 #------------------------------------------------------------------------------
 cdef extern from "receiver.hpp":
-    cdef cppclass RxChannel[T]:
-        RxChannel() except +
-        
-        # Receiver channel constructor
-        RxChannel(const Vec3[T] & location,                      # Antenna location
-                  const Vec3[cpp_complex[T]] & polar,            # Polarization vector
-                  const vector[T] & phi,                         # Azimuth angle array
-                  const vector[T] & phi_ptn,                     # Azimuth pattern
-                  const vector[T] & theta,                       # Elevation angle array
-                  const vector[T] & theta_ptn,                   # Elevation pattern
-                  const T & antenna_gain) except +               # Antenna gain (dB)
-
     cdef cppclass Receiver[T]:
         Receiver() except +
         
@@ -282,7 +253,6 @@ cdef extern from "radar.hpp":
         void InitBaseband(H *bb_real,                            # Real baseband buffer
                           H *bb_imag) except +                   # Imaginary baseband buffer
         void SyncBaseband() except +                             # Synchronize device memory
-        void FreeDeviceMemory() except +                         # Release GPU memory
 
 #------------------------------------------------------------------------------
 # Simulation Engines

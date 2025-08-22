@@ -391,7 +391,6 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
         debug)
 
     if err:
-        radar_c.get()[0].FreeDeviceMemory()
         raise_err(err)
 
     radar_c.get()[0].SyncBaseband()
@@ -460,12 +459,6 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
             interference = np.asarray(bb_real)
         else:
             interference = np.asarray(bb_real) + 1j * np.asarray(bb_imag)
-
-        # Clean up interference radar memory
-        interf_radar_c.get()[0].FreeDeviceMemory()
-
-    # Clean up main radar memory
-    radar_c.get()[0].FreeDeviceMemory()
 
     # Return the simulation results as a structured dictionary
     return {
