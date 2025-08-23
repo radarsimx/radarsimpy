@@ -142,7 +142,8 @@ cdef inline raise_err(RadarSimErrorCode err):
 cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=None, interf_frame_time=None,
                 ray_filter=None, back_propagating=False, log_path=None, debug=False):
     """
-    sim_radar(radar, targets, density=1, level=None, interf=None, ray_filter=None, back_propagating=False, log_path=None, debug=False)
+    sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=None, interf_frame_time=None,
+              ray_filter=None, back_propagating=False, log_path=None, debug=False)
 
     Simulates the radar's baseband response for a given scene.
 

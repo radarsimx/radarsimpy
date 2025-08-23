@@ -71,7 +71,7 @@ cdef extern from "libs/free_tier.hpp":
 #------------------------------------------------------------------------------
 cdef extern from "type_def.hpp":
     cdef enum RadarSimErrorCode:
-        SUCCESS                    # Operation completed successfully
+        SUCCESS                   # Operation completed successfully
         ERROR_NULL_POINTER        # Null pointer error
         ERROR_INVALID_PARAMETER   # Invalid parameter provided
         ERROR_MEMORY_ALLOCATION   # Memory allocation failed
@@ -267,8 +267,8 @@ cdef extern from "simulator_point.hpp":
         PointSimulator() except +
         
         # Run point target simulation
-        void Run(const shared_ptr[Radar[H, L]] & radar,                            # Radar configuration
-                 const shared_ptr[PointsManager[L]] & points_manager)                      # Array of point targets
+        void Run(const shared_ptr[Radar[H, L]] & radar,                 # Radar configuration
+                 const shared_ptr[PointsManager[L]] & points_manager)   # Array of point targets
 
 # Mesh-based Ray Tracing Simulation
 # Physics-based 3D mesh target simulation using ray tracing and physical optics
@@ -279,8 +279,8 @@ cdef extern from "simulator_mesh.hpp":
         MeshSimulator() except +
         
         # Run mesh simulation with configurable fidelity
-        RadarSimErrorCode Run(const shared_ptr[Radar[H, L]] & radar,               # Radar configuration
-                              const shared_ptr[TargetsManager[L]] & targets_manager,         # Targets manager
+        RadarSimErrorCode Run(const shared_ptr[Radar[H, L]] & radar,                    # Radar configuration
+                              const shared_ptr[TargetsManager[L]] & targets_manager,    # Targets manager
                               int level,                         # Simulation level (0=LOW, 1=MEDIUM, 2=HIGH)
                               L density,                         # Ray density for physical optics
                               Vec2[int_t] ray_filter,            # Ray index filter [min, max]

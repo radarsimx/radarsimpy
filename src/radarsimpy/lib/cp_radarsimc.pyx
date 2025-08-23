@@ -2,6 +2,11 @@
 """
 A Python module for radar simulation
 
+This module provides optimized Cython wrapper functions for interfacing with 
+the high-performance C++ radar simulation engine. Contains core conversion
+and management functions for point targets, radar systems, mesh processing,
+and RCS calculations.
+
 ---
 
 - Copyright (C) 2018 - PRESENT  radarsimx.com
@@ -49,68 +54,15 @@ np_float = np.float32
 cdef dict UNIT_SCALE = {"m": 1.0, "cm": 100.0, "mm": 1000.0}
 cdef int_t MAX_FREE_TIER_FACES = 8
 
-# Helper functions for validation and error handling
-cdef inline void _validate_vector_3d(object vector, str name) except *:
-    """
-    Validate that a vector has exactly 3 elements for 3D operations.
-    
-    Parameters
-    ----------
-    vector : array_like
-        Input vector to validate (should have 3 elements for [x, y, z]).
-    name : str
-        Parameter name for clear error messages.
-        
-    Raises
-    ------
-    TypeError
-        If vector is not array-like (missing __len__ method).
-    ValueError
-        If vector doesn't have exactly 3 elements.
-        
-    Examples
-    --------
-    Valid usage:
-        _validate_vector_3d([1, 2, 3], "location")
-        _validate_vector_3d(np.array([0, 0, 1]), "direction")
-        
-    Invalid usage (will raise):
-        _validate_vector_3d([1, 2], "location")  # ValueError: wrong size
-        _validate_vector_3d(5, "location")       # TypeError: not array-like
-    """
-    if not hasattr(vector, '__len__'):
-        raise TypeError(f"{name} must be array-like")
-    if len(vector) != 3:
-        raise ValueError(f"{name} must have 3 elements [x, y, z], got {len(vector)}")
-
 cdef inline float_t _safe_unit_conversion(str unit) except *:
     """
-    Safely convert unit string to scale factor with validation.
-    
-    Parameters
-    ----------
-    unit : str
-        Unit string specifying distance units. Supported values:
-        - 'm': meters (scale factor 1.0)
-        - 'cm': centimeters (scale factor 100.0)  
-        - 'mm': millimeters (scale factor 1000.0)
-        
-    Returns
-    -------
-    float_t
-        Scale factor for converting from specified unit to meters.
-        
-    Raises
-    ------
-    ValueError
-        If unit is not one of the supported values.
-        
-    Examples
-    --------
-    >>> _safe_unit_conversion('m')   # Returns 1.0
-    >>> _safe_unit_conversion('cm')  # Returns 100.0
-    >>> _safe_unit_conversion('mm')  # Returns 1000.0
-    >>> _safe_unit_conversion('ft')  # Raises ValueError
+    Safely convert unit string to scale factor.
+
+    :param str unit:
+        Unit string ('m', 'cm', 'mm')
+    :return: Scale factor for converting to meters
+    :rtype: float_t
+    :raises: ValueError for unsupported units
     """
     if unit not in UNIT_SCALE:
         raise ValueError(f"Invalid unit '{unit}'. Supported units: {list(UNIT_SCALE.keys())}")
@@ -118,35 +70,11 @@ cdef inline float_t _safe_unit_conversion(str unit) except *:
 
 cdef inline void _validate_mesh_for_free_tier(int_t num_faces) except *:
     """
-    Check mesh size limits for free tier with detailed error message.
-    
-    Validates that the number of mesh faces doesn't exceed the FreeTier
-    limitation. If the limit is exceeded, provides a detailed error message
-    with guidance on upgrading.
-    
-    Parameters
-    ----------
-    num_faces : int_t
-        Number of mesh faces in the target model.
-        
-    Raises
-    ------
-    RuntimeError
-        If FreeTier is active and num_faces exceeds MAX_FREE_TIER_FACES (8).
-        The error message includes:
-        - Current limitation value
-        - Actual number of faces in the model
-        - Number of faces that need to be reduced
-        - Link to upgrade information
-        
-    Notes
-    -----
-    This function only performs validation when IsFreeTier() returns True.
-    For full/standard versions, this function does nothing and returns
-    immediately without any checks.
-    
-    The limitation helps maintain reasonable simulation times in the trial
-    version while encouraging users to upgrade for larger simulations.
+    Check mesh size limits for free tier.
+
+    :param int_t num_faces:
+        Number of mesh faces in the target model
+    :raises: RuntimeError if FreeTier limitations are exceeded
     """
     if IsFreeTier() and num_faces > MAX_FREE_TIER_FACES:
         raise RuntimeError(
@@ -162,25 +90,16 @@ cdef inline void _validate_mesh_for_free_tier(int_t num_faces) except *:
             f"{'='*60}\n"
         )
 
-cdef inline cpp_complex[float_t] _convert_permittivity(object permittivity) except *:
-    """Convert permittivity value to complex float with validation."""
-    if permittivity == "PEC":
-        return cpp_complex[float_t](<float_t>1e38, <float_t>0.0)
-    else:
-        try:
-            return cpp_complex[float_t](<float_t>np.real(permittivity), <float_t>np.imag(permittivity))
-        except (TypeError, ValueError) as e:
-            raise ValueError(f"Invalid permittivity value: {e}")
-
-cdef inline cpp_complex[float_t] _convert_permeability(object permeability) except *:
-    """Convert permeability value to complex float with validation."""
-    try:
-        return cpp_complex[float_t](<float_t>np.real(permeability), <float_t>np.imag(permeability))
-    except (TypeError, ValueError) as e:
-        raise ValueError(f"Invalid permeability value: {e}")
-
 cdef inline void _warn_deprecated_parameter(str old_param, str new_param) except *:
-    """Issue a deprecation warning for renamed parameters."""
+    """
+    Issue standardized deprecation warnings for renamed parameters.
+
+    :param str old_param:
+        Name of the deprecated parameter
+    :param str new_param:
+        Name of the new parameter to use instead
+    :raises: DeprecationWarning with migration guidance
+    """
     warnings.warn(
         f"Deprecated: '{old_param}' parameter has been replaced with '{new_param}'. "
         f"Please update your code to use '{new_param}' instead. "
@@ -194,30 +113,20 @@ cdef inline void _warn_deprecated_parameter(str old_param, str new_param) except
 @cython.wraparound(False)
 cdef void cp_AddPoint(location, speed, rcs, phase, shape, PointsManager[float_t] * points_manager):
     """
-    cp_Point(location, speed, rcs, phase, shape)
-
-    Create Point object in Cython with enhanced input validation and error handling
+    Add a point scatterer to the radar simulation.
 
     :param list location:
         Target's location (m), [x, y, z]
-        *Note*: Target's parameters can be specified with
-        ``Radar.timestamp`` to customize the time varying property.
-        Example: ``location=(1e-3*np.sin(2*np.pi*1*radar.timestamp), 0, 0)``
     :param list speed:
         Target's velocity (m/s), [x, y, z]
     :param float rcs:
         Target's RCS (dBsm)
-        *Note*: Target's RCS can be specified with
-        ``Radar.timestamp`` to customize the time varying property.
     :param float phase:
         Target's phase (deg)
-        *Note*: Target's phase can be specified with
-        ``Radar.timestamp`` to customize the time varying property.
     :param tuple shape:
         Shape of the time matrix (channels, frames, pulses)
-
-    :return: C++ object of a point target
-    :rtype: Point
+    :param PointsManager[float_t] * points_manager:
+        Pointer to C++ points manager
     :raises: ValueError for invalid input dimensions or types
     """
     # Input validation - check basic requirements
@@ -295,15 +204,14 @@ cdef void cp_AddPoint(location, speed, rcs, phase, shape, PointsManager[float_t]
 @cython.wraparound(False)
 cdef shared_ptr[Transmitter[double, float_t]] cp_Transmitter(radar):
     """
-    cp_Transmitter(radar)
-
-    Create Transmitter object in Cython with comprehensive parameter processing
+    Create Transmitter object in Cython with comprehensive parameter processing.
 
     :param Radar radar:
-        Radar object containing transmitter configuration
-
+        Radar object containing transmitter configuration including waveform
+        properties (f, t, f_offset, pulse_start_time), RF properties (tx_power),
+        and optional phase noise
     :return: C++ object of a radar transmitter
-    :rtype: Transmitter
+    :rtype: shared_ptr[Transmitter[double, float_t]]
     :raises: ValueError for invalid radar configuration
     """
     # Extract key dimensions from radar configuration
@@ -356,37 +264,16 @@ cdef shared_ptr[Transmitter[double, float_t]] cp_Transmitter(radar):
 @cython.wraparound(False)
 cdef void cp_AddTxChannel(tx, tx_idx, Transmitter[double, float_t] * tx_c):
     """
-    cp_AddTxChannel(tx, tx_idx)
-
-    Create TxChannel object in Cython with complete antenna pattern processing
-
-    Converts Python transmitter channel configuration into a C++ TxChannel object.
-    Handles antenna patterns, polarization, pulse modulation, and waveform modulation
-    for a single transmitter channel.
+    Create TxChannel object in Cython with antenna pattern processing.
 
     :param Transmitter tx:
-        Python transmitter object containing channel configurations including:
-        - Antenna patterns (azimuth and elevation)
-        - Polarization vector [x, y, z] (complex)
-        - Pulse modulation coefficients (complex array)
-        - Waveform modulation parameters
-        - Channel locations and gains
-        - Timing delays and grid orientation
+        Python transmitter object containing channel configurations
+        (antenna patterns, polarization, modulation, locations, gains)
     :param int tx_idx:
         Transmitter channel index (0-based) for multi-channel systems
-
-    :return: C++ object of a transmitter channel
-    :rtype: TxChannel[float_t]
-    
-    :raises ValueError: If channel index is out of range or pattern data is invalid
-    :raises RuntimeError: If antenna pattern conversion fails
-    
-    Notes
-    -----
-    - Azimuth patterns are converted from degrees to radians
-    - Elevation patterns are flipped (90° - elevation) and reversed for C++ convention
-    - Complex polarization vectors are properly converted to C++ complex types
-    - Modulation data is validated for correct dimensions
+    :param Transmitter[double, float_t] * tx_c:
+        Pointer to C++ transmitter object
+    :raises: ValueError for invalid channel index or pattern data
     """
     cdef int_t pulses_c = tx.waveform_prop["pulses"]
 
@@ -460,36 +347,16 @@ cdef void cp_AddTxChannel(tx, tx_idx, Transmitter[double, float_t] * tx_c):
 @cython.wraparound(False)
 cdef void cp_AddRxChannel(rx, rx_idx, Receiver[float_t] * rx_c):
     """
-    cp_RxChannel(rx, rx_idx)
-
-    Create RxChannel object in Cython with antenna pattern processing
-
-    Converts Python receiver channel configuration into a C++ RxChannel object.
-    Handles antenna patterns (azimuth and elevation), polarization, and channel
-    properties for a single receiver channel.
+    Create RxChannel object in Cython with antenna pattern processing.
 
     :param Receiver rx:
-        Python receiver object containing channel configurations including:
-        - Antenna patterns (azimuth and elevation angles and gains)
-        - Polarization vector [x, y, z] (complex)
-        - Channel locations and antenna gains
-        - Receiver-specific properties
+        Python receiver object containing channel configurations
+        (antenna patterns, polarization, locations, gains)
     :param int rx_idx:
-        Receiver channel index (0-based) for multi-channel receiver systems
-
-    :return: C++ object of a receiver channel for simulation
-    :rtype: RxChannel[float_t]
-    
-    :raises ValueError: If channel index is out of range or pattern data is invalid
-    :raises RuntimeError: If antenna pattern conversion fails
-    
-    Notes
-    -----
-    - Similar to TxChannel but for receiver-specific processing
-    - Azimuth patterns are converted from degrees to radians
-    - Elevation patterns are flipped (90° - elevation) and reversed for C++ convention
-    - Complex polarization vectors are properly converted to C++ complex types
-    - No modulation processing needed for receiver channels
+        Receiver channel index (0-based) for multi-channel systems
+    :param Receiver[float_t] * rx_c:
+        Pointer to C++ receiver object
+    :raises: ValueError for invalid channel index or pattern data
     """
     cdef vector[float_t] az_ang_vt, az_ptn_vt
     cdef vector[float_t] el_ang_vt, el_ptn_vt
@@ -532,54 +399,16 @@ cdef void cp_AddRxChannel(rx, rx_idx, Receiver[float_t] * rx_c):
 @cython.wraparound(False)
 cdef shared_ptr[Radar[double, float_t]] cp_Radar(radar, frame_start_time):
     """
-    cp_Radar(radar, frame_start_time)
-
-    Create a complete Radar system object for simulation with enhanced configuration
-
-    Converts Python radar configuration into a comprehensive C++ Radar object.
-    This function orchestrates the creation of transmitter and receiver systems,
-    handles multi-frame timing, and manages complex radar positioning and motion.
+    Create complete Radar system object for simulation.
 
     :param Radar radar:
-        Python radar object containing complete system configuration:
-        
-        Array Properties:
-        - size: Number of channels in the radar array
-        
-        Transmitter Properties:
-        - waveform: Signal parameters (frequency, timing, modulation)
-        - channels: Individual transmitter channel configurations
-        - power levels and antenna patterns
-        
-        Receiver Properties: 
-        - gain settings and noise characteristics
-        - channels: Individual receiver channel configurations
-        - sampling parameters
-        
-        Radar Motion:
-        - location: Radar position [x, y, z] (can be time-varying)
-        - speed: Radar velocity [x, y, z] in m/s
-        - rotation: Radar orientation [roll, pitch, yaw] in degrees
-        - rotation_rate: Angular velocity [x, y, z] in deg/s
-
+        Python radar object containing system configuration (array properties,
+        transmitter/receiver settings, radar motion parameters)
     :param frame_start_time:
-        Timing information for multi-frame simulations:
-        - Single value for single-frame simulation
-        - Array for multi-frame with timing offsets
-
-    :return: Complete C++ Radar object ready for simulation
-    :rtype: Radar[double, float_t]
-    
-    :raises ValueError: If radar configuration is incomplete or invalid
-    :raises RuntimeError: If transmitter/receiver setup fails
-    
-    Notes
-    -----
-    - Automatically handles single vs. multi-frame configurations
-    - Processes both static and time-varying radar parameters
-    - Creates and links transmitter and receiver channel objects
-    - Handles coordinate transformations and unit conversions
-    - Optimized for high-performance simulation engine interface
+        Timing information for multi-frame simulations (single value or array)
+    :return: C++ Radar object ready for simulation
+    :rtype: shared_ptr[Radar[double, float_t]]
+    :raises: ValueError for invalid configuration, RuntimeError for setup failures
     """
     cdef shared_ptr[Transmitter[double, float_t]] tx_c
     cdef shared_ptr[Receiver[float_t]] rx_c
@@ -679,19 +508,19 @@ cdef void cp_AddTarget(radar,
                   mesh_module,
                   TargetsManager[float_t] * targets_manager):
     """
-    cp_Target((radar, target, ts_shape)
-
-    Creat Target object in Cython
+    Add a complex target to the radar simulation.
 
     :param Radar radar:
-        Radar object
+        Radar object containing system configuration
     :param dict target:
-        Target properties
-    :param tuple ts_shape:
-        Shape of the time matrix
-
-    :return: C++ object of a target
-    :rtype: Target
+        Target properties (model, location, speed, rotation, materials, etc.)
+    :param timestamp:
+        Time array for simulation frames
+    :param mesh_module:
+        Mesh loading module for processing 3D models
+    :param TargetsManager[float_t] * targets_manager:
+        Pointer to C++ targets manager
+    :raises: ValueError for invalid target config, RuntimeError for mesh issues
     """
     # vector of location, speed, rotation, rotation rate
     cdef vector[Vec3[float_t]] loc_vt
@@ -853,17 +682,14 @@ cdef void cp_AddTarget(radar,
 @cython.wraparound(False)
 cdef void cp_RCS_Target(target, mesh_module, TargetsManager[float_t] * targets_manager):
     """
-    cp_RCS_Target(target, mesh_module)
-
-    Create Target object in Cython for RCS calculation with enhanced validation
+    Create Target object in Cython for RCS calculation.
 
     :param dict target:
-        Target properties dictionary
+        Target properties dictionary containing model, location, materials
     :param mesh_module:
-        Mesh loading module
-        
-    :return: C++ object of a target for RCS computation
-    :rtype: Target
+        Mesh loading module for processing 3D models
+    :param TargetsManager[float_t] * targets_manager:
+        Pointer to C++ targets manager
     :raises: RuntimeError on mesh limitations, ValueError on invalid target
     """
     # Vector declarations
