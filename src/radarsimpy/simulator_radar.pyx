@@ -124,7 +124,7 @@ cdef inline raise_err(RadarSimErrorCode err):
     :param RadarSimErrorCode err: The error type encountered during simulation
     :raises RuntimeError: When a simulation error is encountered, with detailed message
     """
-    if err == RadarSimErrorCode.ERROR_TOO_MANY_RAYS_PER_GRID:
+    if err == RadarSimErrorCode.RADARSIMCPP_ERROR_TOO_MANY_RAYS_PER_GRID:
         raise RuntimeError(
             "[ERROR_TOO_MANY_RAYS_PER_GRID] The simulation is attempting to launch an "
             "excessive number of rays in a grid, which exceeds system's memory limitations. "
