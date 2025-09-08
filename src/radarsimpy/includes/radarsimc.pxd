@@ -72,12 +72,12 @@ cdef extern from "libs/free_tier.hpp":
 cdef extern from "type_def.hpp":
     cdef enum RadarSimErrorCode:
         SUCCESS                   # Operation completed successfully
-        ERROR_NULL_POINTER        # Null pointer error
-        ERROR_INVALID_PARAMETER   # Invalid parameter provided
-        ERROR_MEMORY_ALLOCATION   # Memory allocation failed
-        ERROR_FREE_TIER_LIMIT     # Free tier usage limit exceeded
-        ERROR_EXCEPTION           # General exception occurred
-        ERROR_TOO_MANY_RAYS_PER_GRID  # Ray density exceeds grid capacity
+        RADARSIMCPP_ERROR_NULL_POINTER        # Null pointer error
+        RADARSIMCPP_ERROR_INVALID_PARAMETER   # Invalid parameter provided
+        RADARSIMCPP_ERROR_MEMORY_ALLOCATION   # Memory allocation failed
+        RADARSIMCPP_ERROR_FREE_TIER_LIMIT     # Free tier usage limit exceeded
+        RADARSIMCPP_ERROR_EXCEPTION           # General exception occurred
+        RADARSIMCPP_ERROR_TOO_MANY_RAYS_PER_GRID  # Ray density exceeds grid capacity
 
 #------------------------------------------------------------------------------
 # Targets Manager
