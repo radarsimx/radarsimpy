@@ -122,11 +122,8 @@ class BuildConfig:
         if self.os_type == "Linux":
             self.link_args = ["-Wl,-rpath,$ORIGIN"]
             self.compile_args = ["-std=c++20"]
-            self.lib_dirs = [
-                "src/radarsimcpp/build",
-                "src/radarsimcpp/hdf5-lib-build/libs/lib_linux_gcc11_x86_64/lib",
-            ]
-            self.libs = ["hdf5", "hdf5_cpp", "hdf5_hl", "hdf5_hl_cpp"]
+            self.lib_dirs = ["src/radarsimcpp/build"]
+            self.libs = []
             self.nvcc_name = "nvcc"
             self.cuda_lib_dir = "lib64"
 
