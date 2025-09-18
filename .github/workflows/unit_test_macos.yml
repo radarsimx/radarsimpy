@@ -26,7 +26,7 @@
 #
 # Requirements:
 #   - RADARSIMC SSH key secret for submodule access
-#   - Xcode 15.2 (x64), Xcode 16.3 (arm64), CMake, GCC/Clang, and Python dependencies
+#   - Xcode 15.2 (x64), Xcode 16.4 (arm64), CMake, GCC/Clang, and Python dependencies
 #   - build.sh script
 #
 # ==============================================================================
@@ -83,40 +83,40 @@ jobs:
             xcode: "15.2"
             os_label: macosx64
             python-version: "3.13"
-          # MacOS arm64, Clang, Xcode 16.3
+          # MacOS arm64, Clang, Xcode 16.4
           - arch: arm64
             runner: macos-15
             c_compiler: clang
             cxx_compiler: clang++
-            xcode: "16.3"
+            xcode: "16.4"
             os_label: macosarm64
             python-version: "3.9"
           - arch: arm64
             runner: macos-15
             c_compiler: clang
             cxx_compiler: clang++
-            xcode: "16.3"
+            xcode: "16.4"
             os_label: macosarm64
             python-version: "3.10"
           - arch: arm64
             runner: macos-15
             c_compiler: clang
             cxx_compiler: clang++
-            xcode: "16.3"
+            xcode: "16.4"
             os_label: macosarm64
             python-version: "3.11"
           - arch: arm64
             runner: macos-15
             c_compiler: clang
             cxx_compiler: clang++
-            xcode: "16.3"
+            xcode: "16.4"
             os_label: macosarm64
             python-version: "3.12"
           - arch: arm64
             runner: macos-15
             c_compiler: clang
             cxx_compiler: clang++
-            xcode: "16.3"
+            xcode: "16.4"
             os_label: macosarm64
             python-version: "3.13"
 
