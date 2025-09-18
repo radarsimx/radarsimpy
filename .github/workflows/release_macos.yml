@@ -138,7 +138,7 @@ jobs:
             python-version: "3.9"
             c_compiler: clang
             cxx_compiler: clang++
-            xcode_version: "16.3"
+            xcode_version: "16.4"
             tier: standard
             arch: cpu
             artifact_name: radarsimpy_macos_arm_py3.9
@@ -146,7 +146,7 @@ jobs:
             python-version: "3.10"
             c_compiler: clang
             cxx_compiler: clang++
-            xcode_version: "16.3"
+            xcode_version: "16.4"
             tier: standard
             arch: cpu
             artifact_name: radarsimpy_macos_arm_py3.10
@@ -154,7 +154,7 @@ jobs:
             python-version: "3.11"
             c_compiler: clang
             cxx_compiler: clang++
-            xcode_version: "16.3"
+            xcode_version: "16.4"
             tier: standard
             arch: cpu
             artifact_name: radarsimpy_macos_arm_py3.11
@@ -162,7 +162,7 @@ jobs:
             python-version: "3.12"
             c_compiler: clang
             cxx_compiler: clang++
-            xcode_version: "16.3"
+            xcode_version: "16.4"
             tier: standard
             arch: cpu
             artifact_name: radarsimpy_macos_arm_py3.12
@@ -170,7 +170,7 @@ jobs:
             python-version: "3.13"
             c_compiler: clang
             cxx_compiler: clang++
-            xcode_version: "16.3"
+            xcode_version: "16.4"
             tier: standard
             arch: cpu
             artifact_name: radarsimpy_macos_arm_py3.13
@@ -179,7 +179,7 @@ jobs:
             python-version: "3.9"
             c_compiler: clang
             cxx_compiler: clang++
-            xcode_version: "16.3"
+            xcode_version: "16.4"
             tier: free
             arch: cpu
             artifact_name: radarsimpy_macos_arm_py3.9_freetier
@@ -187,7 +187,7 @@ jobs:
             python-version: "3.10"
             c_compiler: clang
             cxx_compiler: clang++
-            xcode_version: "16.3"
+            xcode_version: "16.4"
             tier: free
             arch: cpu
             artifact_name: radarsimpy_macos_arm_py3.10_freetier
@@ -195,7 +195,7 @@ jobs:
             python-version: "3.11"
             c_compiler: clang
             cxx_compiler: clang++
-            xcode_version: "16.3"
+            xcode_version: "16.4"
             tier: free
             arch: cpu
             artifact_name: radarsimpy_macos_arm_py3.11_freetier
@@ -203,7 +203,7 @@ jobs:
             python-version: "3.12"
             c_compiler: clang
             cxx_compiler: clang++
-            xcode_version: "16.3"
+            xcode_version: "16.4"
             tier: free
             arch: cpu
             artifact_name: radarsimpy_macos_arm_py3.12_freetier
@@ -211,7 +211,7 @@ jobs:
             python-version: "3.13"
             c_compiler: clang
             cxx_compiler: clang++
-            xcode_version: "16.3"
+            xcode_version: "16.4"
             tier: free
             arch: cpu
             artifact_name: radarsimpy_macos_arm_py3.13_freetier
