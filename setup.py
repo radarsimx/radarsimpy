@@ -43,7 +43,6 @@ logger = logging.getLogger(__name__)
 
 # Package metadata
 PACKAGE_NAME = "radarsimpy"
-PACKAGE_VERSION = "1.0.0"  # Consider reading from __init__.py or version file
 PACKAGE_DESCRIPTION = "A Python-based Radar Simulator"
 PACKAGE_URL = "https://github.com/radarsimx/radarsimpy"
 AUTHOR = "RadarSimX"
@@ -54,6 +53,29 @@ VALID_TIERS = ["free", "standard"]
 VALID_ARCHS = ["cpu", "gpu"]
 DEFAULT_TIER = "standard"
 DEFAULT_ARCH = "cpu"
+
+
+def get_version() -> str:
+    """Read version from package __init__.py file.
+
+    :return: Package version string
+    :rtype: str
+    :raises RuntimeError: If version cannot be read from __init__.py
+    """
+    init_path = Path("src") / PACKAGE_NAME / "__init__.py"
+    if not init_path.exists():
+        raise RuntimeError(f"Could not find {init_path}")
+
+    try:
+        with open(init_path, "r", encoding="utf-8") as f:
+            for line in f:
+                if line.startswith("__version__"):
+                    # Extract version from line like: __version__ = "1.2.3"
+                    version = line.split("=")[1].strip().strip('"').strip("'")
+                    return version
+        raise RuntimeError(f"Could not find __version__ in {init_path}")
+    except (OSError, UnicodeDecodeError) as e:
+        raise RuntimeError(f"Could not read version from {init_path}: {e}") from e
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -346,6 +368,14 @@ def main() -> None:
 
     logger.info("Building %s with tier=%s, arch=%s", PACKAGE_NAME, args.tier, args.arch)
 
+    # Get package version
+    try:
+        package_version = get_version()
+        logger.info("Package version: %s", package_version)
+    except RuntimeError as e:
+        logger.error("Failed to get package version: %s", e)
+        sys.exit(1)
+
     # Create build configuration
     try:
         config = BuildConfig(args.tier, args.arch)
@@ -380,7 +410,7 @@ def main() -> None:
     # Setup configuration
     setup(
         name=PACKAGE_NAME,
-        version=PACKAGE_VERSION,
+        version=package_version,
         description=PACKAGE_DESCRIPTION,
         long_description=get_long_description(),
         long_description_content_type="text/markdown",
