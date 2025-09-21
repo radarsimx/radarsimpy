@@ -392,7 +392,7 @@ jobs:
           # Create base directory structure for final archive
           mkdir -p packed/radarsimpy_macos_all/standard
           mkdir -p packed/radarsimpy_macos_all/trial
-          
+
           # Create temporary directories for building tier-specific packages
           mkdir -p temp/standard/MacOS_x86_64_CPU/radarsimpy
           mkdir -p temp/standard/MacOS_ARM_CPU/radarsimpy
@@ -436,30 +436,30 @@ jobs:
               fi
             fi
           done
-          
+
           # Create ZIP files for each architecture and tier
           echo "Creating MacOS_x86_64_CPU.zip for standard tier..."
           cd temp/standard && zip -r ../../packed/radarsimpy_macos_all/standard/MacOS_x86_64_CPU.zip MacOS_x86_64_CPU/ && cd ../..
-          
+
           echo "Creating MacOS_ARM_CPU.zip for standard tier..."
           cd temp/standard && zip -r ../../packed/radarsimpy_macos_all/standard/MacOS_ARM_CPU.zip MacOS_ARM_CPU/ && cd ../..
-          
+
           echo "Creating MacOS_x86_64_CPU.zip for trial tier..."
           cd temp/trial && zip -r ../../packed/radarsimpy_macos_all/trial/MacOS_x86_64_CPU.zip MacOS_x86_64_CPU/ && cd ../..
-          
+
           echo "Creating MacOS_ARM_CPU.zip for trial tier..."
           cd temp/trial && zip -r ../../packed/radarsimpy_macos_all/trial/MacOS_ARM_CPU.zip MacOS_ARM_CPU/ && cd ../..
-          
+
           # Create tar.gz files for each architecture and tier
           echo "Creating MacOS_x86_64_CPU.tar.gz for standard tier..."
           cd temp/standard && tar -czf ../../packed/radarsimpy_macos_all/standard/MacOS_x86_64_CPU.tar.gz MacOS_x86_64_CPU/ && cd ../..
-          
+
           echo "Creating MacOS_ARM_CPU.tar.gz for standard tier..."
           cd temp/standard && tar -czf ../../packed/radarsimpy_macos_all/standard/MacOS_ARM_CPU.tar.gz MacOS_ARM_CPU/ && cd ../..
-          
+
           echo "Creating MacOS_x86_64_CPU.tar.gz for trial tier..."
           cd temp/trial && tar -czf ../../packed/radarsimpy_macos_all/trial/MacOS_x86_64_CPU.tar.gz MacOS_x86_64_CPU/ && cd ../..
-          
+
           echo "Creating MacOS_ARM_CPU.tar.gz for trial tier..."
           cd temp/trial && tar -czf ../../packed/radarsimpy_macos_all/trial/MacOS_ARM_CPU.tar.gz MacOS_ARM_CPU/ && cd ../..
 
@@ -470,49 +470,49 @@ jobs:
           find packed/radarsimpy_macos_all -type f | sort
           echo ""
           echo "Verifying ZIP and tar.gz files exist:"
-          
+
           if [ -f "packed/radarsimpy_macos_all/standard/MacOS_x86_64_CPU.zip" ]; then
             echo "✓ Standard macOS x86_64 ZIP found"
           else
             echo "✗ Standard macOS x86_64 ZIP missing"
           fi
-          
+
           if [ -f "packed/radarsimpy_macos_all/standard/MacOS_x86_64_CPU.tar.gz" ]; then
             echo "✓ Standard macOS x86_64 tar.gz found"
           else
             echo "✗ Standard macOS x86_64 tar.gz missing"
           fi
-          
+
           if [ -f "packed/radarsimpy_macos_all/standard/MacOS_ARM_CPU.zip" ]; then
             echo "✓ Standard macOS ARM ZIP found"
           else
             echo "✗ Standard macOS ARM ZIP missing"
           fi
-          
+
           if [ -f "packed/radarsimpy_macos_all/standard/MacOS_ARM_CPU.tar.gz" ]; then
             echo "✓ Standard macOS ARM tar.gz found"
           else
             echo "✗ Standard macOS ARM tar.gz missing"
           fi
-          
+
           if [ -f "packed/radarsimpy_macos_all/trial/MacOS_x86_64_CPU.zip" ]; then
             echo "✓ Trial macOS x86_64 ZIP found"
           else
             echo "✗ Trial macOS x86_64 ZIP missing"
           fi
-          
+
           if [ -f "packed/radarsimpy_macos_all/trial/MacOS_x86_64_CPU.tar.gz" ]; then
             echo "✓ Trial macOS x86_64 tar.gz found"
           else
             echo "✗ Trial macOS x86_64 tar.gz missing"
           fi
-          
+
           if [ -f "packed/radarsimpy_macos_all/trial/MacOS_ARM_CPU.zip" ]; then
             echo "✓ Trial macOS ARM ZIP found"
           else
             echo "✗ Trial macOS ARM ZIP missing"
           fi
-          
+
           if [ -f "packed/radarsimpy_macos_all/trial/MacOS_ARM_CPU.tar.gz" ]; then
             echo "✓ Trial macOS ARM tar.gz found"
           else

@@ -371,7 +371,7 @@ jobs:
           # Create base directory structure for final archive
           mkdir -p packed/radarsimpy_ubuntu_cpu_all/standard
           mkdir -p packed/radarsimpy_ubuntu_cpu_all/trial
-          
+
           # Create temporary directories for building tier-specific packages
           mkdir -p temp/standard/Ubuntu22_x86_64_CPU/radarsimpy
           mkdir -p temp/standard/Ubuntu24_x86_64_CPU/radarsimpy
@@ -415,30 +415,30 @@ jobs:
               fi
             fi
           done
-          
+
           # Create ZIP files for each Ubuntu version and tier
           echo "Creating Ubuntu22_x86_64_CPU.zip for standard tier..."
           cd temp/standard && zip -r ../../packed/radarsimpy_ubuntu_cpu_all/standard/Ubuntu22_x86_64_CPU.zip Ubuntu22_x86_64_CPU/ && cd ../..
-          
+
           echo "Creating Ubuntu24_x86_64_CPU.zip for standard tier..."
           cd temp/standard && zip -r ../../packed/radarsimpy_ubuntu_cpu_all/standard/Ubuntu24_x86_64_CPU.zip Ubuntu24_x86_64_CPU/ && cd ../..
-          
+
           echo "Creating Ubuntu22_x86_64_CPU.zip for trial tier..."
           cd temp/trial && zip -r ../../packed/radarsimpy_ubuntu_cpu_all/trial/Ubuntu22_x86_64_CPU.zip Ubuntu22_x86_64_CPU/ && cd ../..
-          
+
           echo "Creating Ubuntu24_x86_64_CPU.zip for trial tier..."
           cd temp/trial && zip -r ../../packed/radarsimpy_ubuntu_cpu_all/trial/Ubuntu24_x86_64_CPU.zip Ubuntu24_x86_64_CPU/ && cd ../..
-          
+
           # Create tar.gz files for each Ubuntu version and tier
           echo "Creating Ubuntu22_x86_64_CPU.tar.gz for standard tier..."
           cd temp/standard && tar -czf ../../packed/radarsimpy_ubuntu_cpu_all/standard/Ubuntu22_x86_64_CPU.tar.gz Ubuntu22_x86_64_CPU/ && cd ../..
-          
+
           echo "Creating Ubuntu24_x86_64_CPU.tar.gz for standard tier..."
           cd temp/standard && tar -czf ../../packed/radarsimpy_ubuntu_cpu_all/standard/Ubuntu24_x86_64_CPU.tar.gz Ubuntu24_x86_64_CPU/ && cd ../..
-          
+
           echo "Creating Ubuntu22_x86_64_CPU.tar.gz for trial tier..."
           cd temp/trial && tar -czf ../../packed/radarsimpy_ubuntu_cpu_all/trial/Ubuntu22_x86_64_CPU.tar.gz Ubuntu22_x86_64_CPU/ && cd ../..
-          
+
           echo "Creating Ubuntu24_x86_64_CPU.tar.gz for trial tier..."
           cd temp/trial && tar -czf ../../packed/radarsimpy_ubuntu_cpu_all/trial/Ubuntu24_x86_64_CPU.tar.gz Ubuntu24_x86_64_CPU/ && cd ../..
 
@@ -449,49 +449,49 @@ jobs:
           find packed/radarsimpy_ubuntu_cpu_all -type f | sort
           echo ""
           echo "Verifying ZIP and tar.gz files exist:"
-          
+
           if [ -f "packed/radarsimpy_ubuntu_cpu_all/standard/Ubuntu22_x86_64_CPU.zip" ]; then
             echo "✓ Standard Ubuntu 22.04 ZIP found"
           else
             echo "✗ Standard Ubuntu 22.04 ZIP missing"
           fi
-          
+
           if [ -f "packed/radarsimpy_ubuntu_cpu_all/standard/Ubuntu22_x86_64_CPU.tar.gz" ]; then
             echo "✓ Standard Ubuntu 22.04 tar.gz found"
           else
             echo "✗ Standard Ubuntu 22.04 tar.gz missing"
           fi
-          
+
           if [ -f "packed/radarsimpy_ubuntu_cpu_all/standard/Ubuntu24_x86_64_CPU.zip" ]; then
             echo "✓ Standard Ubuntu 24.04 ZIP found"
           else
             echo "✗ Standard Ubuntu 24.04 ZIP missing"
           fi
-          
+
           if [ -f "packed/radarsimpy_ubuntu_cpu_all/standard/Ubuntu24_x86_64_CPU.tar.gz" ]; then
             echo "✓ Standard Ubuntu 24.04 tar.gz found"
           else
             echo "✗ Standard Ubuntu 24.04 tar.gz missing"
           fi
-          
+
           if [ -f "packed/radarsimpy_ubuntu_cpu_all/trial/Ubuntu22_x86_64_CPU.zip" ]; then
             echo "✓ Trial Ubuntu 22.04 ZIP found"
           else
             echo "✗ Trial Ubuntu 22.04 ZIP missing"
           fi
-          
+
           if [ -f "packed/radarsimpy_ubuntu_cpu_all/trial/Ubuntu22_x86_64_CPU.tar.gz" ]; then
             echo "✓ Trial Ubuntu 22.04 tar.gz found"
           else
             echo "✗ Trial Ubuntu 22.04 tar.gz missing"
           fi
-          
+
           if [ -f "packed/radarsimpy_ubuntu_cpu_all/trial/Ubuntu24_x86_64_CPU.zip" ]; then
             echo "✓ Trial Ubuntu 24.04 ZIP found"
           else
             echo "✗ Trial Ubuntu 24.04 ZIP missing"
           fi
-          
+
           if [ -f "packed/radarsimpy_ubuntu_cpu_all/trial/Ubuntu24_x86_64_CPU.tar.gz" ]; then
             echo "✓ Trial Ubuntu 24.04 tar.gz found"
           else
@@ -556,17 +556,6 @@ jobs:
           2. Navigate to the desired tier directory (standard/ or trial/)
           3. Extract the appropriate Ubuntu version file (choose ZIP or tar.gz based on your preference)
           4. The radarsimpy module will be ready for use
-          EOF
-          - Built with GCC-13 compiler
-
-          ## Build Information
-
-          - **Total Builds**: 20
-          - **Ubuntu Versions**: 22.04 LTS, 24.04 LTS
-          - **Python Versions**: 3.9, 3.10, 3.11, 3.12, 3.13
-          - **Tiers**: Standard (full features), Trial (limited features)
-          - **Build Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
-
           EOF
 
       - name: Create compressed archive

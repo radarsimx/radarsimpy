@@ -120,8 +120,8 @@ jobs:
       - name: Setup CUDA Toolkit
         uses: N-Storm/cuda-toolkit@v0.2.27m
         with:
-          cuda: '13.0.0'
-          method: 'local'
+          cuda: "13.0.0"
+          method: "local"
           use-github-cache: false
 
       - name: Verify CUDA installation
@@ -266,7 +266,7 @@ jobs:
           # Create base directory structure for final archive
           New-Item -Path "packed\radarsimpy_windows_gpu_all\standard" -ItemType Directory -Force
           New-Item -Path "packed\radarsimpy_windows_gpu_all\trial" -ItemType Directory -Force
-          
+
           # Create temporary directories for building tier-specific packages
           New-Item -Path "temp\standard\radarsimpy" -ItemType Directory -Force
           New-Item -Path "temp\trial\radarsimpy" -ItemType Directory -Force
@@ -298,11 +298,11 @@ jobs:
               Copy-Item -Path "$artifactPath\*" -Destination $tempDir -Recurse -Force
             }
           }
-          
+
           # Create ZIP files for each tier
           Write-Host "Creating Windows_x86_64_GPU.zip for standard tier..."
           Compress-Archive -Path "temp\standard\*" -DestinationPath "packed\radarsimpy_windows_gpu_all\standard\Windows_x86_64_GPU.zip" -Force
-          
+
           Write-Host "Creating Windows_x86_64_GPU.zip for trial tier..."
           Compress-Archive -Path "temp\trial\*" -DestinationPath "packed\radarsimpy_windows_gpu_all\trial\Windows_x86_64_GPU.zip" -Force
         shell: powershell
@@ -312,7 +312,7 @@ jobs:
           echo "::group::Artifact Structure Verification"
           echo "Final directory structure:"
           dir /s packed\radarsimpy_windows_gpu_all
-          
+
           echo ""
           echo "Verifying ZIP files exist:"
           if exist "packed\radarsimpy_windows_gpu_all\standard\Windows_x86_64_GPU.zip" (
@@ -320,7 +320,7 @@ jobs:
           ) else (
             echo "✗ Standard tier ZIP missing"
           )
-          
+
           if exist "packed\radarsimpy_windows_gpu_all\trial\Windows_x86_64_GPU.zip" (
             echo "✓ Trial tier ZIP found"
           ) else (

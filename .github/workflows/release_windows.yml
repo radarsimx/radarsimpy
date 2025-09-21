@@ -234,7 +234,7 @@ jobs:
           # Create base directory structure for final archive
           New-Item -Path "packed\radarsimpy_windows_cpu_all\standard" -ItemType Directory -Force
           New-Item -Path "packed\radarsimpy_windows_cpu_all\trial" -ItemType Directory -Force
-          
+
           # Create temporary directories for building tier-specific packages
           New-Item -Path "temp\standard\radarsimpy" -ItemType Directory -Force
           New-Item -Path "temp\trial\radarsimpy" -ItemType Directory -Force
@@ -266,11 +266,11 @@ jobs:
               Copy-Item -Path "$artifactPath\*" -Destination $tempDir -Recurse -Force
             }
           }
-          
+
           # Create ZIP files for each tier
           Write-Host "Creating Windows_x86_64_CPU.zip for standard tier..."
           Compress-Archive -Path "temp\standard\*" -DestinationPath "packed\radarsimpy_windows_cpu_all\standard\Windows_x86_64_CPU.zip" -Force
-          
+
           Write-Host "Creating Windows_x86_64_CPU.zip for trial tier..."
           Compress-Archive -Path "temp\trial\*" -DestinationPath "packed\radarsimpy_windows_cpu_all\trial\Windows_x86_64_CPU.zip" -Force
         shell: powershell
@@ -280,7 +280,7 @@ jobs:
           echo "::group::Artifact Structure Verification"
           echo "Final directory structure:"
           dir /s packed\radarsimpy_windows_cpu_all
-          
+
           echo ""
           echo "Verifying ZIP files exist:"
           if exist "packed\radarsimpy_windows_cpu_all\standard\Windows_x86_64_CPU.zip" (
@@ -288,7 +288,7 @@ jobs:
           ) else (
             echo "✗ Standard tier ZIP missing"
           )
-          
+
           if exist "packed\radarsimpy_windows_cpu_all\trial\Windows_x86_64_CPU.zip" (
             echo "✓ Trial tier ZIP found"
           ) else (
