@@ -428,6 +428,19 @@ jobs:
           
           echo "Creating Ubuntu24_x86_64_CPU.zip for trial tier..."
           cd temp/trial && zip -r ../../packed/radarsimpy_ubuntu_cpu_all/trial/Ubuntu24_x86_64_CPU.zip Ubuntu24_x86_64_CPU/ && cd ../..
+          
+          # Create tar.gz files for each Ubuntu version and tier
+          echo "Creating Ubuntu22_x86_64_CPU.tar.gz for standard tier..."
+          cd temp/standard && tar -czf ../../packed/radarsimpy_ubuntu_cpu_all/standard/Ubuntu22_x86_64_CPU.tar.gz Ubuntu22_x86_64_CPU/ && cd ../..
+          
+          echo "Creating Ubuntu24_x86_64_CPU.tar.gz for standard tier..."
+          cd temp/standard && tar -czf ../../packed/radarsimpy_ubuntu_cpu_all/standard/Ubuntu24_x86_64_CPU.tar.gz Ubuntu24_x86_64_CPU/ && cd ../..
+          
+          echo "Creating Ubuntu22_x86_64_CPU.tar.gz for trial tier..."
+          cd temp/trial && tar -czf ../../packed/radarsimpy_ubuntu_cpu_all/trial/Ubuntu22_x86_64_CPU.tar.gz Ubuntu22_x86_64_CPU/ && cd ../..
+          
+          echo "Creating Ubuntu24_x86_64_CPU.tar.gz for trial tier..."
+          cd temp/trial && tar -czf ../../packed/radarsimpy_ubuntu_cpu_all/trial/Ubuntu24_x86_64_CPU.tar.gz Ubuntu24_x86_64_CPU/ && cd ../..
 
       - name: Verify artifact structure
         run: |
@@ -435,12 +448,18 @@ jobs:
           echo "Final directory structure:"
           find packed/radarsimpy_ubuntu_cpu_all -type f | sort
           echo ""
-          echo "Verifying ZIP files exist:"
+          echo "Verifying ZIP and tar.gz files exist:"
           
           if [ -f "packed/radarsimpy_ubuntu_cpu_all/standard/Ubuntu22_x86_64_CPU.zip" ]; then
             echo "✓ Standard Ubuntu 22.04 ZIP found"
           else
             echo "✗ Standard Ubuntu 22.04 ZIP missing"
+          fi
+          
+          if [ -f "packed/radarsimpy_ubuntu_cpu_all/standard/Ubuntu22_x86_64_CPU.tar.gz" ]; then
+            echo "✓ Standard Ubuntu 22.04 tar.gz found"
+          else
+            echo "✗ Standard Ubuntu 22.04 tar.gz missing"
           fi
           
           if [ -f "packed/radarsimpy_ubuntu_cpu_all/standard/Ubuntu24_x86_64_CPU.zip" ]; then
@@ -449,10 +468,22 @@ jobs:
             echo "✗ Standard Ubuntu 24.04 ZIP missing"
           fi
           
+          if [ -f "packed/radarsimpy_ubuntu_cpu_all/standard/Ubuntu24_x86_64_CPU.tar.gz" ]; then
+            echo "✓ Standard Ubuntu 24.04 tar.gz found"
+          else
+            echo "✗ Standard Ubuntu 24.04 tar.gz missing"
+          fi
+          
           if [ -f "packed/radarsimpy_ubuntu_cpu_all/trial/Ubuntu22_x86_64_CPU.zip" ]; then
             echo "✓ Trial Ubuntu 22.04 ZIP found"
           else
             echo "✗ Trial Ubuntu 22.04 ZIP missing"
+          fi
+          
+          if [ -f "packed/radarsimpy_ubuntu_cpu_all/trial/Ubuntu22_x86_64_CPU.tar.gz" ]; then
+            echo "✓ Trial Ubuntu 22.04 tar.gz found"
+          else
+            echo "✗ Trial Ubuntu 22.04 tar.gz missing"
           fi
           
           if [ -f "packed/radarsimpy_ubuntu_cpu_all/trial/Ubuntu24_x86_64_CPU.zip" ]; then
@@ -460,7 +491,12 @@ jobs:
           else
             echo "✗ Trial Ubuntu 24.04 ZIP missing"
           fi
-          echo "::endgroup::"
+          
+          if [ -f "packed/radarsimpy_ubuntu_cpu_all/trial/Ubuntu24_x86_64_CPU.tar.gz" ]; then
+            echo "✓ Trial Ubuntu 24.04 tar.gz found"
+          else
+            echo "✗ Trial Ubuntu 24.04 tar.gz missing"
+          fi
           echo "::endgroup::"
 
       - name: Create README for packed artifacts
@@ -478,40 +514,47 @@ jobs:
           radarsimpy_ubuntu_cpu_all/
           ├── standard/
           │   ├── Ubuntu22_x86_64_CPU.zip
-          │   └── Ubuntu24_x86_64_CPU.zip
+          │   ├── Ubuntu22_x86_64_CPU.tar.gz
+          │   ├── Ubuntu24_x86_64_CPU.zip
+          │   └── Ubuntu24_x86_64_CPU.tar.gz
           └── trial/
               ├── Ubuntu22_x86_64_CPU.zip
-              └── Ubuntu24_x86_64_CPU.zip
+              ├── Ubuntu22_x86_64_CPU.tar.gz
+              ├── Ubuntu24_x86_64_CPU.zip
+              └── Ubuntu24_x86_64_CPU.tar.gz
           ```
 
           ## Version and Tier Information
 
-          ### Ubuntu22_x86_64_CPU.zip (Ubuntu 22.04 LTS)
+          ### Ubuntu22_x86_64_CPU (Ubuntu 22.04 LTS)
           - **standard/**: Full-featured builds with all capabilities
           - **trial/**: Free tier builds with limited features
           - Built with GCC-11 compiler
-          - Each ZIP contains the complete radarsimpy module with all Python versions supported
+          - Available in both ZIP and tar.gz formats
+          - Each archive contains the complete radarsimpy module with all Python versions supported
 
-          ### Ubuntu24_x86_64_CPU.zip (Ubuntu 24.04 LTS)
+          ### Ubuntu24_x86_64_CPU (Ubuntu 24.04 LTS)
           - **standard/**: Full-featured builds with all capabilities  
           - **trial/**: Free tier builds with limited features
           - Built with GCC-13 compiler
-          - Each ZIP contains the complete radarsimpy module with all Python versions supported
+          - Available in both ZIP and tar.gz formats
+          - Each archive contains the complete radarsimpy module with all Python versions supported
 
           ## Build Information
 
-          - **Total Builds**: 20 (packaged into 4 ZIP files)
+          - **Total Builds**: 20 (packaged into 8 files: 4 ZIP + 4 tar.gz)
           - **Ubuntu Versions**: 22.04 LTS, 24.04 LTS
           - **Architecture**: x86_64
           - **Python Versions**: 3.9, 3.10, 3.11, 3.12, 3.13
           - **Tiers**: Standard (full features), Trial (limited features)
+          - **Formats**: ZIP and tar.gz for maximum compatibility
           - **Build Date**: $(date)
 
           ## Usage
 
           1. Extract the main archive
           2. Navigate to the desired tier directory (standard/ or trial/)
-          3. Extract the appropriate Ubuntu version ZIP file
+          3. Extract the appropriate Ubuntu version file (choose ZIP or tar.gz based on your preference)
           4. The radarsimpy module will be ready for use
           EOF
           - Built with GCC-13 compiler
@@ -574,10 +617,10 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Packed Artifacts" >> $GITHUB_STEP_SUMMARY
           if [ "${{ needs.pack-artifacts.result }}" == "success" ]; then
-            echo "✅ **All artifacts successfully packed into ZIP files by tier**" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **All artifacts successfully packed into ZIP and tar.gz files by tier**" >> $GITHUB_STEP_SUMMARY
             echo "- Archive: \`radarsimpy_ubuntu_cpu_all_builds\`" >> $GITHUB_STEP_SUMMARY
             echo "- Formats: tar.gz, zip" >> $GITHUB_STEP_SUMMARY
-            echo "- Structure: 4 ZIP files (2 Ubuntu versions × 2 tiers)" >> $GITHUB_STEP_SUMMARY
+            echo "- Structure: 8 files (2 Ubuntu versions × 2 tiers × 2 formats)" >> $GITHUB_STEP_SUMMARY
             echo "- Contains: All 20 build variants organized by Ubuntu version and tier" >> $GITHUB_STEP_SUMMARY
           else
             echo "⚠️ **Artifact packing failed or was skipped**" >> $GITHUB_STEP_SUMMARY

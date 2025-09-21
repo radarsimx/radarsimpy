@@ -448,6 +448,19 @@ jobs:
           
           echo "Creating Ubuntu24_x86_64_GPU.zip for trial tier..."
           cd temp/trial && zip -r ../../packed/radarsimpy_ubuntu_gpu_all/trial/Ubuntu24_x86_64_GPU.zip Ubuntu24_x86_64_GPU/ && cd ../..
+          
+          # Create tar.gz files for each Ubuntu version and tier
+          echo "Creating Ubuntu22_x86_64_GPU.tar.gz for standard tier..."
+          cd temp/standard && tar -czf ../../packed/radarsimpy_ubuntu_gpu_all/standard/Ubuntu22_x86_64_GPU.tar.gz Ubuntu22_x86_64_GPU/ && cd ../..
+          
+          echo "Creating Ubuntu24_x86_64_GPU.tar.gz for standard tier..."
+          cd temp/standard && tar -czf ../../packed/radarsimpy_ubuntu_gpu_all/standard/Ubuntu24_x86_64_GPU.tar.gz Ubuntu24_x86_64_GPU/ && cd ../..
+          
+          echo "Creating Ubuntu22_x86_64_GPU.tar.gz for trial tier..."
+          cd temp/trial && tar -czf ../../packed/radarsimpy_ubuntu_gpu_all/trial/Ubuntu22_x86_64_GPU.tar.gz Ubuntu22_x86_64_GPU/ && cd ../..
+          
+          echo "Creating Ubuntu24_x86_64_GPU.tar.gz for trial tier..."
+          cd temp/trial && tar -czf ../../packed/radarsimpy_ubuntu_gpu_all/trial/Ubuntu24_x86_64_GPU.tar.gz Ubuntu24_x86_64_GPU/ && cd ../..
 
       - name: Verify artifact structure
         run: |
@@ -455,12 +468,18 @@ jobs:
           echo "Final directory structure:"
           find packed/radarsimpy_ubuntu_gpu_all -type f | sort
           echo ""
-          echo "Verifying ZIP files exist:"
+          echo "Verifying ZIP and tar.gz files exist:"
           
           if [ -f "packed/radarsimpy_ubuntu_gpu_all/standard/Ubuntu22_x86_64_GPU.zip" ]; then
             echo "✓ Standard Ubuntu 22.04 GPU ZIP found"
           else
             echo "✗ Standard Ubuntu 22.04 GPU ZIP missing"
+          fi
+          
+          if [ -f "packed/radarsimpy_ubuntu_gpu_all/standard/Ubuntu22_x86_64_GPU.tar.gz" ]; then
+            echo "✓ Standard Ubuntu 22.04 GPU tar.gz found"
+          else
+            echo "✗ Standard Ubuntu 22.04 GPU tar.gz missing"
           fi
           
           if [ -f "packed/radarsimpy_ubuntu_gpu_all/standard/Ubuntu24_x86_64_GPU.zip" ]; then
@@ -469,16 +488,34 @@ jobs:
             echo "✗ Standard Ubuntu 24.04 GPU ZIP missing"
           fi
           
+          if [ -f "packed/radarsimpy_ubuntu_gpu_all/standard/Ubuntu24_x86_64_GPU.tar.gz" ]; then
+            echo "✓ Standard Ubuntu 24.04 GPU tar.gz found"
+          else
+            echo "✗ Standard Ubuntu 24.04 GPU tar.gz missing"
+          fi
+          
           if [ -f "packed/radarsimpy_ubuntu_gpu_all/trial/Ubuntu22_x86_64_GPU.zip" ]; then
             echo "✓ Trial Ubuntu 22.04 GPU ZIP found"
           else
             echo "✗ Trial Ubuntu 22.04 GPU ZIP missing"
           fi
           
+          if [ -f "packed/radarsimpy_ubuntu_gpu_all/trial/Ubuntu22_x86_64_GPU.tar.gz" ]; then
+            echo "✓ Trial Ubuntu 22.04 GPU tar.gz found"
+          else
+            echo "✗ Trial Ubuntu 22.04 GPU tar.gz missing"
+          fi
+          
           if [ -f "packed/radarsimpy_ubuntu_gpu_all/trial/Ubuntu24_x86_64_GPU.zip" ]; then
             echo "✓ Trial Ubuntu 24.04 GPU ZIP found"
           else
             echo "✗ Trial Ubuntu 24.04 GPU ZIP missing"
+          fi
+          
+          if [ -f "packed/radarsimpy_ubuntu_gpu_all/trial/Ubuntu24_x86_64_GPU.tar.gz" ]; then
+            echo "✓ Trial Ubuntu 24.04 GPU tar.gz found"
+          else
+            echo "✗ Trial Ubuntu 24.04 GPU tar.gz missing"
           fi
           echo "::endgroup::"
 
@@ -497,41 +534,48 @@ jobs:
           radarsimpy_ubuntu_gpu_all/
           ├── standard/
           │   ├── Ubuntu22_x86_64_GPU.zip
-          │   └── Ubuntu24_x86_64_GPU.zip
+          │   ├── Ubuntu22_x86_64_GPU.tar.gz
+          │   ├── Ubuntu24_x86_64_GPU.zip
+          │   └── Ubuntu24_x86_64_GPU.tar.gz
           └── trial/
               ├── Ubuntu22_x86_64_GPU.zip
-              └── Ubuntu24_x86_64_GPU.zip
+              ├── Ubuntu22_x86_64_GPU.tar.gz
+              ├── Ubuntu24_x86_64_GPU.zip
+              └── Ubuntu24_x86_64_GPU.tar.gz
           ```
 
           ## Version and Tier Information
 
-          ### Ubuntu22_x86_64_GPU.zip (Ubuntu 22.04 LTS)
+          ### Ubuntu22_x86_64_GPU (Ubuntu 22.04 LTS)
           - **standard/**: Full-featured builds with all capabilities including GPU acceleration
           - **trial/**: Free tier builds with limited features
           - Built with GCC-11 compiler and CUDA support
-          - Each ZIP contains the complete radarsimpy module with all Python versions supported
+          - Available in both ZIP and tar.gz formats
+          - Each archive contains the complete radarsimpy module with all Python versions supported
 
-          ### Ubuntu24_x86_64_GPU.zip (Ubuntu 24.04 LTS)
+          ### Ubuntu24_x86_64_GPU (Ubuntu 24.04 LTS)
           - **standard/**: Full-featured builds with all capabilities including GPU acceleration
           - **trial/**: Free tier builds with limited features
           - Built with GCC-13 compiler and CUDA support
-          - Each ZIP contains the complete radarsimpy module with all Python versions supported
+          - Available in both ZIP and tar.gz formats
+          - Each archive contains the complete radarsimpy module with all Python versions supported
 
           ## Build Information
 
-          - **Total Builds**: 20 (packaged into 4 ZIP files)
+          - **Total Builds**: 20 (packaged into 8 files: 4 ZIP + 4 tar.gz)
           - **Ubuntu Versions**: 22.04 LTS, 24.04 LTS
           - **Architecture**: x86_64
           - **GPU Support**: CUDA-enabled
           - **Python Versions**: 3.9, 3.10, 3.11, 3.12, 3.13
           - **Tiers**: Standard (full features), Trial (limited features)
+          - **Formats**: ZIP and tar.gz for maximum compatibility
           - **Build Date**: $(date)
 
           ## Usage
 
           1. Extract the main archive
           2. Navigate to the desired tier directory (standard/ or trial/)
-          3. Extract the appropriate Ubuntu version ZIP file
+          3. Extract the appropriate Ubuntu version file (choose ZIP or tar.gz based on your preference)
           4. The radarsimpy module will be ready for use with GPU acceleration
           EOF
           - Built with GCC-13 compiler
@@ -594,10 +638,10 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Packed Artifacts" >> $GITHUB_STEP_SUMMARY
           if [ "${{ needs.pack-artifacts.result }}" == "success" ]; then
-            echo "✅ **All artifacts successfully packed into ZIP files by tier**" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **All artifacts successfully packed into ZIP and tar.gz files by tier**" >> $GITHUB_STEP_SUMMARY
             echo "- Archive: \`radarsimpy_ubuntu_gpu_all_builds\`" >> $GITHUB_STEP_SUMMARY
             echo "- Formats: tar.gz, zip" >> $GITHUB_STEP_SUMMARY
-            echo "- Structure: 4 ZIP files (2 Ubuntu versions × 2 tiers)" >> $GITHUB_STEP_SUMMARY
+            echo "- Structure: 8 files (2 Ubuntu versions × 2 tiers × 2 formats)" >> $GITHUB_STEP_SUMMARY
             echo "- Contains: All 20 build variants organized by Ubuntu version and tier" >> $GITHUB_STEP_SUMMARY
           else
             echo "⚠️ **Artifact packing failed or was skipped**" >> $GITHUB_STEP_SUMMARY
