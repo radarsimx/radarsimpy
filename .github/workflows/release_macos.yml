@@ -389,11 +389,15 @@ jobs:
         run: |
           mkdir -p packed/radarsimpy_macos_all
 
-          # Create the directory structure (corrected to match target paths)
-          mkdir -p packed/radarsimpy_macos_all/trial/MacOS_x86_64_CPU/radarsimpy
-          mkdir -p packed/radarsimpy_macos_all/standard/MacOS_x86_64_CPU/radarsimpy
-          mkdir -p packed/radarsimpy_macos_all/trial/MacOS_ARM_CPU/radarsimpy
-          mkdir -p packed/radarsimpy_macos_all/standard/MacOS_ARM_CPU/radarsimpy
+          # Create base directory structure for final archive
+          mkdir -p packed/radarsimpy_macos_all/standard
+          mkdir -p packed/radarsimpy_macos_all/trial
+          
+          # Create temporary directories for building tier-specific packages
+          mkdir -p temp/standard/MacOS_x86_64_CPU/radarsimpy
+          mkdir -p temp/standard/MacOS_ARM_CPU/radarsimpy
+          mkdir -p temp/trial/MacOS_x86_64_CPU/radarsimpy
+          mkdir -p temp/trial/MacOS_ARM_CPU/radarsimpy
 
           # Copy each artifact to appropriate directory based on architecture and tier
           for dir in artifacts/*/; do
@@ -405,16 +409,16 @@ jobs:
               if [[ "$artifact_name" == *"_arm_"* ]]; then
                 # ARM64 builds
                 if [[ "$artifact_name" == *"_freetier"* ]]; then
-                  target_dir="packed/radarsimpy_macos_all/trial/MacOS_ARM_CPU/radarsimpy"
+                  target_dir="temp/trial/MacOS_ARM_CPU/radarsimpy"
                 else
-                  target_dir="packed/radarsimpy_macos_all/standard/MacOS_ARM_CPU/radarsimpy"
+                  target_dir="temp/standard/MacOS_ARM_CPU/radarsimpy"
                 fi
               else
                 # x64 builds
                 if [[ "$artifact_name" == *"_freetier"* ]]; then
-                  target_dir="packed/radarsimpy_macos_all/trial/MacOS_x86_64_CPU/radarsimpy"
+                  target_dir="temp/trial/MacOS_x86_64_CPU/radarsimpy"
                 else
-                  target_dir="packed/radarsimpy_macos_all/standard/MacOS_x86_64_CPU/radarsimpy"
+                  target_dir="temp/standard/MacOS_x86_64_CPU/radarsimpy"
                 fi
               fi
               
@@ -424,7 +428,7 @@ jobs:
               # Copy the radarsimpy module
               if [ -d "$dir/radarsimpy" ]; then
                 echo "Copying radarsimpy module from $dir/radarsimpy to $target_dir/"
-                cp -r "$dir/radarsimpy" "$target_dir/"
+                cp -r "$dir/radarsimpy"/* "$target_dir/" 2>/dev/null || true
               else
                 echo "Copying all contents from $dir to $target_dir/"
                 # If radarsimpy is at root level
@@ -432,27 +436,57 @@ jobs:
               fi
             fi
           done
+          
+          # Create ZIP files for each architecture and tier
+          echo "Creating MacOS_x86_64_CPU.zip for standard tier..."
+          cd temp/standard && zip -r ../../packed/radarsimpy_macos_all/standard/MacOS_x86_64_CPU.zip MacOS_x86_64_CPU/ && cd ../..
+          
+          echo "Creating MacOS_ARM_CPU.zip for standard tier..."
+          cd temp/standard && zip -r ../../packed/radarsimpy_macos_all/standard/MacOS_ARM_CPU.zip MacOS_ARM_CPU/ && cd ../..
+          
+          echo "Creating MacOS_x86_64_CPU.zip for trial tier..."
+          cd temp/trial && zip -r ../../packed/radarsimpy_macos_all/trial/MacOS_x86_64_CPU.zip MacOS_x86_64_CPU/ && cd ../..
+          
+          echo "Creating MacOS_ARM_CPU.zip for trial tier..."
+          cd temp/trial && zip -r ../../packed/radarsimpy_macos_all/trial/MacOS_ARM_CPU.zip MacOS_ARM_CPU/ && cd ../..
 
       - name: Verify artifact structure
         run: |
           echo "::group::Artifact Structure Verification"
           echo "Final directory structure:"
-          find packed/radarsimpy_macos_all -type d | sort
+          find packed/radarsimpy_macos_all -type f | sort
           echo ""
-          echo "Files in each directory:"
-          for dir in packed/radarsimpy_macos_all/*/MacOS_*; do
-            if [ -d "$dir" ]; then
-              echo "Contents of $dir:"
-              ls -la "$dir" || echo "Directory is empty or doesn't exist"
-              echo ""
-            fi
-          done
+          echo "Verifying ZIP files exist:"
+          
+          if [ -f "packed/radarsimpy_macos_all/standard/MacOS_x86_64_CPU.zip" ]; then
+            echo "✓ Standard macOS x86_64 ZIP found"
+          else
+            echo "✗ Standard macOS x86_64 ZIP missing"
+          fi
+          
+          if [ -f "packed/radarsimpy_macos_all/standard/MacOS_ARM_CPU.zip" ]; then
+            echo "✓ Standard macOS ARM ZIP found"
+          else
+            echo "✗ Standard macOS ARM ZIP missing"
+          fi
+          
+          if [ -f "packed/radarsimpy_macos_all/trial/MacOS_x86_64_CPU.zip" ]; then
+            echo "✓ Trial macOS x86_64 ZIP found"
+          else
+            echo "✗ Trial macOS x86_64 ZIP missing"
+          fi
+          
+          if [ -f "packed/radarsimpy_macos_all/trial/MacOS_ARM_CPU.zip" ]; then
+            echo "✓ Trial macOS ARM ZIP found"
+          else
+            echo "✗ Trial macOS ARM ZIP missing"
+          fi
           echo "::endgroup::"
 
       - name: Create README for packed artifacts
         run: |
           cat > packed/radarsimpy_macos_all/README.md << 'EOF'
-          # RadarSimPy MacOS Build Artifacts
+          # RadarSimPy macOS Build Artifacts
 
           This archive contains all RadarSimPy builds for macOS platforms organized by architecture and tier.
 
@@ -461,38 +495,43 @@ jobs:
           The builds are organized in the following structure:
 
           ```
-          standard/
-          ├── MacOS_x86_64_CPU/
-          │   └── radarsimpy/
-          └── MacOS_ARM_CPU/
-              └── radarsimpy/
-
-          trial/
-          ├── MacOS_x86_64_CPU/
-          │   └── radarsimpy/
-          └── MacOS_ARM_CPU/
-              └── radarsimpy/
+          radarsimpy_macos_all/
+          ├── standard/
+          │   ├── MacOS_x86_64_CPU.zip
+          │   └── MacOS_ARM_CPU.zip
+          └── trial/
+              ├── MacOS_x86_64_CPU.zip
+              └── MacOS_ARM_CPU.zip
           ```
 
           ## Architecture and Tier Information
 
-          ### MacOS_x86_64_CPU (Intel-based Macs)
+          ### MacOS_x86_64_CPU.zip (Intel-based Macs)
           - **standard/**: Full-featured builds with all capabilities
           - **trial/**: Free tier builds with limited features
           - Built on macOS 13 with GCC 14 compiler
+          - Each ZIP contains the complete radarsimpy module with all Python versions supported
 
-          ### MacOS_ARM_CPU (Apple Silicon Macs)
+          ### MacOS_ARM_CPU.zip (Apple Silicon Macs)
           - **standard/**: Full-featured builds with all capabilities  
           - **trial/**: Free tier builds with limited features
           - Built on macOS 15 with Clang compiler
+          - Each ZIP contains the complete radarsimpy module with all Python versions supported
 
           ## Build Information
 
-          - **Total Builds**: 20
-          - **Architectures**: x86_64 (Intel), Arm64 (Apple Silicon)
+          - **Total Builds**: 20 (packaged into 4 ZIP files)
+          - **Architectures**: x86_64 (Intel), ARM64 (Apple Silicon)
           - **Python Versions**: 3.9, 3.10, 3.11, 3.12, 3.13
           - **Tiers**: Standard (full features), Trial (limited features)
           - **Build Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+
+          ## Usage
+
+          1. Extract the main archive
+          2. Navigate to the desired tier directory (standard/ or trial/)
+          3. Extract the appropriate architecture ZIP file based on your Mac
+          4. The radarsimpy module will be ready for use
 
           EOF
 
@@ -544,10 +583,11 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Packed Artifacts" >> $GITHUB_STEP_SUMMARY
           if [ "${{ needs.pack-artifacts.result }}" == "success" ]; then
-            echo "✅ **All artifacts successfully packed into single archive**" >> $GITHUB_STEP_SUMMARY
-            echo "- Archive: `radarsimpy_macos_all_builds`" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **All artifacts successfully packed into ZIP files by tier**" >> $GITHUB_STEP_SUMMARY
+            echo "- Archive: \`radarsimpy_macos_all_builds\`" >> $GITHUB_STEP_SUMMARY
             echo "- Formats: tar.gz, zip" >> $GITHUB_STEP_SUMMARY
-            echo "- Contains: All 20 build variants organized by configuration" >> $GITHUB_STEP_SUMMARY
+            echo "- Structure: 4 ZIP files (2 architectures × 2 tiers)" >> $GITHUB_STEP_SUMMARY
+            echo "- Contains: All 20 build variants organized by architecture and tier" >> $GITHUB_STEP_SUMMARY
           else
             echo "⚠️ **Artifact packing failed or was skipped**" >> $GITHUB_STEP_SUMMARY
           fi
