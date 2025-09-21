@@ -118,11 +118,11 @@ jobs:
             ${{ runner.os }}-
 
       - name: Setup CUDA Toolkit
-        uses: Jimver/cuda-toolkit@v0.2.24
+        uses: N-Storm/cuda-toolkit@v0.2.27m
         with:
-          cuda: "12.8.1"
-          method: "network"
-          sub-packages: '["nvcc", "visual_studio_integration", "cudart"]'
+          cuda: '13.0.0'
+          method: 'local'
+          use-github-cache: false
 
       - name: Verify CUDA installation
         run: |

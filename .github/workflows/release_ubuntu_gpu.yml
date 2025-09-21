@@ -240,9 +240,9 @@ jobs:
           sudo apt-get install -y build-essential
 
       - name: Setup CUDA Toolkit
-        uses: Jimver/cuda-toolkit@v0.2.26
+        uses: Jimver/cuda-toolkit@v0.2.27
         with:
-          cuda: "12.9.1"
+          cuda: "13.0.0"
           method: "network"
           sub-packages: '["nvcc"]'
           linux-local-args: '["--toolkit", "--silent"]'
