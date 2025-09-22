@@ -56,13 +56,13 @@ pip install -r requirements.txt
 
 - **Windows**
   - [Visual C++ Runtime](https://aka.ms/vs/16/release/vc_redist.x64.exe/)
-  - GPU version (CUDA12.8) – see [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1)
+  - GPU version (CUDA13) – see [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1)
 - **Ubuntu 22.04**
   - GCC 11 (default)
-  - GPU version (CUDA12.8) – see [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1)
+  - GPU version (CUDA13) – see [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1)
 - **Ubuntu 24.04**
   - GCC 13 (default)
-  - GPU version (CUDA12.8) – see [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1)
+  - GPU version (CUDA13) – see [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1)
 - **Generic Linux x86-64**
   - Try Ubuntu 22.04/24.04 module, or [request a custom build](https://radarsimx.com/request-a-custom-build/)
 - **MacOS**
