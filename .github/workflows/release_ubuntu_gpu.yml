@@ -356,8 +356,8 @@ jobs:
             *.log
           retention-days: 1
 
-  # Pack all artifacts into a single file
-  pack-artifacts:
+  # Pack all artifacts and generate build summary
+  pack-artifacts-and-summary:
     needs: build
     runs-on: ubuntu-latest
     if: success()
@@ -601,22 +601,16 @@ jobs:
           retention-days: 1
           compression-level: 0
 
-  # Summary job that runs after all builds complete
-  build-summary:
-    needs: [build, pack-artifacts]
-    runs-on: ubuntu-latest
-    if: always()
-    steps:
       - name: Generate build summary
         run: |
-          echo "# Ubuntu Build Summary 📊" >> $GITHUB_STEP_SUMMARY
+          echo "# Ubuntu GPU Build Summary �" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Build Matrix Results" >> $GITHUB_STEP_SUMMARY
           echo "Total builds: 20 (5 Python versions × 2 Ubuntu versions × 2 tiers)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Ubuntu Version Distribution" >> $GITHUB_STEP_SUMMARY
-          echo "- **Ubuntu 22.04 LTS**: 10 builds with GCC-11" >> $GITHUB_STEP_SUMMARY
-          echo "- **Ubuntu 24.04 LTS**: 10 builds with GCC-13" >> $GITHUB_STEP_SUMMARY
+          echo "- **Ubuntu 22.04 LTS**: 10 builds with GCC-11 and CUDA support" >> $GITHUB_STEP_SUMMARY
+          echo "- **Ubuntu 24.04 LTS**: 10 builds with GCC-13 and CUDA support" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Tier Distribution" >> $GITHUB_STEP_SUMMARY
           echo "- **Standard**: 10 builds" >> $GITHUB_STEP_SUMMARY
@@ -625,13 +619,16 @@ jobs:
           echo "### Python Versions" >> $GITHUB_STEP_SUMMARY
           echo "- Python 3.9, 3.10, 3.11, 3.12, 3.13" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### GPU Support" >> $GITHUB_STEP_SUMMARY
+          echo "- **CUDA-enabled**: All builds include GPU acceleration support" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Packed Artifacts" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ needs.pack-artifacts.result }}" == "success" ]; then
+          if [ "${{ needs.build.result }}" == "success" ]; then
             echo "✅ **All artifacts successfully packed into ZIP and tar.gz files by tier**" >> $GITHUB_STEP_SUMMARY
             echo "- Archive: \`radarsimpy_ubuntu_gpu_all_builds\`" >> $GITHUB_STEP_SUMMARY
             echo "- Formats: tar.gz, zip" >> $GITHUB_STEP_SUMMARY
             echo "- Structure: 8 files (2 Ubuntu versions × 2 tiers × 2 formats)" >> $GITHUB_STEP_SUMMARY
-            echo "- Contains: All 20 build variants organized by Ubuntu version and tier" >> $GITHUB_STEP_SUMMARY
+            echo "- Contains: All 20 GPU-enabled build variants organized by Ubuntu version and tier" >> $GITHUB_STEP_SUMMARY
           else
             echo "⚠️ **Artifact packing failed or was skipped**" >> $GITHUB_STEP_SUMMARY
           fi
@@ -645,15 +642,5 @@ jobs:
             echo "⚠️ **Some builds may have failed. Check individual job logs for details.**" >> $GITHUB_STEP_SUMMARY
           else
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "✅ **All builds completed successfully!**" >> $GITHUB_STEP_SUMMARY
-          fi
-          echo "Check individual job results above for detailed build information." >> $GITHUB_STEP_SUMMARY
-
-          # Check if any builds failed
-          if [ "${{ needs.build.result }}" != "success" ]; then
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "⚠️ **Some builds may have failed. Check individual job logs for details.**" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "✅ **All builds completed successfully!**" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **All GPU-accelerated builds completed successfully!**" >> $GITHUB_STEP_SUMMARY
           fi

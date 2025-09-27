@@ -357,8 +357,8 @@ jobs:
             *.log
           retention-days: 1
 
-  # Pack all artifacts into a single file
-  pack-artifacts:
+  # Pack all artifacts and generate build summary
+  pack-artifacts-and-summary:
     needs: build
     runs-on: ubuntu-latest
     if: success()
@@ -601,22 +601,16 @@ jobs:
           retention-days: 1
           compression-level: 0
 
-  # Summary job that runs after all builds complete
-  build-summary:
-    needs: [build, pack-artifacts]
-    runs-on: ubuntu-latest
-    if: always()
-    steps:
       - name: Generate build summary
         run: |
-          echo "# MacOS Build Summary 📊" >> $GITHUB_STEP_SUMMARY
+          echo "# macOS Build Summary 🍎" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Build Matrix Results" >> $GITHUB_STEP_SUMMARY
           echo "Total builds: 20 (5 Python versions × 2 architectures × 2 tiers)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Architecture Distribution" >> $GITHUB_STEP_SUMMARY
-          echo "- **x64 (Intel)**: 10 builds on macos-13" >> $GITHUB_STEP_SUMMARY
-          echo "- **ARM64 (Apple Silicon)**: 10 builds on macos-15" >> $GITHUB_STEP_SUMMARY
+          echo "- **x64 (Intel)**: 10 builds on macos-13 with GCC-14" >> $GITHUB_STEP_SUMMARY
+          echo "- **ARM64 (Apple Silicon)**: 10 builds on macos-15 with Clang" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Tier Distribution" >> $GITHUB_STEP_SUMMARY
           echo "- **Standard**: 10 builds" >> $GITHUB_STEP_SUMMARY
@@ -626,7 +620,7 @@ jobs:
           echo "- Python 3.9, 3.10, 3.11, 3.12, 3.13" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Packed Artifacts" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ needs.pack-artifacts.result }}" == "success" ]; then
+          if [ "${{ needs.build.result }}" == "success" ]; then
             echo "✅ **All artifacts successfully packed into ZIP and tar.gz files by tier**" >> $GITHUB_STEP_SUMMARY
             echo "- Archive: \`radarsimpy_macos_all_builds\`" >> $GITHUB_STEP_SUMMARY
             echo "- Formats: tar.gz, zip" >> $GITHUB_STEP_SUMMARY
@@ -645,5 +639,5 @@ jobs:
             echo "⚠️ **Some builds may have failed. Check individual job logs for details.**" >> $GITHUB_STEP_SUMMARY
           else
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "✅ **All builds completed successfully!**" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **All macOS builds completed successfully!**" >> $GITHUB_STEP_SUMMARY
           fi

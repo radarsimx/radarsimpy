@@ -336,8 +336,8 @@ jobs:
             *.log
           retention-days: 1
 
-  # Pack all artifacts into a single file
-  pack-artifacts:
+  # Pack all artifacts and generate build summary
+  pack-artifacts-and-summary:
     needs: build
     runs-on: ubuntu-latest
     if: success()
@@ -580,12 +580,6 @@ jobs:
           retention-days: 1
           compression-level: 0
 
-  # Summary job that runs after all builds complete
-  build-summary:
-    needs: [build, pack-artifacts]
-    runs-on: ubuntu-latest
-    if: always()
-    steps:
       - name: Generate build summary
         run: |
           echo "# Ubuntu Build Summary 📊" >> $GITHUB_STEP_SUMMARY
@@ -605,7 +599,7 @@ jobs:
           echo "- Python 3.9, 3.10, 3.11, 3.12, 3.13" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Packed Artifacts" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ needs.pack-artifacts.result }}" == "success" ]; then
+          if [ "${{ needs.build.result }}" == "success" ]; then
             echo "✅ **All artifacts successfully packed into ZIP and tar.gz files by tier**" >> $GITHUB_STEP_SUMMARY
             echo "- Archive: \`radarsimpy_ubuntu_cpu_all_builds\`" >> $GITHUB_STEP_SUMMARY
             echo "- Formats: tar.gz, zip" >> $GITHUB_STEP_SUMMARY
