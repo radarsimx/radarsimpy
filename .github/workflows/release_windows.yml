@@ -169,18 +169,6 @@ jobs:
           echo "::endgroup::"
         shell: cmd
 
-      - name: Create build summary
-        run: |
-          echo "## Build Summary" >> $env:GITHUB_STEP_SUMMARY
-          echo "| Property | Value |" >> $env:GITHUB_STEP_SUMMARY
-          echo "|----------|-------|" >> $env:GITHUB_STEP_SUMMARY
-          echo "| OS | windows-latest |" >> $env:GITHUB_STEP_SUMMARY
-          echo "| Python Version | ${{ matrix.python-version }} |" >> $env:GITHUB_STEP_SUMMARY
-          echo "| Tier | ${{ matrix.tier }} |" >> $env:GITHUB_STEP_SUMMARY
-          echo "| Architecture | ${{ matrix.arch }} |" >> $env:GITHUB_STEP_SUMMARY
-          echo "| Artifact Name | ${{ matrix.artifact_name }} |" >> $env:GITHUB_STEP_SUMMARY
-        shell: powershell
-
       - name: Archive built module
         uses: actions/upload-artifact@v4
         if: success()
