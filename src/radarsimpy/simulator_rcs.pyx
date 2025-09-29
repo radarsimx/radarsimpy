@@ -55,7 +55,7 @@ cpdef sim_rcs(
     obs_phi=None,
     obs_theta=None,
     obs_pol=None,
-    density=1
+    density=1.0
 ):
     """Calculate the Radar Cross Section (RCS) of targets using the Shooting and Bouncing Rays (SBR) method.
 
@@ -85,22 +85,26 @@ cpdef sim_rcs(
 
     :param float f:
         The center frequency of the incident electromagnetic wave in Hertz (Hz).
-    :param float inc_phi:
+    :param float or array_like inc_phi:
         The horizontal incidence angle (phi) of the incoming wave in degrees (°).  
         This angle is measured relative to the target at the transmitter's point of view.
-    :param float inc_theta:
+        Can be a single value or an array of values.
+    :param float or array_like inc_theta:
         The vertical incidence angle (theta) of the incoming wave in degrees (°).  
         This angle is measured relative to the target at the transmitter's point of view.
+        Can be a single value or an array of values.
     :param list[float] inc_pol:
         The polarization of the incident wave, specified as a 3D vector [x, y, z].  
         Default: ``[0, 0, 1]`` (vertical polarization).
-    :param float obs_phi:
+    :param float or array_like obs_phi:
         The horizontal observation angle (phi) in degrees (°).  
         This is the angle at which the RCS is observed from the observer's point of view.  
+        Can be a single value or an array of values.
         Default: ``None`` (if not specified, it is set to the same value as `inc_phi`).
-    :param float obs_theta:
+    :param float or array_like obs_theta:
         The vertical observation angle (theta) in degrees (°).  
         This is the angle at which the RCS is observed from the observer's point of view.  
+        Can be a single value or an array of values.
         Default: ``None`` (if not specified, it is set to the same value as `inc_theta`).
     :param list[float] obs_pol:
         The polarization of the observer, specified as a 3D vector [x, y, z].  
@@ -112,9 +116,10 @@ cpdef sim_rcs(
 
     :return:  
         The Radar Cross Section (RCS) of the target(s) in square meters (m²).  
+        Returns a single float value if input angles are scalars, or a numpy array if input angles are arrays.
         To convert the result to decibels relative to one square meter (dBsm), use:  
         ``10 * log10(RCS)``.
-    :rtype: float
+    :rtype: float or numpy.ndarray
     """
     if IsFreeTier():
         if len(targets) > 3:
