@@ -167,7 +167,7 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
             - **rotation_rate** (*numpy.ndarray*): Target's angular velocity in degrees per second [yaw rate, pitch rate, roll rate]. Default: ``[0, 0, 0]``.
             - **permittivity** (*complex*): Target's permittivity. Defaults to a perfect electric conductor (PEC).
             - **unit** (*str*): Unit of the target model. Supported values: ``mm``, ``cm``, ``m``. Default: ``m``.
-            - **skip_diffusion** (*boolean*): Flag to skip the calcuation of diffusion reflections of this object. Enable this for large reflectors, such as the ground plane, to reduce processing load. Default: ``False``.
+            - **skip_diffusion** (*boolean*): Flag to skip the calculation of diffusion reflections of this object. Enable this for large reflectors, such as the ground plane, to reduce processing load. Default: ``False``.
 
         - **Ideal Point Target**:
           A simplified target defined as a point in space. Each target is represented as a dictionary with the following keys:
@@ -190,9 +190,9 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
     :param str or None level:
         Fidelity level of the simulation. Default: ``None``.
 
-        - ``None``: Perform one ray-tracing simulation for the entire frame.
-        - ``pulse``: Perform ray-tracing for each pulse.
-        - ``sample``: Perform ray-tracing for each sample.
+        - ``None`` or ``"frame"``: Perform one ray-tracing simulation for the entire frame.
+        - ``"pulse"``: Perform ray-tracing for each pulse.
+        - ``"sample"``: Perform ray-tracing for each sample.
     :param Radar or None interf:
         Interference radar object. Default: ``None``.
     :param float or list or None interf_frame_time:
