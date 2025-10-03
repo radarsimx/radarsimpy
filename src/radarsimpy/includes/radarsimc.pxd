@@ -69,7 +69,7 @@ cdef extern from "libs/free_tier.hpp":
 # Error Handling
 # Error codes for radar simulation operations
 #------------------------------------------------------------------------------
-cdef extern from "type_def.hpp":
+cdef extern from "core/enums.hpp":
     cdef enum RadarSimErrorCode:
         SUCCESS                   # Operation completed successfully
         RADARSIMCPP_ERROR_NULL_POINTER        # Null pointer error
