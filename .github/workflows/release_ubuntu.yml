@@ -55,8 +55,8 @@ jobs:
           # Ubuntu 22.04 with GCC-11 Standard builds
           - os: ubuntu-22.04
             python-version: "3.9"
-            c_compiler: gcc-8
-            cxx_compiler: g++-8
+            c_compiler: gcc-11
+            cxx_compiler: g++-11
             tier: standard
             arch: cpu
             artifact_name: radarsimpy_ubuntu_22_04_py3.9
