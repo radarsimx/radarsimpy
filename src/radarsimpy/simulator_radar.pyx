@@ -37,7 +37,6 @@ cimport cython
 from libcpp.string cimport string
 from libcpp.memory cimport shared_ptr, make_shared
 from radarsimpy.includes.type_def cimport (
-    vector,
     float_t,
     int_t
 )
