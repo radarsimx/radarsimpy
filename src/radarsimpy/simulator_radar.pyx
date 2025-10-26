@@ -141,10 +141,10 @@ cdef inline raise_err(RadarSimErrorCode err):
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=None, interf_frame_time=None,
-                ray_filter=None, back_propagating=False, log_path=None, debug=False):
+                ray_filter=None, back_propagating=False, device="gpu", log_path=None, debug=False):
     """
     sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=None, interf_frame_time=None,
-              ray_filter=None, back_propagating=False, log_path=None, debug=False)
+              ray_filter=None, back_propagating=False, device="gpu", log_path=None, debug=False)
 
     Simulates the radar's baseband response for a given scene.
 
@@ -209,6 +209,11 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
     :param bool back_propagating:
         Whether to enable back propagation in the simulation. When enabled, the simulation will consider
         rays that propagate back towards the radar after reflecting off targets. Default: ``False``.
+    :param str device:
+        Execution device for the simulation. Default: ``"gpu"``.
+
+        - ``"gpu"``: Execute simulation on GPU using CUDA (if available, falls back to CPU).
+        - ``"cpu"``: Execute simulation on CPU only.
     :param str or None log_path:
         Path to save ray-tracing data. Default: ``None`` (does not save data).
     :param bool debug:
@@ -245,6 +250,19 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
     # Initialize error tracking
     err = RadarSimErrorCode.SUCCESS
 
+    # Validate device parameter
+    device_lower = device.lower()
+    if device_lower not in ["gpu", "cpu"]:
+        raise ValueError(
+            f"\nInvalid Device Selection\n"
+            f"------------------------\n"
+            f"The specified device '{device}' is not recognized.\n\n"
+            f"Available devices:\n"
+            f"- 'gpu': Execute simulation on GPU (CUDA)\n"
+            f"- 'cpu': Execute simulation on CPU\n\n"
+            f"Please choose 'gpu' or 'cpu'."
+        )
+
     #----------------------
     # C++ Object Declarations
     #----------------------
@@ -257,11 +275,14 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
     cdef shared_ptr[TargetsManager[float_t]] targets_manager = make_shared[TargetsManager[float_t]]()
     cdef shared_ptr[PointsManager[float_t]] points_manager = make_shared[PointsManager[float_t]]()
 
-    # Simulator instances
+    # Simulator instances - declare both CPU and GPU versions
     cdef:
-        MeshSimulator[double, float_t, gpu_policy] mesh_sim_c
-        PointSimulator[double, float_t, gpu_policy] point_sim_c
-        InterferenceSimulator[double, float_t, gpu_policy] interf_sim_c
+        PointSimulator[double, float_t, cpu_policy] point_sim_cpu
+        PointSimulator[double, float_t, gpu_policy] point_sim_gpu
+        MeshSimulator[double, float_t, cpu_policy] mesh_sim_cpu
+        MeshSimulator[double, float_t, gpu_policy] mesh_sim_gpu
+        InterferenceSimulator[double, float_t, cpu_policy] interf_sim_cpu
+        InterferenceSimulator[double, float_t, gpu_policy] interf_sim_gpu
 
     # Size and index variables
     cdef:
@@ -351,10 +372,7 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
     #----------------------
     # Simulation Execution
     #----------------------
-    # Run ideal point target simulation
-    point_sim_c.Run(radar_c, points_manager)
-
-    # Run scene simulation if there are 3D mesh targets
+    # Validate simulation fidelity level
     level_map = {None: 0, "frame": 0, "pulse": 1, "sample": 2}
     try:
         level_id = level_map[level]
@@ -381,21 +399,40 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
             .format(level)
         )
 
-    # Run scene simulation
-    err = mesh_sim_c.Run(
-        radar_c,
-        targets_manager,
-        level_id,
-        <float_t> density,
-        ray_filter_c,
-        back_propagating,
-        log_path_c,
-        debug)
+    # Run ideal point target simulation and mesh simulation based on device selection
+    if device_lower == "cpu":
+        # CPU execution
+        point_sim_cpu.Run(radar_c, points_manager)
+
+        # Run scene simulation
+        err = mesh_sim_cpu.Run(
+            radar_c,
+            targets_manager,
+            level_id,
+            <float_t> density,
+            ray_filter_c,
+            back_propagating,
+            log_path_c,
+            debug)
+    else:
+        # GPU execution (default)
+        point_sim_gpu.Run(radar_c, points_manager)
+
+        # Run scene simulation
+        err = mesh_sim_gpu.Run(
+            radar_c,
+            targets_manager,
+            level_id,
+            <float_t> density,
+            ray_filter_c,
+            back_propagating,
+            log_path_c,
+            debug)
+
+        radar_c.get()[0].SyncBaseband()
 
     if err:
         raise_err(err)
-
-    radar_c.get()[0].SyncBaseband()
 
     if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
         baseband = np.asarray(bb_real)
@@ -452,9 +489,12 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
         # Initialize baseband for interference calculation
         radar_c.get()[0].InitBaseband(&bb_real[0][0][0], &bb_imag[0][0][0])
 
-        # Run interference simulation
-        interf_sim_c.Run(radar_c, interf_radar_c)
-        radar_c.get()[0].SyncBaseband()
+        # Run interference simulation based on device selection
+        if device_lower == "cpu":
+            interf_sim_cpu.Run(radar_c, interf_radar_c)
+        else:
+            interf_sim_gpu.Run(radar_c, interf_radar_c)
+            radar_c.get()[0].SyncBaseband()
 
         # Extract interference data based on baseband type
         if bb_type == "real":
