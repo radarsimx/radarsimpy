@@ -51,7 +51,9 @@ from radarsimpy.includes.radarsimc cimport (
     PointSimulator,
     InterferenceSimulator,
     IsFreeTier,
-    RadarSimErrorCode
+    RadarSimErrorCode,
+    cpu_policy,
+    gpu_policy
 )
 
 # RadarSimX library components
@@ -257,9 +259,9 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
 
     # Simulator instances
     cdef:
-        MeshSimulator[double, float_t] mesh_sim_c
-        PointSimulator[double, float_t] point_sim_c
-        InterferenceSimulator[double, float_t] interf_sim_c
+        MeshSimulator[double, float_t, gpu_policy] mesh_sim_c
+        PointSimulator[double, float_t, gpu_policy] point_sim_c
+        InterferenceSimulator[double, float_t, gpu_policy] interf_sim_c
 
     # Size and index variables
     cdef:

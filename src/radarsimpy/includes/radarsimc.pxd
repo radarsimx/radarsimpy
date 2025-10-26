@@ -48,6 +48,41 @@ from radarsimpy.includes.rsvector cimport Vec3, Vec2
 from radarsimpy.includes.type_def cimport int_t, vector
 
 #------------------------------------------------------------------------------
+# Execution Policy
+# Template-based execution policy for CPU/GPU selection
+#------------------------------------------------------------------------------
+cdef extern from "core/execution_policy.hpp" namespace "radarsimx":
+    # Base execution policy tag
+    cdef cppclass execution_policy_base:
+        pass
+    
+    # CPU execution policy
+    cdef cppclass cpu_policy(execution_policy_base):
+        @staticmethod
+        bool is_gpu
+        @staticmethod
+        bool is_cpu
+        @staticmethod
+        const char* name()
+        @staticmethod
+        int device_id()
+    
+    # GPU execution policy  
+    cdef cppclass gpu_policy(execution_policy_base):
+        @staticmethod
+        bool is_gpu
+        @staticmethod
+        bool is_cpu
+        @staticmethod
+        const char* name()
+        @staticmethod
+        int device_id()
+    
+    # Global policy instances
+    cdef cpu_policy cpu
+    cdef gpu_policy gpu
+
+#------------------------------------------------------------------------------
 # Memory Management Utilities
 # Memory management utilities for efficient data transfer between Python and C++
 #------------------------------------------------------------------------------
@@ -263,7 +298,7 @@ cdef extern from "radar.hpp":
 # Usage: For fast simulation of simple point scatterers with known RCS values.
 # Suitable for initial design verification and Monte Carlo analysis.
 cdef extern from "simulator_point.hpp":
-    cdef cppclass PointSimulator[H, L]:
+    cdef cppclass PointSimulator[H, L, ExecutionPolicy]:
         PointSimulator() except +
         
         # Run point target simulation
@@ -275,7 +310,7 @@ cdef extern from "simulator_point.hpp":
 # Usage: For realistic simulation of complex targets with detailed geometry.
 # Supports multiple fidelity levels and material properties.
 cdef extern from "simulator_mesh.hpp":
-    cdef cppclass MeshSimulator[H, L]:
+    cdef cppclass MeshSimulator[H, L, ExecutionPolicy]:
         MeshSimulator() except +
         
         # Run mesh simulation with configurable fidelity
@@ -293,7 +328,7 @@ cdef extern from "simulator_mesh.hpp":
 # Usage: For analyzing interference between co-located or nearby radar systems.
 # Essential for spectrum management and coexistence studies.
 cdef extern from "simulator_interference.hpp":
-    cdef cppclass InterferenceSimulator[H, L]:
+    cdef cppclass InterferenceSimulator[H, L, ExecutionPolicy]:
         InterferenceSimulator() except +
         
         # Run interference simulation
