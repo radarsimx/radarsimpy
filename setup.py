@@ -178,10 +178,12 @@ class BuildConfig:
         Sets up macros for compilation including NumPy compatibility,
         free tier, and CUDA support based on configuration.
         """
-        self.macros = [("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")]
+        self.macros: List[tuple[str, Optional[str]]] = [
+            ("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")
+        ]
 
         if self.is_free:
-            self.macros.append(("_FREETIER_", 1))
+            self.macros.append(("_FREETIER_", "1"))
 
         if self.is_gpu:
             self.macros.append(("_CUDA_", None))
