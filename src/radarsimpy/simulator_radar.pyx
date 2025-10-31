@@ -214,6 +214,12 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
 
         - ``"gpu"``: Execute simulation on GPU using CUDA (if available, falls back to CPU).
         - ``"cpu"``: Execute simulation on CPU only.
+        
+        .. note::
+            **Performance Consideration**: When using a GPU-compiled module with ``device="cpu"``, 
+            OpenMP parallelization is not available for CPU execution, resulting in slower 
+            performance compared to a CPU-only compiled module. For optimal CPU performance, 
+            use a module compiled without GPU support.
     :param str or None log_path:
         Path to save ray-tracing data. Default: ``None`` (does not save data).
     :param bool debug:
