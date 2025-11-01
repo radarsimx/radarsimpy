@@ -398,7 +398,9 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
     # Run ideal point target simulation and mesh simulation based on device selection
     if device_lower == "cpu":
         # CPU execution
-        point_sim_cpu.Run(radar_c, points_manager)
+        err = point_sim_cpu.Run(radar_c, points_manager)
+        if err:
+            raise_err(err)
 
         # Run scene simulation
         err = mesh_sim_cpu.Run(
@@ -410,9 +412,13 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
             back_propagating,
             log_path_c,
             debug)
+        if err:
+            raise_err(err)
     else:
         # GPU execution (default)
-        point_sim_gpu.Run(radar_c, points_manager)
+        err = point_sim_gpu.Run(radar_c, points_manager)
+        if err:
+            raise_err(err)
 
         # Run scene simulation
         err = mesh_sim_gpu.Run(
@@ -424,11 +430,10 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
             back_propagating,
             log_path_c,
             debug)
+        if err:
+            raise_err(err)
 
         radar_c.get()[0].SyncBaseband()
-
-    if err:
-        raise_err(err)
 
     if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
         baseband = np.asarray(bb_real)

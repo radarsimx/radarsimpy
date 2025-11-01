@@ -302,8 +302,8 @@ cdef extern from "simulator_point.hpp":
         PointSimulator() except +
         
         # Run point target simulation
-        void Run(const shared_ptr[Radar[H, L]] & radar,                 # Radar configuration
-                 const shared_ptr[PointsManager[L]] & points_manager)   # Array of point targets
+        RadarSimErrorCode Run(const shared_ptr[Radar[H, L]] & radar,                 # Radar configuration
+                              const shared_ptr[PointsManager[L]] & points_manager)   # Array of point targets
 
 # Mesh-based Ray Tracing Simulation
 # Physics-based 3D mesh target simulation using ray tracing and physical optics
