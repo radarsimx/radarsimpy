@@ -143,8 +143,8 @@ cdef inline raise_err(RadarSimErrorCode err):
 cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=None, interf_frame_time=None,
                 ray_filter=None, back_propagating=False, device="gpu", log_path=None, debug=False):
     """
-    sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=None, interf_frame_time=None,
-              ray_filter=None, back_propagating=False, device="gpu", log_path=None, debug=False)
+    sim_radar(radar, targets, density=1, level=None, interf=None, ray_filter=None,
+              back_propagating=False, device="gpu", log_path=None, debug=False)
 
     Simulates the radar's baseband response for a given scene.
 
@@ -181,11 +181,6 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
         *Note*: Target parameters can be time-varying by using ``Radar.timestamp``. For example:
         ``location = (1e-3 * np.sin(2 * np.pi * 1 * radar.timestamp), 0, 0)``
 
-    :param float or list frame_time:
-        **DEPRECATED**: This parameter has been moved to the Radar constructor and is no longer used. 
-        **This parameter is ignored and will be removed in a future version.** 
-        Set frame_time when creating the Radar object: ``Radar(transmitter, receiver, frame_time=your_value)``.
-        Default: ``None`` (ignored).
     :param float density:
         Ray density, defined as the number of rays per wavelength. Default: ``1.0``.
     :param str or None level:
@@ -196,11 +191,6 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
         - ``"sample"``: Perform ray-tracing for each sample.
     :param Radar or None interf:
         Interference radar object. Default: ``None``.
-    :param float or list or None interf_frame_time:
-        **DEPRECATED**: This parameter has been moved to the Radar constructor and is no longer used. 
-        **This parameter is ignored and will be removed in a future version.** 
-        Frame times for interference radar simulation. If None, uses the same frame_time as the main radar.
-        Default: ``None``.
     :param list or None ray_filter:
         Filters rays based on the number of reflections.
         Only rays with the number of reflections between ``ray_filter[0]``
