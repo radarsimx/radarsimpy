@@ -35,4 +35,31 @@ All notable changes to this project will be documented in this file.
 
 ## [14.0.0] - 2025-09-29
 
-Initial tracked release.
+### Added
+
+- Smart pointer-based memory management across all radar components
+- Automatic resource handling with RAII patterns
+- Modern C++ architecture for safer GPU memory usage
+
+### Changed
+
+- Upgraded to `std::shared_ptr` for transmitter, receiver, and radar objects
+- Improved API design for radar configuration and channel setup
+- Enhanced performance and modularity in simulation components
+- Optimized simulation loops for better efficiency
+- Improved internal testing structure and CI configurations
+
+### Deprecated
+
+- `frame_time` parameter in `sim_radar()` (use new timestamp logic via `Radar` constructor)
+
+### Removed
+
+- Manual memory cleanup routines (replaced by automatic RAII)
+- Redundant code in simulation engine
+
+### Fixed
+
+- Error code handling in Python bindings
+- Memory management issues in GPU operations
+- Resource leaks in radar component lifecycle
