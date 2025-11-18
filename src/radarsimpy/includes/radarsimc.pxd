@@ -288,6 +288,9 @@ cdef extern from "radar.hpp":
         void InitBaseband(H *bb_real,                            # Real baseband buffer
                           H *bb_imag) except +                   # Imaginary baseband buffer
         void SyncBaseband() except +                             # Synchronize device memory
+        
+        # Radar properties
+        int sample_size_                                         # Number of samples per pulse
 
 #------------------------------------------------------------------------------
 # Simulation Engines

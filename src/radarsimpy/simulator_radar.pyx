@@ -360,6 +360,22 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
 
     radar_c = cp_Radar(radar, frame_start_time)
 
+    # Validate samples_per_pulse consistency between Python and C++
+    cdef int_t cpp_samples_per_pulse = radar_c.get()[0].sample_size_
+    cdef int_t py_samples_per_pulse = radar.sample_prop["samples_per_pulse"]
+    if cpp_samples_per_pulse != py_samples_per_pulse:
+        raise ValueError(
+            f"\nSamples Per Pulse Mismatch\n"
+            f"-------------------------\n"
+            f"Inconsistency detected between Python and C++ radar configurations.\n\n"
+            f"Python samples_per_pulse: {py_samples_per_pulse}\n"
+            f"C++ sample_size_:         {cpp_samples_per_pulse}\n\n"
+            f"This typically occurs when:\n"
+            f"1. The pulse_length * sampling_frequency calculation differs between implementations\n"
+            f"2. Rounding methods (ceil vs int) are inconsistent\n\n"
+            f"Please ensure both implementations use the same calculation method."
+        )
+
     cdef double[:,:,::1] bb_real = np.empty(ts_shape, order='C', dtype=np.float64)
     cdef double[:,:,::1] bb_imag = np.empty(ts_shape, order='C', dtype=np.float64)
 
