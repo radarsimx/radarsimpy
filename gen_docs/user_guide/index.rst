@@ -9,5 +9,6 @@ User Guide
    dependence
    installation
    coordinate
+   conventions
    examples
    build
