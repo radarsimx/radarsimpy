@@ -25,7 +25,7 @@ Before building RadarSimPy, ensure you have the following installed:
 **Platform-Specific Requirements**
 
 - **Windows**: Visual Studio 2022 or later with "Desktop development with C++" workload
-- **Linux**: GCC 11+ or Clang 13+
+- **Linux**: GCC 11+
 - **MacOS**: Xcode Command Line Tools (Clang 13+)
 
 **For GPU Version**
