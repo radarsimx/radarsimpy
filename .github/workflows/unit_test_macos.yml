@@ -26,7 +26,7 @@
 #
 # Requirements:
 #   - RADARSIMC SSH key secret for submodule access
-#   - Xcode 15.2 (x64), Xcode 16.4 (arm64), CMake, GCC/Clang, and Python dependencies
+#   - Xcode 16.4 (x64), Xcode 16.4 (arm64), CMake, GCC/Clang, and Python dependencies
 #   - build.sh script
 #
 # ==============================================================================
@@ -47,40 +47,40 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # MacOS x64, GCC-14, Xcode 15.2
+          # MacOS x64, GCC-14, Xcode 16.4
           - arch: x64
-            runner: macos-13
+            runner: macos-15-intel
             c_compiler: gcc-14
             cxx_compiler: g++-14
-            xcode: "15.2"
+            xcode: "16.4"
             os_label: macosx64
             python-version: "3.9"
           - arch: x64
-            runner: macos-13
+            runner: macos-15-intel
             c_compiler: gcc-14
             cxx_compiler: g++-14
-            xcode: "15.2"
+            xcode: "16.4"
             os_label: macosx64
             python-version: "3.10"
           - arch: x64
-            runner: macos-13
+            runner: macos-15-intel
             c_compiler: gcc-14
             cxx_compiler: g++-14
-            xcode: "15.2"
+            xcode: "16.4"
             os_label: macosx64
             python-version: "3.11"
           - arch: x64
-            runner: macos-13
+            runner: macos-15-intel
             c_compiler: gcc-14
             cxx_compiler: g++-14
-            xcode: "15.2"
+            xcode: "16.4"
             os_label: macosx64
             python-version: "3.12"
           - arch: x64
-            runner: macos-13
+            runner: macos-15-intel
             c_compiler: gcc-14
             cxx_compiler: g++-14
-            xcode: "15.2"
+            xcode: "16.4"
             os_label: macosx64
             python-version: "3.13"
           # MacOS arm64, Clang, Xcode 16.4
