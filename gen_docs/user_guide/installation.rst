@@ -1,12 +1,12 @@
 Installation
 ============
 
-RadarSimPy can be installed using pre-built binaries or built from source. Most users should use the pre-built modules for quick installation.
+RadarSimPy is distributed as a pre-built module for easy installation across Windows, Linux, and MacOS platforms.
 
 Quick Start
 -----------
 
-This is the fastest and easiest way to get started with RadarSimPy.
+Follow these steps to install RadarSimPy:
 
 **Installation Steps**
 
@@ -89,3 +89,9 @@ You should see output similar to:
 
     RadarSimPy version: 14.x.x
 
+Building from Source
+---------------------
+
+Building ``radarsimpy`` requires access to the source code of ``radarsimcpp``. If you don't have access to ``radarsimcpp``, please use the `pre-built module <https://radarsimx.com/product/radarsimpy/>`_. 
+
+For organizations seeking full source code access for customization or advanced integration, please submit a `Quote for Source Code <https://radarsimx.com/quote-for-source-code/>`_.

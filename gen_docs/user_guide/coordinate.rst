@@ -43,7 +43,7 @@ The local coordinate system defines object-specific reference frames using Euler
 
 **Euler Angle Rotations**
 
-Rotations are applied in the order: yaw → pitch → roll (Z-Y-X convention).
+Rotations in RadarSimPy are specified using the configuration array: ``[yaw, pitch, roll]``. Rotations are applied in the order: yaw → pitch → roll (Z-Y-X convention).
 
 - **yaw** (deg): Rotation about the z-axis
   
@@ -59,6 +59,13 @@ Rotations are applied in the order: yaw → pitch → roll (Z-Y-X convention).
   
   - Positive roll rotates the positive y-axis toward the positive z-axis
   - Range: -180° to 180°
+
+**Example Configuration**
+
+.. code-block:: python
+
+   # Define rotation: 45° yaw, 10° pitch, 5° roll
+   rotation = [45, 10, 5]
 
 **Origin**
 

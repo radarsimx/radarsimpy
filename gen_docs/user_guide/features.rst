@@ -1,50 +1,143 @@
 Key Features
 ============
 
-Radar Modeling
---------------
+RadarSimPy provides comprehensive tools for radar system modeling, simulation, and signal processing. This page outlines the core capabilities available in the library.
 
-**Radar Transceiver Modeling**
+Radar System Modeling
+---------------------
 
-* Arbitrary waveform (CW, FMCW, PMCW, Pulse, ...)
-* Phase noise
-* Phase/amplitude modulation (CDM, FDM, DDM, TDM, ...)
-* Fast-time/slow-time modulation
+**Transceiver Configuration**
 
-Simulation
-----------
+RadarSimPy supports flexible radar transceiver modeling with:
 
-* Radar baseband data from point targets
-* Radar baseband data from 3D modeled objects/environment
-* Interference simulation
-* Target's RCS simulation
-* LiDAR point cloud from 3D modeled objects/environment
+* **Arbitrary Waveforms** - Full support for various radar waveforms:
+  
+  * Continuous Wave (CW)
+  * Frequency Modulated Continuous Wave (FMCW)
+  * Phase Modulated Continuous Wave (PMCW)
+  * Pulsed radar waveforms
+  * Custom user-defined waveforms
 
-Signal Processing
------------------
+* **Phase Noise Modeling** - Simulate realistic oscillator phase noise effects on radar performance
 
-**Range/Doppler Processing**
+* **Modulation Schemes** - Multiple modulation techniques for MIMO and multi-channel systems:
+  
+  * Code Division Multiplexing (CDM)
+  * Frequency Division Multiplexing (FDM)
+  * Doppler Division Multiplexing (DDM)
+  * Time Division Multiplexing (TDM)
+  * Hybrid modulation schemes
 
-* Direction of arrival (DoA) estimation
-* Multiple techniques for ULA DoA estimation:
+* **Signal Modulation** - Advanced modulation capabilities:
+  
+  * Fast-time modulation (pulse-to-pulse variation)
+  * Slow-time modulation (across radar frames)
+  * Amplitude and phase control
 
-  * MUltiple SIgnal Classification (MUSIC)
-  * Root-MUSIC
-  * Estimation of Signal Parameters via Rational Invariance Techniques (ESPRIT)
+Radar Simulation Capabilities
+------------------------------
 
-* Iterative Adaptive Approach (IAA) for amplitude and phase estimation
+**Target Simulation**
 
-**Beamforming**
+* **Point Target Simulation** - Generate radar baseband data from point scatterers with configurable:
+  
+  * Position, velocity, and acceleration
+  * Radar cross-section (RCS)
+  * Multi-path and reflection effects
 
-* Capon beamformer
-* Bartlett beamformer
+* **3D Object Simulation** - High-fidelity simulation from 3D mesh models:
+  
+  * Support for common 3D formats (STL, OBJ, PLY, etc.)
+  * Ray-tracing based electromagnetic scattering
+  * Dynamic object motion and articulation
+  * Complex scene environments with multiple objects
 
-**CFAR Processing**
+* **RCS Calculation** - Compute monostatic and bistatic radar cross-sections for 3D models across:
+  
+  * Multiple frequencies
+  * Various aspect angles
+  * Polarization configurations
 
-* 1D/2D cell-averaging CFAR (CA-CFAR)
-* 1D/2D ordered-statistic CFAR (OS-CFAR)
+**Interference Simulation**
 
-Characterization
-----------------
+* Model radar-to-radar interference scenarios
+* Evaluate mutual interference effects in dense radar environments
+* Support for both intra-vehicle and inter-vehicle interference
 
-* Radar detection characteristics based on Swerling's models
+**LiDAR Simulation**
+
+* Generate realistic LiDAR point clouds from 3D environments
+* Configurable sensor parameters (resolution, field of view)
+
+Signal Processing Toolkit
+--------------------------
+
+**Range-Doppler Processing**
+
+RadarSimPy includes optimized algorithms for standard radar signal processing:
+
+* **FFT-based Range Processing** - Fast Fourier Transform for range compression
+* **Doppler Processing** - Coherent integration and velocity estimation
+* **2D Range-Doppler Maps** - Generate and visualize range-Doppler spectra
+
+**Direction of Arrival (DoA) Estimation**
+
+Advanced DoA estimation for uniform linear arrays (ULA):
+
+* **MUSIC Algorithm** - MUltiple SIgnal Classification for super-resolution angle estimation
+* **Root-MUSIC** - Polynomial-rooting variant for improved computational efficiency
+* **ESPRIT Algorithm** - Estimation of Signal Parameters via Rotational Invariance Techniques
+* **Iterative Adaptive Approach (IAA)** - High-resolution amplitude and phase estimation with excellent sidelobe suppression
+
+**Beamforming Techniques**
+
+* **Capon Beamformer** - Minimum variance distortionless response (MVDR) for optimal interference rejection
+* **Bartlett Beamformer** - Conventional delay-and-sum beamforming
+
+**CFAR Detection**
+
+Constant False Alarm Rate (CFAR) detectors for automatic target detection:
+
+* **CA-CFAR** - Cell-Averaging CFAR for homogeneous clutter
+  
+  * 1D implementation for range or Doppler
+  * 2D implementation for range-Doppler maps
+
+* **OS-CFAR** - Ordered-Statistic CFAR for heterogeneous environments
+  
+  * 1D implementation for range or Doppler
+  * 2D implementation for range-Doppler maps
+  * Improved performance in multi-target scenarios and clutter edges
+
+Radar Performance Characterization
+-----------------------------------
+
+**Detection Analysis**
+
+* **Swerling Target Models** - Evaluate radar detection performance using statistical target models:
+  
+  * Swerling Case I - Constant RCS (one scan)
+  * Swerling Case II - Variable RCS (pulse-to-pulse)
+  * Swerling Case III - Dominant constant scatterer
+  * Swerling Case IV - Dominant variable scatterer
+  * Swerling Case V - Non-fluctuating targets
+
+* **Probability of Detection (Pd)** - Calculate detection probabilities for given:
+  
+  * Signal-to-noise ratio (SNR)
+  * Probability of false alarm (Pfa)
+  * Number of pulses integrated
+  * Target fluctuation model
+
+Performance Considerations
+--------------------------
+
+RadarSimPy leverages optimized C++ implementations for computationally intensive operations, providing:
+
+* **High-speed simulations** suitable for Monte Carlo analysis
+* **Multi-threaded processing** for parallel computation
+* **Efficient memory management** for large-scale scenarios
+* **GPU acceleration** support (where applicable)
+
+.. note::
+   For detailed API documentation and usage examples, refer to the :doc:`../api/index` and :doc:`examples` sections.
