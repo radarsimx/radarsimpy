@@ -1,15 +1,17 @@
 Doppler Sign Convention
 =======================
 
-RadarSimPy follows the automotive radar convention for Doppler frequency sign:
+.. important::
 
-* **Negative Doppler frequency**: Target moving **towards** the radar (closing velocity)
-* **Positive Doppler frequency**: Target moving **away from** the radar (opening velocity)
+   **RadarSimPy Implementation**: RadarSimPy follows the automotive radar convention for Doppler frequency sign:
 
-This convention is commonly used in automotive radar applications and differs from some other radar systems.
+   * **Negative Doppler frequency**: Target moving **towards** the radar (closing velocity)
+   * **Positive Doppler frequency**: Target moving **away from** the radar (opening velocity)
 
-Mathematical Definition
------------------------
+   This convention is commonly used in automotive radar applications and differs from some other radar systems.
+
+Definition
+----------
 
 The Doppler frequency shift is defined as:
 
@@ -52,10 +54,14 @@ A vehicle moving away from the radar at 20 m/s with a 24 GHz radar:
 * Wavelength: :math:`\lambda = \frac{3 \times 10^8}{24 \times 10^9} = 12.5` mm
 * Doppler frequency: :math:`f_d = \frac{2 \times 20}{0.0125} = +3.2` kHz (positive)
 
-Why Automotive Radar Uses This Convention
------------------------------------------
+Background
+----------
 
-The sign convention in automotive radar stems from the baseband mixing process used in coherent radar systems. RadarSimPy models this same mixing process in its backend to accurately reflect real-world automotive radar behavior.
+The sign convention in automotive radar stems from the baseband mixing process used in coherent radar systems.
+
+.. note::
+
+   **RadarSimPy Implementation**: RadarSimPy models this same mixing process in its backend to accurately reflect real-world automotive radar behavior, using the RX × TX\* (receive × transmit conjugate) convention.
 
 **Baseband Mixing**
 
@@ -98,16 +104,18 @@ The received signal phase evolves as:
 
 For approaching targets (:math:`v_r < 0`), the phase decreases with time, resulting in a negative frequency shift in the spectrum.
 
-Converting to Other Conventions
--------------------------------
+Convention Conversion
+---------------------
 
-For radar applications that require positive Doppler for approaching targets (such as defense or aerospace systems), you can convert the sign convention by taking the complex conjugate of the baseband signal:
+.. tip::
 
-.. math::
+   **RadarSimPy Usage**: For radar applications that require positive Doppler for approaching targets (such as defense or aerospace systems), you can convert the sign convention by taking the complex conjugate of the baseband signal:
 
-   b_{converted}(t) = b^*(t)
+   .. math::
 
-This flips the sign of all Doppler frequencies, converting negative Doppler (approaching) to positive Doppler. Apply this conjugation to the raw baseband signal before any signal processing.
+      b_{converted}(t) = b^*(t)
+
+   This flips the sign of all Doppler frequencies, converting negative Doppler (approaching) to positive Doppler. Apply this conjugation to the raw baseband signal before any signal processing.
 
 Summary
 -------
