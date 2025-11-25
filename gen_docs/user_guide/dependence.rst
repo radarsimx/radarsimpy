@@ -10,7 +10,7 @@ Python Requirements
 
 RadarSimPy requires the following Python packages:
 
-* **Python** >= 3.9 (Python 3.10 or 3.11 recommended for best performance)
+* **Python** >= 3.9
 * **NumPy** >= 2.0 - Numerical computing and array operations
 * **SciPy** >= 1.11.0 - Scientific computing and signal processing algorithms
 
