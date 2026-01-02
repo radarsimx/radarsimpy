@@ -286,8 +286,8 @@ def validate_build_environment(tier: str, arch: str) -> List[str]:
     errors = []
 
     # Check Python version
-    if sys.version_info < (3, 9):
-        errors.append(f"Python 3.9+ required, found {sys.version}")
+    if sys.version_info < (3, 10):
+        errors.append(f"Python 3.10+ required, found {sys.version}")
 
     # Check dependencies
     deps_ok, missing = check_dependencies()

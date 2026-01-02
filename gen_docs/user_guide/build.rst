@@ -17,7 +17,7 @@ Before building RadarSimPy, ensure you have the following installed:
 
 **Common Requirements**
 
-- Python >= 3.9
+- Python >= 3.10
 - CMake >= 3.20
 - Git (for cloning repositories)
 - C++ compiler with C++20 support

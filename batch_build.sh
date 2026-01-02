@@ -35,7 +35,7 @@
 
 # Configuration
 SCRIPT_VERSION="2.0"
-PYTHON_VERSIONS="py39 py310 py311 py312 py313"
+PYTHON_VERSIONS="py310 py311 py312 py313 py314"
 BUILD_LOG_DATE=$(date +%Y%m%d)
 BUILD_LOG_TIME=$(date +%H%M%S)
 BUILD_LOG="$(dirname "$(readlink -f "$0")")/build_logs/linux_batch_build_log_${BUILD_LOG_DATE}_${BUILD_LOG_TIME}.log"

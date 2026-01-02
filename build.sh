@@ -13,7 +13,7 @@
 # REQUIREMENTS:
 #   Linux:
 #   - CMake 3.18 or higher
-#   - Python 3.9 or higher
+#   - Python 3.10 or higher
 #   - GCC/G++ compiler
 #   - CUDA toolkit (for GPU builds)
 #   - Python packages: check requirements.txt for details
@@ -21,7 +21,7 @@
 #   macOS:
 #   - Xcode Command Line Tools
 #   - CMake 3.18 or higher
-#   - Python 3.9 or higher
+#   - Python 3.10 or higher
 #   - Clang/Clang++ compiler
 #   - Python packages: check requirements.txt for details
 #

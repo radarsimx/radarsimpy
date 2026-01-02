@@ -315,7 +315,7 @@ jobs:
 
           - **Total Builds**: 12 (packaged into 2 ZIP files)
           - **Architecture**: x64
-          - **Python Versions**: 3.9, 3.10, 3.11, 3.12, 3.13, 3.14
+          - **Python Versions**: 3.10, 3.11, 3.12, 3.13, 3.14
           - **Tiers**: Standard (full features), Trial (limited features)
           - **Build Date**: $(date)
 

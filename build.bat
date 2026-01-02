@@ -14,7 +14,7 @@ REM
 REM REQUIREMENTS:
 REM   - CMake 3.18 or higher
 REM   - Visual Studio 2017 or later (with C++ tools) or Visual Studio Build Tools
-REM   - Python 3.9 or higher
+REM   - Python 3.10 or higher
 REM   - MSVC compiler (automatically detected via vswhere)
 REM   - CUDA toolkit (for GPU builds)
 REM   - Python packages: check requirements.txt for details
@@ -224,7 +224,7 @@ REM Validate build environment
     python --version >nul 2>&1
     if %errorlevel% neq 0 (
         echo ERROR: Python is not installed or not in PATH
-        echo Please install Python 3.9 or higher
+        echo Please install Python 3.10 or higher
         set MISSING_DEPS=1
     ) else (
         echo INFO: Python found and available

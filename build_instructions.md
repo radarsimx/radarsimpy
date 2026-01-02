@@ -64,7 +64,7 @@ radarsimpy/
 
 ### System Requirements
 
-- **Python**: 3.9 or higher
+- **Python**: 3.10 or higher
 - **CMake**: 3.20 or higher
 - **C++ Compiler**: Support for C++20 or higher
 

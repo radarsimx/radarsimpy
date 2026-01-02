@@ -533,7 +533,7 @@ jobs:
           - **Total Builds**: 24 (packaged into 8 files: 4 ZIP + 4 tar.gz)
           - **Ubuntu Versions**: 22.04 LTS, 24.04 LTS
           - **Architecture**: x86_64
-          - **Python Versions**: 3.9, 3.10, 3.11, 3.12, 3.13, 3.14
+          - **Python Versions**: 3.10, 3.11, 3.12, 3.13, 3.14
           - **Tiers**: Standard (full features), Trial (limited features)
           - **Formats**: ZIP and tar.gz for maximum compatibility
           - **Build Date**: $(date)
