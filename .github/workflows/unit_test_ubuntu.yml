@@ -11,7 +11,7 @@
 #   - Pull requests targeting master branch
 #
 # Test Matrix:
-#   - Python versions: 3.9, 3.10, 3.11, 3.12, 3.13
+#   - Python versions: 3.9, 3.10, 3.11, 3.12, 3.13, 3.14
 #   - Platform: Ubuntu 22.04, Ubuntu 24.04
 #   - Compilers: GCC-11 (22.04), GCC-13 (24.04)
 #   - Architecture: x64 (CPU-only builds)
@@ -74,6 +74,11 @@ jobs:
             cxx_compiler: g++-11
             os_label: ubuntu22
             python-version: "3.13"
+          - runner: ubuntu-22.04
+            c_compiler: gcc-11
+            cxx_compiler: g++-11
+            os_label: ubuntu22
+            python-version: "3.14"
           # Ubuntu 24.04, GCC-13
           - runner: ubuntu-24.04
             c_compiler: gcc-13
@@ -100,6 +105,11 @@ jobs:
             cxx_compiler: g++-13
             os_label: ubuntu24
             python-version: "3.13"
+          - runner: ubuntu-24.04
+            c_compiler: gcc-13
+            cxx_compiler: g++-13
+            os_label: ubuntu24
+            python-version: "3.14"
 
     steps:
       - name: Checkout repository

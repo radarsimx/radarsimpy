@@ -11,7 +11,7 @@
 #   - Pull requests targeting master branch
 #
 # Test Matrix:
-#   - Python versions: 3.9, 3.10, 3.11, 3.12, 3.13
+#   - Python versions: 3.9, 3.10, 3.11, 3.12, 3.13, 3.14
 #   - Platform: Windows Latest (windows-latest runner)
 #   - Architecture: x64 (CPU-only builds)
 #

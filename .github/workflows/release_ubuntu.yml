@@ -7,11 +7,11 @@ name: Release on Ubuntu
 # to provide comprehensive Linux coverage with different GCC compiler versions.
 #
 # Build Matrix:
-# - Ubuntu 22.04 LTS: GCC-11 compiler, 10 builds (5 Python × 2 tiers)
-# - Ubuntu 24.04 LTS: GCC-13 compiler, 10 builds (5 Python × 2 tiers)
-# - Python versions: 3.9, 3.10, 3.11, 3.12, 3.13
+# - Ubuntu 22.04 LTS: GCC-11 compiler, 12 builds (6 Python × 2 tiers)
+# - Ubuntu 24.04 LTS: GCC-13 compiler, 12 builds (6 Python × 2 tiers)
+# - Python versions: 3.9, 3.10, 3.11, 3.12, 3.13, 3.14
 # - Build tiers: standard (full features), free (limited features)
-# - Total builds: 20
+# - Total builds: 24
 #
 # Features:
 # - Comprehensive caching (pip, ccache)
@@ -88,6 +88,13 @@ jobs:
             tier: standard
             arch: cpu
             artifact_name: radarsimpy_ubuntu_22_04_py3.13
+          - os: ubuntu-22.04
+            python-version: "3.14"
+            c_compiler: gcc-11
+            cxx_compiler: g++-11
+            tier: standard
+            arch: cpu
+            artifact_name: radarsimpy_ubuntu_22_04_py3.14
           # Ubuntu 22.04 with GCC-11 Free Tier builds
           - os: ubuntu-22.04
             python-version: "3.9"
@@ -124,6 +131,13 @@ jobs:
             tier: free
             arch: cpu
             artifact_name: radarsimpy_ubuntu_22_04_py3.13_freetier
+          - os: ubuntu-22.04
+            python-version: "3.14"
+            c_compiler: gcc-11
+            cxx_compiler: g++-11
+            tier: free
+            arch: cpu
+            artifact_name: radarsimpy_ubuntu_22_04_py3.14_freetier
           # Ubuntu 24.04 with GCC-13 Standard builds
           - os: ubuntu-24.04
             python-version: "3.9"
@@ -160,6 +174,13 @@ jobs:
             tier: standard
             arch: cpu
             artifact_name: radarsimpy_ubuntu_24_04_py3.13
+          - os: ubuntu-24.04
+            python-version: "3.14"
+            c_compiler: gcc-13
+            cxx_compiler: g++-13
+            tier: standard
+            arch: cpu
+            artifact_name: radarsimpy_ubuntu_24_04_py3.14
           # Ubuntu 24.04 with GCC-13 Free Tier builds
           - os: ubuntu-24.04
             python-version: "3.9"
@@ -196,6 +217,13 @@ jobs:
             tier: free
             arch: cpu
             artifact_name: radarsimpy_ubuntu_24_04_py3.13_freetier
+          - os: ubuntu-24.04
+            python-version: "3.14"
+            c_compiler: gcc-13
+            cxx_compiler: g++-13
+            tier: free
+            arch: cpu
+            artifact_name: radarsimpy_ubuntu_24_04_py3.14_freetier
 
     steps:
       - name: Checkout repository
@@ -530,10 +558,10 @@ jobs:
 
           ## Build Information
 
-          - **Total Builds**: 20 (packaged into 8 files: 4 ZIP + 4 tar.gz)
+          - **Total Builds**: 24 (packaged into 8 files: 4 ZIP + 4 tar.gz)
           - **Ubuntu Versions**: 22.04 LTS, 24.04 LTS
           - **Architecture**: x86_64
-          - **Python Versions**: 3.9, 3.10, 3.11, 3.12, 3.13
+          - **Python Versions**: 3.9, 3.10, 3.11, 3.12, 3.13, 3.14
           - **Tiers**: Standard (full features), Trial (limited features)
           - **Formats**: ZIP and tar.gz for maximum compatibility
           - **Build Date**: $(date)
@@ -573,18 +601,18 @@ jobs:
           echo "# Ubuntu Build Summary 📊" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Build Matrix Results" >> $GITHUB_STEP_SUMMARY
-          echo "Total builds: 20 (5 Python versions × 2 Ubuntu versions × 2 tiers)" >> $GITHUB_STEP_SUMMARY
+          echo "Total builds: 24 (6 Python versions × 2 Ubuntu versions × 2 tiers)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Ubuntu Version Distribution" >> $GITHUB_STEP_SUMMARY
-          echo "- **Ubuntu 22.04 LTS**: 10 builds with GCC-11" >> $GITHUB_STEP_SUMMARY
-          echo "- **Ubuntu 24.04 LTS**: 10 builds with GCC-13" >> $GITHUB_STEP_SUMMARY
+          echo "- **Ubuntu 22.04 LTS**: 12 builds with GCC-11" >> $GITHUB_STEP_SUMMARY
+          echo "- **Ubuntu 24.04 LTS**: 12 builds with GCC-13" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Tier Distribution" >> $GITHUB_STEP_SUMMARY
-          echo "- **Standard**: 10 builds" >> $GITHUB_STEP_SUMMARY
-          echo "- **Free**: 10 builds" >> $GITHUB_STEP_SUMMARY
+          echo "- **Standard**: 12 builds" >> $GITHUB_STEP_SUMMARY
+          echo "- **Free**: 12 builds" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Python Versions" >> $GITHUB_STEP_SUMMARY
-          echo "- Python 3.9, 3.10, 3.11, 3.12, 3.13" >> $GITHUB_STEP_SUMMARY
+          echo "- Python 3.9, 3.10, 3.11, 3.12, 3.13, 3.14" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Packed Artifacts" >> $GITHUB_STEP_SUMMARY
           if [ "${{ needs.build.result }}" == "success" ]; then
@@ -592,7 +620,7 @@ jobs:
             echo "- Archive: \`radarsimpy_ubuntu_cpu_all_builds\`" >> $GITHUB_STEP_SUMMARY
             echo "- Formats: tar.gz, zip" >> $GITHUB_STEP_SUMMARY
             echo "- Structure: 8 files (2 Ubuntu versions × 2 tiers × 2 formats)" >> $GITHUB_STEP_SUMMARY
-            echo "- Contains: All 20 build variants organized by Ubuntu version and tier" >> $GITHUB_STEP_SUMMARY
+            echo "- Contains: All 24 build variants organized by Ubuntu version and tier" >> $GITHUB_STEP_SUMMARY
           else
             echo "⚠️ **Artifact packing failed or was skipped**" >> $GITHUB_STEP_SUMMARY
           fi

@@ -12,7 +12,7 @@
 #   - Pull requests targeting master branch
 #
 # Test Matrix:
-#   - Python versions: 3.9, 3.10, 3.11, 3.12, 3.13
+#   - Python versions: 3.9, 3.10, 3.11, 3.12, 3.13, 3.14
 #   - Platform: MacOS 13 (x64), MacOS 15 (ARM64)
 #   - Compilers: GCC/G++ (x64), Clang/Clang++ (ARM64)
 #   - Architecture: x64, arm64 (CPU-only builds)
@@ -83,6 +83,13 @@ jobs:
             xcode: "16.4"
             os_label: macosx64
             python-version: "3.13"
+          - arch: x64
+            runner: macos-15-intel
+            c_compiler: gcc-14
+            cxx_compiler: g++-14
+            xcode: "16.4"
+            os_label: macosx64
+            python-version: "3.14"
           # MacOS arm64, Clang, Xcode 16.4
           - arch: arm64
             runner: macos-15
@@ -119,6 +126,13 @@ jobs:
             xcode: "16.4"
             os_label: macosarm64
             python-version: "3.13"
+          - arch: arm64
+            runner: macos-15
+            c_compiler: clang
+            cxx_compiler: clang++
+            xcode: "16.4"
+            os_label: macosarm64
+            python-version: "3.14"
 
     steps:
       - name: Checkout repository

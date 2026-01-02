@@ -7,10 +7,10 @@ name: Release on Windows
 # MSVC compiler and provides comprehensive Windows-specific optimizations.
 #
 # Build Matrix:
-# - Windows x64: MSVC compiler, 10 builds (5 Python × 2 tiers)
-# - Python versions: 3.9, 3.10, 3.11, 3.12, 3.13
+# - Windows x64: MSVC compiler, 12 builds (6 Python × 2 tiers)
+# - Python versions: 3.9, 3.10, 3.11, 3.12, 3.13, 3.14
 # - Build tiers: standard (full features), free (limited features)
-# - Total builds: 10
+# - Total builds: 12
 #
 # Features:
 # - Comprehensive caching (pip)
@@ -71,6 +71,10 @@ jobs:
             tier: standard
             arch: cpu
             artifact_name: radarsimpy_windows_py3.13
+          - python-version: "3.14"
+            tier: standard
+            arch: cpu
+            artifact_name: radarsimpy_windows_py3.14
           # Windows Free Tier builds
           - python-version: "3.9"
             tier: free
@@ -92,6 +96,10 @@ jobs:
             tier: free
             arch: cpu
             artifact_name: radarsimpy_windows_py3.13_freetier
+          - python-version: "3.14"
+            tier: free
+            arch: cpu
+            artifact_name: radarsimpy_windows_py3.14_freetier
 
     steps:
       - name: Checkout repository
@@ -313,9 +321,9 @@ jobs:
 
           ## Build Information
 
-          - **Total Builds**: 10 (packaged into 2 ZIP files)
+          - **Total Builds**: 12 (packaged into 2 ZIP files)
           - **Architecture**: x64
-          - **Python Versions**: 3.9, 3.10, 3.11, 3.12, 3.13
+          - **Python Versions**: 3.9, 3.10, 3.11, 3.12, 3.13, 3.14
           - **Tiers**: Standard (full features), Trial (limited features)
           - **Build Date**: $(date)
 
@@ -349,17 +357,17 @@ jobs:
           echo "# Windows Build Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Build Matrix Results" >> $GITHUB_STEP_SUMMARY
-          echo "Total builds: 10 [5 Python versions x 2 tiers]" >> $GITHUB_STEP_SUMMARY
+          echo "Total builds: 12 [6 Python versions x 2 tiers]" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Architecture Distribution" >> $GITHUB_STEP_SUMMARY
-          echo "- **Windows x64**: 10 builds on windows-latest" >> $GITHUB_STEP_SUMMARY
+          echo "- **Windows x64**: 12 builds on windows-latest" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Tier Distribution" >> $GITHUB_STEP_SUMMARY
-          echo "- **Standard**: 5 builds" >> $GITHUB_STEP_SUMMARY
-          echo "- **Free**: 5 builds" >> $GITHUB_STEP_SUMMARY
+          echo "- **Standard**: 6 builds" >> $GITHUB_STEP_SUMMARY
+          echo "- **Free**: 6 builds" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Python Versions" >> $GITHUB_STEP_SUMMARY
-          echo "- Python 3.9, 3.10, 3.11, 3.12, 3.13" >> $GITHUB_STEP_SUMMARY
+          echo "- Python 3.9, 3.10, 3.11, 3.12, 3.13, 3.14" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Packed Artifacts" >> $GITHUB_STEP_SUMMARY
           if [ "${{ needs.build.result }}" == "success" ]; then
@@ -367,7 +375,7 @@ jobs:
             echo "- Archive: \`radarsimpy_windows_cpu_all_builds\`" >> $GITHUB_STEP_SUMMARY
             echo "- Format: zip" >> $GITHUB_STEP_SUMMARY
             echo "- Structure: standard/Windows_x86_64_CPU.zip and trial/Windows_x86_64_CPU.zip" >> $GITHUB_STEP_SUMMARY
-            echo "- Contains: All 10 build variants organized by tier in separate ZIP files" >> $GITHUB_STEP_SUMMARY
+            echo "- Contains: All 12 build variants organized by tier in separate ZIP files" >> $GITHUB_STEP_SUMMARY
           else
             echo "⚠️ **Artifact packing failed or was skipped**" >> $GITHUB_STEP_SUMMARY
           fi
