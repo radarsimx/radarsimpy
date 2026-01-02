@@ -7,11 +7,11 @@ name: Release on MacOS
 # architectures to provide comprehensive macOS coverage.
 #
 # Build Matrix:
-# - macOS 13 (Intel x64): GCC-14 compiler, 12 builds (6 Python × 2 tiers)
-# - macOS 15 (Apple Silicon ARM64): Clang compiler, 12 builds (6 Python × 2 tiers)
-# - Python versions: 3.9, 3.10, 3.11, 3.12, 3.13, 3.14
+# - macOS 13 (Intel x64): GCC-14 compiler, 10 builds (5 Python × 2 tiers)
+# - macOS 15 (Apple Silicon ARM64): Clang compiler, 10 builds (5 Python × 2 tiers)
+# - Python versions: 3.10, 3.11, 3.12, 3.13, 3.14
 # - Build tiers: standard (full features), free (limited features)
-# - Total builds: 24
+# - Total builds: 20
 #
 # Features:
 # - Comprehensive caching (pip, Homebrew, ccache)
@@ -52,14 +52,6 @@ jobs:
       matrix:
         include:
           # MacOS x64 Standard builds
-          - os: macos-15-intel
-            python-version: "3.9"
-            c_compiler: gcc-14
-            cxx_compiler: g++-14
-            xcode_version: "16.4"
-            tier: standard
-            arch: cpu
-            artifact_name: radarsimpy_macos_py3.9
           - os: macos-15-intel
             python-version: "3.10"
             c_compiler: gcc-14
@@ -102,14 +94,6 @@ jobs:
             artifact_name: radarsimpy_macos_py3.14
           # MacOS x64 Free Tier builds
           - os: macos-15-intel
-            python-version: "3.9"
-            c_compiler: gcc-14
-            cxx_compiler: g++-14
-            xcode_version: "16.4"
-            tier: free
-            arch: cpu
-            artifact_name: radarsimpy_macos_py3.9_freetier
-          - os: macos-15-intel
             python-version: "3.10"
             c_compiler: gcc-14
             cxx_compiler: g++-14
@@ -151,14 +135,6 @@ jobs:
             artifact_name: radarsimpy_macos_py3.14_freetier
           # MacOS ARM64 (Apple Silicon) Standard builds
           - os: macos-15
-            python-version: "3.9"
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode_version: "16.4"
-            tier: standard
-            arch: cpu
-            artifact_name: radarsimpy_macos_arm_py3.9
-          - os: macos-15
             python-version: "3.10"
             c_compiler: clang
             cxx_compiler: clang++
@@ -199,14 +175,6 @@ jobs:
             arch: cpu
             artifact_name: radarsimpy_macos_arm_py3.14
           # MacOS ARM64 (Apple Silicon) Free Tier builds
-          - os: macos-15
-            python-version: "3.9"
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode_version: "16.4"
-            tier: free
-            arch: cpu
-            artifact_name: radarsimpy_macos_arm_py3.9_freetier
           - os: macos-15
             python-version: "3.10"
             c_compiler: clang
@@ -584,7 +552,7 @@ jobs:
 
           - **Total Builds**: 20 (packaged into 8 files: 4 ZIP + 4 tar.gz)
           - **Architectures**: x86_64 (Intel), ARM64 (Apple Silicon)
-          - **Python Versions**: 3.9, 3.10, 3.11, 3.12, 3.13, 3.14
+          - **Python Versions**: 3.10, 3.11, 3.12, 3.13, 3.14
           - **Tiers**: Standard (full features), Trial (limited features)
           - **Formats**: ZIP and tar.gz for maximum compatibility
           - **Build Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
@@ -625,18 +593,18 @@ jobs:
           echo "# macOS Build Summary 🍎" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Build Matrix Results" >> $GITHUB_STEP_SUMMARY
-          echo "Total builds: 24 (6 Python versions × 2 architectures × 2 tiers)" >> $GITHUB_STEP_SUMMARY
+          echo "Total builds: 20 (5 Python versions × 2 architectures × 2 tiers)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Architecture Distribution" >> $GITHUB_STEP_SUMMARY
-          echo "- **x64 (Intel)**: 12 builds on macos-15-intel with GCC-14" >> $GITHUB_STEP_SUMMARY
-          echo "- **ARM64 (Apple Silicon)**: 12 builds on macos-15 with Clang" >> $GITHUB_STEP_SUMMARY
+          echo "- **x64 (Intel)**: 10 builds on macos-15-intel with GCC-14" >> $GITHUB_STEP_SUMMARY
+          echo "- **ARM64 (Apple Silicon)**: 10 builds on macos-15 with Clang" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Tier Distribution" >> $GITHUB_STEP_SUMMARY
-          echo "- **Standard**: 12 builds" >> $GITHUB_STEP_SUMMARY
-          echo "- **Free**: 12 builds" >> $GITHUB_STEP_SUMMARY
+          echo "- **Standard**: 10 builds" >> $GITHUB_STEP_SUMMARY
+          echo "- **Free**: 10 builds" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Python Versions" >> $GITHUB_STEP_SUMMARY
-          echo "- Python 3.9, 3.10, 3.11, 3.12, 3.13, 3.14" >> $GITHUB_STEP_SUMMARY
+          echo "- Python 3.10, 3.11, 3.12, 3.13, 3.14" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Packed Artifacts" >> $GITHUB_STEP_SUMMARY
           if [ "${{ needs.build.result }}" == "success" ]; then

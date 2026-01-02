@@ -12,7 +12,7 @@
 #   - Pull requests targeting master branch
 #
 # Test Matrix:
-#   - Python versions: 3.9, 3.10, 3.11, 3.12, 3.13, 3.14
+#   - Python versions: 3.10, 3.11, 3.12, 3.13, 3.14
 #   - Platform: MacOS 13 (x64), MacOS 15 (ARM64)
 #   - Compilers: GCC/G++ (x64), Clang/Clang++ (ARM64)
 #   - Architecture: x64, arm64 (CPU-only builds)
