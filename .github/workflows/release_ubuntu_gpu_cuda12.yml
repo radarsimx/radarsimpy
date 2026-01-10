@@ -1,4 +1,4 @@
-name: Release on Ubuntu GPU
+name: Release on Ubuntu GPU (CUDA 12)
 
 # GitHub Actions workflow for building and packaging RadarSimPy on Ubuntu platforms.
 #

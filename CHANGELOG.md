@@ -4,6 +4,35 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [14.2.0] - 2026-01-09
+
+### Added
+
+- Python 3.14 support across all build and test matrices
+- Doppler sign convention documentation page
+- Sample size consistency check between Python and C++ implementations
+- Comprehensive documentation expansion for build, dependencies, features, and coordinate systems
+
+### Changed
+
+- Updated minimum Python requirement to 3.10+ (dropped Python 3.9 support)
+- Updated CUDA version to 13.1.0 in existing GPU workflows
+- Updated macOS x64 CI to use Xcode 16.4 and macos-15-intel
+- Expanded and clarified installation guide with platform-specific details
+- Improved coordinate system and Doppler sign convention documentation
+- Allow `prp` and `f_offset` parameters in Transmitter to accept List types
+- Updated HDF5 libs to v2.0.0
+
+### Removed
+
+- Python 3.9 from all CI build and test matrices
+
+### Fixed
+
+- Validation error when Python `samples_per_pulse` mismatches C++ `sample_size_`
+
+---
+
 ## [14.1.0] - 2025-11-12
 
 ### Added
