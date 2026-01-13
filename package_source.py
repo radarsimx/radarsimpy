@@ -22,7 +22,7 @@ import shutil
 import sys
 import zipfile
 from pathlib import Path
-from typing import List, Set
+from typing import Set
 
 
 # Color codes for terminal output
@@ -37,6 +37,7 @@ class Colors:
 
     @staticmethod
     def is_windows():
+        """Check if running on Windows platform"""
         return sys.platform == "win32"
 
     @classmethod
@@ -364,7 +365,7 @@ def main() -> int:
 
         return 0
 
-    except Exception as e:
+    except (RuntimeError, OSError, IOError, zipfile.BadZipFile) as e:
         print_error(f"Packaging failed: {e}")
         return 1
 
