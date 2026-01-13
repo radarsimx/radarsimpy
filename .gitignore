@@ -137,3 +137,4 @@ gen_docs/_build/
 *.dll
 
 debug/*
+/hdf5-analyzer
