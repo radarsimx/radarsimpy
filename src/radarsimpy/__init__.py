@@ -51,6 +51,10 @@ try:
     from .license import initialize_license, is_licensed, is_free_tier, get_license_info
 
     _simulation_available = True
+    
+    # Automatically initialize license on module import
+    # Searches for license_RadarSimPy_*.lic in module directory
+    initialize_license()
 except ImportError:
     _simulation_available = False
 
@@ -282,7 +286,10 @@ def hello():
     3. Process results:
        >>> range_doppler = rs.processing.range_doppler_fft(result['baseband'])
     
-    📚 Documentation: https://radarsimx.github.io/radarsimpy/
+    💡 License: Automatically detected from module directory (license_RadarSimPy_*.lic)
+       Or manually specify: rs.initialize_license('/path/to/license.lic')
+    
+    �📚 Documentation: https://radarsimx.github.io/radarsimpy/
     💬 Support: info@radarsimx.com
     """
     )

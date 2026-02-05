@@ -25,27 +25,50 @@ It allows checking license status and accessing license information.
 
 from libcpp.string cimport string
 from radarsimpy.includes.radarsimc cimport LicenseManager, IsFreeTier as cpp_IsFreeTier
+import os
+import glob
 
 
-def initialize_license(product_name="RadarSimPy"):
+def initialize_license(license_file_path=None):
     """
-    Initialize the license manager with a specific product name.
+    Initialize the license manager with a license file.
     
-    This searches for license files matching the pattern:
-    license_<product_name>_*.lic in the library directory.
+    If no path is provided, searches for license files matching the pattern:
+    license_RadarSimPy_*.lic in the module directory.
     
     Args:
-        product_name (str): Product name to search for (default: "RadarSimPy")
-                           Common values: "RadarSimPy", "RadarSimM"
+        license_file_path (str, optional): Path to license file. If None, searches
+                                          in the module directory for license_RadarSimPy_*.lic
     
     Example:
         >>> import radarsimpy
-        >>> radarsimpy.initialize_license("RadarSimPy")
+        >>> # Automatic search in module directory
+        >>> radarsimpy.initialize_license()
+        >>> # Or with explicit path
+        >>> radarsimpy.initialize_license("/path/to/license_RadarSimPy_customer.lic")
         >>> if radarsimpy.is_licensed():
         ...     print("Full license active")
     """
-    cdef string cpp_product_name = product_name.encode('utf-8')
-    LicenseManager.getInstance().initialize(cpp_product_name)
+    cdef string cpp_license_path
+    
+    if license_file_path is None:
+        # Search for license files in the module directory
+        module_dir = os.path.dirname(os.path.abspath(__file__))
+        pattern = os.path.join(module_dir, "license_RadarSimPy_*.lic")
+        license_files = glob.glob(pattern)
+        
+        if license_files:
+            # Use the first found license file
+            license_file_path = license_files[0]
+            cpp_license_path = license_file_path.encode('utf-8')
+        else:
+            # No license file found, pass empty string (free tier mode)
+            cpp_license_path = b""
+    else:
+        # Use provided path
+        cpp_license_path = license_file_path.encode('utf-8')
+    
+    LicenseManager.getInstance().initialize(cpp_license_path)
 
 
 def is_licensed():
