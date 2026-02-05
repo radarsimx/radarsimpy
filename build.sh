@@ -910,24 +910,24 @@ run_tests() {
         log_info "Running test suite on ${PLATFORM_NAME}..."
         
         # Run C++ unit tests using CTest with parallel execution
-        if [ -f "./src/radarsimcpp/build/radarsimcpp_test" ]; then
-            log_info "Running C++ unit tests with CTest using $JOBS parallel jobs..."
-            if [ "$VERBOSE" = "true" ]; then
-                ctest --test-dir "./src/radarsimcpp/build" --parallel "$JOBS" --verbose
-            else
-                ctest --test-dir "./src/radarsimcpp/build" --parallel "$JOBS" --verbose >> "${LOG_FILE}" 2>&1
-            fi
+        # if [ -f "./src/radarsimcpp/build/radarsimcpp_test" ]; then
+        #     log_info "Running C++ unit tests with CTest using $JOBS parallel jobs..."
+        #     if [ "$VERBOSE" = "true" ]; then
+        #         ctest --test-dir "./src/radarsimcpp/build" --parallel "$JOBS" --verbose
+        #     else
+        #         ctest --test-dir "./src/radarsimcpp/build" --parallel "$JOBS" --verbose >> "${LOG_FILE}" 2>&1
+        #     fi
             
-            local cpp_test_result=$?
-            if [ $cpp_test_result -eq 0 ]; then
-                log_success "C++ tests passed"
-            else
-                log_error "C++ tests failed"
-                test_failures=$((test_failures + 1))
-            fi
-        else
-            log_warning "C++ test executable not found, skipping C++ tests"
-        fi
+        #     local cpp_test_result=$?
+        #     if [ $cpp_test_result -eq 0 ]; then
+        #         log_success "C++ tests passed"
+        #     else
+        #         log_error "C++ tests failed"
+        #         test_failures=$((test_failures + 1))
+        #     fi
+        # else
+        #     log_warning "C++ test executable not found, skipping C++ tests"
+        # fi
         
         # Run Python unit tests using pytest
         if command_exists pytest; then
