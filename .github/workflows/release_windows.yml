@@ -122,6 +122,24 @@ jobs:
         run: |
           python -m pip install --upgrade pip wheel setuptools
           pip install -r requirements-dev.txt
+      
+      - name: Setup vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          .\vcpkg\bootstrap-vcpkg.bat
+          echo "${{ github.workspace }}\vcpkg" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      
+      - name: Cache vcpkg packages
+        uses: actions/cache@v4
+        with:
+          path: vcpkg/installed
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}-mbedtls
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-
+      
+      - name: Install mbedTLS
+        run: |
+          .\vcpkg\vcpkg install mbedtls:x64-windows
 
       - name: Display build information
         run: |
