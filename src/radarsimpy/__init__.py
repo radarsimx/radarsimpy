@@ -45,9 +45,9 @@ from .receiver import Receiver
 
 # Simulation engines
 try:
-    from .simulator_radar import sim_radar
-    from .simulator_lidar import sim_lidar
-    from .simulator_rcs import sim_rcs
+    from .simulator import sim_radar
+    from .simulator import sim_lidar
+    from .simulator import sim_rcs
     from .license import initialize_license, is_licensed, is_free_tier, get_license_info
 
     _simulation_available = True
