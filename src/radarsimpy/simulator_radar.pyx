@@ -50,11 +50,13 @@ from radarsimpy.includes.radarsimc cimport (
     MeshSimulator,
     PointSimulator,
     InterferenceSimulator,
-    IsFreeTier,
     RadarSimErrorCode,
     cpu_policy,
     gpu_policy
 )
+
+# License management
+from radarsimpy.license import is_free_tier
 
 # RadarSimX library components
 from radarsimpy.lib.cp_radarsimc cimport (
@@ -79,7 +81,7 @@ cdef inline void validate_free_tier_limits(radar, list targets):
     :param targets: List of targets to simulate
     :raises RuntimeError: If free tier limitations are exceeded
     """
-    if not IsFreeTier():
+    if not is_free_tier():
         return
         
     if len(targets) > 2:
