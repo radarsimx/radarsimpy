@@ -91,6 +91,13 @@ jobs:
         run: |
           .\vcpkg\vcpkg install mbedtls:x64-windows
 
+      - name: Setup license file
+        run: |
+          New-Item -ItemType Directory -Force -Path .\radarsimpy
+          $env:TEST_LICENSE | Out-File -FilePath .\radarsimpy\license_RadarSimPy_M1770306974.lic -Encoding utf8
+        env:
+          TEST_LICENSE: ${{ secrets.TEST_LICENSE }}
+
       - name: Set up Visual Studio environment
         uses: ilammy/msvc-dev-cmd@v1
 
