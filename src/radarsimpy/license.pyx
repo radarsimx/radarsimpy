@@ -25,45 +25,30 @@ It allows checking license status and accessing license information.
 
 from libcpp.string cimport string
 from radarsimpy.includes.radarsimc cimport LicenseManager, IsFreeTier as cpp_IsFreeTier
-import os
-import glob
 
 
 def initialize_license(license_file_path=None):
     """
     Initialize the license manager with a license file.
     
-    If no path is provided, searches for license files matching the pattern:
-    license_RadarSimPy_*.lic in the module directory.
-    
     Args:
-        license_file_path (str, optional): Path to license file. If None, searches
-                                          in the module directory for license_RadarSimPy_*.lic
+        license_file_path (str, optional): Path to license file. If None, runs in free tier mode.
     
     Example:
         >>> import radarsimpy
-        >>> # Automatic search in module directory
-        >>> radarsimpy.initialize_license()
-        >>> # Or with explicit path
+        >>> # Explicit path
         >>> radarsimpy.initialize_license("/path/to/license_RadarSimPy_customer.lic")
         >>> if radarsimpy.is_licensed():
         ...     print("Full license active")
+        
+    Note:
+        Typically called automatically by the package during import with auto-detected license path.
     """
     cdef string cpp_license_path
     
     if license_file_path is None:
-        # Search for license files in the module directory
-        module_dir = os.path.dirname(os.path.abspath(__file__))
-        pattern = os.path.join(module_dir, "license_RadarSimPy_*.lic")
-        license_files = glob.glob(pattern)
-        
-        if license_files:
-            # Use the first found license file
-            license_file_path = license_files[0]
-            cpp_license_path = license_file_path.encode('utf-8')
-        else:
-            # No license file found, pass empty string (free tier mode)
-            cpp_license_path = b""
+        # No license file provided, pass empty string (free tier mode)
+        cpp_license_path = b""
     else:
         # Use provided path
         cpp_license_path = license_file_path.encode('utf-8')
