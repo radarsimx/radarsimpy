@@ -23,7 +23,6 @@ import argparse
 import logging
 import os
 import platform
-import subprocess
 import sys
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -315,56 +314,6 @@ class BuildConfig:
         return lib_dirs
 
 
-class CustomBuildExt(build_ext):
-    """Custom build_ext to fix macOS dylib install names."""
-
-    def run(self):
-        """Run the build and fix dylib install names on macOS."""
-        # Run the normal build process
-        build_ext.run(self)
-
-        # Fix install names on macOS
-        if platform.system() == "Darwin":
-            self._fix_macos_install_names()
-
-    def _fix_macos_install_names(self):
-        """Fix dylib install names using install_name_tool on macOS."""
-        logger.info("Fixing macOS dylib install names...")
-
-        # Find the radarsimcpp dylib in the build directory
-        build_dir = Path("src/radarsimcpp/build")
-        dylib_pattern = "**/libradarsimcpp*.dylib"
-
-        for dylib_path in build_dir.rglob(dylib_pattern):
-            logger.info("Processing dylib: %s", dylib_path)
-
-            try:
-                # Change the install name to use @loader_path (relative to the loading binary)
-                new_install_name = f"@loader_path/{dylib_path.name}"
-                subprocess.run(
-                    ["install_name_tool", "-id", new_install_name, str(dylib_path)],
-                    check=True,
-                    capture_output=True,
-                    text=True,
-                )
-                logger.info("Set install name to: %s", new_install_name)
-
-                # Verify the change
-                result = subprocess.run(
-                    ["otool", "-D", str(dylib_path)],
-                    check=True,
-                    capture_output=True,
-                    text=True,
-                )
-                logger.debug("otool -D output:\n%s", result.stdout)
-
-            except subprocess.CalledProcessError as e:
-                logger.error("Failed to fix install name for %s: %s", dylib_path, e)
-                logger.error("stderr: %s", e.stderr)
-            except FileNotFoundError:
-                logger.error("install_name_tool not found. Make sure Xcode Command Line Tools are installed.")
-
-
 def create_extension(name: str, sources: List[str], config: BuildConfig) -> Extension:
     """Create a Cython extension with the given configuration.
 
@@ -476,7 +425,7 @@ def main() -> None:
         packages=find_packages(),
         install_requires=requirements,
         python_requires=">=3.10",
-        cmdclass={"build_ext": CustomBuildExt},
+        cmdclass={"build_ext": build_ext},
         ext_modules=cythonize(
             ext_modules,
             annotate=False,
