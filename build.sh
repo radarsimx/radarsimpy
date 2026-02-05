@@ -626,7 +626,16 @@ clean_build_artifacts() {
         
         # Remove build directories and files
         rm -rf ./src/radarsimcpp/build
-        rm -rf ./radarsimpy
+        
+        # Clean radarsimpy directory but preserve *.lic files
+        if [ -d "./radarsimpy" ]; then
+            log_info "Cleaning radarsimpy directory (preserving *.lic files)..."
+            # Remove all subdirectories
+            find ./radarsimpy -mindepth 1 -type d -exec rm -rf {} + 2>/dev/null || true
+            # Remove all files except *.lic files
+            find ./radarsimpy -maxdepth 1 -type f ! -name "*.lic" -exec rm -f {} + 2>/dev/null || true
+        fi
+        
         rm -rf ./build
         
         # Remove generated source files
