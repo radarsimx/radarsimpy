@@ -44,19 +44,19 @@ from .transmitter import Transmitter
 from .receiver import Receiver
 
 # Simulation engines
-try:
-    from .simulator import sim_radar
-    from .simulator import sim_lidar
-    from .simulator import sim_rcs
-    from .license import initialize_license, is_licensed, is_free_tier, get_license_info
+# try:
+from .simulator import sim_radar
+from .simulator import sim_lidar
+from .simulator import sim_rcs
+from .license import initialize_license, is_licensed, is_free_tier, get_license_info
 
-    _simulation_available = True
-    
-    # Automatically initialize license on module import
-    # Searches for license_RadarSimPy_*.lic in module directory
-    initialize_license()
-except ImportError:
-    _simulation_available = False
+_simulation_available = True
+
+# Automatically initialize license on module import
+# Searches for license_RadarSimPy_*.lic in module directory
+initialize_license()
+# except ImportError:
+#     _simulation_available = False
 
 # Signal processing and analysis tools
 from . import processing
