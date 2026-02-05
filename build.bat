@@ -368,22 +368,14 @@ REM   Continues on cleanup failures with warnings (non-fatal)
     )
     
     if exist ".\radarsimpy" (
-        echo INFO: Cleaning radarsimpy directory (preserving *.lic files)...
+        echo INFO: Cleaning radarsimpy directory ^(preserving *.lic files^)...
         
         REM Delete all subdirectories
-        for /d %%i in (".\radarsimpy\*") do (
-            rmdir /q /s "%%i" 2>nul
-        )
+        for /d %%i in (".\radarsimpy\*") do rmdir /q /s "%%i" 2>nul
         
         REM Delete all files except *.lic files
         for %%i in (".\radarsimpy\*") do (
-            if /I not "%%~xi" == ".lic" (
-                del /q "%%i" 2>nul
-            )
-        )
-        
-        if %errorlevel% neq 0 (
-            echo WARNING: Could not fully clean Python module directory
+            if /I not "%%~xi" == ".lic" del /q "%%i" 2>nul
         )
     )
     
