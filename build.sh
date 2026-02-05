@@ -836,7 +836,7 @@ install_libraries() {
     
     # Copy shared libraries (platform-specific)
     if [ -d "./src/radarsimcpp/build" ]; then
-        find ./src/radarsimcpp/build -name "*.${lib_ext}" -exec mv {} ./radarsimpy/ \; 2>/dev/null || true
+        find ./src/radarsimcpp/build -name "*.${lib_ext}" -exec cp {} ./radarsimpy/ \; 2>/dev/null || true
     fi
     
     log_success "Library files installed successfully"
