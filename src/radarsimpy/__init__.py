@@ -48,6 +48,7 @@ try:
     from .simulator_radar import sim_radar
     from .simulator_lidar import sim_lidar
     from .simulator_rcs import sim_rcs
+    from .license import initialize_license, is_licensed, is_free_tier, get_license_info
 
     _simulation_available = True
 except ImportError:
@@ -78,6 +79,11 @@ __all__ = [
     "sim_radar",
     "sim_lidar",
     "sim_rcs",
+    # License Functions (if available)
+    "initialize_license",
+    "is_licensed",
+    "is_free_tier",
+    "get_license_info",
     # Processing and Analysis
     "processing",
     "tools",
@@ -89,11 +95,12 @@ __all__ = [
     "__url__",
 ]
 
-# Remove simulation functions from __all__ if not available
+# Remove simulation and license functions from __all__ if not available
 if not _simulation_available:
-    for sim_func in ["sim_radar", "sim_lidar", "sim_rcs"]:
-        if sim_func in __all__:
-            __all__.remove(sim_func)
+    for func in ["sim_radar", "sim_lidar", "sim_rcs", 
+                 "initialize_license", "is_licensed", "is_free_tier", "get_license_info"]:
+        if func in __all__:
+            __all__.remove(func)
 
 
 def get_version():

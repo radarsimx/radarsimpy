@@ -95,10 +95,18 @@ cdef extern from "libs/mem_lib.hpp":
 
 #------------------------------------------------------------------------------
 # License and Version Management
-# Free tier license validation functionality
+# License validation functionality via LicenseManager
 #------------------------------------------------------------------------------
-cdef extern from "libs/free_tier.hpp":
-    cdef int IsFreeTier() except +
+cdef extern from "libs/license_manager.hpp":
+    cdef cppclass LicenseManager:
+        @staticmethod
+        LicenseManager& getInstance()
+        void initialize(const string& product_name)
+        bint isLicensed() const
+        bint isFreeTier() const
+        string getLicenseInfo() const
+    
+    cdef bint IsFreeTier() except +
 
 #------------------------------------------------------------------------------
 # Error Handling

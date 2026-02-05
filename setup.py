@@ -395,6 +395,9 @@ def main() -> None:
         create_extension(
             "radarsimpy.simulator", ["src/radarsimpy/simulator.pyx"], config
         ),
+        create_extension(
+            "radarsimpy.license", ["src/radarsimpy/license.pyx"], config
+        ),
     ]
 
     # Read package requirements
