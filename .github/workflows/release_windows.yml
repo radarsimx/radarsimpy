@@ -3,7 +3,7 @@ name: Release on Windows
 # GitHub Actions workflow for building and packaging RadarSimPy on Windows platforms.
 #
 # This workflow builds RadarSimPy for Windows x64 architecture across multiple Python
-# versions. It uses the latest Windows runner with MSVC compiler and provides 
+# versions. It uses the latest Windows runner with MSVC compiler and provides
 # comprehensive Windows-specific optimizations.
 #
 # Build Matrix:
@@ -94,13 +94,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip wheel setuptools
           pip install -r requirements-dev.txt
-      
+
       - name: Setup vcpkg
         run: |
           git clone https://github.com/microsoft/vcpkg.git
           .\vcpkg\bootstrap-vcpkg.bat
           echo "${{ github.workspace }}\vcpkg" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-      
+
       - name: Cache vcpkg packages
         uses: actions/cache@v4
         with:
@@ -108,7 +108,7 @@ jobs:
           key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}-mbedtls
           restore-keys: |
             ${{ runner.os }}-vcpkg-
-      
+
       - name: Install mbedTLS
         run: |
           .\vcpkg\vcpkg install mbedtls:x64-windows
