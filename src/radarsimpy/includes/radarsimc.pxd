@@ -100,13 +100,12 @@ cdef extern from "libs/mem_lib.hpp":
 cdef extern from "libs/license_manager.hpp":
     cdef cppclass LicenseManager:
         @staticmethod
-        LicenseManager& getInstance()
-        void initialize(const string& license_file_path)
-        bint isLicensed() const
-        bint isFreeTier() const
-        string getLicenseInfo() const
-    
-    cdef bint IsFreeTier() except +
+        LicenseManager& GetInstance()
+        void Initialize(const string& license_file_path)
+        bint IsLicensed() const
+        bint IsFreeTier() const
+        string GetLicenseInfo() const
+
 
 #------------------------------------------------------------------------------
 # Error Handling

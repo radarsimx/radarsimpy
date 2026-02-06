@@ -24,7 +24,7 @@ It allows checking license status and accessing license information.
 """
 
 from libcpp.string cimport string
-from radarsimpy.includes.radarsimc cimport LicenseManager, IsFreeTier as cpp_IsFreeTier
+from radarsimpy.includes.radarsimc cimport LicenseManager
 
 
 def initialize_license(license_file_path=None):
@@ -53,7 +53,7 @@ def initialize_license(license_file_path=None):
         # Use provided path
         cpp_license_path = license_file_path.encode('utf-8')
     
-    LicenseManager.getInstance().initialize(cpp_license_path)
+    LicenseManager.GetInstance().Initialize(cpp_license_path)
 
 
 def is_licensed():
@@ -69,21 +69,7 @@ def is_licensed():
         ... else:
         ...     print("Running in free tier mode")
     """
-    return LicenseManager.getInstance().isLicensed()
-
-
-def is_free_tier():
-    """
-    Check if running in free tier mode (no valid license).
-    
-    Returns:
-        bool: True if no valid license is present, False if licensed.
-    
-    Example:
-        >>> if radarsimpy.is_free_tier():
-        ...     print("Free tier limitations apply")
-    """
-    return cpp_IsFreeTier()
+    return LicenseManager.GetInstance().IsLicensed()
 
 
 def get_license_info():
@@ -98,5 +84,5 @@ def get_license_info():
         >>> print(info)
         'Licensed to: Customer Name (30 days remaining)'
     """
-    cdef string info = LicenseManager.getInstance().getLicenseInfo()
+    cdef string info = LicenseManager.GetInstance().GetLicenseInfo()
     return info.decode('utf-8')

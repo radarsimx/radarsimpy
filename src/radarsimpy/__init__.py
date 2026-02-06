@@ -48,7 +48,7 @@ from .receiver import Receiver
 from .simulator import sim_radar
 from .simulator import sim_lidar
 from .simulator import sim_rcs
-from .license import initialize_license, is_licensed, is_free_tier, get_license_info
+from .license import initialize_license, is_licensed, get_license_info
 
 _simulation_available = True
 

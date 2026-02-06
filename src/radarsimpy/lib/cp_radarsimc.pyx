@@ -40,10 +40,12 @@ from radarsimpy.includes.radarsimc cimport (
     Transmitter, Receiver, 
     Radar, TargetsManager, PointsManager,
     Mem_Copy, Mem_Copy_Vec3,
-    Mem_Copy_Complex, IsFreeTier
+    Mem_Copy_Complex
 )
 from radarsimpy.includes.rsvector cimport Vec3
 from radarsimpy.includes.type_def cimport int_t, float_t, vector
+
+from radarsimpy.license import is_licensed
 
 from radarsimpy.mesh_kit import load_mesh
 
@@ -76,7 +78,7 @@ cdef inline void _validate_mesh_for_free_tier(int_t num_faces) except *:
         Number of mesh faces in the target model
     :raises: RuntimeError if FreeTier limitations are exceeded
     """
-    if IsFreeTier() and num_faces > MAX_FREE_TIER_FACES:
+    if not is_licensed() and num_faces > MAX_FREE_TIER_FACES:
         raise RuntimeError(
             f"\n{'='*60}\n"
             f"TRIAL VERSION LIMITATION - Mesh Size\n"
