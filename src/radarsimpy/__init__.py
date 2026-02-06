@@ -52,21 +52,7 @@ from .license import initialize_license, is_licensed, get_license_info
 
 _simulation_available = True
 
-# Automatically initialize license on module import
-# Searches for license_RadarSimPy_*.lic in module directory
-import os
-import glob
-
-_module_dir = os.path.dirname(os.path.abspath(__file__))
-_license_pattern = os.path.join(_module_dir, "license_RadarSimPy_*.lic")
-_license_files = glob.glob(_license_pattern)
-
-if _license_files:
-    # Use the first found license file
-    initialize_license(_license_files[0])
-else:
-    # No license file found, initialize without path (free tier mode)
-    initialize_license()
+initialize_license()
 # except ImportError:
 #     _simulation_available = False
 

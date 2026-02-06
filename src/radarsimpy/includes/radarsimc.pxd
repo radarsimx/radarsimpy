@@ -102,6 +102,7 @@ cdef extern from "libs/license_manager.hpp":
         @staticmethod
         LicenseManager& GetInstance()
         void Initialize(const string& license_file_path)
+        void Initialize(const vector[string]& license_file_paths)
         bint IsLicensed() const
         bint IsFreeTier() const
         string GetLicenseInfo() const

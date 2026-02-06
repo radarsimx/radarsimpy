@@ -24,7 +24,10 @@ It allows checking license status and accessing license information.
 """
 
 from libcpp.string cimport string
+from libcpp.vector cimport vector
 from radarsimpy.includes.radarsimc cimport LicenseManager
+import os
+import glob
 
 
 def initialize_license(license_file_path=None):
@@ -32,7 +35,8 @@ def initialize_license(license_file_path=None):
     Initialize the license manager with a license file.
     
     Args:
-        license_file_path (str, optional): Path to license file. If None, runs in free tier mode.
+        license_file_path (str, optional): Path to license file. If None, automatically 
+            searches for all license_RadarSimPy_*.lic files in the module directory.
     
     Example:
         >>> import radarsimpy
@@ -45,15 +49,27 @@ def initialize_license(license_file_path=None):
         Typically called automatically by the package during import with auto-detected license path.
     """
     cdef string cpp_license_path
+    cdef vector[string] cpp_license_paths
     
     if license_file_path is None:
-        # No license file provided, pass empty string (free tier mode)
-        cpp_license_path = b""
+        # No license file provided, search for all license_RadarSimPy_*.lic files
+        _module_dir = os.path.dirname(os.path.abspath(__file__))
+        license_pattern = os.path.join(_module_dir, "license_RadarSimPy_*.lic")
+        license_files = glob.glob(license_pattern)
+        
+        if license_files:
+            # Pass all found license files to C++
+            for lic_file in license_files:
+                cpp_license_paths.push_back(lic_file.encode('utf-8'))
+            LicenseManager.GetInstance().Initialize(cpp_license_paths)
+        else:
+            # No license files found, use empty string (free tier mode)
+            cpp_license_path = b""
+            LicenseManager.GetInstance().Initialize(cpp_license_path)
     else:
         # Use provided path
         cpp_license_path = license_file_path.encode('utf-8')
-    
-    LicenseManager.GetInstance().Initialize(cpp_license_path)
+        LicenseManager.GetInstance().Initialize(cpp_license_path)
 
 
 def is_licensed():
