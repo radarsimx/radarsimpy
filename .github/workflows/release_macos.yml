@@ -262,6 +262,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip wheel setuptools
           pip install -r requirements-dev.txt
+      
+      - name: Install mbedTLS
+        run: |
+          brew install mbedtls
 
       - name: Display build information
         run: |
