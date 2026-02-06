@@ -30,9 +30,9 @@ import os
 import glob
 
 
-def initialize_license(license_file_path=None):
+def set_license(license_file_path=None):
     """
-    Initialize the license manager with a license file.
+    Set or update the license for RadarSimPy.
     
     Args:
         license_file_path (str, optional): Path to license file. If None, automatically 
@@ -41,12 +41,13 @@ def initialize_license(license_file_path=None):
     Example:
         >>> import radarsimpy
         >>> # Explicit path
-        >>> radarsimpy.initialize_license("/path/to/license_RadarSimPy_customer.lic")
+        >>> radarsimpy.set_license("/path/to/license_RadarSimPy_customer.lic")
         >>> if radarsimpy.is_licensed():
         ...     print("Full license active")
         
     Note:
-        Typically called automatically by the package during import with auto-detected license path.
+        Can be called multiple times to update or recheck license files.
+        Typically called automatically by the package during import.
     """
     cdef string cpp_license_path
     cdef vector[string] cpp_license_paths
@@ -61,15 +62,19 @@ def initialize_license(license_file_path=None):
             # Pass all found license files to C++
             for lic_file in license_files:
                 cpp_license_paths.push_back(lic_file.encode('utf-8'))
-            LicenseManager.GetInstance().Initialize(cpp_license_paths)
+            LicenseManager.GetInstance().SetLicense(cpp_license_paths)
         else:
             # No license files found, use empty string (free tier mode)
             cpp_license_path = b""
-            LicenseManager.GetInstance().Initialize(cpp_license_path)
+            LicenseManager.GetInstance().SetLicense(cpp_license_path)
     else:
         # Use provided path
         cpp_license_path = license_file_path.encode('utf-8')
-        LicenseManager.GetInstance().Initialize(cpp_license_path)
+        LicenseManager.GetInstance().SetLicense(cpp_license_path)
+
+
+# Backwards compatibility alias
+initialize_license = set_license
 
 
 def is_licensed():

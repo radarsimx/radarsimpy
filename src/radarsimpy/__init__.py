@@ -48,11 +48,11 @@ from .receiver import Receiver
 from .simulator import sim_radar
 from .simulator import sim_lidar
 from .simulator import sim_rcs
-from .license import initialize_license, is_licensed, get_license_info
+from .license import set_license, initialize_license, is_licensed, get_license_info
 
 _simulation_available = True
 
-initialize_license()
+set_license()
 # except ImportError:
 #     _simulation_available = False
 
@@ -82,7 +82,8 @@ __all__ = [
     "sim_lidar",
     "sim_rcs",
     # License Functions (if available)
-    "initialize_license",
+    "set_license",
+    "initialize_license",  # Backwards compatibility
     "is_licensed",
     "is_free_tier",
     "get_license_info",
@@ -100,7 +101,7 @@ __all__ = [
 # Remove simulation and license functions from __all__ if not available
 if not _simulation_available:
     for func in ["sim_radar", "sim_lidar", "sim_rcs", 
-                 "initialize_license", "is_licensed", "is_free_tier", "get_license_info"]:
+                 "set_license", "initialize_license", "is_licensed", "is_free_tier", "get_license_info"]:
         if func in __all__:
             __all__.remove(func)
 
@@ -285,7 +286,7 @@ def hello():
        >>> range_doppler = rs.processing.range_doppler_fft(result['baseband'])
     
     💡 License: Automatically detected from module directory (license_RadarSimPy_*.lic)
-       Or manually specify: rs.initialize_license('/path/to/license.lic')
+       Or manually specify: rs.set_license('/path/to/license.lic')
     
     �📚 Documentation: https://radarsimx.github.io/radarsimpy/
     💬 Support: info@radarsimx.com

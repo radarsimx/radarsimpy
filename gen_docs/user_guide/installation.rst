@@ -89,6 +89,98 @@ You should see output similar to:
 
     RadarSimPy version: 14.x.x
 
+License Configuration
+---------------------
+
+RadarSimPy supports both free tier and licensed operation modes. License files enable access to advanced features and remove free tier limitations.
+
+License File Placement
+^^^^^^^^^^^^^^^^^^^^^^
+
+**Automatic Detection**
+
+The simplest way to activate your license is to place the license file in the ``radarsimpy/`` package directory:
+
+.. code-block:: none
+
+    your_project/
+    ├── your_script.py
+    └── radarsimpy/
+        ├── __init__.py
+        ├── license_RadarSimPy_customer.lic    # Your license file
+        ├── radar.py
+        └── ...
+
+License files must follow the naming pattern: ``license_RadarSimPy_*.lic``
+
+.. note::
+   RadarSimPy automatically searches for and validates all ``license_RadarSimPy_*.lic`` files in the package directory. As long as one valid license is found, full functionality is enabled.
+
+**Multiple License Files**
+
+You can place multiple license files in the directory. The system will try each one until a valid license is found:
+
+.. code-block:: none
+
+    radarsimpy/
+    ├── license_RadarSimPy_company.lic
+    ├── license_RadarSimPy_backup.lic
+    └── license_RadarSimPy_trial.lic
+
+Manual License Configuration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you need to specify a license file from a custom location, or update the license at runtime:
+
+.. code-block:: python
+
+    import radarsimpy
+    
+    # Set license with a specific license file
+    radarsimpy.set_license("/path/to/your/license_RadarSimPy_customer.lic")
+    
+    # Check if license is active
+    if radarsimpy.is_licensed():
+        print("Full license active")
+        print(radarsimpy.get_license_info())
+    else:
+        print("Running in free tier mode")
+
+Checking License Status
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+You can verify your license status at any time:
+
+.. code-block:: python
+
+    import radarsimpy
+    
+    # Check license status
+    if radarsimpy.is_licensed():
+        # Get license information
+        info = radarsimpy.get_license_info()
+        print(f"License info: {info}")
+    else:
+        print("Running in free tier mode with limitations")
+
+**Example Output**
+
+.. code-block:: none
+
+    License info: Licensed to: Company Name (365 days remaining)
+
+Free Tier Mode
+^^^^^^^^^^^^^^
+
+If no valid license file is found, RadarSimPy automatically operates in free tier mode with certain limitations:
+
+- Limited target complexity
+- Reduced simulation fidelity options
+- Other feature restrictions as documented
+
+.. tip::
+   To obtain a license file, visit `radarsimx.com <https://radarsimx.com/product/radarsimpy/>`_ or contact info@radarsimx.com.
+
 Building from Source
 ---------------------
 
