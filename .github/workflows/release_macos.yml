@@ -2,16 +2,15 @@ name: Release on MacOS
 
 # GitHub Actions workflow for building and packaging RadarSimPy on macOS platforms.
 #
-# This workflow builds RadarSimPy across multiple macOS versions, Python versions,
-# and build tiers (standard/free). It supports both Intel x64 and Apple Silicon ARM64
-# architectures to provide comprehensive macOS coverage.
+# This workflow builds RadarSimPy across multiple macOS versions and Python versions.
+# It supports both Intel x64 and Apple Silicon ARM64 architectures to provide
+# comprehensive macOS coverage.
 #
 # Build Matrix:
-# - macOS 13 (Intel x64): GCC-14 compiler, 10 builds (5 Python × 2 tiers)
-# - macOS 15 (Apple Silicon ARM64): Clang compiler, 10 builds (5 Python × 2 tiers)
+# - macOS 13 (Intel x64): GCC-14 compiler, 5 builds (5 Python)
+# - macOS 15 (Apple Silicon ARM64): Clang compiler, 5 builds (5 Python)
 # - Python versions: 3.10, 3.11, 3.12, 3.13, 3.14
-# - Build tiers: standard (full features), free (limited features)
-# - Total builds: 20
+# - Total builds: 10
 #
 # Features:
 # - Comprehensive caching (pip, Homebrew, ccache)
@@ -24,7 +23,7 @@ name: Release on MacOS
 #
 # Outputs:
 # - Individual artifacts for each build configuration
-# - Packed archive containing all builds organized by architecture and tier
+# - Packed archive containing all builds organized by architecture
 # - Build summaries and statistics
 #
 # Triggers:
@@ -51,13 +50,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # MacOS x64 Standard builds
+          # MacOS x64 builds
           - os: macos-15-intel
             python-version: "3.10"
             c_compiler: gcc-14
             cxx_compiler: g++-14
             xcode_version: "16.4"
-            tier: standard
             arch: cpu
             artifact_name: radarsimpy_macos_py3.10
           - os: macos-15-intel
@@ -65,7 +63,6 @@ jobs:
             c_compiler: gcc-14
             cxx_compiler: g++-14
             xcode_version: "16.4"
-            tier: standard
             arch: cpu
             artifact_name: radarsimpy_macos_py3.11
           - os: macos-15-intel
@@ -73,7 +70,6 @@ jobs:
             c_compiler: gcc-14
             cxx_compiler: g++-14
             xcode_version: "16.4"
-            tier: standard
             arch: cpu
             artifact_name: radarsimpy_macos_py3.12
           - os: macos-15-intel
@@ -81,7 +77,6 @@ jobs:
             c_compiler: gcc-14
             cxx_compiler: g++-14
             xcode_version: "16.4"
-            tier: standard
             arch: cpu
             artifact_name: radarsimpy_macos_py3.13
           - os: macos-15-intel
@@ -89,57 +84,14 @@ jobs:
             c_compiler: gcc-14
             cxx_compiler: g++-14
             xcode_version: "16.4"
-            tier: standard
             arch: cpu
             artifact_name: radarsimpy_macos_py3.14
-          # MacOS x64 Free Tier builds
-          - os: macos-15-intel
-            python-version: "3.10"
-            c_compiler: gcc-14
-            cxx_compiler: g++-14
-            xcode_version: "16.4"
-            tier: free
-            arch: cpu
-            artifact_name: radarsimpy_macos_py3.10_freetier
-          - os: macos-15-intel
-            python-version: "3.11"
-            c_compiler: gcc-14
-            cxx_compiler: g++-14
-            xcode_version: "16.4"
-            tier: free
-            arch: cpu
-            artifact_name: radarsimpy_macos_py3.11_freetier
-          - os: macos-15-intel
-            python-version: "3.12"
-            c_compiler: gcc-14
-            cxx_compiler: g++-14
-            xcode_version: "16.4"
-            tier: free
-            arch: cpu
-            artifact_name: radarsimpy_macos_py3.12_freetier
-          - os: macos-15-intel
-            python-version: "3.13"
-            c_compiler: gcc-14
-            cxx_compiler: g++-14
-            xcode_version: "16.4"
-            tier: free
-            arch: cpu
-            artifact_name: radarsimpy_macos_py3.13_freetier
-          - os: macos-15-intel
-            python-version: "3.14"
-            c_compiler: gcc-14
-            cxx_compiler: g++-14
-            xcode_version: "16.4"
-            tier: free
-            arch: cpu
-            artifact_name: radarsimpy_macos_py3.14_freetier
           # MacOS ARM64 (Apple Silicon) Standard builds
           - os: macos-15
             python-version: "3.10"
             c_compiler: clang
             cxx_compiler: clang++
             xcode_version: "16.4"
-            tier: standard
             arch: cpu
             artifact_name: radarsimpy_macos_arm_py3.10
           - os: macos-15
@@ -147,7 +99,6 @@ jobs:
             c_compiler: clang
             cxx_compiler: clang++
             xcode_version: "16.4"
-            tier: standard
             arch: cpu
             artifact_name: radarsimpy_macos_arm_py3.11
           - os: macos-15
@@ -155,7 +106,6 @@ jobs:
             c_compiler: clang
             cxx_compiler: clang++
             xcode_version: "16.4"
-            tier: standard
             arch: cpu
             artifact_name: radarsimpy_macos_arm_py3.12
           - os: macos-15
@@ -163,7 +113,6 @@ jobs:
             c_compiler: clang
             cxx_compiler: clang++
             xcode_version: "16.4"
-            tier: standard
             arch: cpu
             artifact_name: radarsimpy_macos_arm_py3.13
           - os: macos-15
@@ -171,50 +120,8 @@ jobs:
             c_compiler: clang
             cxx_compiler: clang++
             xcode_version: "16.4"
-            tier: standard
             arch: cpu
             artifact_name: radarsimpy_macos_arm_py3.14
-          # MacOS ARM64 (Apple Silicon) Free Tier builds
-          - os: macos-15
-            python-version: "3.10"
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode_version: "16.4"
-            tier: free
-            arch: cpu
-            artifact_name: radarsimpy_macos_arm_py3.10_freetier
-          - os: macos-15
-            python-version: "3.11"
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode_version: "16.4"
-            tier: free
-            arch: cpu
-            artifact_name: radarsimpy_macos_arm_py3.11_freetier
-          - os: macos-15
-            python-version: "3.12"
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode_version: "16.4"
-            tier: free
-            arch: cpu
-            artifact_name: radarsimpy_macos_arm_py3.12_freetier
-          - os: macos-15
-            python-version: "3.13"
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode_version: "16.4"
-            tier: free
-            arch: cpu
-            artifact_name: radarsimpy_macos_arm_py3.13_freetier
-          - os: macos-15
-            python-version: "3.14"
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode_version: "16.4"
-            tier: free
-            arch: cpu
-            artifact_name: radarsimpy_macos_arm_py3.14_freetier
 
     steps:
       - name: Checkout repository
@@ -242,9 +149,9 @@ jobs:
             ~/.cache/pip
             ~/Library/Caches/Homebrew
             ~/.ccache
-          key: ${{ runner.os }}-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.tier }}-${{ hashFiles('requirements-dev.txt') }}
+          key: ${{ runner.os }}-${{ matrix.os }}-${{ matrix.python-version }}-${{ hashFiles('requirements-dev.txt') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.tier }}-
+            ${{ runner.os }}-${{ matrix.os }}-${{ matrix.python-version }}-
             ${{ runner.os }}-${{ matrix.os }}-${{ matrix.python-version }}-
             ${{ runner.os }}-${{ matrix.os }}-
 
@@ -272,7 +179,6 @@ jobs:
           echo "::group::Build Information"
           echo "OS: ${{ matrix.os }}"
           echo "Python: ${{ matrix.python-version }}"
-          echo "Tier: ${{ matrix.tier }}"
           echo "Architecture: ${{ matrix.arch }}"
           echo "C Compiler: ${{ matrix.c_compiler }}"
           echo "C++ Compiler: ${{ matrix.cxx_compiler }}"
@@ -298,7 +204,7 @@ jobs:
         run: |
           echo "::group::Build Process"
           chmod +x build.sh
-          ./build.sh --tier=${{ matrix.tier }} --arch=${{ matrix.arch }} --test=off --verbose
+          ./build.sh --license=on --arch=${{ matrix.arch }} --test=off --verbose
           echo "::endgroup::"
 
       - name: Display build statistics
@@ -380,17 +286,11 @@ jobs:
         run: |
           mkdir -p packed/radarsimpy_macos_all
 
-          # Create base directory structure for final archive
-          mkdir -p packed/radarsimpy_macos_all/standard
-          mkdir -p packed/radarsimpy_macos_all/trial
+          # Create temporary directories for building packages
+          mkdir -p temp/MacOS_x86_64_CPU/radarsimpy
+          mkdir -p temp/MacOS_ARM_CPU/radarsimpy
 
-          # Create temporary directories for building tier-specific packages
-          mkdir -p temp/standard/MacOS_x86_64_CPU/radarsimpy
-          mkdir -p temp/standard/MacOS_ARM_CPU/radarsimpy
-          mkdir -p temp/trial/MacOS_x86_64_CPU/radarsimpy
-          mkdir -p temp/trial/MacOS_ARM_CPU/radarsimpy
-
-          # Copy each artifact to appropriate directory based on architecture and tier
+          # Copy each artifact to appropriate directory based on architecture
           for dir in artifacts/*/; do
             if [ -d "$dir" ]; then
               artifact_name=$(basename "$dir")
@@ -399,18 +299,10 @@ jobs:
               # Determine target directory based on artifact name
               if [[ "$artifact_name" == *"_arm_"* ]]; then
                 # ARM64 builds
-                if [[ "$artifact_name" == *"_freetier"* ]]; then
-                  target_dir="temp/trial/MacOS_ARM_CPU/radarsimpy"
-                else
-                  target_dir="temp/standard/MacOS_ARM_CPU/radarsimpy"
-                fi
+                target_dir="temp/MacOS_ARM_CPU/radarsimpy"
               else
                 # x64 builds
-                if [[ "$artifact_name" == *"_freetier"* ]]; then
-                  target_dir="temp/trial/MacOS_x86_64_CPU/radarsimpy"
-                else
-                  target_dir="temp/standard/MacOS_x86_64_CPU/radarsimpy"
-                fi
+                target_dir="temp/MacOS_x86_64_CPU/radarsimpy"
               fi
               
               # Ensure target directory exists
@@ -428,31 +320,19 @@ jobs:
             fi
           done
 
-          # Create ZIP files for each architecture and tier
-          echo "Creating MacOS_x86_64_CPU.zip for standard tier..."
-          cd temp/standard && zip -r ../../packed/radarsimpy_macos_all/standard/MacOS_x86_64_CPU.zip MacOS_x86_64_CPU/ && cd ../..
+          # Create ZIP files for each architecture
+          echo "Creating MacOS_x86_64_CPU.zip..."
+          cd temp && zip -r ../packed/radarsimpy_macos_all/MacOS_x86_64_CPU.zip MacOS_x86_64_CPU/ && cd ..
 
-          echo "Creating MacOS_ARM_CPU.zip for standard tier..."
-          cd temp/standard && zip -r ../../packed/radarsimpy_macos_all/standard/MacOS_ARM_CPU.zip MacOS_ARM_CPU/ && cd ../..
+          echo "Creating MacOS_ARM_CPU.zip..."
+          cd temp && zip -r ../packed/radarsimpy_macos_all/MacOS_ARM_CPU.zip MacOS_ARM_CPU/ && cd ..
 
-          echo "Creating MacOS_x86_64_CPU.zip for trial tier..."
-          cd temp/trial && zip -r ../../packed/radarsimpy_macos_all/trial/MacOS_x86_64_CPU.zip MacOS_x86_64_CPU/ && cd ../..
+          # Create tar.gz files for each architecture
+          echo "Creating MacOS_x86_64_CPU.tar.gz..."
+          cd temp && tar -czf ../packed/radarsimpy_macos_all/MacOS_x86_64_CPU.tar.gz MacOS_x86_64_CPU/ && cd ..
 
-          echo "Creating MacOS_ARM_CPU.zip for trial tier..."
-          cd temp/trial && zip -r ../../packed/radarsimpy_macos_all/trial/MacOS_ARM_CPU.zip MacOS_ARM_CPU/ && cd ../..
-
-          # Create tar.gz files for each architecture and tier
-          echo "Creating MacOS_x86_64_CPU.tar.gz for standard tier..."
-          cd temp/standard && tar -czf ../../packed/radarsimpy_macos_all/standard/MacOS_x86_64_CPU.tar.gz MacOS_x86_64_CPU/ && cd ../..
-
-          echo "Creating MacOS_ARM_CPU.tar.gz for standard tier..."
-          cd temp/standard && tar -czf ../../packed/radarsimpy_macos_all/standard/MacOS_ARM_CPU.tar.gz MacOS_ARM_CPU/ && cd ../..
-
-          echo "Creating MacOS_x86_64_CPU.tar.gz for trial tier..."
-          cd temp/trial && tar -czf ../../packed/radarsimpy_macos_all/trial/MacOS_x86_64_CPU.tar.gz MacOS_x86_64_CPU/ && cd ../..
-
-          echo "Creating MacOS_ARM_CPU.tar.gz for trial tier..."
-          cd temp/trial && tar -czf ../../packed/radarsimpy_macos_all/trial/MacOS_ARM_CPU.tar.gz MacOS_ARM_CPU/ && cd ../..
+          echo "Creating MacOS_ARM_CPU.tar.gz..."
+          cd temp && tar -czf ../packed/radarsimpy_macos_all/MacOS_ARM_CPU.tar.gz MacOS_ARM_CPU/ && cd ..
 
       - name: Verify artifact structure
         run: |
@@ -462,53 +342,30 @@ jobs:
           echo ""
           echo "Verifying ZIP and tar.gz files exist:"
 
-          if [ -f "packed/radarsimpy_macos_all/standard/MacOS_x86_64_CPU.zip" ]; then
-            echo "✓ Standard macOS x86_64 ZIP found"
+          if [ -f "packed/radarsimpy_macos_all/MacOS_x86_64_CPU.zip" ]; then
+            echo "✓ macOS x86_64 ZIP found"
           else
-            echo "✗ Standard macOS x86_64 ZIP missing"
+            echo "✗ macOS x86_64 ZIP missing"
           fi
 
-          if [ -f "packed/radarsimpy_macos_all/standard/MacOS_x86_64_CPU.tar.gz" ]; then
-            echo "✓ Standard macOS x86_64 tar.gz found"
+          if [ -f "packed/radarsimpy_macos_all/MacOS_x86_64_CPU.tar.gz" ]; then
+            echo "✓ macOS x86_64 tar.gz found"
           else
-            echo "✗ Standard macOS x86_64 tar.gz missing"
+            echo "✗ macOS x86_64 tar.gz missing"
           fi
 
-          if [ -f "packed/radarsimpy_macos_all/standard/MacOS_ARM_CPU.zip" ]; then
-            echo "✓ Standard macOS ARM ZIP found"
+          if [ -f "packed/radarsimpy_macos_all/MacOS_ARM_CPU.zip" ]; then
+            echo "✓ macOS ARM ZIP found"
           else
-            echo "✗ Standard macOS ARM ZIP missing"
+            echo "✗ macOS ARM ZIP missing"
           fi
 
-          if [ -f "packed/radarsimpy_macos_all/standard/MacOS_ARM_CPU.tar.gz" ]; then
-            echo "✓ Standard macOS ARM tar.gz found"
+          if [ -f "packed/radarsimpy_macos_all/MacOS_ARM_CPU.tar.gz" ]; then
+            echo "✓ macOS ARM tar.gz found"
           else
-            echo "✗ Standard macOS ARM tar.gz missing"
+            echo "✗ macOS ARM tar.gz missing"
           fi
 
-          if [ -f "packed/radarsimpy_macos_all/trial/MacOS_x86_64_CPU.zip" ]; then
-            echo "✓ Trial macOS x86_64 ZIP found"
-          else
-            echo "✗ Trial macOS x86_64 ZIP missing"
-          fi
-
-          if [ -f "packed/radarsimpy_macos_all/trial/MacOS_x86_64_CPU.tar.gz" ]; then
-            echo "✓ Trial macOS x86_64 tar.gz found"
-          else
-            echo "✗ Trial macOS x86_64 tar.gz missing"
-          fi
-
-          if [ -f "packed/radarsimpy_macos_all/trial/MacOS_ARM_CPU.zip" ]; then
-            echo "✓ Trial macOS ARM ZIP found"
-          else
-            echo "✗ Trial macOS ARM ZIP missing"
-          fi
-
-          if [ -f "packed/radarsimpy_macos_all/trial/MacOS_ARM_CPU.tar.gz" ]; then
-            echo "✓ Trial macOS ARM tar.gz found"
-          else
-            echo "✗ Trial macOS ARM tar.gz missing"
-          fi
           echo "::endgroup::"
 
       - name: Create README for packed artifacts
@@ -516,7 +373,7 @@ jobs:
           cat > packed/radarsimpy_macos_all/README.md << 'EOF'
           # RadarSimPy macOS Build Artifacts
 
-          This archive contains all RadarSimPy builds for macOS platforms organized by architecture and tier.
+          This archive contains all RadarSimPy builds for macOS platforms organized by architecture.
 
           ## Directory Structure
 
@@ -524,49 +381,37 @@ jobs:
 
           ```
           radarsimpy_macos_all/
-          ├── standard/
-          │   ├── MacOS_x86_64_CPU.zip
-          │   ├── MacOS_x86_64_CPU.tar.gz
-          │   ├── MacOS_ARM_CPU.zip
-          │   └── MacOS_ARM_CPU.tar.gz
-          └── trial/
-              ├── MacOS_x86_64_CPU.zip
-              ├── MacOS_x86_64_CPU.tar.gz
-              ├── MacOS_ARM_CPU.zip
-              └── MacOS_ARM_CPU.tar.gz
+          ├── MacOS_x86_64_CPU.zip
+          ├── MacOS_x86_64_CPU.tar.gz
+          ├── MacOS_ARM_CPU.zip
+          └── MacOS_ARM_CPU.tar.gz
           ```
 
-          ## Architecture and Tier Information
+          ## Architecture Information
 
           ### MacOS_x86_64_CPU (Intel-based Macs)
-          - **standard/**: Full-featured builds with all capabilities
-          - **trial/**: Free tier builds with limited features
           - Built on macOS 13 with GCC 14 compiler
           - Available in both ZIP and tar.gz formats
           - Each archive contains the complete radarsimpy module with all Python versions supported
 
           ### MacOS_ARM_CPU (Apple Silicon Macs)
-          - **standard/**: Full-featured builds with all capabilities  
-          - **trial/**: Free tier builds with limited features
           - Built on macOS 15 with Clang compiler
           - Available in both ZIP and tar.gz formats
           - Each archive contains the complete radarsimpy module with all Python versions supported
 
           ## Build Information
 
-          - **Total Builds**: 20 (packaged into 8 files: 4 ZIP + 4 tar.gz)
+          - **Total Builds**: 10 (packaged into 4 files: 2 ZIP + 2 tar.gz)
           - **Architectures**: x86_64 (Intel), ARM64 (Apple Silicon)
           - **Python Versions**: 3.10, 3.11, 3.12, 3.13, 3.14
-          - **Tiers**: Standard (full features), Trial (limited features)
           - **Formats**: ZIP and tar.gz for maximum compatibility
           - **Build Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
 
           ## Usage
 
           1. Extract the main archive
-          2. Navigate to the desired tier directory (standard/ or trial/)
-          3. Extract the appropriate architecture file (choose ZIP or tar.gz based on your preference)
-          4. The radarsimpy module will be ready for use
+          2. Extract the appropriate architecture file (choose ZIP or tar.gz based on your preference)
+          3. The radarsimpy module will be ready for use
 
           EOF
 
@@ -597,26 +442,22 @@ jobs:
           echo "# macOS Build Summary 🍎" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Build Matrix Results" >> $GITHUB_STEP_SUMMARY
-          echo "Total builds: 20 (5 Python versions × 2 architectures × 2 tiers)" >> $GITHUB_STEP_SUMMARY
+          echo "Total builds: 10 (5 Python versions × 2 architectures)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Architecture Distribution" >> $GITHUB_STEP_SUMMARY
-          echo "- **x64 (Intel)**: 10 builds on macos-15-intel with GCC-14" >> $GITHUB_STEP_SUMMARY
-          echo "- **ARM64 (Apple Silicon)**: 10 builds on macos-15 with Clang" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Tier Distribution" >> $GITHUB_STEP_SUMMARY
-          echo "- **Standard**: 10 builds" >> $GITHUB_STEP_SUMMARY
-          echo "- **Free**: 10 builds" >> $GITHUB_STEP_SUMMARY
+          echo "- **x64 (Intel)**: 5 builds on macos-15-intel with GCC-14" >> $GITHUB_STEP_SUMMARY
+          echo "- **ARM64 (Apple Silicon)**: 5 builds on macos-15 with Clang" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Python Versions" >> $GITHUB_STEP_SUMMARY
           echo "- Python 3.10, 3.11, 3.12, 3.13, 3.14" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Packed Artifacts" >> $GITHUB_STEP_SUMMARY
           if [ "${{ needs.build.result }}" == "success" ]; then
-            echo "✅ **All artifacts successfully packed into ZIP and tar.gz files by tier**" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **All artifacts successfully packed into ZIP and tar.gz files by architecture**" >> $GITHUB_STEP_SUMMARY
             echo "- Archive: \`radarsimpy_macos_all_builds\`" >> $GITHUB_STEP_SUMMARY
             echo "- Formats: tar.gz, zip" >> $GITHUB_STEP_SUMMARY
-            echo "- Structure: 8 files (2 architectures × 2 tiers × 2 formats)" >> $GITHUB_STEP_SUMMARY
-            echo "- Contains: All 20 build variants organized by architecture and tier" >> $GITHUB_STEP_SUMMARY
+            echo "- Structure: 4 files (2 architectures × 2 formats)" >> $GITHUB_STEP_SUMMARY
+            echo "- Contains: All 10 build variants organized by architecture" >> $GITHUB_STEP_SUMMARY
           else
             echo "⚠️ **Artifact packing failed or was skipped**" >> $GITHUB_STEP_SUMMARY
           fi

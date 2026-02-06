@@ -2,7 +2,7 @@
 Setup script for RadarSimPy - A Python-based Radar Simulator
 
 This setup script builds the radarsimpy package with C++ extensions and CUDA support.
-It supports both free and standard tiers, and both CPU and GPU architectures.
+It supports both CPU and GPU architectures.
 
 Author: RadarSimX (info@radarsimx.com)
 Website: https://radarsimx.com
@@ -49,9 +49,7 @@ AUTHOR = "RadarSimX"
 AUTHOR_EMAIL = "info@radarsimx.com"
 
 # Build configuration constants
-VALID_TIERS = ["free", "standard"]
 VALID_ARCHS = ["cpu", "gpu"]
-DEFAULT_TIER = "standard"
 DEFAULT_ARCH = "cpu"
 
 
@@ -81,19 +79,12 @@ def get_version() -> str:
 def parse_arguments() -> argparse.Namespace:
     """Parse command line arguments for build configuration.
 
-    :return: Parsed command line arguments containing tier, arch, and verbose flags
+    :return: Parsed command line arguments containing arch and verbose flags
     :rtype: argparse.Namespace
     """
     parser = argparse.ArgumentParser(
         description="Build script for RadarSimPy with configurable options",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-    )
-    parser.add_argument(
-        "-t",
-        "--tier",
-        choices=VALID_TIERS,
-        default=DEFAULT_TIER,
-        help=f"Build tier (default: {DEFAULT_TIER})",
     )
     parser.add_argument(
         "-a",
@@ -116,19 +107,15 @@ def parse_arguments() -> argparse.Namespace:
 class BuildConfig:
     """Configuration class for build settings."""
 
-    def __init__(self, tier: str, arch: str) -> None:
-        """Initialize BuildConfig with tier and architecture settings.
+    def __init__(self, arch: str) -> None:
+        """Initialize BuildConfig with architecture settings.
 
-        :param tier: Build tier ('free' or 'standard')
-        :type tier: str
         :param arch: Build architecture ('cpu' or 'gpu')
         :type arch: str
         """
-        self.tier = tier
         self.arch = arch
         self.os_type = platform.system()
         self.is_gpu = arch == "gpu"
-        self.is_free = tier == "free"
 
         # Platform-specific settings
         self._configure_platform()
@@ -175,15 +162,12 @@ class BuildConfig:
     def _configure_macros(self) -> None:
         """Configure preprocessor macros.
 
-        Sets up macros for compilation including NumPy compatibility,
-        free tier, and CUDA support based on configuration.
+        Sets up macros for compilation including NumPy compatibility
+        and CUDA support based on configuration.
         """
         self.macros: List[tuple[str, Optional[str]]] = [
             ("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")
         ]
-
-        if self.is_free:
-            self.macros.append(("_FREETIER_", "1"))
 
         if self.is_gpu:
             self.macros.append(("_CUDA_", None))
@@ -368,7 +352,7 @@ def main() -> None:
     if args.verbose:
         logger.setLevel(logging.DEBUG)
 
-    logger.info("Building %s with tier=%s, arch=%s", PACKAGE_NAME, args.tier, args.arch)
+    logger.info("Building %s with arch=%s", PACKAGE_NAME, args.arch)
 
     # Get package version
     try:
@@ -380,7 +364,7 @@ def main() -> None:
 
     # Create build configuration
     try:
-        config = BuildConfig(args.tier, args.arch)
+        config = BuildConfig(args.arch)
     except (EnvironmentError, OSError, ValueError) as e:
         logger.error("Failed to create build configuration: %s", e)
         sys.exit(1)

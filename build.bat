@@ -24,16 +24,16 @@ REM   build.bat [OPTIONS]
 REM
 REM OPTIONS:
 REM   --help              Show help message
-REM   --tier=TIER         Build tier: 'standard' or 'free' (default: standard)
+REM   --license=LICENSE   Enable license verification: 'on' or 'off' (default: off)
 REM   --arch=ARCH         Build architecture: 'cpu' or 'gpu' (default: cpu)
 REM   --test=TEST         Enable unit tests: 'on' or 'off' (default: on)
 REM   --jobs=N            Number of parallel build jobs (default: auto-detect)
 REM
 REM EXAMPLES:
 REM   build.bat                                    REM Default build
-REM   build.bat --tier=free --arch=gpu           REM GPU build with free tier
+REM   build.bat --license=on --arch=gpu          REM GPU build with license verification
 REM   build.bat --jobs=8 --test=off              REM 8-core parallel build, no tests
-REM   build.bat --arch=cpu --tier=standard       REM CPU build with standard tier
+REM   build.bat --arch=cpu --license=on          REM CPU build with license verification
 REM
 REM EXIT CODES:
 REM   0  - Success
@@ -46,7 +46,7 @@ REM
 REM ==============================================================================
 
 REM Default build configuration
-set TIER=standard
+set LICENSE=off
 set ARCH=cpu
 set TEST=on
 set BUILD_TYPE=Release
@@ -75,16 +75,16 @@ REM Help section - displays command line parameter usage
     echo.
     echo OPTIONS:
     echo   --help              Show this help message
-    echo   --tier=TIER         Build tier: 'standard' or 'free' (default: standard)
+    echo   --license=LICENSE   Enable license verification: 'on' or 'off' (default: off)
     echo   --arch=ARCH         Build architecture: 'cpu' or 'gpu' (default: cpu)
     echo   --test=TEST         Enable unit tests: 'on' or 'off' (default: on)
     echo   --jobs=N            Number of parallel build jobs (default: auto-detect)
     echo.
     echo EXAMPLES:
     echo   %~nx0                                    # Default build
-    echo   %~nx0 --tier=free --arch=gpu           # GPU build with free tier
+    echo   %~nx0 --license=on --arch=gpu          # GPU build with license verification
     echo   %~nx0 --jobs=8 --test=off              # 8-core parallel build, no tests
-    echo   %~nx0 --arch=cpu --tier=standard       # CPU build with standard tier
+    echo   %~nx0 --arch=cpu --license=on          # CPU build with license verification
     echo.
     echo WINDOWS-SPECIFIC NOTES:
     echo   - Uses MSVC compiler, creates .dll files
@@ -113,13 +113,13 @@ REM   assignment. Also handles special cases like --help and automatic CPU detec
 REM Arguments:
 REM   %1, %2, ... - Command line arguments passed to the script
 REM Global Variables Set:
-REM   TIER - Build tier (standard/free)
+REM   LICENSE - License verification (on/off)
 REM   ARCH - Build architecture (cpu/gpu)
 REM   TEST - Unit test flag (on/off)
 REM   JOBS - Number of parallel build jobs
 REM Supported Options:
 REM   --help: Shows help and exits
-REM   --tier=VALUE: Sets build tier
+REM   --license=VALUE: Enables/disables license verification
 REM   --arch=VALUE: Sets architecture
 REM   --test=VALUE: Enables/disables tests
 REM   --jobs=VALUE: Sets parallel job count
@@ -130,8 +130,8 @@ REM   Exits with code 1 on unknown options or validation errors
     REM Parse command line arguments
     if /I "%1" == "--help" goto Help
     if /I "%1" == "-h" goto Help
-    if /I "%1" == "--tier" (
-        set TIER=%2
+    if /I "%1" == "--license" (
+        set LICENSE=%2
         shift
         shift
         goto GETOPTS
@@ -160,10 +160,10 @@ REM   Exits with code 1 on unknown options or validation errors
         goto ERROR_EXIT
     )
 
-    REM Validate tier parameter
-    if /I NOT "%TIER%" == "free" (
-        if /I NOT "%TIER%" == "standard" (
-            echo ERROR: Invalid --tier parameter '%TIER%'. Please choose 'free' or 'standard'
+    REM Validate license parameter
+    if /I NOT "%LICENSE%" == "on" (
+        if /I NOT "%LICENSE%" == "off" (
+            echo ERROR: Invalid --license parameter '%LICENSE%'. Please choose 'on' or 'off'
             goto ERROR_EXIT
         )
     )
@@ -318,7 +318,7 @@ REM Display banner and copyright information
     echo.
     echo Build Configuration (Windows):
     echo   - Platform: Windows
-    echo   - Tier: %TIER%
+    echo   - License Verification: %LICENSE%
     echo   - Architecture: %ARCH%
     echo   - Tests: %TEST%
     echo   - Build Type: %BUILD_TYPE%
@@ -391,12 +391,13 @@ REM
 REM BUILD_CPP() - Builds the RadarSimCpp C++ library using CMake
 REM Description:
 REM   Configures and builds the C++ library component using CMake with appropriate
-REM   settings for the target architecture (CPU/GPU) and test configuration.
+REM   settings for the target architecture (CPU/GPU), license verification, and test configuration.
 REM   Uses Visual Studio generators for Windows compatibility.
 REM Arguments:
 REM   None
 REM Global Variables Used:
 REM   ARCH - Determines GPU_BUILD CMake option
+REM   LICENSE - Determines ENABLE_LICENSE CMake option
 REM   TEST - Determines GTEST CMake option
 REM   BUILD_TYPE - CMake build configuration (Release/Debug)
 REM   JOBS - Number of parallel build jobs
@@ -420,20 +421,24 @@ REM   Sets CMAKE_FAILED=1 and exits on any CMake failures
     REM Change to build directory
     pushd ".\src\radarsimcpp\build"
     
-    REM Configure CMake build based on architecture and test settings
-    echo INFO: Configuring CMake build - Architecture: %ARCH%, Tests: %TEST%...
+    REM Configure CMake build based on architecture, license, and test settings
+    echo INFO: Configuring CMake build - Architecture: %ARCH%, License: %LICENSE%, Tests: %TEST%...
+    
+    REM Set license flag
+    set LICENSE_FLAG=OFF
+    if /I "%LICENSE%" == "on" set LICENSE_FLAG=ON
     
     if /I "%ARCH%" == "gpu" (
         if /I "%TEST%" == "on" (
-            cmake -DGPU_BUILD=ON -DGTEST=ON ..
+            cmake -DGPU_BUILD=ON -DENABLE_LICENSE=%LICENSE_FLAG% -DGTEST=ON ..
         ) else (
-            cmake -DGPU_BUILD=ON -DGTEST=OFF ..
+            cmake -DGPU_BUILD=ON -DENABLE_LICENSE=%LICENSE_FLAG% -DGTEST=OFF ..
         )
     ) else (
         if /I "%TEST%" == "on" (
-            cmake -DGTEST=ON ..
+            cmake -DENABLE_LICENSE=%LICENSE_FLAG% -DGTEST=ON ..
         ) else (
-            cmake -DGTEST=OFF ..
+            cmake -DENABLE_LICENSE=%LICENSE_FLAG% -DGTEST=OFF ..
         )
     )
     
@@ -463,11 +468,10 @@ REM
 REM BUILD_PYTHON() - Builds Python extensions using Cython and setup.py
 REM Description:
 REM   Compiles Python extensions using Cython, linking against the previously
-REM   built C++ library. Uses setup.py with tier and architecture parameters.
+REM   built C++ library. Uses setup.py with architecture parameters.
 REM Arguments:
 REM   None
 REM Global Variables Used:
-REM   TIER - Build tier passed to setup.py
 REM   ARCH - Architecture passed to setup.py
 REM   PWD - Working directory for build context
 REM Output:
@@ -478,7 +482,7 @@ REM   Sets PYTHON_BUILD_FAILED=1 and exits on setup.py failures
     echo INFO: Building Python extensions with Cython...
     
     cd /d "%PWD%"
-    python setup.py build_ext -b ./ --tier %TIER% --arch %ARCH%
+    python setup.py build_ext -b ./ --arch %ARCH%
     
     if %errorlevel% neq 0 (
         echo ERROR: Python extension build failed
@@ -635,7 +639,7 @@ REM Build completion
     echo.
     echo Build Summary (Windows):
     echo   - Platform: Windows
-    echo   - Tier: %TIER%
+    echo   - License Verification: %LICENSE%
     echo   - Architecture: %ARCH%
     echo   - Tests: %TEST%
     echo   - Build Type: %BUILD_TYPE%
@@ -668,7 +672,7 @@ REM Error handling
     echo.
     echo Build Configuration (Windows):
     echo   - Platform: Windows
-    echo   - Tier: %TIER%
+    echo   - License Verification: %LICENSE%
     echo   - Architecture: %ARCH%
     echo   - Tests: %TEST%
     echo   - Build Type: %BUILD_TYPE%

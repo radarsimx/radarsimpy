@@ -115,7 +115,7 @@ jobs:
 
       - name: Build & Test
         run: |
-          .\build.bat --tier=standard --arch=cpu --test=on
+          .\build.bat --license=on --arch=cpu --test=on
         env:
           PYTHONPATH: ${{ github.workspace }}
           CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake

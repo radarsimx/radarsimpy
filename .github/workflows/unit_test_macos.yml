@@ -186,7 +186,7 @@ jobs:
           PYTHONPATH: ${{ github.workspace }}
         run: |
           chmod +x build.sh
-          ./build.sh --tier=standard --arch=cpu --test=on
+          ./build.sh --license=on --arch=cpu --test=on
 
       - name: Display build logs on failure
         if: failure()

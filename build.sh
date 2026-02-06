@@ -30,7 +30,7 @@
 #
 # OPTIONS:
 #   --help              Show help message
-#   --tier=TIER         Build tier: 'standard' or 'free' (default: standard)
+#   --license=LICENSE   Enable license verification: 'on' or 'off' (default: off)
 #   --arch=ARCH         Build architecture: 'cpu' or 'gpu' (default: cpu)
 #   --test=TEST         Enable unit tests: 'on' or 'off' (default: on)
 #   --jobs=N            Number of parallel build jobs (default: auto-detect)
@@ -40,7 +40,7 @@
 #
 # EXAMPLES:
 #   ./build.sh                                    # Default build
-#   ./build.sh --tier=free --arch=gpu           # GPU build with free tier
+#   ./build.sh --license=on --arch=gpu          # GPU build with license verification
 #   ./build.sh --jobs=8 --verbose               # 8-core parallel build
 #   ./build.sh --cmake-args="-DCUSTOM_FLAG=ON"  # Custom CMake flags
 #
@@ -148,7 +148,7 @@ Current Platform: ${PLATFORM_NAME}
 
 OPTIONS:
     --help              Show this help message
-    --tier=TIER         Build tier: 'standard' or 'free' (default: standard)
+    --license=LICENSE   Enable license verification: 'on' or 'off' (default: off)
     --arch=ARCH         Build architecture: 'cpu' or 'gpu' (default: cpu)
     --test=TEST         Enable unit tests: 'on' or 'off' (default: on)
     --jobs=N            Number of parallel build jobs (default: auto-detect)
@@ -158,7 +158,7 @@ OPTIONS:
 
 EXAMPLES:
     $0                                  # Default build
-    $0 --tier=free --arch=gpu         # GPU build with free tier
+    $0 --license=on --arch=gpu        # GPU build with license verification
     $0 --jobs=4 --verbose              # Parallel build with verbose output
     $0 --cmake-args="-DCUSTOM_FLAG=ON" # Custom CMake arguments
 
@@ -391,7 +391,7 @@ check_requirements() {
 # Arguments:
 #   $@ - All command line arguments passed to the script
 # Global Variables Set:
-#   TIER - Build tier (standard/free)
+#   LICENSE - License verification (on/off)
 #   ARCH - Build architecture (cpu/gpu)  
 #   TEST - Unit test flag (on/off)
 #   JOBS - Number of parallel build jobs
@@ -400,7 +400,7 @@ check_requirements() {
 #   CMAKE_ARGS - Additional CMake arguments
 # Supported Options:
 #   --help: Shows help and exits
-#   --tier=VALUE: Sets build tier
+#   --license=VALUE: Enables/disables license verification
 #   --arch=VALUE: Sets architecture
 #   --test=VALUE: Enables/disables tests
 #   --jobs=VALUE: Sets parallel job count
@@ -412,7 +412,7 @@ check_requirements() {
 #   Exits with code 1 on unknown options
 parse_arguments() {
     # Default configuration values (make them global)
-    TIER="standard"         # Build tier (standard/free)
+    LICENSE="off"          # License verification (on/off)
     ARCH="cpu"             # Build architecture (cpu/gpu)
     TEST="on"              # Unit test flag (on/off)
     JOBS=""                # Number of parallel jobs (auto-detect if empty)
@@ -421,15 +421,15 @@ parse_arguments() {
     CMAKE_ARGS=""          # Additional CMake arguments
     
     # Parse command line arguments
-    # Supports --help, --tier, --arch, --test, --jobs, --clean, --verbose, and --cmake-args parameters
+    # Supports --help, --license, --arch, --test, --jobs, --clean, --verbose, and --cmake-args parameters
     for i in "$@"; do
         case $i in
             --help*)
                 Help
                 exit 0
                 ;;
-            --tier=*)
-                TIER="${i#*=}"
+            --license=*)
+                LICENSE="${i#*=}"
                 shift
                 ;;
             --arch=*)
@@ -482,13 +482,13 @@ parse_arguments() {
 # Arguments:
 #   None
 # Global Variables Used:
-#   TIER - Validated against 'standard' and 'free'
+#   LICENSE - Validated against 'on' and 'off'
 #   ARCH - Validated against 'cpu' and 'gpu'
 #   TEST - Validated against 'on' and 'off'
 #   JOBS - Validated as positive integer
 #   CLEAN - Validated against 'true' and 'false'
 # Validation Rules:
-#   - TIER: Must be 'standard' or 'free' (case insensitive)
+#   - LICENSE: Must be 'on' or 'off' (case insensitive)
 #   - ARCH: Must be 'cpu' or 'gpu' (case insensitive)
 #   - TEST: Must be 'on' or 'off' (case insensitive)
 #   - JOBS: Must be positive integer >= 1
@@ -498,12 +498,12 @@ parse_arguments() {
 validate_parameters() {
     local errors=0
     
-    # Validate tier parameter
-    tier_lower=$(echo "${TIER}" | tr '[:upper:]' '[:lower:]')
-    case "${tier_lower}" in
-        "standard"|"free") ;;
+    # Validate license parameter
+    license_lower=$(echo "${LICENSE}" | tr '[:upper:]' '[:lower:]')
+    case "${license_lower}" in
+        "on"|"off") ;;
         *)
-            log_error "Invalid --tier parameter: '$TIER'. Choose 'free' or 'standard'"
+            log_error "Invalid --license parameter: '$LICENSE'. Choose 'on' or 'off'"
             errors=$((errors + 1))
             ;;
     esac
@@ -562,7 +562,7 @@ validate_parameters() {
 #   None
 # Global Variables Used:
 #   PLATFORM_NAME - Current platform
-#   TIER - Build tier setting
+#   LICENSE - License verification setting
 #   ARCH - Architecture setting  
 #   TEST - Test execution setting
 #   JOBS - Number of parallel jobs
@@ -590,7 +590,7 @@ display_banner() {
     echo
     echo "Build Configuration (${PLATFORM_NAME}):"
     echo "  - Platform: ${PLATFORM_NAME}"
-    echo "  - Tier: $(echo "${TIER}" | tr '[:lower:]' '[:upper:]')"
+    echo "  - License Verification: $(echo "${LICENSE}" | tr '[:lower:]' '[:upper:]')"
     echo "  - Architecture: $(echo "${ARCH}" | tr '[:lower:]' '[:upper:]')"
     echo "  - Tests: $(echo "${TEST}" | tr '[:lower:]' '[:upper:]')"
     echo "  - Parallel Jobs: ${JOBS}"
@@ -665,6 +665,7 @@ clean_build_artifacts() {
 # Global Variables Used:
 #   PLATFORM_NAME - Current platform for library naming
 #   ARCH - Determines GPU build flags
+#   LICENSE - Determines ENABLE_LICENSE build flag
 #   TEST - Controls Google Test compilation
 #   CMAKE_ARGS - Additional CMake arguments
 #   JOBS - Number of parallel compilation jobs
@@ -680,6 +681,7 @@ clean_build_artifacts() {
 # CMake Flags Set:
 #   - CMAKE_BUILD_TYPE=Release (always)
 #   - GPU_BUILD=ON (if ARCH=gpu)
+#   - ENABLE_LICENSE=ON/OFF (based on LICENSE setting)
 #   - GTEST=ON/OFF (based on TEST setting)
 #   - Custom flags from CMAKE_ARGS
 build_cpp_library() {
@@ -700,6 +702,14 @@ build_cpp_library() {
     arch_lower=$(echo "${ARCH}" | tr '[:upper:]' '[:lower:]')
     if [ "${arch_lower}" = "gpu" ]; then
         cmake_args+=" -DGPU_BUILD=ON"
+    fi
+    
+    # Add license verification flag
+    license_lower=$(echo "${LICENSE}" | tr '[:upper:]' '[:lower:]')
+    if [ "${license_lower}" = "on" ]; then
+        cmake_args+=" -DENABLE_LICENSE=ON"
+    else
+        cmake_args+=" -DENABLE_LICENSE=OFF"
     fi
     
     # Add test flags
@@ -763,12 +773,11 @@ build_cpp_library() {
 # Global Variables Used:
 #   WORKPATH - Working directory for build
 #   VERBOSE - Controls build output verbosity
-#   TIER - Build tier passed to setup.py
 #   ARCH - Architecture setting passed to setup.py
 #   LOG_FILE - Log file for quiet builds
 # Build Process:
 #   1. Changes to working directory
-#   2. Invokes setup.py build_ext with tier and architecture flags
+#   2. Invokes setup.py build_ext with architecture flags
 #   3. Times the build process
 #   4. Handles both verbose and quiet build modes
 # Output:
@@ -781,9 +790,9 @@ build_python_extensions() {
     
     # Build Python extensions
     if [ "$VERBOSE" = "true" ]; then
-        python3 setup.py build_ext -b ./ --tier "${TIER}" --arch "${ARCH}"
+        python3 setup.py build_ext -b ./ --arch "${ARCH}"
     else
-        python3 setup.py build_ext -b ./ --tier "${TIER}" --arch "${ARCH}" >> "${LOG_FILE}" 2>&1
+        python3 setup.py build_ext -b ./ --arch "${ARCH}" >> "${LOG_FILE}" 2>&1
     fi
     
     # Check build success
@@ -980,7 +989,7 @@ run_tests() {
 # Global Variables Used:
 #   BUILD_START_TIME - Start time for total duration calculation
 #   PLATFORM_NAME - Current platform
-#   TIER - Build tier setting
+#   LICENSE - License verification setting
 #   ARCH - Architecture setting
 #   TEST - Test execution setting
 #   JOBS - Number of parallel jobs used
@@ -1002,7 +1011,7 @@ display_summary() {
     echo "  Total Build Time: ${total_time}s"
     echo "  Configuration:"
     echo "    - Platform: ${PLATFORM_NAME}"
-    echo "    - Tier: $(echo "${TIER}" | tr '[:lower:]' '[:upper:]')"
+    echo "    - License Verification: $(echo "${LICENSE}" | tr '[:lower:]' '[:upper:]')"
     echo "    - Architecture: $(echo "${ARCH}" | tr '[:lower:]' '[:upper:]')"
     echo "    - Tests: $(echo "${TEST}" | tr '[:lower:]' '[:upper:]')"
     echo "    - Parallel Jobs: ${JOBS}"

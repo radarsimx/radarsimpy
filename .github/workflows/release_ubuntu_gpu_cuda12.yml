@@ -2,16 +2,15 @@ name: Release on Ubuntu GPU (CUDA 12)
 
 # GitHub Actions workflow for building and packaging RadarSimPy on Ubuntu platforms.
 #
-# This workflow builds RadarSimPy across multiple Ubuntu LTS versions, Python versions,
-# and build tiers (standard/free). It supports both Ubuntu 22.04 LTS and Ubuntu 24.04 LTS
-# to provide comprehensive Linux coverage with different GCC compiler versions.
+# This workflow builds RadarSimPy across multiple Ubuntu LTS versions and Python versions.
+# It supports both Ubuntu 22.04 LTS and Ubuntu 24.04 LTS to provide comprehensive Linux
+# coverage with different GCC compiler versions.
 #
 # Build Matrix:
-# - Ubuntu 22.04 LTS: GCC-11 compiler, 10 builds (5 Python × 2 tiers)
-# - Ubuntu 24.04 LTS: GCC-13 compiler, 10 builds (5 Python × 2 tiers)
+# - Ubuntu 22.04 LTS: GCC-11 compiler, 5 builds (5 Python versions)
+# - Ubuntu 24.04 LTS: GCC-13 compiler, 5 builds (5 Python versions)
 # - Python versions: 3.10, 3.11, 3.12, 3.13, 3.14
-# - Build tiers: standard (full features), free (limited features)
-# - Total builds: 20
+# - Total builds: 10
 #
 # Features:
 # - Comprehensive caching (pip, ccache)
@@ -25,7 +24,7 @@ name: Release on Ubuntu GPU (CUDA 12)
 #
 # Outputs:
 # - Individual artifacts for each build configuration
-# - Packed archive containing all builds organized by Ubuntu version and tier
+# - Packed archive containing all builds organized by Ubuntu version
 # - Build summaries and statistics
 #
 # Triggers:
@@ -52,150 +51,68 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Ubuntu 22.04 with GCC-11 Standard builds
+          # Ubuntu 22.04 with GCC-11 builds
           - os: ubuntu-22.04
             python-version: "3.10"
             c_compiler: gcc-11
             cxx_compiler: g++-11
-            tier: standard
             arch: gpu
             artifact_name: radarsimpy_ubuntu_22_04_py3.10
           - os: ubuntu-22.04
             python-version: "3.11"
             c_compiler: gcc-11
             cxx_compiler: g++-11
-            tier: standard
             arch: gpu
             artifact_name: radarsimpy_ubuntu_22_04_py3.11
           - os: ubuntu-22.04
             python-version: "3.12"
             c_compiler: gcc-11
             cxx_compiler: g++-11
-            tier: standard
             arch: gpu
             artifact_name: radarsimpy_ubuntu_22_04_py3.12
           - os: ubuntu-22.04
             python-version: "3.13"
             c_compiler: gcc-11
             cxx_compiler: g++-11
-            tier: standard
             arch: gpu
             artifact_name: radarsimpy_ubuntu_22_04_py3.13
           - os: ubuntu-22.04
             python-version: "3.14"
             c_compiler: gcc-11
             cxx_compiler: g++-11
-            tier: standard
             arch: gpu
             artifact_name: radarsimpy_ubuntu_22_04_py3.14
-          # Ubuntu 22.04 with GCC-11 Free Tier builds
-          - os: ubuntu-22.04
-            python-version: "3.10"
-            c_compiler: gcc-11
-            cxx_compiler: g++-11
-            tier: free
-            arch: gpu
-            artifact_name: radarsimpy_ubuntu_22_04_py3.10_freetier
-          - os: ubuntu-22.04
-            python-version: "3.11"
-            c_compiler: gcc-11
-            cxx_compiler: g++-11
-            tier: free
-            arch: gpu
-            artifact_name: radarsimpy_ubuntu_22_04_py3.11_freetier
-          - os: ubuntu-22.04
-            python-version: "3.12"
-            c_compiler: gcc-11
-            cxx_compiler: g++-11
-            tier: free
-            arch: gpu
-            artifact_name: radarsimpy_ubuntu_22_04_py3.12_freetier
-          - os: ubuntu-22.04
-            python-version: "3.13"
-            c_compiler: gcc-11
-            cxx_compiler: g++-11
-            tier: free
-            arch: gpu
-            artifact_name: radarsimpy_ubuntu_22_04_py3.13_freetier
-          - os: ubuntu-22.04
-            python-version: "3.14"
-            c_compiler: gcc-11
-            cxx_compiler: g++-11
-            tier: free
-            arch: gpu
-            artifact_name: radarsimpy_ubuntu_22_04_py3.14_freetier
-          # Ubuntu 24.04 with GCC-13 Standard builds
+          # Ubuntu 24.04 with GCC-13 builds
           - os: ubuntu-24.04
             python-version: "3.10"
             c_compiler: gcc-13
             cxx_compiler: g++-13
-            tier: standard
             arch: gpu
             artifact_name: radarsimpy_ubuntu_24_04_py3.10
           - os: ubuntu-24.04
             python-version: "3.11"
             c_compiler: gcc-13
             cxx_compiler: g++-13
-            tier: standard
             arch: gpu
             artifact_name: radarsimpy_ubuntu_24_04_py3.11
           - os: ubuntu-24.04
             python-version: "3.12"
             c_compiler: gcc-13
             cxx_compiler: g++-13
-            tier: standard
             arch: gpu
             artifact_name: radarsimpy_ubuntu_24_04_py3.12
           - os: ubuntu-24.04
             python-version: "3.13"
             c_compiler: gcc-13
             cxx_compiler: g++-13
-            tier: standard
             arch: gpu
             artifact_name: radarsimpy_ubuntu_24_04_py3.13
           - os: ubuntu-24.04
             python-version: "3.14"
             c_compiler: gcc-13
             cxx_compiler: g++-13
-            tier: standard
             arch: gpu
             artifact_name: radarsimpy_ubuntu_24_04_py3.14
-          # Ubuntu 24.04 with GCC-13 Free Tier builds
-          - os: ubuntu-24.04
-            python-version: "3.10"
-            c_compiler: gcc-13
-            cxx_compiler: g++-13
-            tier: free
-            arch: gpu
-            artifact_name: radarsimpy_ubuntu_24_04_py3.10_freetier
-          - os: ubuntu-24.04
-            python-version: "3.11"
-            c_compiler: gcc-13
-            cxx_compiler: g++-13
-            tier: free
-            arch: gpu
-            artifact_name: radarsimpy_ubuntu_24_04_py3.11_freetier
-          - os: ubuntu-24.04
-            python-version: "3.12"
-            c_compiler: gcc-13
-            cxx_compiler: g++-13
-            tier: free
-            arch: gpu
-            artifact_name: radarsimpy_ubuntu_24_04_py3.12_freetier
-          - os: ubuntu-24.04
-            python-version: "3.13"
-            c_compiler: gcc-13
-            cxx_compiler: g++-13
-            tier: free
-            arch: gpu
-            artifact_name: radarsimpy_ubuntu_24_04_py3.13_freetier
-          - os: ubuntu-24.04
-            python-version: "3.14"
-            c_compiler: gcc-13
-            cxx_compiler: g++-13
-            tier: free
-            arch: gpu
-            artifact_name: radarsimpy_ubuntu_24_04_py3.14_freetier
 
     steps:
       - name: Checkout repository
@@ -217,9 +134,9 @@ jobs:
           path: |
             ~/.cache/pip
             ~/.ccache
-          key: ${{ runner.os }}-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.tier }}-${{ hashFiles('requirements-dev.txt') }}
+          key: ${{ runner.os }}-${{ matrix.os }}-${{ matrix.python-version }}-${{ hashFiles('requirements-dev.txt') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.tier }}-
+            ${{ runner.os }}-${{ matrix.os }}-${{ matrix.python-version }}-
             ${{ runner.os }}-${{ matrix.os }}-${{ matrix.python-version }}-
             ${{ runner.os }}-${{ matrix.os }}-
 
@@ -272,7 +189,6 @@ jobs:
           echo "::group::Build Information"
           echo "OS: ${{ matrix.os }}"
           echo "Python: ${{ matrix.python-version }}"
-          echo "Tier: ${{ matrix.tier }}"
           echo "Architecture: ${{ matrix.arch }}"
           echo "C Compiler: ${{ matrix.c_compiler }}"
           echo "C++ Compiler: ${{ matrix.cxx_compiler }}"
@@ -299,7 +215,7 @@ jobs:
           echo "::group::Build Process"
           sudo chown -R $USER:$USER /home/runner/work/radarsimpy
           chmod +x build.sh
-          ./build.sh --tier=${{ matrix.tier }} --arch=${{ matrix.arch }} --test=off --verbose
+          ./build.sh --license=on --arch=${{ matrix.arch }} --test=off --verbose
           echo "::endgroup::"
 
       - name: Display build statistics
@@ -381,17 +297,11 @@ jobs:
         run: |
           mkdir -p packed/radarsimpy_ubuntu_gpu_all
 
-          # Create base directory structure for final archive
-          mkdir -p packed/radarsimpy_ubuntu_gpu_all/standard
-          mkdir -p packed/radarsimpy_ubuntu_gpu_all/trial
+          # Create temporary directories for building packages
+          mkdir -p temp/Ubuntu22_x86_64_GPU/radarsimpy
+          mkdir -p temp/Ubuntu24_x86_64_GPU/radarsimpy
 
-          # Create temporary directories for building tier-specific packages
-          mkdir -p temp/standard/Ubuntu22_x86_64_GPU/radarsimpy
-          mkdir -p temp/standard/Ubuntu24_x86_64_GPU/radarsimpy
-          mkdir -p temp/trial/Ubuntu22_x86_64_GPU/radarsimpy
-          mkdir -p temp/trial/Ubuntu24_x86_64_GPU/radarsimpy
-
-          # Copy each artifact to appropriate directory based on Ubuntu version and tier
+          # Copy each artifact to appropriate directory based on Ubuntu version
           for dir in artifacts/*/; do
             if [ -d "$dir" ]; then
               artifact_name=$(basename "$dir")
@@ -399,19 +309,9 @@ jobs:
               
               # Determine target directory based on artifact name
               if [[ "$artifact_name" == *"ubuntu_24_04"* ]]; then
-                # Ubuntu 24.04 builds
-                if [[ "$artifact_name" == *"_freetier"* ]]; then
-                  target_dir="temp/trial/Ubuntu24_x86_64_GPU/radarsimpy"
-                else
-                  target_dir="temp/standard/Ubuntu24_x86_64_GPU/radarsimpy"
-                fi
+                target_dir="temp/Ubuntu24_x86_64_GPU/radarsimpy"
               else
-                # Ubuntu 22.04 builds
-                if [[ "$artifact_name" == *"_freetier"* ]]; then
-                  target_dir="temp/trial/Ubuntu22_x86_64_GPU/radarsimpy"
-                else
-                  target_dir="temp/standard/Ubuntu22_x86_64_GPU/radarsimpy"
-                fi
+                target_dir="temp/Ubuntu22_x86_64_GPU/radarsimpy"
               fi
               
               # Ensure target directory exists
@@ -429,31 +329,19 @@ jobs:
             fi
           done
 
-          # Create ZIP files for each Ubuntu version and tier
-          echo "Creating Ubuntu22_x86_64_GPU.zip for standard tier..."
-          cd temp/standard && zip -r ../../packed/radarsimpy_ubuntu_gpu_all/standard/Ubuntu22_x86_64_GPU.zip Ubuntu22_x86_64_GPU/ && cd ../..
+          # Create ZIP files for each Ubuntu version
+          echo "Creating Ubuntu22_x86_64_GPU.zip..."
+          cd temp && zip -r ../packed/radarsimpy_ubuntu_gpu_all/Ubuntu22_x86_64_GPU.zip Ubuntu22_x86_64_GPU/ && cd ..
 
-          echo "Creating Ubuntu24_x86_64_GPU.zip for standard tier..."
-          cd temp/standard && zip -r ../../packed/radarsimpy_ubuntu_gpu_all/standard/Ubuntu24_x86_64_GPU.zip Ubuntu24_x86_64_GPU/ && cd ../..
+          echo "Creating Ubuntu24_x86_64_GPU.zip..."
+          cd temp && zip -r ../packed/radarsimpy_ubuntu_gpu_all/Ubuntu24_x86_64_GPU.zip Ubuntu24_x86_64_GPU/ && cd ..
 
-          echo "Creating Ubuntu22_x86_64_GPU.zip for trial tier..."
-          cd temp/trial && zip -r ../../packed/radarsimpy_ubuntu_gpu_all/trial/Ubuntu22_x86_64_GPU.zip Ubuntu22_x86_64_GPU/ && cd ../..
+          # Create tar.gz files for each Ubuntu version
+          echo "Creating Ubuntu22_x86_64_GPU.tar.gz..."
+          cd temp && tar -czf ../packed/radarsimpy_ubuntu_gpu_all/Ubuntu22_x86_64_GPU.tar.gz Ubuntu22_x86_64_GPU/ && cd ..
 
-          echo "Creating Ubuntu24_x86_64_GPU.zip for trial tier..."
-          cd temp/trial && zip -r ../../packed/radarsimpy_ubuntu_gpu_all/trial/Ubuntu24_x86_64_GPU.zip Ubuntu24_x86_64_GPU/ && cd ../..
-
-          # Create tar.gz files for each Ubuntu version and tier
-          echo "Creating Ubuntu22_x86_64_GPU.tar.gz for standard tier..."
-          cd temp/standard && tar -czf ../../packed/radarsimpy_ubuntu_gpu_all/standard/Ubuntu22_x86_64_GPU.tar.gz Ubuntu22_x86_64_GPU/ && cd ../..
-
-          echo "Creating Ubuntu24_x86_64_GPU.tar.gz for standard tier..."
-          cd temp/standard && tar -czf ../../packed/radarsimpy_ubuntu_gpu_all/standard/Ubuntu24_x86_64_GPU.tar.gz Ubuntu24_x86_64_GPU/ && cd ../..
-
-          echo "Creating Ubuntu22_x86_64_GPU.tar.gz for trial tier..."
-          cd temp/trial && tar -czf ../../packed/radarsimpy_ubuntu_gpu_all/trial/Ubuntu22_x86_64_GPU.tar.gz Ubuntu22_x86_64_GPU/ && cd ../..
-
-          echo "Creating Ubuntu24_x86_64_GPU.tar.gz for trial tier..."
-          cd temp/trial && tar -czf ../../packed/radarsimpy_ubuntu_gpu_all/trial/Ubuntu24_x86_64_GPU.tar.gz Ubuntu24_x86_64_GPU/ && cd ../..
+          echo "Creating Ubuntu24_x86_64_GPU.tar.gz..."
+          cd temp && tar -czf ../packed/radarsimpy_ubuntu_gpu_all/Ubuntu24_x86_64_GPU.tar.gz Ubuntu24_x86_64_GPU/ && cd ..
 
       - name: Verify artifact structure
         run: |
@@ -463,53 +351,30 @@ jobs:
           echo ""
           echo "Verifying ZIP and tar.gz files exist:"
 
-          if [ -f "packed/radarsimpy_ubuntu_gpu_all/standard/Ubuntu22_x86_64_GPU.zip" ]; then
-            echo "✓ Standard Ubuntu 22.04 GPU ZIP found"
+          if [ -f "packed/radarsimpy_ubuntu_gpu_all/Ubuntu22_x86_64_GPU.zip" ]; then
+            echo "✓ Ubuntu 22.04 GPU ZIP found"
           else
-            echo "✗ Standard Ubuntu 22.04 GPU ZIP missing"
+            echo "✗ Ubuntu 22.04 GPU ZIP missing"
           fi
 
-          if [ -f "packed/radarsimpy_ubuntu_gpu_all/standard/Ubuntu22_x86_64_GPU.tar.gz" ]; then
-            echo "✓ Standard Ubuntu 22.04 GPU tar.gz found"
+          if [ -f "packed/radarsimpy_ubuntu_gpu_all/Ubuntu22_x86_64_GPU.tar.gz" ]; then
+            echo "✓ Ubuntu 22.04 GPU tar.gz found"
           else
-            echo "✗ Standard Ubuntu 22.04 GPU tar.gz missing"
+            echo "✗ Ubuntu 22.04 GPU tar.gz missing"
           fi
 
-          if [ -f "packed/radarsimpy_ubuntu_gpu_all/standard/Ubuntu24_x86_64_GPU.zip" ]; then
-            echo "✓ Standard Ubuntu 24.04 GPU ZIP found"
+          if [ -f "packed/radarsimpy_ubuntu_gpu_all/Ubuntu24_x86_64_GPU.zip" ]; then
+            echo "✓ Ubuntu 24.04 GPU ZIP found"
           else
-            echo "✗ Standard Ubuntu 24.04 GPU ZIP missing"
+            echo "✗ Ubuntu 24.04 GPU ZIP missing"
           fi
 
-          if [ -f "packed/radarsimpy_ubuntu_gpu_all/standard/Ubuntu24_x86_64_GPU.tar.gz" ]; then
-            echo "✓ Standard Ubuntu 24.04 GPU tar.gz found"
+          if [ -f "packed/radarsimpy_ubuntu_gpu_all/Ubuntu24_x86_64_GPU.tar.gz" ]; then
+            echo "✓ Ubuntu 24.04 GPU tar.gz found"
           else
-            echo "✗ Standard Ubuntu 24.04 GPU tar.gz missing"
+            echo "✗ Ubuntu 24.04 GPU tar.gz missing"
           fi
 
-          if [ -f "packed/radarsimpy_ubuntu_gpu_all/trial/Ubuntu22_x86_64_GPU.zip" ]; then
-            echo "✓ Trial Ubuntu 22.04 GPU ZIP found"
-          else
-            echo "✗ Trial Ubuntu 22.04 GPU ZIP missing"
-          fi
-
-          if [ -f "packed/radarsimpy_ubuntu_gpu_all/trial/Ubuntu22_x86_64_GPU.tar.gz" ]; then
-            echo "✓ Trial Ubuntu 22.04 GPU tar.gz found"
-          else
-            echo "✗ Trial Ubuntu 22.04 GPU tar.gz missing"
-          fi
-
-          if [ -f "packed/radarsimpy_ubuntu_gpu_all/trial/Ubuntu24_x86_64_GPU.zip" ]; then
-            echo "✓ Trial Ubuntu 24.04 GPU ZIP found"
-          else
-            echo "✗ Trial Ubuntu 24.04 GPU ZIP missing"
-          fi
-
-          if [ -f "packed/radarsimpy_ubuntu_gpu_all/trial/Ubuntu24_x86_64_GPU.tar.gz" ]; then
-            echo "✓ Trial Ubuntu 24.04 GPU tar.gz found"
-          else
-            echo "✗ Trial Ubuntu 24.04 GPU tar.gz missing"
-          fi
           echo "::endgroup::"
 
       - name: Create README for packed artifacts
@@ -517,7 +382,7 @@ jobs:
           cat > packed/radarsimpy_ubuntu_gpu_all/README.md << 'EOF'
           # RadarSimPy Ubuntu GPU Build Artifacts
 
-          This archive contains all RadarSimPy builds for Ubuntu GPU platforms organized by version and tier.
+          This archive contains all RadarSimPy builds for Ubuntu GPU platforms organized by version.
 
           ## Directory Structure
 
@@ -525,51 +390,39 @@ jobs:
 
           ```
           radarsimpy_ubuntu_gpu_all/
-          ├── standard/
-          │   ├── Ubuntu22_x86_64_GPU.zip
-          │   ├── Ubuntu22_x86_64_GPU.tar.gz
-          │   ├── Ubuntu24_x86_64_GPU.zip
-          │   └── Ubuntu24_x86_64_GPU.tar.gz
-          └── trial/
-              ├── Ubuntu22_x86_64_GPU.zip
-              ├── Ubuntu22_x86_64_GPU.tar.gz
-              ├── Ubuntu24_x86_64_GPU.zip
-              └── Ubuntu24_x86_64_GPU.tar.gz
+          ├── Ubuntu22_x86_64_GPU.zip
+          ├── Ubuntu22_x86_64_GPU.tar.gz
+          ├── Ubuntu24_x86_64_GPU.zip
+          └── Ubuntu24_x86_64_GPU.tar.gz
           ```
 
-          ## Version and Tier Information
+          ## Version Information
 
           ### Ubuntu22_x86_64_GPU (Ubuntu 22.04 LTS)
-          - **standard/**: Full-featured builds with all capabilities including GPU acceleration
-          - **trial/**: Free tier builds with limited features
-          - Built with GCC-11 compiler and CUDA support
+          - Built with GCC-11 compiler and CUDA 12 support
           - Available in both ZIP and tar.gz formats
           - Each archive contains the complete radarsimpy module with all Python versions supported
 
           ### Ubuntu24_x86_64_GPU (Ubuntu 24.04 LTS)
-          - **standard/**: Full-featured builds with all capabilities including GPU acceleration
-          - **trial/**: Free tier builds with limited features
-          - Built with GCC-13 compiler and CUDA support
+          - Built with GCC-13 compiler and CUDA 12 support
           - Available in both ZIP and tar.gz formats
           - Each archive contains the complete radarsimpy module with all Python versions supported
 
           ## Build Information
 
-          - **Total Builds**: 20 (packaged into 8 files: 4 ZIP + 4 tar.gz)
+          - **Total Builds**: 10 (packaged into 4 files: 2 ZIP + 2 tar.gz)
           - **Ubuntu Versions**: 22.04 LTS, 24.04 LTS
           - **Architecture**: x86_64
-          - **GPU Support**: CUDA-enabled
+          - **GPU Support**: CUDA 12 enabled
           - **Python Versions**: 3.10, 3.11, 3.12, 3.13, 3.14
-          - **Tiers**: Standard (full features), Trial (limited features)
           - **Formats**: ZIP and tar.gz for maximum compatibility
           - **Build Date**: $(date)
 
           ## Usage
 
           1. Extract the main archive
-          2. Navigate to the desired tier directory (standard/ or trial/)
-          3. Extract the appropriate Ubuntu version file (choose ZIP or tar.gz based on your preference)
-          4. The radarsimpy module will be ready for use with GPU acceleration
+          2. Extract the appropriate Ubuntu version file (choose ZIP or tar.gz based on your preference)
+          3. The radarsimpy module will be ready for use with GPU acceleration
           EOF
 
       - name: Create compressed archive
@@ -596,18 +449,14 @@ jobs:
 
       - name: Generate build summary
         run: |
-          echo "# Ubuntu GPU Build Summary �" >> $GITHUB_STEP_SUMMARY
+          echo "# Ubuntu GPU Build Summary 📊" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Build Matrix Results" >> $GITHUB_STEP_SUMMARY
-          echo "Total builds: 20 (5 Python versions × 2 Ubuntu versions × 2 tiers)" >> $GITHUB_STEP_SUMMARY
+          echo "Total builds: 10 (5 Python versions × 2 Ubuntu versions)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Ubuntu Version Distribution" >> $GITHUB_STEP_SUMMARY
-          echo "- **Ubuntu 22.04 LTS**: 10 builds with GCC-11 and CUDA support" >> $GITHUB_STEP_SUMMARY
-          echo "- **Ubuntu 24.04 LTS**: 10 builds with GCC-13 and CUDA support" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Tier Distribution" >> $GITHUB_STEP_SUMMARY
-          echo "- **Standard**: 10 builds" >> $GITHUB_STEP_SUMMARY
-          echo "- **Free**: 10 builds" >> $GITHUB_STEP_SUMMARY
+          echo "- **Ubuntu 22.04 LTS**: 5 builds with GCC-11 and CUDA support" >> $GITHUB_STEP_SUMMARY
+          echo "- **Ubuntu 24.04 LTS**: 5 builds with GCC-13 and CUDA support" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Python Versions" >> $GITHUB_STEP_SUMMARY
           echo "- Python 3.10, 3.11, 3.12, 3.13, 3.14" >> $GITHUB_STEP_SUMMARY
@@ -617,11 +466,11 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Packed Artifacts" >> $GITHUB_STEP_SUMMARY
           if [ "${{ needs.build.result }}" == "success" ]; then
-            echo "✅ **All artifacts successfully packed into ZIP and tar.gz files by tier**" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **All artifacts successfully packed into ZIP and tar.gz files**" >> $GITHUB_STEP_SUMMARY
             echo "- Archive: \`radarsimpy_ubuntu_gpu_all_builds\`" >> $GITHUB_STEP_SUMMARY
             echo "- Formats: tar.gz, zip" >> $GITHUB_STEP_SUMMARY
-            echo "- Structure: 8 files (2 Ubuntu versions × 2 tiers × 2 formats)" >> $GITHUB_STEP_SUMMARY
-            echo "- Contains: All 20 GPU-enabled build variants organized by Ubuntu version and tier" >> $GITHUB_STEP_SUMMARY
+            echo "- Structure: 4 files (2 Ubuntu versions × 2 formats)" >> $GITHUB_STEP_SUMMARY
+            echo "- Contains: All 10 GPU-enabled build variants organized by Ubuntu version" >> $GITHUB_STEP_SUMMARY
           else
             echo "⚠️ **Artifact packing failed or was skipped**" >> $GITHUB_STEP_SUMMARY
           fi
