@@ -158,9 +158,9 @@ jobs:
       - name: Setup license file
         run: |
           mkdir -p ./radarsimpy
-          echo "$TEST_LICENSE" > ./radarsimpy/license_RadarSimPy_M1770306974.lic
+          echo "$TEST_LICENSE_MACOS" > ./radarsimpy/license_RadarSimPy_MacOS.lic
         env:
-          TEST_LICENSE: ${{ secrets.TEST_LICENSE }}
+          TEST_LICENSE_MACOS: ${{ secrets.TEST_LICENSE_MACOS }}
 
       - name: Display system information
         run: |
