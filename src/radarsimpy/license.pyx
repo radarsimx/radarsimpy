@@ -51,6 +51,7 @@ def set_license(license_file_path=None):
     """
     cdef string cpp_license_path
     cdef vector[string] cpp_license_paths
+    cdef string cpp_product = b"RadarSimPy"
     
     if license_file_path is None:
         # No license file provided, search for all license_RadarSimPy_*.lic files
@@ -62,15 +63,15 @@ def set_license(license_file_path=None):
             # Pass all found license files to C++
             for lic_file in license_files:
                 cpp_license_paths.push_back(lic_file.encode('utf-8'))
-            LicenseManager.GetInstance().SetLicense(cpp_license_paths)
+            LicenseManager.GetInstance().SetLicense(cpp_license_paths, cpp_product)
         else:
             # No license files found, use empty string (free tier mode)
             cpp_license_path = b""
-            LicenseManager.GetInstance().SetLicense(cpp_license_path)
+            LicenseManager.GetInstance().SetLicense(cpp_license_path, cpp_product)
     else:
         # Use provided path
         cpp_license_path = license_file_path.encode('utf-8')
-        LicenseManager.GetInstance().SetLicense(cpp_license_path)
+        LicenseManager.GetInstance().SetLicense(cpp_license_path, cpp_product)
 
 
 # Backwards compatibility alias
