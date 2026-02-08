@@ -94,7 +94,7 @@ jobs:
       - name: Setup license file
         run: |
           New-Item -ItemType Directory -Force -Path .\radarsimpy
-          $env:TEST_LICENSE_WINDOWS | Out-File -FilePath .\radarsimpy\license_RadarSimPy_Windows.lic -Encoding utf8
+          $env:TEST_LICENSE_LINUX | Out-File -FilePath .\radarsimpy\license_RadarSimPy_Windows.lic -Encoding utf8
         env:
           TEST_LICENSE_WINDOWS: ${{ secrets.TEST_LICENSE_WINDOWS }}
 
