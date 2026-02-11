@@ -106,9 +106,6 @@ jobs:
           pip --version
           echo "CMake version:"
           cmake --version
-          echo "Visual Studio version:"
-          where cl
-          cl 2>&1 | head -1 || echo "cl not found"
 
       - name: Build & Test
         run: |
