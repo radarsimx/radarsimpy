@@ -127,25 +127,6 @@ You can place multiple license files in the directory. The system will try each 
     ├── license_RadarSimPy_backup.lic
     └── license_RadarSimPy_trial.lic
 
-Manual License Configuration
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-If you need to specify a license file from a custom location, or update the license at runtime:
-
-.. code-block:: python
-
-    import radarsimpy
-    
-    # Set license with a specific license file
-    radarsimpy.set_license("/path/to/your/license_RadarSimPy_customer.lic")
-    
-    # Check if license is active
-    if radarsimpy.is_licensed():
-        print("Full license active")
-        print(radarsimpy.get_license_info())
-    else:
-        print("Running in free tier mode")
-
 Checking License Status
 ^^^^^^^^^^^^^^^^^^^^^^^^
 

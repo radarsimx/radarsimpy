@@ -74,10 +74,6 @@ def set_license(license_file_path=None):
         LicenseManager.GetInstance().SetLicense(cpp_license_path, cpp_product)
 
 
-# Backwards compatibility alias
-initialize_license = set_license
-
-
 def is_licensed():
     """
     Check if a valid license is active.

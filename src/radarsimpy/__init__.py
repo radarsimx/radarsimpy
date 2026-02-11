@@ -48,13 +48,10 @@ from .receiver import Receiver
 from .simulator import sim_radar
 from .simulator import sim_lidar
 from .simulator import sim_rcs
-from .license import set_license, initialize_license, is_licensed, get_license_info
+from .license import set_license, is_licensed, get_license_info
 
-_simulation_available = True
 
 set_license()
-# except ImportError:
-#     _simulation_available = False
 
 # Signal processing and analysis tools
 from . import processing
@@ -77,15 +74,13 @@ __all__ = [
     "Radar",
     "Transmitter",
     "Receiver",
-    # Simulation Functions (if available)
+    # Simulation Functions
     "sim_radar",
     "sim_lidar",
     "sim_rcs",
-    # License Functions (if available)
+    # License Functions
     "set_license",
-    "initialize_license",  # Backwards compatibility
     "is_licensed",
-    "is_free_tier",
     "get_license_info",
     # Processing and Analysis
     "processing",
@@ -97,13 +92,6 @@ __all__ = [
     "__email__",
     "__url__",
 ]
-
-# Remove simulation and license functions from __all__ if not available
-if not _simulation_available:
-    for func in ["sim_radar", "sim_lidar", "sim_rcs", 
-                 "set_license", "initialize_license", "is_licensed", "is_free_tier", "get_license_info"]:
-        if func in __all__:
-            __all__.remove(func)
 
 
 def get_version():
@@ -133,13 +121,6 @@ def get_info():
         "website": __url__,
         "python_version": sys.version,
         "platform": platform.platform(),
-        "capabilities": {
-            "core_components": True,
-            "simulation_engines": _simulation_available,
-            "signal_processing": True,
-            "mesh_processing": True,
-            "analysis_tools": True,
-        },
         "modules": {
             "radar": "Core radar system modeling",
             "transmitter": "Radar transmitter configuration",
@@ -148,14 +129,12 @@ def get_info():
             "tools": "Analysis and characterization tools",
             "mesh_kit": "3D mesh file loading utilities",
         },
-    }
-
-    if _simulation_available:
-        info["simulation_engines"] = {
+        "simulation_engines": {
             "sim_radar": "Radar baseband simulation",
             "sim_lidar": "LiDAR point cloud simulation",
             "sim_rcs": "Radar cross-section calculation",
-        }
+        },
+    }
 
     # Check for optional dependencies
     optional_deps = {}
@@ -235,12 +214,6 @@ def check_installation():
 
     # Check core components (already imported at module level)
     # No need to re-import here
-
-    # Check simulation engines
-    if not _simulation_available:
-        issues.append(
-            "Simulation engines not available - compiled extensions may be missing"
-        )
 
     # Check required dependencies
     try:
