@@ -4,6 +4,44 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [15.0.1] - 2026-02-11
+
+### Changed
+
+- Refactored `__init__.py` to improve module initialization structure
+
+### Removed
+
+- `initialize_license` alias and optional gating from license module
+
+---
+
+## [15.0.0] - 2026-02-09
+
+### Added
+
+- License management system with mbedTLS integration
+- `set_license()` API for license configuration
+- Support for multiple license files
+- Automatic license initialization on module import
+- Packaging scripts for Windows and Linux/macOS platforms
+
+### Changed
+
+- Consolidated simulator imports from unified module
+- Simplified CI packaging by removing build tiers
+- Updated license API usage and free-tier checks
+- Enhanced build scripts for better library handling
+- Updated radarsimcpp submodule with licensing support
+
+### Removed
+
+- Ubuntu CUDA 12 GPU workflow from CI
+- Vehicle STL model files from repository
+- Build tier system
+
+---
+
 ## [14.2.0] - 2026-01-09
 
 ### Added

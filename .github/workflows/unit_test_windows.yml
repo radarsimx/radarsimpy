@@ -50,18 +50,18 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ssh-key: ${{secrets.RADARSIMC}}
           submodules: recursive
 
       - name: Set up Python ${{matrix.python-version}}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{matrix.python-version}}
 
       - name: Cache pip packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~\AppData\Local\pip\Cache
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements-dev.txt') }}
@@ -80,7 +80,7 @@ jobs:
           echo "${{ github.workspace }}\vcpkg" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Cache vcpkg packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: vcpkg/installed
           key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}-mbedtls
@@ -97,9 +97,6 @@ jobs:
           $env:TEST_LICENSE_WINDOWS | Out-File -FilePath .\radarsimpy\license_RadarSimPy_Windows.lic -Encoding utf8
         env:
           TEST_LICENSE_WINDOWS: ${{ secrets.TEST_LICENSE_WINDOWS }}
-
-      - name: Set up Visual Studio environment
-        uses: ilammy/msvc-dev-cmd@v1
 
       - name: Display system information
         run: |
