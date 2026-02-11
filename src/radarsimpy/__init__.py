@@ -38,29 +38,39 @@ Quick Start:
 
 """
 
+# =============================================================================
+# Imports
+# =============================================================================
+
 # Core radar system components
 from .radar import Radar
 from .transmitter import Transmitter
 from .receiver import Receiver
 
 # Simulation engines
-# try:
-from .simulator import sim_radar
-from .simulator import sim_lidar
-from .simulator import sim_rcs
+from .simulator import sim_radar, sim_lidar, sim_rcs
+
+# License management
 from .license import set_license, is_licensed, get_license_info
 
-
-set_license()
-
-# Signal processing and analysis tools
+# Signal processing and analysis modules
 from . import processing
 from . import tools
 
 # 3D mesh utilities
 from . import mesh_kit
 
-# Package metadata
+# =============================================================================
+# License Initialization
+# =============================================================================
+
+# Automatically initialize license from module directory
+set_license()
+
+# =============================================================================
+# Package Metadata
+# =============================================================================
+
 __version__ = "15.0.1"
 __author__ = "RadarSimX"
 __email__ = "info@radarsimx.com"
@@ -68,7 +78,10 @@ __url__ = "https://radarsimx.com"
 __license__ = "Proprietary"
 __description__ = "A comprehensive radar simulation library for Python"
 
-# Public API - modules and functions available for import
+# =============================================================================
+# Public API
+# =============================================================================
+
 __all__ = [
     # Core Components
     "Radar",
@@ -82,7 +95,7 @@ __all__ = [
     "set_license",
     "is_licensed",
     "get_license_info",
-    # Processing and Analysis
+    # Processing and Analysis Modules
     "processing",
     "tools",
     "mesh_kit",
@@ -91,15 +104,33 @@ __all__ = [
     "__author__",
     "__email__",
     "__url__",
+    # Utility Functions
+    "get_version",
+    "get_info",
+    "print_info",
+    "check_installation",
+    "hello",
 ]
+
+# =============================================================================
+# Utility Functions
+# =============================================================================
 
 
 def get_version():
     """
     Get the current version of RadarSimPy.
 
-    Returns:
-        str: Version string in semantic versioning format
+    Returns
+    -------
+    str
+        Version string in semantic versioning format (e.g., "15.0.1")
+
+    Examples
+    --------
+    >>> import radarsimpy as rs
+    >>> rs.get_version()
+    '15.0.1'
     """
     return __version__
 
@@ -108,8 +139,30 @@ def get_info():
     """
     Get comprehensive information about the RadarSimPy installation.
 
-    Returns:
-        dict: Dictionary containing package information, capabilities, and dependencies
+    This function collects information about the package version, platform,
+    available modules, and installed dependencies.
+
+    Returns
+    -------
+    dict
+        Dictionary containing:
+
+        - **package** (str): Package name
+        - **version** (str): Current version
+        - **author** (str): Package author
+        - **website** (str): Official website URL
+        - **python_version** (str): Python interpreter version
+        - **platform** (str): Operating system and platform information
+        - **modules** (dict): Available RadarSimPy modules and their descriptions
+        - **simulation_engines** (dict): Available simulation engines and descriptions
+        - **dependencies** (dict): Installed optional dependencies and their versions
+
+    Examples
+    --------
+    >>> import radarsimpy as rs
+    >>> info = rs.get_info()
+    >>> print(f"RadarSimPy version: {info['version']}")
+    >>> print(f"NumPy installed: {info['dependencies']['numpy']}")
     """
     import sys
     import platform
@@ -172,7 +225,21 @@ def get_info():
 
 
 def print_info():
-    """Print formatted information about the RadarSimPy installation."""
+    """
+    Print formatted information about the RadarSimPy installation.
+
+    This function displays package version, platform details, core modules,
+    simulation engines, and dependency status in a readable format.
+
+    Examples
+    --------
+    >>> import radarsimpy as rs
+    >>> rs.print_info()
+    RadarSimPy v15.0.1
+    Author: RadarSimX
+    Website: https://radarsimx.com
+    ...
+    """
     info = get_info()
 
     print(f"\n{info['package']} v{info['version']}")
@@ -181,19 +248,13 @@ def print_info():
     print(f"Python: {info['python_version']}")
     print(f"Platform: {info['platform']}")
 
-    print("\n📡 Capabilities:")
-    for capability, available in info["capabilities"].items():
-        status = "✅ Available" if available else "❌ Not Available"
-        print(f"  {capability.replace('_', ' ').title()}: {status}")
-
     print("\n📦 Core Modules:")
     for module, description in info["modules"].items():
         print(f"  {module}: {description}")
 
-    if "simulation_engines" in info and isinstance(info["simulation_engines"], dict):
-        print("\n🎯 Simulation Engines:")
-        for engine, description in info["simulation_engines"].items():
-            print(f"  {engine}: {description}")
+    print("\n🎯 Simulation Engines:")
+    for engine, description in info["simulation_engines"].items():
+        print(f"  {engine}: {description}")
 
     print("\n🔧 Dependencies:")
     for dep, version in info["dependencies"].items():
@@ -201,14 +262,28 @@ def print_info():
             print(f"  {dep}: ❌ {version}")
         else:
             print(f"  {dep}: ✅ v{version}")
+    print()
 
 
 def check_installation():
     """
     Check if RadarSimPy is properly installed and functional.
 
-    Returns:
-        bool: True if installation appears complete, False otherwise
+    Verifies that core components are importable and required dependencies
+    are available. Reports any installation issues found.
+
+    Returns
+    -------
+    bool
+        True if installation appears complete and functional, False if issues detected
+
+    Examples
+    --------
+    >>> import radarsimpy as rs
+    >>> if rs.check_installation():
+    ...     print("Ready to use!")
+    ✅ RadarSimPy installation appears complete
+    Ready to use!
     """
     issues = []
 
@@ -236,9 +311,20 @@ def check_installation():
         return True
 
 
-# Convenience function for getting started
 def hello():
-    """Print a welcome message and basic usage information."""
+    """
+    Print a welcome message and basic usage information.
+
+    Displays a friendly introduction to RadarSimPy with quick start examples
+    and helpful resources for getting started.
+
+    Examples
+    --------
+    >>> import radarsimpy as rs
+    >>> rs.hello()
+    🎯 Welcome to RadarSimPy!
+    ...
+    """
     print(
         """
     🎯 Welcome to RadarSimPy!
@@ -259,14 +345,16 @@ def hello():
        >>> range_doppler = rs.processing.range_doppler_fft(result['baseband'])
     
     💡 License: Automatically detected from module directory (license_RadarSimPy_*.lic)
-       Or manually specify: rs.set_license('/path/to/license.lic')
     
-    �📚 Documentation: https://radarsimx.github.io/radarsimpy/
+    📚 Documentation: https://radarsimx.github.io/radarsimpy/
     💬 Support: info@radarsimx.com
     """
     )
 
 
-# For development and debugging
+# =============================================================================
+# Module Entry Point (for development and debugging)
+# =============================================================================
+
 if __name__ == "__main__":
     print_info()
