@@ -64,7 +64,7 @@ from . import tools
 from . import mesh_kit
 
 # Package metadata
-__version__ = "15.0.0"
+__version__ = "15.0.1"
 __author__ = "RadarSimX"
 __email__ = "info@radarsimx.com"
 __url__ = "https://radarsimx.com"
