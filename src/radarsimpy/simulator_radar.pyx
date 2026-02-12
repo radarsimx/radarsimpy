@@ -381,6 +381,9 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
     cdef double[:,:,::1] bb_real = np.empty(ts_shape, order='C', dtype=np.float64)
     cdef double[:,:,::1] bb_imag = np.empty(ts_shape, order='C', dtype=np.float64)
 
+    cdef double[:,:,::1] bb_real_interf = np.empty(ts_shape, order='C', dtype=np.float64)
+    cdef double[:,:,::1] bb_imag_interf = np.empty(ts_shape, order='C', dtype=np.float64)
+
     radar_c.get()[0].InitBaseband(&bb_real[0][0][0], &bb_imag[0][0][0])
 
     #----------------------
@@ -506,7 +509,7 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
         interf_radar_c = cp_Radar(interf, interf_frame_start_time)
 
         # Initialize baseband for interference calculation
-        radar_c.get()[0].InitBaseband(&bb_real[0][0][0], &bb_imag[0][0][0])
+        radar_c.get()[0].InitBaseband(&bb_real_interf[0][0][0], &bb_imag_interf[0][0][0])
 
         # Run interference simulation based on device selection
         if device_lower == "cpu":
@@ -517,9 +520,9 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
 
         # Extract interference data based on baseband type
         if bb_type == "real":
-            interference = np.asarray(bb_real)
+            interference = np.asarray(bb_real_interf)
         else:
-            interference = np.asarray(bb_real) + 1j * np.asarray(bb_imag)
+            interference = np.asarray(bb_real_interf) + 1j * np.asarray(bb_imag_interf)
 
     # Return the simulation results as a structured dictionary
     return {
