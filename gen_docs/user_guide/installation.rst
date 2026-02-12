@@ -156,7 +156,7 @@ Free Tier Mode
 If no valid license file is found, RadarSimPy automatically operates in free tier mode with certain limitations:
 
 - Limited target complexity
-- Reduced simulation fidelity options
+- Limited radar channels
 - Other feature restrictions as documented
 
 .. tip::

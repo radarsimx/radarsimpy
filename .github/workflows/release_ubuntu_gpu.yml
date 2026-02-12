@@ -116,20 +116,20 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ssh-key: ${{secrets.RADARSIMC}}
           submodules: recursive
           fetch-depth: 0
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
 
       - name: Cache build dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.cache/pip
@@ -246,7 +246,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Archive built module
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: success()
         with:
           name: ${{ matrix.artifact_name }}
@@ -255,7 +255,7 @@ jobs:
           compression-level: 6
 
       - name: Upload build logs on failure
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: failure()
         with:
           name: build-logs-${{ matrix.artifact_name }}
@@ -274,7 +274,7 @@ jobs:
         run: mkdir -p artifacts
 
       - name: Download all artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           path: artifacts/
 
@@ -436,7 +436,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Upload packed artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: radarsimpy_ubuntu_gpu_all_builds
           path: |
