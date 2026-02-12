@@ -30,9 +30,9 @@
 #
 # OPTIONS:
 #   --help              Show help message
-#   --license=LICENSE   Enable license verification: 'on' or 'off' (default: off)
-#   --arch=ARCH         Build architecture: 'cpu' or 'gpu' (default: cpu)
-#   --test=TEST         Enable unit tests: 'on' or 'off' (default: on)
+#   --license=<on|off>  Enable license verification: 'on' or 'off' (default: off)
+#   --arch=<cpu|gpu>    Build architecture: 'cpu' or 'gpu' (default: cpu)
+#   --test=<on|off>     Enable unit tests: 'on' or 'off' (default: on)
 #   --jobs=N            Number of parallel build jobs (default: auto-detect)
 #   --clean=CLEAN       Clean build artifacts: 'true' or 'false' (default: true)
 #   --verbose           Enable verbose output (default: true)

@@ -24,9 +24,9 @@ REM   build.bat [OPTIONS]
 REM
 REM OPTIONS:
 REM   --help              Show help message
-REM   --license=LICENSE   Enable license verification: 'on' or 'off' (default: off)
-REM   --arch=ARCH         Build architecture: 'cpu' or 'gpu' (default: cpu)
-REM   --test=TEST         Enable unit tests: 'on' or 'off' (default: on)
+REM   --license=[on/off]  Enable license verification: 'on' or 'off' (default: off)
+REM   --arch=[cpu/gpu]    Build architecture: 'cpu' or 'gpu' (default: cpu)
+REM   --test=[on/off]     Enable unit tests: 'on' or 'off' (default: on)
 REM   --jobs=N            Number of parallel build jobs (default: auto-detect)
 REM
 REM EXAMPLES:
