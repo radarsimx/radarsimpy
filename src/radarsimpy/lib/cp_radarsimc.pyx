@@ -87,7 +87,7 @@ cdef inline void _validate_mesh_for_free_tier(int_t num_faces) except *:
             f"Your model: {num_faces} faces\n"
             f"Reduction needed: {num_faces - MAX_FREE_TIER_FACES} faces\n\n"
             f"This limitation helps maintain reasonable simulation times in the trial version.\n"
-            f"To simulate larger meshes, please upgrade to the Standard Version:\n"
+            f"To simulate larger meshes, please purchase a license:\n"
             f"→ https://radarsimx.com/product/radarsimpy/\n"
             f"{'='*60}\n"
         )
@@ -384,7 +384,7 @@ cdef void cp_AddRxChannel(rx, rx_idx, Receiver[float_t] * rx_c):
 
     polar = rx.rxchannel_prop["polarization"][rx_idx]
     cdef Vec3[cpp_complex[float_t]] polarization_vt = Vec3[cpp_complex[float_t]](cpp_complex[float_t](np.real(polar[0]), np.imag(polar[0])), cpp_complex[float_t](np.real(polar[1]), np.imag(polar[1])), cpp_complex[float_t](np.real(polar[2]), np.imag(polar[2])))
-    # cdef float_t[:] polarization_mv = rx.rxchannel_prop["polarization"][rx_idx].astype(np_float)
+
     rx_c[0].AddChannel(
         Vec3[float_t](&location_mv[0]),
         polarization_vt,

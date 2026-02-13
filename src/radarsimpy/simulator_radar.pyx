@@ -90,7 +90,7 @@ cdef inline void validate_free_tier_limits(radar, list targets):
             "----------------------------------------\n"
             "Current limitation: Maximum 2 targets\n"
             "Your scene: {} targets\n\n"
-            "To simulate more targets, please upgrade to the Standard Version:\n"
+            "To simulate more targets, please purchase a license:\n"
             "→ https://radarsimx.com/product/radarsimpy/\n"
             .format(len(targets))
         )
@@ -101,7 +101,7 @@ cdef inline void validate_free_tier_limits(radar, list targets):
             "----------------------------------------------\n"
             "Current limitation: 1 transmitter channel\n"
             "Your configuration: {} channels\n\n"
-            "To use multiple transmitter channels, please upgrade to the Standard Version:\n"
+            "To use multiple transmitter channels, please purchase a license:\n"
             "→ https://radarsimx.com/product/radarsimpy/\n"
             .format(radar.radar_prop["transmitter"].txchannel_prop["size"])
         )
@@ -112,7 +112,7 @@ cdef inline void validate_free_tier_limits(radar, list targets):
             "-------------------------------------------\n"
             "Current limitation: 1 receiver channel\n"
             "Your configuration: {} channels\n\n"
-            "To use multiple receiver channels, please upgrade to the Standard Version:\n"
+            "To use multiple receiver channels, please purchase a license:\n"
             "→ https://radarsimx.com/product/radarsimpy/\n"
             .format(radar.radar_prop["receiver"].rxchannel_prop["size"])
         )
@@ -142,7 +142,7 @@ cdef inline raise_err(RadarSimErrorCode err):
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=None, interf_frame_time=None,
+cpdef sim_radar(radar, targets, density=1, level=None, interf=None,
                 ray_filter=None, back_propagating=False, device="gpu", log_path=None, debug=False):
     """
     sim_radar(radar, targets, density=1, level=None, interf=None, ray_filter=None,
@@ -301,18 +301,6 @@ cpdef sim_radar(radar, targets, frame_time=None, density=1, level=None, interf=N
     #----------------------
     # Initialization
     #----------------------
-    # Check for deprecated frame_time parameter
-    if frame_time is not None or interf_frame_time is not None:
-        import warnings
-        warnings.warn(
-            "The 'frame_time' and 'interf_frame_time' parameters in sim_radar() have been moved to the Radar constructor and are no longer used here. "
-            "These parameters will be ignored. Please set frame_time and interf_frame_time when creating the Radar object: "
-            "Radar(transmitter, receiver, frame_time=your_value). "
-            "These parameters will be removed in a future version.",
-            DeprecationWarning,
-            stacklevel=2
-        )
-
     # Validate free tier limitations
     validate_free_tier_limits(radar, targets)
 

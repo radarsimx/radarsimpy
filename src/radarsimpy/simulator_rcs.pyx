@@ -131,7 +131,7 @@ cpdef sim_rcs(
                 "Current limitation: Maximum 3 targets\n"
                 "Your scene: {} targets\n\n"
                 "This limitation helps maintain reasonable simulation times in the trial version.\n"
-                "To simulate more targets, please upgrade to the Standard Version:\n"
+                "To simulate more targets, please purchase a license:\n"
                 "→ https://radarsimx.com/product/radarsimpy/\n"
                 .format(len(targets))
             )
