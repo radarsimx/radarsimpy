@@ -143,7 +143,8 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
                                     Vec3[float_t](&speed_mv[0]),
                                     Vec3[float_t](&rotation_mv[0]),
                                     Vec3[float_t](&rotation_rate_mv[0]),
-                                    <bool> targets[idx_c].get("skip_diffusion", False))
+                                    <bool> targets[idx_c].get("skip_diffusion", False),
+                                    <float_t> targets[idx_c].get("density", 0.0))
 
     # Lidar parameters
     cdef float_t[:] phi_mv = np.radians(np.array(lidar["phi"], dtype=np_float))

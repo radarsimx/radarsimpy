@@ -677,7 +677,8 @@ cdef void cp_AddTarget(radar,
                            rrt_vt,
                            ep_c,
                            mu_c,
-                           <bool> target.get("skip_diffusion", False))
+                           <bool> target.get("skip_diffusion", False),
+                           <float_t> target.get("density", 0.0))
 
 @cython.cdivision(True)
 @cython.boundscheck(False)
@@ -763,4 +764,5 @@ cdef void cp_RCS_Target(target, mesh_module, TargetsManager[float_t] * targets_m
                            rrt_vt,
                            ep_c,
                            mu_c,
-                           <bool> target.get("skip_diffusion", False))
+                           <bool> target.get("skip_diffusion", False),
+                           <float_t> target.get("density", 0.0))

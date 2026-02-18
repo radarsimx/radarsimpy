@@ -140,7 +140,8 @@ cdef extern from "targets_manager.hpp":
                const vector[Vec3[T]] & rotation_rate_array,  # Time-varying rotation rates
                const cpp_complex[T] & ep,     # Relative permittivity (material property)
                const cpp_complex[T] & mu,     # Relative permeability (material property)
-               const bool & skip_diffusion) except +
+               const bool & skip_diffusion,   # Skip diffusion calculation flag
+               const T & density) except +    # Ray density (0.0 uses global density)
         
         void AddTargetSimple(const T * points,
                const int_t * cells,
@@ -150,7 +151,8 @@ cdef extern from "targets_manager.hpp":
                const Vec3[T] & speed,
                const Vec3[T] & rotation,
                const Vec3[T] & rotation_rate,
-               const bool & skip_diffusion) except +
+               const bool & skip_diffusion,   # Skip diffusion calculation flag
+               const T & density) except +    # Ray density (0.0 uses global density)
 
 #------------------------------------------------------------------------------
 # Ray Tracing Primitives
