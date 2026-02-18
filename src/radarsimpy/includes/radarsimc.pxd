@@ -334,7 +334,7 @@ cdef extern from "simulator_mesh.hpp":
                               Vec2[int_t] ray_filter,            # Ray index filter [min, max]
                               bool back_propagating,             # Enable back-propagation
                               string log_path,                   # Debug log file path
-                              bool debug)                        # Enable debug output
+                              bool dry_run)                      # Enable dry run mode
 
 # Radar Interference Simulation
 # Radar-to-radar interference simulation for EMC analysis

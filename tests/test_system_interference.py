@@ -81,7 +81,7 @@ def test_scene_interference():
 
     targets = [target_1]
 
-    data = sim_radar(radar, targets, density=0.2, debug=False, interf=int_radar)
+    data = sim_radar(radar, targets, density=0.2, interf=int_radar)
 
     inc_bb = data["interference"]
 

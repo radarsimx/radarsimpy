@@ -143,10 +143,10 @@ cdef inline raise_err(RadarSimErrorCode err):
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cpdef sim_radar(radar, targets, density=1, level=None, interf=None,
-                ray_filter=None, back_propagating=False, device="gpu", log_path=None, debug=False):
+                ray_filter=None, back_propagating=False, device="gpu", log_path=None, dry_run=False):
     """
     sim_radar(radar, targets, density=1, level=None, interf=None, ray_filter=None,
-              back_propagating=False, device="gpu", log_path=None, debug=False)
+              back_propagating=False, device="gpu", log_path=None, dry_run=False)
 
     Simulates the radar's baseband response for a given scene.
 
@@ -214,9 +214,9 @@ cpdef sim_radar(radar, targets, density=1, level=None, interf=None,
             use a module compiled without GPU support.
     :param str or None log_path:
         Path to save ray-tracing data. Default: ``None`` (does not save data).
-    :param bool debug:
-        Whether to enable debug mode. When enabled, additional debug information will be printed
-        during the simulation process. Default: ``False``.
+    :param bool dry_run:
+        Whether to enable dry run mode. When enabled, the simulation will skip actual ray tracing
+        while still performing setup and validation. Default: ``False``.
 
     :return:
         A dictionary containing the simulated baseband response and related data:
@@ -420,7 +420,7 @@ cpdef sim_radar(radar, targets, density=1, level=None, interf=None,
             ray_filter_c,
             back_propagating,
             log_path_c,
-            debug)
+            dry_run)
         if err:
             raise_err(err)
     else:
@@ -438,7 +438,7 @@ cpdef sim_radar(radar, targets, density=1, level=None, interf=None,
             ray_filter_c,
             back_propagating,
             log_path_c,
-            debug)
+            dry_run)
         if err:
             raise_err(err)
 

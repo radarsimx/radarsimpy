@@ -652,7 +652,7 @@ def test_fmcw_raytracing_radar_rotation():
 
     targets = [target_1]
 
-    data = sim_radar(radar, targets, density=1, level="pulse", debug=False)
+    data = sim_radar(radar, targets, density=1, level="pulse")
 
     baseband = data["baseband"]
 
@@ -721,7 +721,7 @@ def test_fmcw_raytracing_radar_speed():
 
     targets = [target_1]
 
-    data = sim_radar(radar, targets, density=1, level="pulse", debug=False)
+    data = sim_radar(radar, targets, density=1, level="pulse")
 
     baseband = data["baseband"]
 
