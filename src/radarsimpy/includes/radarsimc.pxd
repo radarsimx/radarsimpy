@@ -141,7 +141,8 @@ cdef extern from "targets_manager.hpp":
                const cpp_complex[T] & ep,     # Relative permittivity (material property)
                const cpp_complex[T] & mu,     # Relative permeability (material property)
                const bool & skip_diffusion,   # Skip diffusion calculation flag
-               const T & density) except +    # Ray density (0.0 uses global density)
+               const T & density,             # Ray density (0.0 uses global density)
+               const bool & environment) except +  # Environment flag for target
         
         void AddTargetSimple(const T * points,
                const int_t * cells,
@@ -152,7 +153,8 @@ cdef extern from "targets_manager.hpp":
                const Vec3[T] & rotation,
                const Vec3[T] & rotation_rate,
                const bool & skip_diffusion,   # Skip diffusion calculation flag
-               const T & density) except +    # Ray density (0.0 uses global density)
+               const T & density,             # Ray density (0.0 uses global density)
+               const bool & environment) except +  # Environment flag for target
 
 #------------------------------------------------------------------------------
 # Ray Tracing Primitives
