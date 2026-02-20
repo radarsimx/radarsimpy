@@ -87,16 +87,12 @@ cdef inline void _validate_mesh_for_free_tier(int_t num_faces) except *:
     """
     if not is_licensed() and num_faces > MAX_FREE_TIER_FACES:
         raise RuntimeError(
-            f"\n{'='*60}\n"
-            f"TRIAL VERSION LIMITATION - Mesh Size\n"
-            f"{'='*60}\n"
+            f"\nTrial Version Limitation - Mesh Size\n"
+            f"----------------------------------------\n"
             f"Current limitation: Maximum {MAX_FREE_TIER_FACES} mesh faces\n"
-            f"Your model: {num_faces} faces\n"
-            f"Reduction needed: {num_faces - MAX_FREE_TIER_FACES} faces\n\n"
-            f"This limitation helps maintain reasonable simulation times in the trial version.\n"
+            f"Your model: {num_faces} faces\n\n"
             f"To simulate larger meshes, please purchase a license:\n"
             f"→ https://radarsimx.com/product/radarsimpy/\n"
-            f"{'='*60}\n"
         )
 
 cdef inline void _warn_deprecated_parameter(str old_param, str new_param) except *:
