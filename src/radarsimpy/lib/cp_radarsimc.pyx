@@ -55,6 +55,13 @@ np_float = np.float32
 # Constants for unit conversion and validation
 cdef dict UNIT_SCALE = {"m": 1.0, "cm": 100.0, "mm": 1000.0}
 cdef int_t MAX_FREE_TIER_FACES = 8
+cdef frozenset _VALID_TARGET_KEYS = frozenset({
+    "model", "unit", "origin",
+    "location", "speed", "rotation", "rotation_rate",
+    "permittivity", "permeability",
+    "skip_diffusion", "is_ground",  # is_ground is a deprecated alias
+    "density", "environment",
+})
 
 cdef inline float_t _safe_unit_conversion(str unit) except *:
     """
@@ -109,6 +116,23 @@ cdef inline void _warn_deprecated_parameter(str old_param, str new_param) except
         DeprecationWarning,
         stacklevel=3
     )
+
+cdef inline void _validate_target_keys(target) except *:
+    """
+    Warn about unrecognized keys in a target dict to catch typos.
+
+    :param dict target:
+        Target properties dictionary to validate
+    :raises: UserWarning for any keys not in the known set
+    """
+    unknown = set(target.keys()) - _VALID_TARGET_KEYS
+    if unknown:
+        warnings.warn(
+            f"Unrecognized key(s) in target dict: {sorted(unknown)}. "
+            f"These will be ignored. Valid keys: {sorted(_VALID_TARGET_KEYS)}",
+            UserWarning,
+            stacklevel=3
+        )
 
 @cython.cdivision(True)
 @cython.boundscheck(False)
@@ -545,6 +569,8 @@ cdef void cp_AddTarget(radar,
     cdef float_t[:, :] points_mv
     cdef int_t[:, :] cells_mv
 
+    _validate_target_keys(target)
+
     # Enhanced mesh validation and loading with improved error messages
     unit = target.get("unit", "m")
     try:
@@ -702,6 +728,8 @@ cdef void cp_RCS_Target(target, mesh_module, TargetsManager[float_t] * targets_m
     cdef float_t scale
     cdef float_t[:, :] points_mv
     cdef int_t[:, :] cells_mv
+
+    _validate_target_keys(target)
 
     # Enhanced mesh validation and loading with improved error messages  
     unit = target.get("unit", "m")
