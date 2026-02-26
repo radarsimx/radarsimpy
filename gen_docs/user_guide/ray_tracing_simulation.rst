@@ -131,16 +131,6 @@ planes, walls, or other surfaces where diffusion effects are negligible
 compared to specular reflection. Enabling it reduces the computational load
 for these targets.
 
-**Example:**
-
-.. code-block:: python
-
-   ground = {
-       "model": "./models/ground.stl",
-       "location": (0, 0, 0),
-       "skip_diffusion": True,
-   }
-
 ``environment``
 ~~~~~~~~~~~~~~~
 
