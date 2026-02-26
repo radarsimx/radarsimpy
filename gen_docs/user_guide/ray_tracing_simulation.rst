@@ -30,8 +30,10 @@ during the pyramid ray generation stage.
   miss small geometric features or produce less accurate scattering results.
 
 A value of ``1.0`` means one ray per wavelength, which is generally a
-reasonable starting point. For electrically large targets or scenes requiring
-high fidelity, consider increasing the density.
+reasonable starting point. Increase the density for scenes requiring higher
+fidelity, or decrease it below ``1.0`` for faster computation when high
+spatial resolution is not needed or when the target mesh faces are large
+relative to the wavelength.
 
 .. tip::
 
