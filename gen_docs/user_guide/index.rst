@@ -10,5 +10,6 @@ User Guide
    installation
    coordinate
    conventions
+   ray_tracing_simulation
    examples
    build
