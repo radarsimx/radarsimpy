@@ -4,6 +4,32 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [15.1.0] - 2026-02-28
+
+### Added
+
+- `density` parameter to target APIs for per-target ray density control (0.0 uses global density)
+- `environment` flag to target APIs to mark large surrounding surfaces, using reduced ray density to improve simulation efficiency
+- `dry_run` in `sim_radar`, When enabled, the simulation will skip actual ray tracing while still performing setup and validation.
+- Runtime validation of target dictionary keys with `UserWarning` for unrecognized keys to catch typos and silently ignored properties
+- Ray-tracing simulation documentation page covering `density`, `level`, `ray_filter`, `back_propagating`, `skip_diffusion`, and `environment` parameters
+
+### Changed
+
+- Updated trial/license messaging across the codebase to prompt users to "purchase a license"
+- Simplified trial mesh size error message formatting
+- Updated CI GitHub Actions versions
+
+### Removed
+
+- Deprecated `frame_time` and `interf_frame_time` parameters from `sim_radar`
+
+### Fixed
+
+- Interference simulation now uses separate baseband buffers (`bb_real_interf`/`bb_imag_interf`) to prevent overwriting primary signal buffers
+
+---
+
 ## [15.0.1] - 2026-02-11
 
 ### Changed

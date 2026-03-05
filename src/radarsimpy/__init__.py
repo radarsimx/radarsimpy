@@ -71,7 +71,7 @@ set_license()
 # Package Metadata
 # =============================================================================
 
-__version__ = "15.0.1"
+__version__ = "15.1.0"
 __author__ = "RadarSimX"
 __email__ = "info@radarsimx.com"
 __url__ = "https://radarsimx.com"
