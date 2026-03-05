@@ -161,6 +161,7 @@ def get_exclude_patterns() -> tuple[Set[str], Set[str]]:
         "package_source.bat",
         "package_source.py",
         "package_source.sh",
+        "public_key.hpp"
     }
 
     return exclude_dirs, exclude_files
