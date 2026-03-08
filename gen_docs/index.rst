@@ -8,7 +8,7 @@ Welcome to RadarSimPy's Documentation!
 
 |
 
-.. image:: _static/radarsimx_main.svg
+.. image:: https://raw.githubusercontent.com/radarsimx/.github/main/profile/radarsimx_main.svg
    :width: 60%
    :alt: RadarSimX
    :target: https://radarsimx.com
