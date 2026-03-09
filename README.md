@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/radarsimpy.svg" alt="RadarSimPy logo" width="200"/>
+  <img src="https://raw.githubusercontent.com/radarsimx/.github/refs/heads/main/profile/radarsimpy.svg" alt="RadarSimPy logo" width="200"/>
 </p>
 
 <p align="center">
