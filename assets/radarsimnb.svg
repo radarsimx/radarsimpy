@@ -8,7 +8,7 @@
    viewBox="0 0 512 512"
    version="1.1"
    id="svg8"
-   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
    sodipodi:docname="radarsimnb.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -27,10 +27,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.35"
-     inkscape:cx="-422.85714"
-     inkscape:cy="1304.2857"
+     inkscape:cx="-421.42857"
+     inkscape:cy="1302.8571"
      inkscape:document-units="mm"
-     inkscape:current-layer="g2485"
+     inkscape:current-layer="text365"
      inkscape:document-rotation="0"
      showgrid="false"
      inkscape:window-width="3840"
@@ -239,11 +239,11 @@
          style="font-weight:bold;font-size:92.7778px;font-family:'Noto Sans';-inkscape-font-specification:'Noto Sans Bold';fill:#4d4d4d;stroke:#4caf50;stroke-width:4.99999;stroke-linecap:round">
         <path
            d="m 390.47828,471.69226 h -17.81333 l -28.8539,-50.10001 h -0.37111 q 0.18555,4.73167 0.37111,9.46333 0.27833,4.73167 0.46389,9.46334 v 31.17334 h -12.52501 v -66.24335 h 17.72057 l 28.76111,49.63612 h 0.27834 q -0.0928,-4.63889 -0.27834,-9.185 -0.18555,-4.54611 -0.37111,-9.09222 v -31.3589 h 12.61778 z"
-           style="stroke:none;stroke-width:5"
+           style="stroke:none;stroke-width:5;fill:#f07e17;fill-opacity:1"
            id="path1497" />
         <path
            d="m 419.88882,417.6028 q 0,2.87611 -0.18555,5.65945 -0.18556,2.78333 -0.37111,4.36056 h 0.55666 q 2.04111,-3.15445 5.47389,-5.28834 3.43278,-2.22667 8.90667,-2.22667 8.53556,0 13.82389,6.68 5.28834,6.58723 5.28834,19.48334 0,12.9889 -5.38111,19.6689 -5.38112,6.68 -14.10223,6.68 -5.56667,0 -8.81389,-1.94834 -3.15445,-2.04111 -5.19556,-4.54611 h -0.92777 l -2.31945,5.56667 h -10.57667 v -70.51113 h 13.82389 z m 9.92723,13.54556 q -5.38111,0 -7.60778,3.34 -2.13389,3.34 -2.31945,10.20556 v 1.48445 q 0,7.32944 2.13389,11.31889 2.22667,3.89666 7.97889,3.89666 4.26778,0 6.77278,-3.89666 2.505,-3.98945 2.505,-11.41167 0,-7.42223 -2.59777,-11.13334 -2.50501,-3.80389 -6.86556,-3.80389 z"
-           style="stroke:none;stroke-width:5"
+           style="stroke:none;stroke-width:5;fill:#757575;fill-opacity:1"
            id="path1499" />
       </g>
     </g>

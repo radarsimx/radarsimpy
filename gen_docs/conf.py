@@ -49,7 +49,7 @@ autodoc_typehints = "description"
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
-html_favicon = "_static/radarsimdoc.png"  # pylint: disable=invalid-name
+html_favicon = "https://raw.githubusercontent.com/radarsimx/.github/main/profile/radarsimpy_nobg.svg"  # pylint: disable=invalid-name
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -67,8 +67,8 @@ html_theme = "pydata_sphinx_theme"  # pylint: disable=invalid-name
 html_theme_options = {
     "logo": {
         "text": "RadarSimPy v" + version,
-        "image_light": "_static/radarsimdoc.svg",
-        "image_dark": "_static/radarsimdoc.svg",
+        "image_light": "https://raw.githubusercontent.com/radarsimx/.github/main/profile/radarsimpy.svg",
+        "image_dark": "https://raw.githubusercontent.com/radarsimx/.github/main/profile/radarsimpy.svg",
     },
     "navbar_align": "left",
     "secondary_sidebar_items": ["page-toc"],
