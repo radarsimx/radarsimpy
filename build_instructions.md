@@ -15,7 +15,6 @@ radarsimpy/
 ├── assets/                       # Documentation assets and diagrams
 ├── gen_docs/                     # Documentation generation files
 ├── models/                       # 3D model files for simulation
-├── references/                   # Research papers and documentation
 ├── src/                          # Source code
 │   ├── radarsimcpp/              # C++ source code
 │   │   ├── hdf5-lib-build/       # HDF5 library build files
@@ -59,9 +58,6 @@ radarsimpy/
 ├── build_instructions.md         # This file
 ├── CHANGELOG.md                  # Project changelog
 ├── LICENSE                       # License file (RadarSimPy)
-├── package_source.bat            # Windows source packaging script
-├── package_source.py             # Source packaging utility
-├── package_source.sh             # Linux/macOS source packaging script
 ├── README.md                     # Project overview
 ├── requirements-dev.txt          # Development dependencies
 ├── requirements.txt              # Runtime dependencies
@@ -107,7 +103,7 @@ python build_config.py
 
 1. **Visual Studio 2022 or later** with "Desktop development with C++"
 2. **CMake** (Windows x64 Installer) - [Download here](https://cmake.org/download/)
-3. **CUDA Toolkit 12** (Optional, required only for GPU builds) - [Download here](https://developer.nvidia.com/cuda-downloads)
+3. **CUDA Toolkit 12 or later** (Optional, required only for GPU builds) - [Download here](https://developer.nvidia.com/cuda-downloads)
 
 ### Windows Build Steps
 
