@@ -146,7 +146,7 @@ class BuildConfig:
 
         elif self.os_type == "Windows":
             self.link_args = []
-            self.compile_args = ["/std:c++20"]
+            self.compile_args = ["/std:c++20", "/Zc:preprocessor"]
             self.lib_dirs = ["src/radarsimcpp/build/Release"]
             self.libs = []
             self.nvcc_name = "nvcc.exe"
