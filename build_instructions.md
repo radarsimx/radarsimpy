@@ -18,7 +18,6 @@ radarsimpy/
 ├── references/                   # Research papers and documentation
 ├── src/                          # Source code
 │   ├── radarsimcpp/              # C++ source code
-│   │   ├── gtest/                # Google Test framework (RadarSimCpp)
 │   │   ├── hdf5-lib-build/       # HDF5 library build files
 │   │   │   ├── hdf5/             # HDF5 source code (HDF Group)
 │   │   │   ├── libs/             # Platform-specific precompiled libraries
@@ -35,19 +34,34 @@ radarsimpy/
 │   │   │   ├── libs/             # Core library headers
 │   │   │   └── rsvector/         # Custom vector implementations
 │   │   ├── src/                  # C++/CUDA implementation files
-│   │   ├── CMakeLists.txt        # CMake configuration (Config path to precomipled HDF5 library)
+│   │   ├── tests/                # C++ unit tests (Google Test)
+│   │   ├── CMakeLists.txt        # CMake configuration (Config path to precompiled HDF5 library)
 │   │   └── README.md
 │   └── radarsimpy/               # Python source code
 │       ├── includes/             # Cython declaration files
-│       └── lib/                  # Cython wrapper library
+│       ├── lib/                  # Cython wrapper library
+│       ├── simulator.pyx         # Main radar simulator (Cython)
+│       ├── simulator_lidar.pyx   # LiDAR simulator (Cython)
+│       ├── simulator_radar.pyx   # Radar simulator (Cython)
+│       ├── simulator_rcs.pyx     # RCS simulator (Cython)
+│       ├── license.pyx           # License module (Cython)
+│       ├── radar.py              # Radar configuration
+│       ├── receiver.py           # Receiver configuration
+│       ├── transmitter.py        # Transmitter configuration
+│       ├── processing.py         # Signal processing
+│       ├── tools.py              # Utility tools
+│       ├── mesh_kit.py           # Mesh processing utilities
+│       └── __init__.py
 ├── tests/                        # Test suite (RadarSimPy)
-├── batch_build.bat               # Windows batch build script
-├── batch_build.sh                # Linux/macOS batch build script
 ├── build.bat                     # Windows build script
 ├── build.sh                      # Linux/macOS build script
 ├── build_config.py               # Build configuration validation
 ├── build_instructions.md         # This file
+├── CHANGELOG.md                  # Project changelog
 ├── LICENSE                       # License file (RadarSimPy)
+├── package_source.bat            # Windows source packaging script
+├── package_source.py             # Source packaging utility
+├── package_source.sh             # Linux/macOS source packaging script
 ├── README.md                     # Project overview
 ├── requirements-dev.txt          # Development dependencies
 ├── requirements.txt              # Runtime dependencies
@@ -122,7 +136,7 @@ python build_config.py
 
 - `--arch`: Architecture (`cpu` or `gpu`)
 - `--test`: Enable testing (`on` or `off`)
-- `--tier`: Build tier (`standard` or `free`)
+- `--license`: Enable license verification (`on` or `off`)
 
 ## Ubuntu 22.04/24.04 and Other Linux Distributions
 
@@ -182,7 +196,7 @@ python build_config.py
 
 - `--arch`: Architecture (`cpu` or `gpu`)
 - `--test`: Enable testing (`on` or `off`)
-- `--tier`: Build tier (`standard` or `free`)
+- `--license`: Enable license verification (`on` or `off`)
 
 ## macOS
 
@@ -240,10 +254,10 @@ python build_config.py
 
 - `--arch`: Architecture (`cpu`)
 - `--test`: Enable testing (`on` or `off`)
+- `--license`: Enable license verification (`on` or `off`)
 - `--jobs`: Number of parallel build jobs (auto-detected by default)
 - `--verbose`: Enable verbose output
 - `--clean`: Clean build artifacts (`true` or `false`)
-- `--tier`: Build tier (`standard` or `free`)
 - `--cmake-args`: Additional CMake arguments
 
 ## Building Documentation
@@ -292,9 +306,9 @@ Before building documentation, ensure RadarSimPy is properly built:
 python build_config.py
 
 # Build the project first (required for API documentation)
-./build.sh --tier=standard --arch=cpu --test=off    # Linux/macOS
+./build.sh --arch=cpu --test=off    # Linux/macOS
 # OR
-build.bat --tier=standard --arch=cpu --test=off     # Windows
+build.bat --arch=cpu --test=off     # Windows
 ```
 
 #### Linux/macOS Documentation Build
