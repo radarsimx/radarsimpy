@@ -50,6 +50,7 @@ from radarsimpy.includes.radarsimc cimport (
     MeshSimulator,
     PointSimulator,
     InterferenceSimulator,
+    NoiseSimulator,
     RadarSimErrorCode,
     cpu_policy,
     gpu_policy
@@ -71,7 +72,6 @@ from radarsimpy.mesh_kit import import_mesh_module
 cdef:
     int_t MAX_RAY_REFLECTIONS = 10
     int_t DEFAULT_MIN_REFLECTIONS = 0
-    float_t SQRT_2 = 1.4142135623730951
 
 cdef inline void validate_free_tier_limits(radar, list targets):
     """
@@ -282,6 +282,8 @@ cpdef sim_radar(radar, targets, density=1, level=None, interf=None,
         MeshSimulator[double, float_t, gpu_policy] mesh_sim_gpu
         InterferenceSimulator[double, float_t, cpu_policy] interf_sim_cpu
         InterferenceSimulator[double, float_t, gpu_policy] interf_sim_gpu
+        NoiseSimulator[double, float_t, cpu_policy] noise_sim_cpu
+        NoiseSimulator[double, float_t, gpu_policy] noise_sim_gpu
 
     # Size and index variables
     cdef:
@@ -292,12 +294,6 @@ cpdef sim_radar(radar, targets, density=1, level=None, interf=None,
         int_t rxsize_c = radar.radar_prop["receiver"].rxchannel_prop["size"]
         int_t txsize_c = radar.radar_prop["transmitter"].txchannel_prop["size"]
         string log_path_c
-
-        # Pre-declare variables for better performance
-        int_t frame_idx, ch_idx, rx_ch
-        float_t t0
-        int_t f_ch_idx
-        int_t num_noise_samples
 
     #----------------------
     # Initialization
@@ -453,38 +449,40 @@ cpdef sim_radar(radar, targets, density=1, level=None, interf=None,
     #----------------------
     # Noise Generation
     #----------------------
-    # Calculate noise parameters
-    max_ts = np.max(radar_ts)
-    min_ts = np.min(radar_ts)
-    num_noise_samples = int(np.ceil((max_ts - min_ts) * radar.radar_prop["receiver"].bb_prop["fs"])) + 1
-
-    # Initialize noise matrix based on baseband type
     cdef str bb_type = radar.radar_prop["receiver"].bb_prop["bb_type"]
-    if bb_type == "real":
-        noise_mat = np.zeros(ts_shape, dtype=np.float64)
-    elif bb_type == "complex":
-        noise_mat = np.zeros(ts_shape, dtype=complex)
-    else:
-        raise ValueError(f"Unsupported baseband type: {bb_type}")
-
-    # Generate noise for each frame
+    cdef bint is_complex_noise = (bb_type == "complex")
     cdef float_t noise_level = radar.sample_prop["noise"]
-    cdef float_t sqrt_2_inv = 1.0 / SQRT_2
 
-    for frame_idx in range(frames_c):
-        if bb_type == "real":
-            noise_per_frame_rx = noise_level * np.random.randn(rxsize_c, num_noise_samples)
-        elif bb_type == "complex":
-            noise_per_frame_rx = (noise_level * sqrt_2_inv * 
-                                 (np.random.randn(rxsize_c, num_noise_samples) + 
-                                  1j * np.random.randn(rxsize_c, num_noise_samples)))
+    # Prepare timestamp array as contiguous C-order double array
+    cdef double[:,:,::1] radar_ts_c = np.ascontiguousarray(radar_ts, dtype=np.float64)
 
-        for ch_idx in range(radar_ts_shape[0]):
-            for ps_idx in range(radar_ts_shape[1]):
-                f_ch_idx = ch_idx + frame_idx * radar_ts_shape[0]
-                t0 = (radar_ts[ch_idx, ps_idx, 0] - min_ts) * radar.radar_prop["receiver"].bb_prop["fs"]
-                rx_ch = ch_idx % rxsize_c
-                noise_mat[f_ch_idx, ps_idx, :] = noise_per_frame_rx[rx_ch, int(t0):(int(t0) + radar_ts_shape[2])]
+    # Output noise arrays: shape = [frames * channels, pulses, samples]
+    cdef int_t out_channels = frames_c * radar_ts_shape[0]
+    cdef double[:,:,::1] noise_real_out = np.zeros(
+        (out_channels, radar_ts_shape[1], radar_ts_shape[2]),
+        dtype=np.float64, order='C')
+    cdef double[:,:,::1] noise_imag_out = np.zeros(
+        (out_channels, radar_ts_shape[1], radar_ts_shape[2]),
+        dtype=np.float64, order='C')
+
+    # Run noise generation via C++
+    if device_lower == "cpu":
+        noise_sim_cpu.Run(
+            radar_c, <double>noise_level, is_complex_noise,
+            &radar_ts_c[0][0][0],
+            radar_ts_shape[0], radar_ts_shape[1], radar_ts_shape[2],
+            &noise_real_out[0][0][0], &noise_imag_out[0][0][0], 0)
+    else:
+        noise_sim_gpu.Run(
+            radar_c, <double>noise_level, is_complex_noise,
+            &radar_ts_c[0][0][0],
+            radar_ts_shape[0], radar_ts_shape[1], radar_ts_shape[2],
+            &noise_real_out[0][0][0], &noise_imag_out[0][0][0], 0)
+
+    if is_complex_noise:
+        noise_mat = np.asarray(noise_real_out) + 1j * np.asarray(noise_imag_out)
+    else:
+        noise_mat = np.asarray(noise_real_out)
 
     #----------------------
     # Interference Processing

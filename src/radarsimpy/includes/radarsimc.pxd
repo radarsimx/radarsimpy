@@ -350,6 +350,26 @@ cdef extern from "simulator_interference.hpp":
         void Run(const shared_ptr[Radar[H, L]] & radar,                            # Victim radar
                  const shared_ptr[Radar[H, L]] & interf_radar)                     # Interfering radar
 
+# Noise Simulation
+# Receiver thermal noise generation for radar systems
+# Usage: For generating realistic receiver noise with proper correlation
+# across channels and pulses based on timestamp offsets.
+cdef extern from "simulator_noise.hpp":
+    cdef cppclass NoiseSimulator[H, L, ExecutionPolicy]:
+        NoiseSimulator() except +
+
+        # Run noise generation
+        void Run(const shared_ptr[Radar[H, L]] & radar,                            # Radar configuration
+                 H noise_level,                                                     # RMS noise amplitude
+                 bint is_complex,                                                   # Complex baseband flag
+                 const H* timestamps,                                               # Origin timestamp array
+                 int ts_channel_size,                                               # Timestamp channels
+                 int ts_pulse_size,                                                 # Timestamp pulses
+                 int ts_sample_size,                                                # Timestamp samples
+                 H* noise_real,                                                     # Output noise real
+                 H* noise_imag,                                                     # Output noise imag
+                 unsigned long long seed)                                            # Random seed
+
 
 #------------------------------------------------------------------------------
 # End of RadarSimPy C++ Interface Declarations
