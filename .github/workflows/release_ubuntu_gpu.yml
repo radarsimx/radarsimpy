@@ -160,8 +160,12 @@ jobs:
         with:
           cuda: "13.1.0"
           method: "network"
-          sub-packages: '["nvcc", "libcurand"]'
+          sub-packages: '["nvcc"]'
           linux-local-args: '["--toolkit", "--silent"]'
+
+      - name: Install CUDA cuRAND development headers
+        run: |
+          sudo apt-get install -y libcurand-dev-13-1
 
       - name: Verify CUDA installation
         run: |
