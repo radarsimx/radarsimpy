@@ -160,7 +160,7 @@ jobs:
         with:
           cuda: "13.1.0"
           method: "network"
-          sub-packages: '["nvcc"]'
+          sub-packages: '["nvcc", "libcurand-dev"]'
           linux-local-args: '["--toolkit", "--silent"]'
 
       - name: Verify CUDA installation
