@@ -128,7 +128,7 @@ jobs:
           submodules: recursive
 
       - name: Set up Xcode
-        uses: maxim-lobanov/setup-xcode@v1.6.0
+        uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: ${{ matrix.xcode }}
 
