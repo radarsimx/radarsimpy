@@ -10,6 +10,7 @@ User Guide
    installation
    coordinate
    conventions
+   noise
    ray_tracing_simulation
    examples
    build

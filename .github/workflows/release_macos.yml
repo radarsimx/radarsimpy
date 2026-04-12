@@ -132,7 +132,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Xcode
-        uses: maxim-lobanov/setup-xcode@v1.6.0
+        uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: ${{ matrix.xcode_version }}
 
