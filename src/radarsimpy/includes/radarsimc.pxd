@@ -374,16 +374,16 @@ cdef extern from "simulator_noise.hpp":
         NoiseSimulator() except +
 
         # Run noise generation
-        void Run(const shared_ptr[Radar[H, L]] & radar,                            # Radar configuration
-                 H noise_level,                                                     # RMS noise amplitude
-                 bint is_complex,                                                   # Complex baseband flag
-                 const H* timestamps,                                               # Origin timestamp array
-                 int ts_channel_size,                                               # Timestamp channels
-                 int ts_pulse_size,                                                 # Timestamp pulses
-                 int ts_sample_size,                                                # Timestamp samples
-                 H* noise_real,                                                     # Output noise real
-                 H* noise_imag,                                                     # Output noise imag
-                 unsigned long long seed)                                            # Random seed
+        RadarSimErrorCode Run(const shared_ptr[Radar[H, L]] & radar,                # Radar configuration
+                              H noise_level,                                        # RMS noise amplitude
+                              bint is_complex,                                      # Complex baseband flag
+                              const H* timestamps,                                  # Origin timestamp array
+                              int ts_channel_size,                                  # Timestamp channels
+                              int ts_pulse_size,                                    # Timestamp pulses
+                              int ts_sample_size,                                   # Timestamp samples
+                              H* noise_real,                                        # Output noise real
+                              H* noise_imag,                                        # Output noise imag
+                              unsigned long long seed)                              # Random seed
 
 
 #------------------------------------------------------------------------------

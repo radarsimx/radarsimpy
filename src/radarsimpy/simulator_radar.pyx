@@ -467,17 +467,21 @@ cpdef sim_radar(radar, targets, density=1, level=None, interf=None,
 
     # Run noise generation via C++
     if device_lower == "cpu":
-        noise_sim_cpu.Run(
+        err = noise_sim_cpu.Run(
             radar_c, <double>noise_level, is_complex_noise,
             &radar_ts_c[0][0][0],
             radar_ts_shape[0], radar_ts_shape[1], radar_ts_shape[2],
             &noise_real_out[0][0][0], &noise_imag_out[0][0][0], 0)
+        if err:
+            raise_err(err)
     else:
-        noise_sim_gpu.Run(
+        err = noise_sim_gpu.Run(
             radar_c, <double>noise_level, is_complex_noise,
             &radar_ts_c[0][0][0],
             radar_ts_shape[0], radar_ts_shape[1], radar_ts_shape[2],
             &noise_real_out[0][0][0], &noise_imag_out[0][0][0], 0)
+        if err:
+            raise_err(err)
 
     if is_complex_noise:
         noise_mat = np.asarray(noise_real_out) + 1j * np.asarray(noise_imag_out)
