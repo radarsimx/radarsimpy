@@ -473,9 +473,18 @@ class Radar:
             transmitter.rf_prop["pn_f"] is not None
             and transmitter.rf_prop["pn_power"] is not None
         ):
+            pn_f = np.array(transmitter.rf_prop["pn_f"])
+            pn_power = np.array(transmitter.rf_prop["pn_power"])
+            if len(pn_f) != len(pn_power):
+                raise ValueError(
+                    f"pn_f and pn_power must have the same length: "
+                    f"pn_f={len(pn_f)}, pn_power={len(pn_power)}"
+                )
+            if np.any(pn_f < 0):
+                raise ValueError("All pn_f frequency values must be non-negative")
             # Pass SSB phase noise parameters to C++ for per-frame generation
-            self.sample_prop["pn_f"] = np.array(transmitter.rf_prop["pn_f"])
-            self.sample_prop["pn_power"] = np.array(transmitter.rf_prop["pn_power"])
+            self.sample_prop["pn_f"] = pn_f
+            self.sample_prop["pn_power"] = pn_power
             self.sample_prop["pn_fs"] = receiver.bb_prop["fs"]
             self.sample_prop["pn_seed"] = seed if seed is not None else 0
             self.sample_prop["pn_validation"] = kwargs.get("validation", False)
