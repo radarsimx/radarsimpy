@@ -245,7 +245,6 @@ cdef shared_ptr[Transmitter[double, float_t]] cp_Transmitter(radar):
     cdef vector[double] f_vt, t_vt
     cdef vector[double] f_offset_vt
     cdef vector[double] t_pstart_vt
-    cdef vector[cpp_complex[double]] pn_vt
 
     # frequency
     cdef double[:] f_mv = radar.radar_prop["transmitter"].waveform_prop["f"].astype(np.float64)
@@ -263,21 +262,38 @@ cdef shared_ptr[Transmitter[double, float_t]] cp_Transmitter(radar):
     cdef double[:] t_pstart_mv = radar.radar_prop["transmitter"].waveform_prop["pulse_start_time"].astype(np.float64)
     Mem_Copy(&t_pstart_mv[0], <int_t>(len(radar.radar_prop["transmitter"].waveform_prop["pulse_start_time"])), t_pstart_vt)
 
-    # phase noise
-    cdef double[:] pn_real_mv
-    cdef double[:] pn_imag_mv
-    if radar.sample_prop["phase_noise"] is not None:
-        pn_real_mv = np.real(radar.sample_prop["phase_noise"]).astype(np.float64)
-        pn_imag_mv = np.imag(radar.sample_prop["phase_noise"]).astype(np.float64)
-        Mem_Copy_Complex(&pn_real_mv[0], &pn_imag_mv[0], <int_t>(np.size(radar.sample_prop["phase_noise"])), pn_vt)
+    # phase noise — pass SSB parameters for deferred per-frame generation in C++
+    cdef vector[double] pn_freq_vt
+    cdef vector[double] pn_power_vt
+    cdef double[:] pn_freq_mv
+    cdef double[:] pn_power_mv
+
+    if radar.sample_prop.get("pn_f") is not None:
+        pn_freq_mv = np.array(radar.sample_prop["pn_f"]).astype(np.float64)
+        pn_power_mv = np.array(radar.sample_prop["pn_power"]).astype(np.float64)
+        Mem_Copy(&pn_freq_mv[0], <int_t>(len(radar.sample_prop["pn_f"])), pn_freq_vt)
+        Mem_Copy(&pn_power_mv[0], <int_t>(len(radar.sample_prop["pn_power"])), pn_power_vt)
+
+        return make_shared[Transmitter[double, float_t]](
+            <float_t> radar.radar_prop["transmitter"].rf_prop["tx_power"],
+            f_vt,
+            t_vt,
+            f_offset_vt,
+            t_pstart_vt,
+            pn_freq_vt,
+            pn_power_vt,
+            <double> radar.sample_prop["pn_fs"],
+            <int> 0,
+            <unsigned long long> radar.sample_prop["pn_seed"],
+            <bool> radar.sample_prop["pn_validation"]
+        )
 
     return make_shared[Transmitter[double, float_t]](
         <float_t> radar.radar_prop["transmitter"].rf_prop["tx_power"],
         f_vt,
         t_vt,
         f_offset_vt,
-        t_pstart_vt,
-        pn_vt
+        t_pstart_vt
     )
 
 

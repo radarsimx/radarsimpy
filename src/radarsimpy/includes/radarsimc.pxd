@@ -235,13 +235,26 @@ cdef extern from "transmitter.hpp":
                     const vector[H] & freq_offset,               # Frequency offset array (Hz)
                     const vector[H] & pulse_start_time) except + # Pulse start times (s)
                     
-        # Constructor with phase noise
+        # Constructor with pre-computed phase noise
         Transmitter(const L & tx_power,
                     const vector[H] & freq,
                     const vector[H] & freq_time,
                     const vector[H] & freq_offset,
                     const vector[H] & pulse_start_time,
                     const vector[cpp_complex[H]] & phase_noise) except +  # Phase noise samples
+
+        # Constructor with SSB phase noise specification (deferred per-frame generation)
+        Transmitter(const L & tx_power,
+                    const vector[H] & freq,
+                    const vector[H] & freq_time,
+                    const vector[H] & freq_offset,
+                    const vector[H] & pulse_start_time,
+                    const vector[H] & pn_freq,                   # Phase noise freq offsets (Hz)
+                    const vector[H] & pn_power,                  # Phase noise power (dBc/Hz)
+                    const H & pn_fs,                              # Sampling frequency (Hz)
+                    const int & pn_num_samples,                   # Number of samples
+                    const unsigned long long & pn_seed,           # Random seed
+                    const bool & pn_validation) except +          # Validation mode
                     
         void AddChannel(const Vec3[L] & location,                      # Antenna location
                         const Vec3[cpp_complex[L]] & polar,            # Polarization vector

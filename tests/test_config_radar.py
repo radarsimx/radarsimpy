@@ -364,9 +364,11 @@ class TestRadar:
         assert radar.samples_per_pulse == 100  # 2e-6 * 50e6
         assert radar.virtual_array_locations.shape == (6, 3)
 
-        # Test that phase noise was generated
-        assert radar.sample_prop["phase_noise"] is not None
-        assert isinstance(radar.sample_prop["phase_noise"], np.ndarray)
+        # Test that phase noise SSB parameters were stored
+        assert radar.sample_prop["pn_f"] is not None
+        assert isinstance(radar.sample_prop["pn_f"], np.ndarray)
+        assert radar.sample_prop["pn_power"] is not None
+        assert isinstance(radar.sample_prop["pn_power"], np.ndarray)
 
         # Test radar properties
         np.testing.assert_allclose(radar.radar_prop["location"], [100, 200, 10])
@@ -410,8 +412,9 @@ class TestRadar:
         rx = Receiver(fs=10e6)
         radar = Radar(transmitter=tx, receiver=rx)
 
-        # Phase noise should be None
-        assert radar.sample_prop["phase_noise"] is None
+        # Phase noise SSB parameters should be None
+        assert radar.sample_prop["pn_f"] is None
+        assert radar.sample_prop["pn_power"] is None
 
     def test_init_with_phase_noise(self):
         """Test initialization with phase noise."""
@@ -426,9 +429,12 @@ class TestRadar:
         )
         rx = Receiver(fs=10e6)
         radar = Radar(transmitter=tx, receiver=rx)
-        assert radar.sample_prop["phase_noise"] is not None
-        assert isinstance(radar.sample_prop["phase_noise"], np.ndarray)
-        assert radar.sample_prop["phase_noise"].shape == (191,)
+        assert radar.sample_prop["pn_f"] is not None
+        assert isinstance(radar.sample_prop["pn_f"], np.ndarray)
+        np.testing.assert_array_equal(radar.sample_prop["pn_f"], [1e3, 1e4, 1e5])
+        assert radar.sample_prop["pn_power"] is not None
+        assert isinstance(radar.sample_prop["pn_power"], np.ndarray)
+        np.testing.assert_array_equal(radar.sample_prop["pn_power"], [-100, -110, -120])
 
     def test_init_with_phase_noise_validation(self):
         """Test initialization with phase noise and validation."""
@@ -443,9 +449,9 @@ class TestRadar:
         )
         rx = Receiver(fs=10e6)
         radar = Radar(transmitter=tx, receiver=rx, validation=True)
-        assert radar.sample_prop["phase_noise"] is not None
-        assert isinstance(radar.sample_prop["phase_noise"], np.ndarray)
-        assert radar.sample_prop["phase_noise"].shape == (191,)
+        assert radar.sample_prop["pn_f"] is not None
+        assert radar.sample_prop["pn_power"] is not None
+        assert radar.sample_prop["pn_validation"] is True
 
     def test_init_with_multiple_channels(self):
         """Test initialization with multiple channels."""

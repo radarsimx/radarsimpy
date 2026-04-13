@@ -377,7 +377,11 @@ class Radar:
 
         - **samples_per_pulse** (*int*): Number of samples in a single pulse.
         - **noise** (*float*): Noise amplitude.
-        - **phase_noise** (*numpy.ndarray*): Phase noise matrix for pulse samples.
+        - **pn_f** (*numpy.ndarray or None*): Phase noise frequency offsets (Hz).
+        - **pn_power** (*numpy.ndarray or None*): Phase noise power levels (dBc/Hz).
+        - **pn_fs** (*float or None*): Sampling frequency for phase noise (Hz).
+        - **pn_seed** (*int*): Random seed for phase noise generation.
+        - **pn_validation** (*bool*): Whether to use deterministic AWGN for testing.
 
     :ivar dict array_prop:
         Metadata related to the radar's virtual array:
@@ -469,32 +473,18 @@ class Radar:
             transmitter.rf_prop["pn_f"] is not None
             and transmitter.rf_prop["pn_power"] is not None
         ):
-            num_pn_samples = (
-                np.ceil(
-                    (
-                        np.max(self.time_prop["origin_timestamp"])
-                        - np.min(self.time_prop["origin_timestamp"])
-                    )
-                    * self.radar_prop["receiver"].bb_prop["fs"]
-                ).astype(int)
-                + 1
-            )
-            self.sample_prop["phase_noise"] = cal_phase_noise(
-                np.ones(
-                    (
-                        1,
-                        num_pn_samples,
-                    )
-                ),
-                receiver.bb_prop["fs"],
-                transmitter.rf_prop["pn_f"],
-                transmitter.rf_prop["pn_power"],
-                seed=seed,
-                validation=kwargs.get("validation", False),
-            )
-            self.sample_prop["phase_noise"] = self.sample_prop["phase_noise"].flatten()
+            # Pass SSB phase noise parameters to C++ for per-frame generation
+            self.sample_prop["pn_f"] = np.array(transmitter.rf_prop["pn_f"])
+            self.sample_prop["pn_power"] = np.array(transmitter.rf_prop["pn_power"])
+            self.sample_prop["pn_fs"] = receiver.bb_prop["fs"]
+            self.sample_prop["pn_seed"] = seed if seed is not None else 0
+            self.sample_prop["pn_validation"] = kwargs.get("validation", False)
         else:
-            self.sample_prop["phase_noise"] = None
+            self.sample_prop["pn_f"] = None
+            self.sample_prop["pn_power"] = None
+            self.sample_prop["pn_fs"] = None
+            self.sample_prop["pn_seed"] = 0
+            self.sample_prop["pn_validation"] = False
 
         self._process_radar_motion(
             list(location),
