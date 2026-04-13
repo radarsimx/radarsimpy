@@ -29,7 +29,7 @@ cimport numpy as np
 cimport cython
 
 # RadarSimX imports
-from radarsimpy.includes.radarsimc cimport LidarSimulator, TargetsManager
+from radarsimpy.includes.radarsimc cimport LidarSimulator, TargetsManager, RadarSimErrorCode
 from radarsimpy.includes.radarsimc cimport Mem_Copy
 from radarsimpy.includes.rsvector cimport Vec3
 from radarsimpy.includes.type_def cimport float_t, int_t, vector
@@ -92,10 +92,22 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
         Default: ``0``.
 
     :return:  
-        Simulated Lidar rays based on the provided configuration and targets.
+        Simulated Lidar point cloud with per-point attributes.
 
     :rtype:  
-        numpy.ndarray - A structured array representing the Lidar ray interactions with the scene, including details such as ray origins, directions, and intersections.
+        numpy.ndarray - A structured array with the following fields:
+
+        - **positions** (*numpy.ndarray*):  
+          3D coordinates of the hit point [x, y, z] in meters (m).
+        - **directions** (*numpy.ndarray*):  
+          Reflected ray direction vector [dx, dy, dz] at the hit point.
+        - **normals** (*numpy.ndarray*):  
+          Surface normal vector [nx, ny, nz] at the hit point.
+        - **range** (*float*):  
+          Distance from the sensor to the hit point in meters (m).
+        - **intensity** (*float*):  
+          Return intensity based on Lambertian reflectance model,
+          computed as ``cos(angle_of_incidence) / range^2``.
     """
     cdef LidarSimulator[float_t] lidar_sim_c
 
@@ -159,14 +171,19 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
     Mem_Copy(&theta_mv[0], <int_t>(theta_mv.shape[0]), theta_vt)
 
     # Perform ray tracing
-    lidar_sim_c.Run(targets_manager,
+    cdef RadarSimErrorCode err = lidar_sim_c.Run(targets_manager,
                     phi_vt,
                     theta_vt,
                     Vec3[float_t](&position_mv[0]))
+    if err != RadarSimErrorCode.SUCCESS:
+        raise RuntimeError(f"LiDAR simulation error occurred with code: {err}")
 
-    # Prepare output
+    # Prepare output with LiDAR-typical fields
     ray_type = np.dtype([("positions", np_float, (3,)),
-                        ("directions", np_float, (3,))])
+                        ("directions", np_float, (3,)),
+                        ("normals", np_float, (3,)),
+                        ("range", np_float),
+                        ("intensity", np_float)])
     rays = np.zeros(lidar_sim_c.cloud_.size(), dtype=ray_type)
 
     for idx_c in range(0, <int_t> lidar_sim_c.cloud_.size()):
@@ -176,5 +193,21 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
         rays[idx_c]["directions"][0] = lidar_sim_c.cloud_[idx_c].direction_[1][0]
         rays[idx_c]["directions"][1] = lidar_sim_c.cloud_[idx_c].direction_[1][1]
         rays[idx_c]["directions"][2] = lidar_sim_c.cloud_[idx_c].direction_[1][2]
+        rays[idx_c]["normals"][0] = lidar_sim_c.cloud_[idx_c].normal_[1][0]
+        rays[idx_c]["normals"][1] = lidar_sim_c.cloud_[idx_c].normal_[1][1]
+        rays[idx_c]["normals"][2] = lidar_sim_c.cloud_[idx_c].normal_[1][2]
+        rays[idx_c]["range"] = lidar_sim_c.cloud_[idx_c].range_[1]
+
+        # Intensity based on Lambertian reflectance: cos(angle_of_incidence) / range^2
+        cos_inc = -(
+            lidar_sim_c.cloud_[idx_c].direction_[0][0] * lidar_sim_c.cloud_[idx_c].normal_[1][0]
+            + lidar_sim_c.cloud_[idx_c].direction_[0][1] * lidar_sim_c.cloud_[idx_c].normal_[1][1]
+            + lidar_sim_c.cloud_[idx_c].direction_[0][2] * lidar_sim_c.cloud_[idx_c].normal_[1][2]
+        )
+        r = lidar_sim_c.cloud_[idx_c].range_[1]
+        if cos_inc > 0 and r > 0:
+            rays[idx_c]["intensity"] = cos_inc / (r * r)
+        else:
+            rays[idx_c]["intensity"] = 0
 
     return rays

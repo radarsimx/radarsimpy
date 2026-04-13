@@ -165,6 +165,8 @@ cdef extern from "ray.hpp":
         Ray() except +
         Vec3[T] * direction_      # Ray direction vector
         Vec3[T] * location_       # Ray origin/intersection point
+        Vec3[T] * normal_         # Surface normal at hit point
+        T * range_                # Cumulative range at each bounce
         int reflections_          # Number of reflections encountered
 
 #------------------------------------------------------------------------------
@@ -193,7 +195,7 @@ cdef extern from "simulator_lidar.hpp":
         LidarSimulator() except +
 
         # Generate point cloud by ray casting
-        void Run(const shared_ptr[TargetsManager[T]] & targets_manager,  # Targets manager
+        RadarSimErrorCode Run(const shared_ptr[TargetsManager[T]] & targets_manager,  # Targets manager
                  const vector[T] & phi,      # Azimuth angles (radians)
                  const vector[T] & theta,    # Elevation angles (radians)
                  const Vec3[T] & position)   # LiDAR sensor position
