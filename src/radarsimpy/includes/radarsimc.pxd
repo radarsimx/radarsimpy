@@ -121,6 +121,7 @@ cdef extern from "core/enums.hpp":
         RADARSIMCPP_ERROR_FREE_TIER_LIMIT     # Free tier usage limit exceeded
         RADARSIMCPP_ERROR_EXCEPTION           # General exception occurred
         RADARSIMCPP_ERROR_TOO_MANY_RAYS_PER_GRID  # Ray density exceeds grid capacity
+        RADARSIMCPP_ERROR_CUDA_DEVICE_QUERY   # Failed to query CUDA device memory info
 
 #------------------------------------------------------------------------------
 # Targets Manager
