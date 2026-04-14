@@ -360,7 +360,7 @@ cdef extern from "simulator_interference.hpp":
         InterferenceSimulator() except +
         
         # Run interference simulation
-        void Run(const shared_ptr[Radar[H, L]] & radar,                            # Victim radar
+        RadarSimErrorCode Run(const shared_ptr[Radar[H, L]] & radar,                            # Victim radar
                  const shared_ptr[Radar[H, L]] & interf_radar)                     # Interfering radar
 
 # Noise Simulation

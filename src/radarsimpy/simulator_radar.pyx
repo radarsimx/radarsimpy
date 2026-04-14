@@ -500,9 +500,13 @@ cpdef sim_radar(radar, targets, density=1, level=None, interf=None,
 
         # Run interference simulation based on device selection
         if device_lower == "cpu":
-            interf_sim_cpu.Run(radar_c, interf_radar_c)
+            err = interf_sim_cpu.Run(radar_c, interf_radar_c)
+            if err:
+                raise_err(err)
         else:
-            interf_sim_gpu.Run(radar_c, interf_radar_c)
+            err = interf_sim_gpu.Run(radar_c, interf_radar_c)
+            if err:
+                raise_err(err)
             radar_c.get()[0].SyncBaseband()
 
         # Extract interference data based on baseband type
