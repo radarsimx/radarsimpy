@@ -178,13 +178,16 @@ cdef extern from "simulator_rcs.hpp":
         RcsSimulator() except +
         
         # Calculate RCS for multiple targets and observation angles
-        vector[T] Run(const shared_ptr[TargetsManager[float]] & targets_manager,    # Targets manager
+        RadarSimErrorCode Run(const shared_ptr[TargetsManager[float]] & targets_manager,    # Targets manager
                      vector[Vec3[T]] inc_dir_array,            # Incident wave directions
                      vector[Vec3[T]] obs_dir_array,            # Observation directions
                      Vec3[cpp_complex[T]] inc_polarization,    # Incident wave polarization
                      Vec3[cpp_complex[T]] obs_polarization,    # Observation polarization
                      T frequency,                              # Operating frequency (Hz)
                      T density) except +                       # Ray density for computation
+        
+        # Get computed RCS values
+        const vector[T]& GetRcs()
 
 #------------------------------------------------------------------------------
 # LiDAR Point Cloud Generation

@@ -33,7 +33,7 @@ cimport numpy as np
 # Local imports
 from radarsimpy.includes.rsvector cimport Vec3
 from radarsimpy.includes.type_def cimport vector
-from radarsimpy.includes.radarsimc cimport RcsSimulator, TargetsManager
+from radarsimpy.includes.radarsimc cimport RcsSimulator, TargetsManager, RadarSimErrorCode
 from radarsimpy.lib.cp_radarsimc cimport cp_RCS_Target
 from libcpp.complex cimport complex as cpp_complex
 
@@ -233,7 +233,7 @@ cpdef sim_rcs(
     # Calculate RCS
     cdef RcsSimulator[double] rcs_sim_c
 
-    cdef vector[double] rcs_vect = rcs_sim_c.Run(
+    cdef RadarSimErrorCode err = rcs_sim_c.Run(
         targets_manager,
         inc_dir,
         obs_dir,
@@ -241,6 +241,11 @@ cpdef sim_rcs(
         obs_pol_cpp,
         <double>f,
         <double>density)
+
+    if err:
+        raise RuntimeError(f"RCS simulation error occurred with code: {err}")
+
+    cdef vector[double] rcs_vect = rcs_sim_c.GetRcs()
 
     rcs=np.zeros(array_size)
 
