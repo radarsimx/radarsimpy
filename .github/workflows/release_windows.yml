@@ -111,7 +111,7 @@ jobs:
 
       - name: Install mbedTLS
         run: |
-          .\vcpkg\vcpkg install mbedtls:x64-windows
+          .\vcpkg\vcpkg install mbedtls:x64-windows-static-md
 
       - name: Display build information
         run: |
