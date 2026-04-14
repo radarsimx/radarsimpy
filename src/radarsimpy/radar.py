@@ -351,8 +351,8 @@ class Radar:
         Seed for the random noise generator to ensure reproducibility.
 
     .. note::
-        For time-varying motion (location/rotation changes over time), initialize the Radar object 
-        first with the desired frame_time, then use the :meth:`set_motion` method to configure 
+        For time-varying motion (location/rotation changes over time), initialize the Radar object
+        first with the desired frame_time, then use the :meth:`set_motion` method to configure
         time-varying motions using ``radar.time_prop["timestamp"]`` as the time variable.
         **See the documentation of** :meth:`set_motion` **for detailed workflow and examples.**
 
