@@ -598,7 +598,7 @@ cdef void cp_AddTarget(radar,
         raise RuntimeError(f"Failed to load mesh model '{target.get('model', 'unknown')}': {e}")
     
     # Enhanced FreeTier validation using helper function
-    _validate_mesh_for_free_tier(cells_mv.shape[0])
+    _validate_mesh_for_free_tier(<int_t>cells_mv.shape[0])
 
     cdef float_t[:] origin_mv = np.array(target.get("origin", (0, 0, 0)), dtype=np_float)
 
@@ -758,7 +758,7 @@ cdef void cp_RCS_Target(target, mesh_module, TargetsManager[float_t] * targets_m
         raise RuntimeError(f"Failed to load mesh model '{target.get('model', 'unknown')}': {e}")
 
     # Enhanced FreeTier validation using helper function
-    _validate_mesh_for_free_tier(cells_mv.shape[0])
+    _validate_mesh_for_free_tier(<int_t>cells_mv.shape[0])
 
     cdef float_t[:] origin_mv = np.array(target.get("origin", (0, 0, 0)), dtype=np_float)
 
