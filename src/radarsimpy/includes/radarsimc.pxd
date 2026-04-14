@@ -165,6 +165,8 @@ cdef extern from "ray.hpp":
         Ray() except +
         Vec3[T] * direction_      # Ray direction vector
         Vec3[T] * location_       # Ray origin/intersection point
+        Vec3[T] * normal_         # Surface normal at hit point
+        T * range_                # Cumulative range at each bounce
         int reflections_          # Number of reflections encountered
 
 #------------------------------------------------------------------------------
@@ -193,7 +195,7 @@ cdef extern from "simulator_lidar.hpp":
         LidarSimulator() except +
 
         # Generate point cloud by ray casting
-        void Run(const shared_ptr[TargetsManager[T]] & targets_manager,  # Targets manager
+        RadarSimErrorCode Run(const shared_ptr[TargetsManager[T]] & targets_manager,  # Targets manager
                  const vector[T] & phi,      # Azimuth angles (radians)
                  const vector[T] & theta,    # Elevation angles (radians)
                  const Vec3[T] & position)   # LiDAR sensor position
@@ -372,16 +374,16 @@ cdef extern from "simulator_noise.hpp":
         NoiseSimulator() except +
 
         # Run noise generation
-        void Run(const shared_ptr[Radar[H, L]] & radar,                            # Radar configuration
-                 H noise_level,                                                     # RMS noise amplitude
-                 bint is_complex,                                                   # Complex baseband flag
-                 const H* timestamps,                                               # Origin timestamp array
-                 int ts_channel_size,                                               # Timestamp channels
-                 int ts_pulse_size,                                                 # Timestamp pulses
-                 int ts_sample_size,                                                # Timestamp samples
-                 H* noise_real,                                                     # Output noise real
-                 H* noise_imag,                                                     # Output noise imag
-                 unsigned long long seed)                                            # Random seed
+        RadarSimErrorCode Run(const shared_ptr[Radar[H, L]] & radar,                # Radar configuration
+                              H noise_level,                                        # RMS noise amplitude
+                              bint is_complex,                                      # Complex baseband flag
+                              const H* timestamps,                                  # Origin timestamp array
+                              int ts_channel_size,                                  # Timestamp channels
+                              int ts_pulse_size,                                    # Timestamp pulses
+                              int ts_sample_size,                                   # Timestamp samples
+                              H* noise_real,                                        # Output noise real
+                              H* noise_imag,                                        # Output noise imag
+                              unsigned long long seed)                              # Random seed
 
 
 #------------------------------------------------------------------------------
