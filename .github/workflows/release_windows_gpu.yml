@@ -90,7 +90,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Setup CUDA Toolkit
-        uses: Jimver/cuda-toolkit@v0.2.30
+        uses: Jimver/cuda-toolkit@v0.2.35
         with:
           cuda: "13.1.0"
           method: "local"
