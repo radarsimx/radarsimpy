@@ -60,11 +60,6 @@ jobs:
           pip install -r requirements-dev.txt
         shell: bash
 
-      - name: Install mbedTLS
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libmbedtls-dev
-
       - name: Build project (Linux, CPU, no tests)
         env:
           CC: ${{matrix.c_compiler}}
