@@ -246,12 +246,11 @@ cpdef sim_radar(radar, targets, density=1, level=None, interf=None,
     :raises ValueError: When invalid simulation parameters are provided
     """
 
-    # Initialize error tracking
-    err = RadarSimErrorCode.SUCCESS
-
-    # Validate device parameter
+    #----------------------
+    # Parameter Validation
+    #----------------------
     device_lower = device.lower()
-    if device_lower not in ["gpu", "cpu"]:
+    if device_lower not in ("gpu", "cpu"):
         raise ValueError(
             f"\nInvalid Device Selection\n"
             f"------------------------\n"
@@ -262,123 +261,8 @@ cpdef sim_radar(radar, targets, density=1, level=None, interf=None,
             f"Please choose 'gpu' or 'cpu'."
         )
 
-    #----------------------
-    # C++ Object Declarations
-    #----------------------
-    # Core simulation objects
-    cdef:
-        shared_ptr[Radar[double, float_t]] radar_c = make_shared[Radar[double, float_t]]()
-        shared_ptr[Radar[double, float_t]] interf_radar_c = make_shared[Radar[double, float_t]]()
-        Vec2[int_t] ray_filter_c
-        
-    cdef shared_ptr[TargetsManager[float_t]] targets_manager = make_shared[TargetsManager[float_t]]()
-    cdef shared_ptr[PointsManager[float_t]] points_manager = make_shared[PointsManager[float_t]]()
-
-    # Simulator instances - declare both CPU and GPU versions
-    cdef:
-        PointSimulator[double, float_t, cpu_policy] point_sim_cpu
-        PointSimulator[double, float_t, gpu_policy] point_sim_gpu
-        MeshSimulator[double, float_t, cpu_policy] mesh_sim_cpu
-        MeshSimulator[double, float_t, gpu_policy] mesh_sim_gpu
-        InterferenceSimulator[double, float_t, cpu_policy] interf_sim_cpu
-        InterferenceSimulator[double, float_t, gpu_policy] interf_sim_gpu
-        NoiseSimulator[double, float_t, cpu_policy] noise_sim_cpu
-        NoiseSimulator[double, float_t, gpu_policy] noise_sim_gpu
-
-    # Size and index variables
-    cdef:
-        int_t level_id = 0
-        int_t ps_idx
-        int_t frames_c = np.size(radar.time_prop["frame_start_time"])
-        int_t channels_c = radar.array_prop["size"]
-        int_t rxsize_c = radar.radar_prop["receiver"].rxchannel_prop["size"]
-        int_t txsize_c = radar.radar_prop["transmitter"].txchannel_prop["size"]
-        string log_path_c
-
-    #----------------------
-    # Initialization
-    #----------------------
-    # Validate free tier limitations
-    validate_free_tier_limits(radar, targets)
-
-    # Basic setup with type safety
-    frame_start_time = radar.time_prop["frame_start_time"]
-    log_path_c = str.encode(log_path) if log_path is not None else str.encode("")
-
-    #----------------------
-    # Timestamp Processing
-    #----------------------
-    radar_ts = radar.time_prop["origin_timestamp"]
-    radar_ts_shape = radar.time_prop["origin_timestamp_shape"]
-
-    timestamp = radar.time_prop["timestamp"]
-    ts_shape = radar.time_prop["timestamp_shape"]
-
-    # Set ray filter with constants
-    if ray_filter is None:
-        ray_filter_c = Vec2[int_t](DEFAULT_MIN_REFLECTIONS, MAX_RAY_REFLECTIONS)
-    else:
-        ray_filter_c = Vec2[int_t](<int_t>ray_filter[0], <int_t>ray_filter[1])
-
-    #----------------------
-    # Target Processing
-    #----------------------
-    cdef double[:, :, :] timestamp_mv = timestamp.astype(np.float64)
-
-    # Process each target with optimized loop
-    mesh_module = None
-    cdef int_t target_count = len(targets)
-
-    for target_idx in range(target_count):
-        tgt = targets[target_idx]
-        if "model" in tgt:
-            if mesh_module is None:
-                mesh_module = import_mesh_module()
-
-            cp_AddTarget(radar, tgt, timestamp, mesh_module, targets_manager.get())
-        else:
-            # Extract point target parameters with defaults
-            loc = tgt["location"]
-            spd = tgt.get("speed", (0, 0, 0))
-            rcs = tgt["rcs"]
-            phs = tgt.get("phase", 0)
-
-            cp_AddPoint(loc, spd, rcs, phs, ts_shape, points_manager.get())
-
-    radar_c = cp_Radar(radar, frame_start_time)
-
-    # Validate samples_per_pulse consistency between Python and C++
-    cdef int_t cpp_samples_per_pulse = radar_c.get()[0].sample_size_
-    cdef int_t py_samples_per_pulse = radar.sample_prop["samples_per_pulse"]
-    if cpp_samples_per_pulse != py_samples_per_pulse:
-        raise ValueError(
-            f"\nSamples Per Pulse Mismatch\n"
-            f"-------------------------\n"
-            f"Inconsistency detected between Python and C++ radar configurations.\n\n"
-            f"Python samples_per_pulse: {py_samples_per_pulse}\n"
-            f"C++ sample_size_:         {cpp_samples_per_pulse}\n\n"
-            f"This typically occurs when:\n"
-            f"1. The pulse_length * sampling_frequency calculation differs between implementations\n"
-            f"2. Rounding methods (ceil vs int) are inconsistent\n\n"
-            f"Please ensure both implementations use the same calculation method."
-        )
-
-    cdef double[:,:,::1] bb_real = np.empty(ts_shape, order='C', dtype=np.float64)
-    cdef double[:,:,::1] bb_imag = np.empty(ts_shape, order='C', dtype=np.float64)
-
-    cdef double[:,:,::1] bb_real_interf = np.empty(ts_shape, order='C', dtype=np.float64)
-    cdef double[:,:,::1] bb_imag_interf = np.empty(ts_shape, order='C', dtype=np.float64)
-
-    radar_c.get()[0].InitBaseband(&bb_real[0][0][0], &bb_imag[0][0][0])
-
-    #----------------------
-    # Simulation Execution
-    #----------------------
-    # Validate simulation fidelity level
     level_map = {None: 0, "frame": 0, "pulse": 1, "sample": 2}
-    try:
-        level_id = level_map[level]
-    except KeyError:
+    if level not in level_map:
         raise ValueError(
             "\nInvalid Simulation Fidelity Level\n"
             "------------------------------\n"
@@ -401,125 +285,161 @@ cpdef sim_radar(radar, targets, density=1, level=None, interf=None,
             .format(level)
         )
 
-    # Run ideal point target simulation and mesh simulation based on device selection
-    if device_lower == "cpu":
-        # CPU execution
-        err = point_sim_cpu.Run(radar_c, points_manager)
-        if err:
-            raise_err(err)
+    validate_free_tier_limits(radar, targets)
 
-        # Run scene simulation
-        err = mesh_sim_cpu.Run(
-            radar_c,
-            targets_manager,
-            level_id,
-            <float_t> density,
-            ray_filter_c,
-            back_propagating,
-            log_path_c,
-            dry_run)
-        if err:
-            raise_err(err)
+    #----------------------
+    # Variable Declarations
+    #----------------------
+    cdef:
+        shared_ptr[Radar[double, float_t]] radar_c = make_shared[Radar[double, float_t]]()
+        shared_ptr[Radar[double, float_t]] interf_radar_c = make_shared[Radar[double, float_t]]()
+        shared_ptr[TargetsManager[float_t]] targets_manager = make_shared[TargetsManager[float_t]]()
+        shared_ptr[PointsManager[float_t]] points_manager = make_shared[PointsManager[float_t]]()
+        Vec2[int_t] ray_filter_c
+        string log_path_c
+        int_t level_id = level_map[level]
+        int_t frames_c = np.size(radar.time_prop["frame_start_time"])
+        str bb_type = radar.radar_prop["receiver"].bb_prop["bb_type"]
+        bint is_complex = (bb_type == "complex")
+        float_t noise_level = radar.sample_prop["noise"]
+        int_t out_channels
+        int_t cpp_samples_per_pulse
+        int_t py_samples_per_pulse
+
+    cdef:
+        PointSimulator[double, float_t, cpu_policy] point_sim_cpu
+        PointSimulator[double, float_t, gpu_policy] point_sim_gpu
+        MeshSimulator[double, float_t, cpu_policy] mesh_sim_cpu
+        MeshSimulator[double, float_t, gpu_policy] mesh_sim_gpu
+        InterferenceSimulator[double, float_t, cpu_policy] interf_sim_cpu
+        InterferenceSimulator[double, float_t, gpu_policy] interf_sim_gpu
+        NoiseSimulator[double, float_t, cpu_policy] noise_sim_cpu
+        NoiseSimulator[double, float_t, gpu_policy] noise_sim_gpu
+
+    #----------------------
+    # Setup
+    #----------------------
+    frame_start_time = radar.time_prop["frame_start_time"]
+    log_path_c = str.encode(log_path) if log_path is not None else str.encode("")
+
+    radar_ts = radar.time_prop["origin_timestamp"]
+    radar_ts_shape = radar.time_prop["origin_timestamp_shape"]
+    timestamp = radar.time_prop["timestamp"]
+    ts_shape = radar.time_prop["timestamp_shape"]
+
+    if ray_filter is None:
+        ray_filter_c = Vec2[int_t](DEFAULT_MIN_REFLECTIONS, MAX_RAY_REFLECTIONS)
     else:
-        # GPU execution (default)
-        err = point_sim_gpu.Run(radar_c, points_manager)
-        if err:
-            raise_err(err)
+        ray_filter_c = Vec2[int_t](<int_t>ray_filter[0], <int_t>ray_filter[1])
 
-        # Run scene simulation
-        err = mesh_sim_gpu.Run(
-            radar_c,
-            targets_manager,
-            level_id,
-            <float_t> density,
-            ray_filter_c,
-            back_propagating,
-            log_path_c,
-            dry_run)
-        if err:
-            raise_err(err)
+    #----------------------
+    # Build C++ Objects
+    #----------------------
+    mesh_module = None
+    for tgt in targets:
+        if "model" in tgt:
+            if mesh_module is None:
+                mesh_module = import_mesh_module()
+            cp_AddTarget(radar, tgt, timestamp, mesh_module, targets_manager.get())
+        else:
+            cp_AddPoint(
+                tgt["location"], tgt.get("speed", (0, 0, 0)),
+                tgt["rcs"], tgt.get("phase", 0),
+                ts_shape, points_manager.get())
+
+    radar_c = cp_Radar(radar, frame_start_time)
+
+    cpp_samples_per_pulse = radar_c.get()[0].sample_size_
+    py_samples_per_pulse = radar.sample_prop["samples_per_pulse"]
+    if cpp_samples_per_pulse != py_samples_per_pulse:
+        raise ValueError(
+            f"\nSamples Per Pulse Mismatch\n"
+            f"-------------------------\n"
+            f"Inconsistency detected between Python and C++ radar configurations.\n\n"
+            f"Python samples_per_pulse: {py_samples_per_pulse}\n"
+            f"C++ sample_size_:         {cpp_samples_per_pulse}\n\n"
+            f"This typically occurs when:\n"
+            f"1. The pulse_length * sampling_frequency calculation differs between implementations\n"
+            f"2. Rounding methods (ceil vs int) are inconsistent\n\n"
+            f"Please ensure both implementations use the same calculation method."
+        )
+
+    #----------------------
+    # Allocate Output Buffers
+    #----------------------
+    cdef double[:,:,::1] bb_real = np.empty(ts_shape, order='C', dtype=np.float64)
+    cdef double[:,:,::1] bb_imag = np.empty(ts_shape, order='C', dtype=np.float64)
+    cdef double[:,:,::1] bb_real_interf = np.empty(ts_shape, order='C', dtype=np.float64)
+    cdef double[:,:,::1] bb_imag_interf = np.empty(ts_shape, order='C', dtype=np.float64)
+
+    out_channels = frames_c * radar_ts_shape[0]
+    cdef double[:,:,::1] radar_ts_c = np.ascontiguousarray(radar_ts, dtype=np.float64)
+    cdef double[:,:,::1] noise_real_out = np.zeros(
+        (out_channels, radar_ts_shape[1], radar_ts_shape[2]), dtype=np.float64, order='C')
+    cdef double[:,:,::1] noise_imag_out = np.zeros(
+        (out_channels, radar_ts_shape[1], radar_ts_shape[2]), dtype=np.float64, order='C')
+
+    radar_c.get()[0].InitBaseband(&bb_real[0][0][0], &bb_imag[0][0][0])
+
+    #----------------------
+    # Run Simulations
+    #----------------------
+    if device_lower == "cpu":
+        err = point_sim_cpu.Run(radar_c, points_manager)
+        if err: raise_err(err)
+
+        err = mesh_sim_cpu.Run(radar_c, targets_manager, level_id, <float_t>density,
+                               ray_filter_c, back_propagating, log_path_c, dry_run)
+        if err: raise_err(err)
+
+        err = noise_sim_cpu.Run(
+            radar_c, <double>noise_level, is_complex,
+            &radar_ts_c[0][0][0], radar_ts_shape[0], radar_ts_shape[1], radar_ts_shape[2],
+            &noise_real_out[0][0][0], &noise_imag_out[0][0][0], 0)
+        if err: raise_err(err)
+    else:
+        err = point_sim_gpu.Run(radar_c, points_manager)
+        if err: raise_err(err)
+
+        err = mesh_sim_gpu.Run(radar_c, targets_manager, level_id, <float_t>density,
+                               ray_filter_c, back_propagating, log_path_c, dry_run)
+        if err: raise_err(err)
 
         radar_c.get()[0].SyncBaseband()
 
-    if radar.radar_prop["receiver"].bb_prop["bb_type"] == "real":
-        baseband = np.asarray(bb_real)
-    else:
-        baseband = np.asarray(bb_real)+1j*np.asarray(bb_imag)
-
-    #----------------------
-    # Noise Generation
-    #----------------------
-    cdef str bb_type = radar.radar_prop["receiver"].bb_prop["bb_type"]
-    cdef bint is_complex_noise = (bb_type == "complex")
-    cdef float_t noise_level = radar.sample_prop["noise"]
-
-    # Prepare timestamp array as contiguous C-order double array
-    cdef double[:,:,::1] radar_ts_c = np.ascontiguousarray(radar_ts, dtype=np.float64)
-
-    # Output noise arrays: shape = [frames * channels, pulses, samples]
-    cdef int_t out_channels = frames_c * radar_ts_shape[0]
-    cdef double[:,:,::1] noise_real_out = np.zeros(
-        (out_channels, radar_ts_shape[1], radar_ts_shape[2]),
-        dtype=np.float64, order='C')
-    cdef double[:,:,::1] noise_imag_out = np.zeros(
-        (out_channels, radar_ts_shape[1], radar_ts_shape[2]),
-        dtype=np.float64, order='C')
-
-    # Run noise generation via C++
-    if device_lower == "cpu":
-        err = noise_sim_cpu.Run(
-            radar_c, <double>noise_level, is_complex_noise,
-            &radar_ts_c[0][0][0],
-            radar_ts_shape[0], radar_ts_shape[1], radar_ts_shape[2],
-            &noise_real_out[0][0][0], &noise_imag_out[0][0][0], 0)
-        if err:
-            raise_err(err)
-    else:
         err = noise_sim_gpu.Run(
-            radar_c, <double>noise_level, is_complex_noise,
-            &radar_ts_c[0][0][0],
-            radar_ts_shape[0], radar_ts_shape[1], radar_ts_shape[2],
+            radar_c, <double>noise_level, is_complex,
+            &radar_ts_c[0][0][0], radar_ts_shape[0], radar_ts_shape[1], radar_ts_shape[2],
             &noise_real_out[0][0][0], &noise_imag_out[0][0][0], 0)
-        if err:
-            raise_err(err)
-
-    if is_complex_noise:
-        noise_mat = np.asarray(noise_real_out) + 1j * np.asarray(noise_imag_out)
-    else:
-        noise_mat = np.asarray(noise_real_out)
+        if err: raise_err(err)
 
     #----------------------
-    # Interference Processing
+    # Interference (optional)
     #----------------------
     cdef object interference = None
-    
-    # Run interference simulation if interference radar is provided
     if interf is not None:
-        # Use main radar frame time if interference frame time not specified
-        interf_frame_start_time = np.array(interf.time_prop["frame_start_time"], dtype=np.float64)
-        interf_radar_c = cp_Radar(interf, interf_frame_start_time)
-
-        # Initialize baseband for interference calculation
+        interf_radar_c = cp_Radar(interf, np.array(interf.time_prop["frame_start_time"], dtype=np.float64))
         radar_c.get()[0].InitBaseband(&bb_real_interf[0][0][0], &bb_imag_interf[0][0][0])
 
-        # Run interference simulation based on device selection
         if device_lower == "cpu":
             err = interf_sim_cpu.Run(radar_c, interf_radar_c)
-            if err:
-                raise_err(err)
+            if err: raise_err(err)
         else:
             err = interf_sim_gpu.Run(radar_c, interf_radar_c)
-            if err:
-                raise_err(err)
+            if err: raise_err(err)
             radar_c.get()[0].SyncBaseband()
 
-        # Extract interference data based on baseband type
-        if bb_type == "real":
-            interference = np.asarray(bb_real_interf)
-        else:
-            interference = np.asarray(bb_real_interf) + 1j * np.asarray(bb_imag_interf)
+        interference = (np.asarray(bb_real_interf) if bb_type == "real"
+                        else np.asarray(bb_real_interf) + 1j * np.asarray(bb_imag_interf))
 
-    # Return the simulation results as a structured dictionary
+    #----------------------
+    # Extract and Return Results
+    #----------------------
+    baseband = (np.asarray(bb_real) if bb_type == "real"
+                else np.asarray(bb_real) + 1j * np.asarray(bb_imag))
+    noise_mat = (np.asarray(noise_real_out) if not is_complex
+                 else np.asarray(noise_real_out) + 1j * np.asarray(noise_imag_out))
+
     return {
         "baseband": baseband,
         "noise": noise_mat,
