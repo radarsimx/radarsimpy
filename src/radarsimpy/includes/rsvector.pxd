@@ -37,63 +37,28 @@ Common Usage:
 
 #------------------------------------------------------------------------------
 # RadarSimPy Vector Library Interface
-# High-performance vector classes for 3D geometric calculations in radar simulation
 #------------------------------------------------------------------------------
 cdef extern from "rsvector.hpp" namespace "rsv" nogil:
-    
-    # 3D Vector Class - Primary geometric primitive for radar calculations
+
+    # 3D vector for positions, directions, velocities, and angular measurements.
+    # Template T: Numeric type (float, double, int, etc.)
+    # Components: [0] X (East/Right), [1] Y (North/Forward), [2] Z (Up/Elevation)
     cdef cppclass Vec3[T]:
-        """
-        3D vector class for positions, directions, and transformations
-        
-        Template parameter T: Numeric type (float, double, int, etc.)
-        
-        Components:
-        - [0]: X-coordinate (typically East/Right)
-        - [1]: Y-coordinate (typically North/Forward) 
-        - [2]: Z-coordinate (typically Up/Elevation)
-        
-        Coordinate Systems:
-        - Cartesian: (x, y, z) in meters
-        - Spherical: (range, azimuth, elevation) - use conversion functions
-        - Platform: Body-fixed coordinates relative to radar platform
-        """
-        
-        # Constructors
         Vec3() except +                                          # Zero vector constructor
         Vec3(const T&, const T&, const T&) except +             # Component constructor (x, y, z)
         Vec3(T*) except +                                        # Array/pointer constructor
-        
-        # Operators
         Vec3& operator=(const Vec3&)                             # Assignment operator
-        T& operator[](const unsigned int&)                       # Index operator for component access
+        T& operator[](const unsigned int&)                       # Component index access
 
-    # 2D Vector Class - For planar calculations and projections
+    # 2D vector for planar calculations, range-angle pairs, and filter bounds.
+    # Template T: Numeric type (float, double, int, etc.)
+    # Components: [0] X/range/min, [1] Y/angle/max
     cdef cppclass Vec2[T]:
-        """
-        2D vector class for planar calculations and range-angle representations
-        
-        Template parameter T: Numeric type (float, double, int, etc.)
-        
-        Components:
-        - [0]: X-coordinate or Range
-        - [1]: Y-coordinate or Angle
-        
-        Common Uses:
-        - Range-Doppler maps: (range_bin, doppler_bin)
-        - Angular coordinates: (azimuth, elevation)
-        - Image coordinates: (pixel_x, pixel_y)
-        - Filter parameters: (min_value, max_value)
-        """
-        
-        # Constructors
         Vec2() except +                                          # Zero vector constructor
         Vec2(const T&, const T&) except +                       # Component constructor (x, y)
         Vec2(T*) except +                                        # Array/pointer constructor
-        
-        # Operators
         Vec2& operator=(const Vec2&)                             # Assignment operator
-        T& operator[](const unsigned int&)                       # Index operator for component access
+        T& operator[](const unsigned int&)                       # Component index access
 
 #------------------------------------------------------------------------------
 # End of RadarSimPy Vector Library Interface

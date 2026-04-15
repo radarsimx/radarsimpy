@@ -54,35 +54,12 @@ ctypedef float float_t          # Single precision (32-bit) for memory efficienc
 
 #------------------------------------------------------------------------------
 # Enhanced C++ Standard Library - std::vector Interface
+# Extended from Cython's libcpp/vector.pxd with full iterator support.
+# Key differences:
+#   - ALLOCATOR=* removed to enable proper 'const &' reference handling
+#   - Complete iterator hierarchy (forward, reverse, const variants)
+#   - C++11 methods: emplace, emplace_back, shrink_to_fit, cbegin/cend
 #------------------------------------------------------------------------------
-
-"""
-Extended std::vector Interface for RadarSimPy
-
-This is an enhanced version of Cython's libcpp/vector.pxd with the following
-key modifications for RadarSimPy compatibility:
-
-1. **Custom Allocator Removal**: ALLOCATOR=* parameter removed to enable 
-   proper 'const &' reference handling in C++ function signatures
-
-2. **Complete Iterator Support**: Full iterator hierarchy including:
-   - Forward iterators (iterator, const_iterator)
-   - Reverse iterators (reverse_iterator, const_reverse_iterator)
-   - All comparison and arithmetic operators
-
-3. **Memory Safety**: Exception-safe operations with proper exception 
-   propagation from C++ to Python
-
-4. **Performance Optimized**: Direct memory access methods for numerical
-   array operations common in radar signal processing
-
-Usage Notes:
-- Use for storing large arrays of numerical data (samples, coordinates, etc.)
-- Prefer push_back() for dynamic array construction
-- Use data() for direct memory access when interfacing with C++ algorithms
-- Reserve capacity with reserve() for known array sizes to prevent reallocations
-"""
-
 cdef extern from "<vector>" namespace "std" nogil:
     cdef cppclass vector[T]:
         # Type definitions for size and iterator arithmetic
@@ -200,10 +177,10 @@ cdef extern from "<vector>" namespace "std" nogil:
             bint operator>=(reverse_iterator)
             bint operator>=(const_reverse_iterator)
 
-        # ================================================================
-        # Vector Constructors and Core Operations
-        # ================================================================
-        
+        #----------------------------------------------------------------------
+        # Constructors and Core Operations
+        #----------------------------------------------------------------------
+
         # Constructors
         vector() except +                                # Default empty vector
         vector(vector&) except +                         # Copy constructor
@@ -229,10 +206,11 @@ cdef extern from "<vector>" namespace "std" nogil:
         bint operator>(vector&, vector&)                 # Lexicographic greater than
         bint operator<=(vector&, vector&)                # Less than or equal
         bint operator>=(vector&, vector&)                # Greater than or equal
-        # ================================================================
+
+        #----------------------------------------------------------------------
         # Container Modification Methods
-        # ================================================================
-        
+        #----------------------------------------------------------------------
+
         # Assignment and Population
         void assign(size_type, const T&)                 # Fill with repeated value
         void assign[InputIt](InputIt, InputIt) except +  # Assign from iterator range
