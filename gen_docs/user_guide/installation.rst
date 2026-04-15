@@ -127,6 +127,19 @@ You can place multiple license files in the directory. The system will try each 
     ├── license_RadarSimPy_backup.lic
     └── license_RadarSimPy_trial.lic
 
+**Programmatic License Path**
+
+Use ``set_license(path)`` to load a license file from a custom location at runtime:
+
+.. code-block:: python
+
+    import radarsimpy
+
+    # Load license from a custom path
+    radarsimpy.set_license("/path/to/license_RadarSimPy_customer.lic")
+
+This is useful when the license file is stored outside the ``radarsimpy/`` package directory, such as a shared network location or a path managed by your deployment environment.
+
 Checking License Status
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
