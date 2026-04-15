@@ -24,6 +24,10 @@ and RCS calculations.
 
 """
 
+# ============================================================================
+# Imports
+# ============================================================================
+
 # Standard imports
 import numpy as np
 import warnings
@@ -52,7 +56,11 @@ from radarsimpy.mesh_kit import load_mesh
 np.import_array()
 np_float = np.float32
 
-# Constants for unit conversion and validation
+
+# ============================================================================
+# Constants
+# ============================================================================
+
 cdef dict UNIT_SCALE = {"m": 1.0, "cm": 100.0, "mm": 1000.0}
 cdef int_t MAX_FREE_TIER_FACES = 8
 cdef frozenset _VALID_TARGET_KEYS = frozenset({
@@ -62,6 +70,10 @@ cdef frozenset _VALID_TARGET_KEYS = frozenset({
     "skip_diffusion", "is_ground",  # is_ground is a deprecated alias
     "density", "environment",
 })
+
+# ============================================================================
+# Private Helpers (validation, deprecation, unit conversion)
+# ============================================================================
 
 cdef inline float_t _safe_unit_conversion(str unit) except *:
     """
@@ -129,6 +141,68 @@ cdef inline void _validate_target_keys(target) except *:
             UserWarning,
             stacklevel=3
         )
+
+cdef inline tuple _load_and_validate_mesh(target, mesh_module) except *:
+    """
+    Load mesh model and validate against free tier limits.
+
+    :param dict target:
+        Target properties containing 'model' and optional 'unit'
+    :param mesh_module:
+        Mesh loading module
+    :return: Tuple of (points_array, cells_array) as numpy arrays
+    :rtype: tuple
+    """
+    cdef float_t scale = _safe_unit_conversion(target.get("unit", "m"))
+    try:
+        mesh_data = load_mesh(target["model"], scale, mesh_module)
+    except Exception as e:
+        raise RuntimeError(
+            f"Failed to load mesh model '{target.get('model', 'unknown')}': {e}"
+        )
+    points = mesh_data["points"].astype(np_float)
+    cells = mesh_data["cells"].astype(np.int32)
+    _validate_mesh_for_free_tier(<int_t>cells.shape[0])
+    return points, cells
+
+cdef inline void _parse_material_properties(
+    target,
+    cpp_complex[float_t] * ep_out,
+    cpp_complex[float_t] * mu_out,
+) except *:
+    """
+    Parse permittivity and permeability from target dict.
+
+    :param dict target:
+        Target properties containing optional 'permittivity' and 'permeability'
+    :param cpp_complex[float_t] * ep_out:
+        Output pointer for permittivity
+    :param cpp_complex[float_t] * mu_out:
+        Output pointer for permeability
+    """
+    permittivity = target.get("permittivity", 1e38)
+    permeability = target.get("permeability", 1)
+    if permittivity == "PEC":
+        ep_out[0] = cpp_complex[float_t](<float_t>1e38, <float_t>0.0)
+        mu_out[0] = cpp_complex[float_t](<float_t>1.0, <float_t>0.0)
+    else:
+        ep_out[0] = cpp_complex[float_t](<float_t>np.real(permittivity), <float_t>np.imag(permittivity))
+        mu_out[0] = cpp_complex[float_t](<float_t>np.real(permeability), <float_t>np.imag(permeability))
+
+cdef inline void _handle_deprecated_target_params(target) except *:
+    """
+    Handle deprecated parameter names in target dict.
+
+    :param dict target:
+        Target properties dictionary (modified in-place)
+    """
+    if "is_ground" in target:
+        target["skip_diffusion"] = target["is_ground"]
+        _warn_deprecated_parameter("is_ground", "skip_diffusion")
+
+# ============================================================================
+# Point Target
+# ============================================================================
 
 @cython.cdivision(True)
 @cython.boundscheck(False)
@@ -221,6 +295,10 @@ cdef void cp_AddPoint(location, speed, rcs, phase, shape, PointsManager[float_t]
     )
 
 
+# ============================================================================
+# Radar System (Transmitter, Receiver, Radar)
+# ============================================================================
+
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -236,10 +314,10 @@ cdef shared_ptr[Transmitter[double, float_t]] cp_Transmitter(radar):
     :rtype: shared_ptr[Transmitter[double, float_t]]
     :raises: ValueError for invalid radar configuration
     """
-    # Extract key dimensions from radar configuration
-    cdef int_t channles_c = radar.array_prop["size"]
-    cdef int_t pulses_c = radar.radar_prop["transmitter"].waveform_prop["pulses"]
-    cdef int_t samples_c = radar.sample_prop["samples_per_pulse"]
+    # Cache nested property lookups
+    tx_prop = radar.radar_prop["transmitter"]
+    wf_prop = tx_prop.waveform_prop
+    sample_prop = radar.sample_prop
 
     # Vector declarations for transmitter parameters
     cdef vector[double] f_vt, t_vt
@@ -247,49 +325,49 @@ cdef shared_ptr[Transmitter[double, float_t]] cp_Transmitter(radar):
     cdef vector[double] t_pstart_vt
 
     # frequency
-    cdef double[:] f_mv = radar.radar_prop["transmitter"].waveform_prop["f"].astype(np.float64)
-    Mem_Copy(&f_mv[0], <int_t>(len(radar.radar_prop["transmitter"].waveform_prop["f"])), f_vt)
+    cdef double[:] f_mv = wf_prop["f"].astype(np.float64)
+    Mem_Copy(&f_mv[0], <int_t>len(f_mv), f_vt)
 
     # time
-    cdef double[:] t_mv = radar.radar_prop["transmitter"].waveform_prop["t"].astype(np.float64)
-    Mem_Copy(&t_mv[0], <int_t>(len(radar.radar_prop["transmitter"].waveform_prop["t"])), t_vt)
+    cdef double[:] t_mv = wf_prop["t"].astype(np.float64)
+    Mem_Copy(&t_mv[0], <int_t>len(t_mv), t_vt)
 
     # frequency offset per pulse
-    cdef double[:] f_offset_mv = radar.radar_prop["transmitter"].waveform_prop["f_offset"].astype(np.float64)
-    Mem_Copy(&f_offset_mv[0], <int_t>(len(radar.radar_prop["transmitter"].waveform_prop["f_offset"])), f_offset_vt)
+    cdef double[:] f_offset_mv = wf_prop["f_offset"].astype(np.float64)
+    Mem_Copy(&f_offset_mv[0], <int_t>len(f_offset_mv), f_offset_vt)
 
     # pulse start time
-    cdef double[:] t_pstart_mv = radar.radar_prop["transmitter"].waveform_prop["pulse_start_time"].astype(np.float64)
-    Mem_Copy(&t_pstart_mv[0], <int_t>(len(radar.radar_prop["transmitter"].waveform_prop["pulse_start_time"])), t_pstart_vt)
+    cdef double[:] t_pstart_mv = wf_prop["pulse_start_time"].astype(np.float64)
+    Mem_Copy(&t_pstart_mv[0], <int_t>len(t_pstart_mv), t_pstart_vt)
 
-    # phase noise — pass SSB parameters for deferred per-frame generation in C++
+    # phase noise
     cdef vector[double] pn_freq_vt
     cdef vector[double] pn_power_vt
     cdef double[:] pn_freq_mv
     cdef double[:] pn_power_mv
 
-    if radar.sample_prop.get("pn_f") is not None:
-        pn_freq_mv = np.array(radar.sample_prop["pn_f"]).astype(np.float64)
-        pn_power_mv = np.array(radar.sample_prop["pn_power"]).astype(np.float64)
-        Mem_Copy(&pn_freq_mv[0], <int_t>(len(radar.sample_prop["pn_f"])), pn_freq_vt)
-        Mem_Copy(&pn_power_mv[0], <int_t>(len(radar.sample_prop["pn_power"])), pn_power_vt)
+    if sample_prop.get("pn_f") is not None:
+        pn_freq_mv = np.asarray(sample_prop["pn_f"]).astype(np.float64)
+        pn_power_mv = np.asarray(sample_prop["pn_power"]).astype(np.float64)
+        Mem_Copy(&pn_freq_mv[0], <int_t>len(pn_freq_mv), pn_freq_vt)
+        Mem_Copy(&pn_power_mv[0], <int_t>len(pn_power_mv), pn_power_vt)
 
         return make_shared[Transmitter[double, float_t]](
-            <float_t> radar.radar_prop["transmitter"].rf_prop["tx_power"],
+            <float_t> tx_prop.rf_prop["tx_power"],
             f_vt,
             t_vt,
             f_offset_vt,
             t_pstart_vt,
             pn_freq_vt,
             pn_power_vt,
-            <double> radar.sample_prop["pn_fs"],
+            <double> sample_prop["pn_fs"],
             <int> 0,
-            <unsigned long long> radar.sample_prop["pn_seed"],
-            <bool> radar.sample_prop["pn_validation"]
+            <unsigned long long> sample_prop["pn_seed"],
+            <bool> sample_prop["pn_validation"]
         )
 
     return make_shared[Transmitter[double, float_t]](
-        <float_t> radar.radar_prop["transmitter"].rf_prop["tx_power"],
+        <float_t> tx_prop.rf_prop["tx_power"],
         f_vt,
         t_vt,
         f_offset_vt,
@@ -313,6 +391,8 @@ cdef void cp_AddTxChannel(tx, tx_idx, Transmitter[double, float_t] * tx_c):
         Pointer to C++ transmitter object
     :raises: ValueError for invalid channel index or pattern data
     """
+    # Cache channel properties
+    txch = tx.txchannel_prop
     cdef int_t pulses_c = tx.waveform_prop["pulses"]
 
     cdef vector[float_t] az_ang_vt, az_ptn_vt
@@ -328,41 +408,50 @@ cdef void cp_AddTxChannel(tx, tx_idx, Transmitter[double, float_t] * tx_c):
     cdef vector[float_t] mod_t_vt
 
     # azimuth pattern
-    az_ang_mv = np.radians(np.array(tx.txchannel_prop["az_angles"][tx_idx])).astype(np_float)
-    az_ptn_mv = np.array(tx.txchannel_prop["az_patterns"][tx_idx]).astype(np_float)
-
-    Mem_Copy(&az_ang_mv[0], <int_t>(len(tx.txchannel_prop["az_angles"][tx_idx])), az_ang_vt)
-    Mem_Copy(&az_ptn_mv[0], <int_t>(len(tx.txchannel_prop["az_patterns"][tx_idx])), az_ptn_vt)
+    az_angles = txch["az_angles"][tx_idx]
+    az_patterns = txch["az_patterns"][tx_idx]
+    az_ang_mv = np.radians(np.asarray(az_angles)).astype(np_float)
+    az_ptn_mv = np.asarray(az_patterns).astype(np_float)
+    Mem_Copy(&az_ang_mv[0], <int_t>len(az_angles), az_ang_vt)
+    Mem_Copy(&az_ptn_mv[0], <int_t>len(az_patterns), az_ptn_vt)
 
     # elevation pattern
-    el_ang_mv = np.radians(np.flip(90-tx.txchannel_prop["el_angles"][tx_idx])).astype(np_float)
-    el_ptn_mv = np.flip(tx.txchannel_prop["el_patterns"][tx_idx]).astype(np_float)
-
-    Mem_Copy(&el_ang_mv[0], <int_t>(len(tx.txchannel_prop["el_angles"][tx_idx])), el_ang_vt)
-    Mem_Copy(&el_ptn_mv[0], <int_t>(len(tx.txchannel_prop["el_patterns"][tx_idx])), el_ptn_vt)
+    el_angles = txch["el_angles"][tx_idx]
+    el_patterns = txch["el_patterns"][tx_idx]
+    el_ang_mv = np.radians(np.flip(90 - np.asarray(el_angles))).astype(np_float)
+    el_ptn_mv = np.flip(np.asarray(el_patterns)).astype(np_float)
+    Mem_Copy(&el_ang_mv[0], <int_t>len(el_angles), el_ang_vt)
+    Mem_Copy(&el_ptn_mv[0], <int_t>len(el_patterns), el_ptn_vt)
 
     # pulse modulation
-    cdef float_t[:] pulse_real_mv = np.real(tx.txchannel_prop["pulse_mod"][tx_idx]).astype(np_float)
-    cdef float_t[:] pulse_imag_mv = np.imag(tx.txchannel_prop["pulse_mod"][tx_idx]).astype(np_float)
-    Mem_Copy_Complex(&pulse_real_mv[0], &pulse_imag_mv[0], <int_t>(pulses_c), pulse_mod_vt)
+    pulse_mod = txch["pulse_mod"][tx_idx]
+    cdef float_t[:] pulse_real_mv = np.real(pulse_mod).astype(np_float)
+    cdef float_t[:] pulse_imag_mv = np.imag(pulse_mod).astype(np_float)
+    Mem_Copy_Complex(&pulse_real_mv[0], &pulse_imag_mv[0], pulses_c, pulse_mod_vt)
 
     # waveform modulation
-    mod_enabled = tx.txchannel_prop["waveform_mod"][tx_idx]["enabled"]
+    wf_mod = txch["waveform_mod"][tx_idx]
+    mod_enabled = wf_mod["enabled"]
 
     cdef float_t[:] mod_real_mv, mod_imag_mv
     cdef float_t[:] mod_t_mv
     if mod_enabled:
-        mod_real_mv = np.real(tx.txchannel_prop["waveform_mod"][tx_idx]["var"]).astype(np_float)
-        mod_imag_mv = np.imag(tx.txchannel_prop["waveform_mod"][tx_idx]["var"]).astype(np_float)
-        mod_t_mv = tx.txchannel_prop["waveform_mod"][tx_idx]["t"].astype(np_float)
+        mod_var = wf_mod["var"]
+        mod_t = wf_mod["t"]
+        mod_real_mv = np.real(mod_var).astype(np_float)
+        mod_imag_mv = np.imag(mod_var).astype(np_float)
+        mod_t_mv = mod_t.astype(np_float)
+        Mem_Copy_Complex(&mod_real_mv[0], &mod_imag_mv[0], <int_t>len(mod_var), mod_var_vt)
+        Mem_Copy(&mod_t_mv[0], <int_t>len(mod_t), mod_t_vt)
 
-        Mem_Copy_Complex(&mod_real_mv[0], &mod_imag_mv[0], <int_t>(len(tx.txchannel_prop["waveform_mod"][tx_idx]["var"])), mod_var_vt)
-        Mem_Copy(&mod_t_mv[0], <int_t>(len(tx.txchannel_prop["waveform_mod"][tx_idx]["t"])), mod_t_vt)
+    cdef float_t[:] location_mv = txch["locations"][tx_idx].astype(np_float)
 
-    cdef float_t[:] location_mv = tx.txchannel_prop["locations"][tx_idx].astype(np_float)
-
-    polar = tx.txchannel_prop["polarization"][tx_idx]
-    cdef Vec3[cpp_complex[float_t]] polarization_vt = Vec3[cpp_complex[float_t]](cpp_complex[float_t](np.real(polar[0]), np.imag(polar[0])), cpp_complex[float_t](np.real(polar[1]), np.imag(polar[1])), cpp_complex[float_t](np.real(polar[2]), np.imag(polar[2])))
+    polar = txch["polarization"][tx_idx]
+    cdef Vec3[cpp_complex[float_t]] polarization_vt = Vec3[cpp_complex[float_t]](
+        cpp_complex[float_t](<float_t>np.real(polar[0]), <float_t>np.imag(polar[0])),
+        cpp_complex[float_t](<float_t>np.real(polar[1]), <float_t>np.imag(polar[1])),
+        cpp_complex[float_t](<float_t>np.real(polar[2]), <float_t>np.imag(polar[2]))
+    )
 
     tx_c[0].AddChannel(
         Vec3[float_t](&location_mv[0]),
@@ -371,12 +460,12 @@ cdef void cp_AddTxChannel(tx, tx_idx, Transmitter[double, float_t] * tx_c):
         az_ptn_vt,
         el_ang_vt,
         el_ptn_vt,
-        <float_t> tx.txchannel_prop["antenna_gains"][tx_idx],
+        <float_t> txch["antenna_gains"][tx_idx],
         mod_t_vt,
         mod_var_vt,
         pulse_mod_vt,
-        <float_t> tx.txchannel_prop["delay"][tx_idx],
-        <float_t> np.radians(tx.txchannel_prop["grid"][tx_idx])
+        <float_t> txch["delay"][tx_idx],
+        <float_t> np.radians(txch["grid"][tx_idx])
     )
 
 
@@ -396,6 +485,9 @@ cdef void cp_AddRxChannel(rx, rx_idx, Receiver[float_t] * rx_c):
         Pointer to C++ receiver object
     :raises: ValueError for invalid channel index or pattern data
     """
+    # Cache channel properties
+    rxch = rx.rxchannel_prop
+
     cdef vector[float_t] az_ang_vt, az_ptn_vt
     cdef vector[float_t] el_ang_vt, el_ptn_vt
 
@@ -403,23 +495,29 @@ cdef void cp_AddRxChannel(rx, rx_idx, Receiver[float_t] * rx_c):
     cdef float_t[:] el_ang_mv, el_ptn_mv
 
     # azimuth pattern
-    az_ang_mv = np.radians(rx.rxchannel_prop["az_angles"][rx_idx]).astype(np_float)
-    az_ptn_mv = rx.rxchannel_prop["az_patterns"][rx_idx].astype(np_float)
-
-    Mem_Copy(&az_ang_mv[0], <int_t>(len(rx.rxchannel_prop["az_angles"][rx_idx])), az_ang_vt)
-    Mem_Copy(&az_ptn_mv[0], <int_t>(len(rx.rxchannel_prop["az_patterns"][rx_idx])), az_ptn_vt)
+    az_angles = rxch["az_angles"][rx_idx]
+    az_patterns = rxch["az_patterns"][rx_idx]
+    az_ang_mv = np.radians(np.asarray(az_angles)).astype(np_float)
+    az_ptn_mv = np.asarray(az_patterns).astype(np_float)
+    Mem_Copy(&az_ang_mv[0], <int_t>len(az_angles), az_ang_vt)
+    Mem_Copy(&az_ptn_mv[0], <int_t>len(az_patterns), az_ptn_vt)
 
     # elevation pattern
-    el_ang_mv = np.radians(np.flip(90-rx.rxchannel_prop["el_angles"][rx_idx])).astype(np_float)
-    el_ptn_mv = np.flip(rx.rxchannel_prop["el_patterns"][rx_idx]).astype(np_float)
+    el_angles = rxch["el_angles"][rx_idx]
+    el_patterns = rxch["el_patterns"][rx_idx]
+    el_ang_mv = np.radians(np.flip(90 - np.asarray(el_angles))).astype(np_float)
+    el_ptn_mv = np.flip(np.asarray(el_patterns)).astype(np_float)
+    Mem_Copy(&el_ang_mv[0], <int_t>len(el_angles), el_ang_vt)
+    Mem_Copy(&el_ptn_mv[0], <int_t>len(el_patterns), el_ptn_vt)
 
-    Mem_Copy(&el_ang_mv[0], <int_t>(len(rx.rxchannel_prop["el_angles"][rx_idx])), el_ang_vt)
-    Mem_Copy(&el_ptn_mv[0], <int_t>(len(rx.rxchannel_prop["el_patterns"][rx_idx])), el_ptn_vt)
+    cdef float_t[:] location_mv = rxch["locations"][rx_idx].astype(np_float)
 
-    cdef float_t[:] location_mv = rx.rxchannel_prop["locations"][rx_idx].astype(np_float)
-
-    polar = rx.rxchannel_prop["polarization"][rx_idx]
-    cdef Vec3[cpp_complex[float_t]] polarization_vt = Vec3[cpp_complex[float_t]](cpp_complex[float_t](np.real(polar[0]), np.imag(polar[0])), cpp_complex[float_t](np.real(polar[1]), np.imag(polar[1])), cpp_complex[float_t](np.real(polar[2]), np.imag(polar[2])))
+    polar = rxch["polarization"][rx_idx]
+    cdef Vec3[cpp_complex[float_t]] polarization_vt = Vec3[cpp_complex[float_t]](
+        cpp_complex[float_t](<float_t>np.real(polar[0]), <float_t>np.imag(polar[0])),
+        cpp_complex[float_t](<float_t>np.real(polar[1]), <float_t>np.imag(polar[1])),
+        cpp_complex[float_t](<float_t>np.real(polar[2]), <float_t>np.imag(polar[2]))
+    )
 
     rx_c[0].AddChannel(
         Vec3[float_t](&location_mv[0]),
@@ -428,7 +526,7 @@ cdef void cp_AddRxChannel(rx, rx_idx, Receiver[float_t] * rx_c):
         az_ptn_vt,
         el_ang_vt,
         el_ptn_vt,
-        <float_t> rx.rxchannel_prop["antenna_gains"][rx_idx]
+        <float_t> rxch["antenna_gains"][rx_idx]
     )
 
 
@@ -451,22 +549,23 @@ cdef shared_ptr[Radar[double, float_t]] cp_Radar(radar, frame_start_time):
     cdef shared_ptr[Transmitter[double, float_t]] tx_c
     cdef shared_ptr[Receiver[float_t]] rx_c
 
-    # Extract key system dimensions from radar configuration
-    cdef int_t txsize_c = radar.radar_prop["transmitter"].txchannel_prop["size"]
-    cdef int_t rxsize_c = radar.radar_prop["receiver"].rxchannel_prop["size"]
+    # Cache nested property lookups
+    radar_prop = radar.radar_prop
+    tx_obj = radar_prop["transmitter"]
+    rx_obj = radar_prop["receiver"]
+
+    cdef int_t txsize_c = tx_obj.txchannel_prop["size"]
+    cdef int_t rxsize_c = rx_obj.rxchannel_prop["size"]
     cdef int_t frames_c = np.size(frame_start_time)
     cdef int_t channles_c = radar.array_prop["size"]
-    cdef int_t pulses_c = radar.radar_prop["transmitter"].waveform_prop["pulses"]
+    cdef int_t pulses_c = tx_obj.waveform_prop["pulses"]
     cdef int_t samples_c = radar.sample_prop["samples_per_pulse"]
 
-    # Calculate total buffer size for simulation data
-    cdef int_t bbsize_c = channles_c*frames_c*pulses_c*samples_c
+    cdef int_t bbsize_c = channles_c * frames_c * pulses_c * samples_c
 
-    # Memory views for time-varying position and orientation
     cdef float_t[:, :, :] locx_mv, locy_mv, locz_mv
     cdef float_t[:, :, :] rotx_mv, roty_mv, rotz_mv
 
-    # Vector storage for C++ radar object construction
     cdef vector[double] t_frame_vt
     cdef vector[Vec3[float_t]] loc_vt
     cdef Vec3[float_t] spd_vt
@@ -483,51 +582,50 @@ cdef shared_ptr[Radar[double, float_t]] cp_Radar(radar, frame_start_time):
     else:
         t_frame_vt.push_back(<double> frame_start_time)
 
-    """
-    Transmitter
-    """
+    # Transmitter
     tx_c = cp_Transmitter(radar)
     for idx_c in range(0, txsize_c):
-        cp_AddTxChannel(radar.radar_prop["transmitter"], idx_c, tx_c.get())
+        cp_AddTxChannel(tx_obj, idx_c, tx_c.get())
 
-    """
-    Receiver
-    """
+    # Receiver
+    rx_bb = rx_obj.bb_prop
     rx_c = make_shared[Receiver[float_t]](
-        <float_t> radar.radar_prop["receiver"].bb_prop["fs"],
-        <float_t> radar.radar_prop["receiver"].rf_prop["rf_gain"],
-        <float_t> radar.radar_prop["receiver"].bb_prop["load_resistor"],
-        <float_t> radar.radar_prop["receiver"].bb_prop["baseband_gain"],
-        <float_t> radar.radar_prop["receiver"].bb_prop["noise_bandwidth"]
+        <float_t> rx_bb["fs"],
+        <float_t> rx_obj.rf_prop["rf_gain"],
+        <float_t> rx_bb["load_resistor"],
+        <float_t> rx_bb["baseband_gain"],
+        <float_t> rx_bb["noise_bandwidth"]
     )
     for idx_c in range(0, rxsize_c):
-        cp_AddRxChannel(radar.radar_prop["receiver"], idx_c, rx_c.get())
+        cp_AddRxChannel(rx_obj, idx_c, rx_c.get())
 
-    """
-    Radar
-    """
+    # Radar location and rotation
     cdef float_t[:] loc_mv, rot_mv
+    radar_location = radar_prop["location"]
+    radar_rotation = radar_prop["rotation"]
 
-    if len(np.shape(radar.radar_prop["location"])) == 4:
-        locx_mv = radar.radar_prop["location"][:,:,:,0].astype(np_float)
-        locy_mv = radar.radar_prop["location"][:,:,:,1].astype(np_float)
-        locz_mv = radar.radar_prop["location"][:,:,:,2].astype(np_float)
-        rotx_mv = radar.radar_prop["rotation"][:,:,:,0].astype(np_float)
-        roty_mv = radar.radar_prop["rotation"][:,:,:,1].astype(np_float)
-        rotz_mv = radar.radar_prop["rotation"][:,:,:,2].astype(np_float)
+    if len(np.shape(radar_location)) == 4:
+        locx_mv = radar_location[:,:,:,0].astype(np_float)
+        locy_mv = radar_location[:,:,:,1].astype(np_float)
+        locz_mv = radar_location[:,:,:,2].astype(np_float)
+        rotx_mv = radar_rotation[:,:,:,0].astype(np_float)
+        roty_mv = radar_rotation[:,:,:,1].astype(np_float)
+        rotz_mv = radar_rotation[:,:,:,2].astype(np_float)
 
         Mem_Copy_Vec3(&locx_mv[0,0,0], &locy_mv[0,0,0], &locz_mv[0,0,0], bbsize_c, loc_vt)
         Mem_Copy_Vec3(&rotx_mv[0,0,0], &roty_mv[0,0,0], &rotz_mv[0,0,0], bbsize_c, rot_vt)
 
     else:
-        loc_mv = radar.radar_prop["location"].astype(np_float)
+        loc_mv = radar_location.astype(np_float)
         loc_vt.push_back(Vec3[float_t](&loc_mv[0]))
 
-        rot_mv = radar.radar_prop["rotation"].astype(np_float)
+        rot_mv = radar_rotation.astype(np_float)
         rot_vt.push_back(Vec3[float_t](&rot_mv[0]))
     
-    spd_vt = Vec3[float_t](<float_t>radar.radar_prop["speed"][0], <float_t>radar.radar_prop["speed"][1], <float_t>radar.radar_prop["speed"][2])
-    rrt_vt = Vec3[float_t](<float_t>radar.radar_prop["rotation_rate"][0], <float_t>radar.radar_prop["rotation_rate"][1], <float_t>radar.radar_prop["rotation_rate"][2])
+    radar_speed = radar_prop["speed"]
+    radar_rot_rate = radar_prop["rotation_rate"]
+    spd_vt = Vec3[float_t](<float_t>radar_speed[0], <float_t>radar_speed[1], <float_t>radar_speed[2])
+    rrt_vt = Vec3[float_t](<float_t>radar_rot_rate[0], <float_t>radar_rot_rate[1], <float_t>radar_rot_rate[2])
 
     return make_shared[Radar[double, float_t]](tx_c,
                                                rx_c,
@@ -536,6 +634,10 @@ cdef shared_ptr[Radar[double, float_t]] cp_Radar(radar, frame_start_time):
                                                spd_vt,
                                                rot_vt,
                                                rrt_vt)
+
+# ============================================================================
+# Mesh Targets (Radar Simulation and RCS)
+# ============================================================================
 
 @cython.cdivision(True)
 @cython.boundscheck(False)
@@ -573,50 +675,29 @@ cdef void cp_AddTarget(radar,
 
     cdef cpp_complex[float_t] ep_c, mu_c
 
-    cdef int_t ch_idx, ps_idx, sp_idx
     ts_shape = np.shape(timestamp)
-    cdef int_t bbsize_c = <int_t>(ts_shape[0]*ts_shape[1]*ts_shape[2])
+    cdef int_t bbsize_c = <int_t>(ts_shape[0] * ts_shape[1] * ts_shape[2])
 
-    cdef float_t scale
     cdef float_t[:, :] points_mv
     cdef int_t[:, :] cells_mv
 
     _validate_target_keys(target)
 
-    # Enhanced mesh validation and loading with improved error messages
-    unit = target.get("unit", "m")
-    try:
-        scale = _safe_unit_conversion(unit)
-    except ValueError as e:
-        raise ValueError(f"Invalid unit in target configuration: {e}")
+    # Load and validate mesh
+    points_arr, cells_arr = _load_and_validate_mesh(target, mesh_module)
+    points_mv = points_arr
+    cells_mv = cells_arr
 
-    try:
-        mesh_data = load_mesh(target["model"], scale, mesh_module)
-        points_mv = mesh_data["points"].astype(np_float)
-        cells_mv = mesh_data["cells"].astype(np.int32)
-    except Exception as e:
-        raise RuntimeError(f"Failed to load mesh model '{target.get('model', 'unknown')}': {e}")
-    
-    # Enhanced FreeTier validation using helper function
-    _validate_mesh_for_free_tier(<int_t>cells_mv.shape[0])
-
-    cdef float_t[:] origin_mv = np.array(target.get("origin", (0, 0, 0)), dtype=np_float)
+    cdef float_t[:] origin_mv = np.asarray(target.get("origin", (0, 0, 0)), dtype=np_float)
 
     location = list(target.get("location", [0, 0, 0]))
     speed = list(target.get("speed", [0, 0, 0]))
     rotation = list(target.get("rotation", [0, 0, 0]))
-    rotation_rate = list(target.get( "rotation_rate", [0, 0, 0]))
+    rotation_rate = list(target.get("rotation_rate", [0, 0, 0]))
 
     cdef float_t[:] location_mv, speed_mv, rotation_mv, rotation_rate_mv
 
-    permittivity = target.get("permittivity", 1e38)
-    permeability = target.get("permeability", 1)
-    if permittivity == "PEC":
-        ep_c = cpp_complex[float_t](<float_t>1e38, <float_t>0.0)
-        mu_c = cpp_complex[float_t](<float_t>1.0, <float_t>0.0)
-    else:
-        ep_c = cpp_complex[float_t](<float_t>np.real(permittivity), <float_t>np.imag(permittivity))
-        mu_c = cpp_complex[float_t](<float_t>np.real(permeability), <float_t>np.imag(permeability))
+    _parse_material_properties(target, &ep_c, &mu_c)
 
     if any(np.size(var) > 1 for var in location + speed + rotation + rotation_rate):
         if np.size(location[0]) > 1:
@@ -700,10 +781,7 @@ cdef void cp_AddTarget(radar,
         rotation_rate_mv = np.radians(np.array(rotation_rate, dtype=np_float)).astype(np_float)
         rrt_vt.push_back(Vec3[float_t](&rotation_rate_mv[0]))
     
-    # Handle deprecated parameter with enhanced warning
-    if "is_ground" in target:
-        target["skip_diffusion"] = target["is_ground"]
-        _warn_deprecated_parameter("is_ground", "skip_diffusion")
+    _handle_deprecated_target_params(target)
 
     targets_manager[0].AddTarget(&points_mv[0, 0],
                            &cells_mv[0, 0],
@@ -737,46 +815,26 @@ cdef void cp_RCS_Target(target, mesh_module, TargetsManager[float_t] * targets_m
     # Vector declarations
     cdef vector[Vec3[float_t]] loc_vt, spd_vt, rot_vt, rrt_vt
     cdef cpp_complex[float_t] ep_c, mu_c
-    cdef float_t scale
     cdef float_t[:, :] points_mv
     cdef int_t[:, :] cells_mv
 
     _validate_target_keys(target)
 
-    # Enhanced mesh validation and loading with improved error messages  
-    unit = target.get("unit", "m")
-    try:
-        scale = _safe_unit_conversion(unit)
-    except ValueError as e:
-        raise ValueError(f"Invalid unit in target configuration: {e}")
+    # Load and validate mesh
+    points_arr, cells_arr = _load_and_validate_mesh(target, mesh_module)
+    points_mv = points_arr
+    cells_mv = cells_arr
 
-    try:
-        mesh_data = load_mesh(target["model"], scale, mesh_module)
-        points_mv = mesh_data["points"].astype(np_float)
-        cells_mv = mesh_data["cells"].astype(np.int32)
-    except Exception as e:
-        raise RuntimeError(f"Failed to load mesh model '{target.get('model', 'unknown')}': {e}")
+    cdef float_t[:] origin_mv = np.asarray(target.get("origin", (0, 0, 0)), dtype=np_float)
 
-    # Enhanced FreeTier validation using helper function
-    _validate_mesh_for_free_tier(<int_t>cells_mv.shape[0])
-
-    cdef float_t[:] origin_mv = np.array(target.get("origin", (0, 0, 0)), dtype=np_float)
-
-    location = np.array(target.get("location", (0, 0, 0)), dtype=object)
-    speed = np.array(target.get("speed", (0, 0, 0)), dtype=object)
-    rotation = np.array(target.get("rotation", (0, 0, 0)), dtype=object)
-    rotation_rate = np.array(target.get( "rotation_rate", (0, 0, 0)), dtype=object)
+    location = np.asarray(target.get("location", (0, 0, 0)), dtype=object)
+    speed = np.asarray(target.get("speed", (0, 0, 0)), dtype=object)
+    rotation = np.asarray(target.get("rotation", (0, 0, 0)), dtype=object)
+    rotation_rate = np.asarray(target.get("rotation_rate", (0, 0, 0)), dtype=object)
 
     cdef float_t[:] location_mv, speed_mv, rotation_mv, rotation_rate_mv
 
-    permittivity = target.get("permittivity", 1e38)
-    permeability = target.get("permeability", 1)
-    if permittivity == "PEC":
-        ep_c = cpp_complex[float_t](<float_t>1e38, <float_t>0.0)
-        mu_c = cpp_complex[float_t](<float_t>1.0, <float_t>0.0)
-    else:
-        ep_c = cpp_complex[float_t](<float_t>np.real(permittivity), <float_t>np.imag(permittivity))
-        mu_c = cpp_complex[float_t](<float_t>np.real(permeability), <float_t>np.imag(permeability))
+    _parse_material_properties(target, &ep_c, &mu_c)
 
     location_mv = location.astype(np_float)
     loc_vt.push_back(Vec3[float_t](&location_mv[0]))
@@ -790,10 +848,7 @@ cdef void cp_RCS_Target(target, mesh_module, TargetsManager[float_t] * targets_m
     rotation_rate_mv = np.radians(rotation_rate.astype(np_float)).astype(np_float)
     rrt_vt.push_back(Vec3[float_t](&rotation_rate_mv[0]))
 
-    # Handle deprecated parameter with enhanced warning
-    if "is_ground" in target:
-        target["skip_diffusion"] = target["is_ground"]
-        _warn_deprecated_parameter("is_ground", "skip_diffusion")
+    _handle_deprecated_target_params(target)
 
     targets_manager[0].AddTarget(&points_mv[0, 0],
                            &cells_mv[0, 0],
