@@ -137,14 +137,6 @@ cdef extern from "transmitter.hpp":
                     const vector[H] & freq_offset,               # Frequency offset array (Hz)
                     const vector[H] & pulse_start_time) except + # Pulse start times (s)
 
-        # Constructor with pre-computed phase noise
-        Transmitter(const L & tx_power,
-                    const vector[H] & freq,
-                    const vector[H] & freq_time,
-                    const vector[H] & freq_offset,
-                    const vector[H] & pulse_start_time,
-                    const vector[cpp_complex[H]] & phase_noise) except +  # Phase noise samples
-
         # Constructor with SSB phase noise specification (deferred per-frame generation)
         Transmitter(const L & tx_power,
                     const vector[H] & freq,
