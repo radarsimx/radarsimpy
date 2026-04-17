@@ -96,6 +96,29 @@ cdef extern from "core/enums.hpp":
         RADARSIMCPP_ERROR_EXCEPTION           # General exception occurred
         RADARSIMCPP_ERROR_TOO_MANY_RAYS_PER_GRID  # Ray density exceeds grid capacity
         RADARSIMCPP_ERROR_CUDA_DEVICE_QUERY   # Failed to query CUDA device memory info
+        # PointSimulator CUDA errors (100-103)
+        RADARSIMCPP_ERROR_POINT_SIM_CUDA_SYNC          # cudaDeviceSynchronize failed in PointSimulator (standard path)
+        RADARSIMCPP_ERROR_POINT_SIM_CUDA_KERNEL        # CUDA kernel launch failed in PointSimulator (standard path)
+        RADARSIMCPP_ERROR_POINT_SIM_FRAME_CUDA_SYNC    # cudaDeviceSynchronize failed in PointSimulator (per-frame phase noise path)
+        RADARSIMCPP_ERROR_POINT_SIM_FRAME_CUDA_KERNEL  # CUDA kernel launch failed in PointSimulator (per-frame phase noise path)
+        # MeshSimulator CUDA errors (200-203)
+        RADARSIMCPP_ERROR_MESH_SIM_BASEBAND_CUDA_SYNC       # cudaDeviceSynchronize failed in MeshSimulator::ProcessBaseband
+        RADARSIMCPP_ERROR_MESH_SIM_BASEBAND_CUDA_KERNEL     # CUDA kernel launch failed in MeshSimulator::ProcessBaseband
+        RADARSIMCPP_ERROR_MESH_SIM_BACKTRACING_CUDA_SYNC    # cudaDeviceSynchronize failed in MeshSimulator::ProcessBackTracingBaseband
+        RADARSIMCPP_ERROR_MESH_SIM_BACKTRACING_CUDA_KERNEL  # CUDA kernel launch failed in MeshSimulator::ProcessBackTracingBaseband
+        # InterferenceSimulator CUDA errors (300-301)
+        RADARSIMCPP_ERROR_INTERF_SIM_CUDA_SYNC    # cudaDeviceSynchronize failed in InterferenceSimulator::Run
+        RADARSIMCPP_ERROR_INTERF_SIM_CUDA_KERNEL  # CUDA kernel launch failed in InterferenceSimulator::Run
+        # LidarSimulator CUDA errors (400-401)
+        RADARSIMCPP_ERROR_LIDAR_SIM_CUDA_KERNEL  # CUDA kernel launch failed in LidarSimulator::Run
+        RADARSIMCPP_ERROR_LIDAR_SIM_CUDA_SYNC    # cudaDeviceSynchronize failed in LidarSimulator::Run
+        # NoiseSimulator CUDA errors (500-501)
+        RADARSIMCPP_ERROR_NOISE_SIM_CUDA_KERNEL  # CUDA kernel launch failed in NoiseSimulator::Run
+        RADARSIMCPP_ERROR_NOISE_SIM_CUDA_SYNC    # cudaDeviceSynchronize failed in NoiseSimulator::Run
+        # RcsSimulator CUDA errors (600-602)
+        RADARSIMCPP_ERROR_RCS_SIM_CUDA_KERNEL_VISIBLE  # _Kernel_IsVisible launch failed in RcsSimulator::Run
+        RADARSIMCPP_ERROR_RCS_SIM_CUDA_KERNEL_RCS      # _Kernel_RcsProcessing launch failed in RcsSimulator::Run
+        RADARSIMCPP_ERROR_RCS_SIM_CUDA_SYNC            # cudaDeviceSynchronize failed in RcsSimulator::Run
 
 #------------------------------------------------------------------------------
 # Memory Management Utilities
