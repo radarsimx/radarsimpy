@@ -142,7 +142,7 @@ cdef inline void _validate_target_keys(target) except *:
             stacklevel=3
         )
 
-cdef inline tuple _load_and_validate_mesh(target, mesh_module) except *:
+cdef inline tuple _load_and_validate_mesh(target, mesh_module):
     """
     Load mesh model and validate against free tier limits.
 
