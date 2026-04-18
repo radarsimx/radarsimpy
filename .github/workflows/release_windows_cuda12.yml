@@ -1,4 +1,4 @@
-name: Release on Windows GPU
+name: Release on Windows GPU CUDA12
 
 # GitHub Actions workflow for building and packaging RadarSimPy on Windows platforms.
 #
@@ -29,9 +29,6 @@ name: Release on Windows GPU
 # - Manual workflow dispatch
 
 on:
-  push:
-    tags:
-      - "*"
   # Allow manual trigger from the Actions tab
   workflow_dispatch:
 
@@ -51,19 +48,19 @@ jobs:
           # Windows builds
           - python-version: "3.10"
             arch: gpu
-            artifact_name: radarsimpy_windows_py3.10
+            artifact_name: radarsimpy_windows_cuda12_py3.10
           - python-version: "3.11"
             arch: gpu
-            artifact_name: radarsimpy_windows_py3.11
+            artifact_name: radarsimpy_windows_cuda12_py3.11
           - python-version: "3.12"
             arch: gpu
-            artifact_name: radarsimpy_windows_py3.12
+            artifact_name: radarsimpy_windows_cuda12_py3.12
           - python-version: "3.13"
             arch: gpu
-            artifact_name: radarsimpy_windows_py3.13
+            artifact_name: radarsimpy_windows_cuda12_py3.13
           - python-version: "3.14"
             arch: gpu
-            artifact_name: radarsimpy_windows_py3.14
+            artifact_name: radarsimpy_windows_cuda12_py3.14
 
     steps:
       - name: Checkout repository
@@ -92,7 +89,7 @@ jobs:
       - name: Setup CUDA Toolkit
         uses: Jimver/cuda-toolkit@v0.2.35
         with:
-          cuda: "13.1.0"
+          cuda: "12.9.1"
           method: "local"
           use-github-cache: false
 
@@ -210,7 +207,7 @@ jobs:
         with:
           failOnError: false
           name: |
-            radarsimpy_windows_py*
+            radarsimpy_windows_cuda12_py*
 
       - name: Display downloaded artifacts
         run: |
@@ -220,7 +217,7 @@ jobs:
 
       - name: Create artifact structure
         run: |
-          mkdir -p packed/radarsimpy_windows_gpu_all
+          mkdir -p packed/radarsimpy_windows_cuda12_gpu_all
           mkdir -p temp/radarsimpy
 
           # Process each artifact directory
@@ -243,19 +240,19 @@ jobs:
 
           # Create ZIP file
           echo "Creating Windows_x86_64_GPU.zip..."
-          cd temp && zip -r ../packed/radarsimpy_windows_gpu_all/Windows_x86_64_GPU.zip . && cd ..
+          cd temp && zip -r ../packed/radarsimpy_windows_cuda12_gpu_all/Windows_x86_64_GPU.zip . && cd ..
 
       - name: Verify artifact structure
         run: |
           echo "::group::Artifact Structure Verification"
           echo "Final directory structure:"
-          find packed/radarsimpy_windows_gpu_all -type f | sort
+          find packed/radarsimpy_windows_cuda12_gpu_all -type f | sort
 
           echo ""
           echo "Verifying ZIP file exists:"
-          if [ -f "packed/radarsimpy_windows_gpu_all/Windows_x86_64_GPU.zip" ]; then
+          if [ -f "packed/radarsimpy_windows_cuda12_gpu_all/Windows_x86_64_GPU.zip" ]; then
             echo "✓ Windows_x86_64_GPU.zip found"
-            ls -lh packed/radarsimpy_windows_gpu_all/Windows_x86_64_GPU.zip
+            ls -lh packed/radarsimpy_windows_cuda12_gpu_all/Windows_x86_64_GPU.zip
           else
             echo "✗ Windows_x86_64_GPU.zip missing"
             exit 1
@@ -264,7 +261,7 @@ jobs:
 
       - name: Create README for packed artifacts
         run: |
-          cat > packed/radarsimpy_windows_gpu_all/README.md << 'EOF'
+          cat > packed/radarsimpy_windows_cuda12_gpu_all/README.md << 'EOF'
           # RadarSimPy Windows GPU Build Artifacts
 
           This archive contains all RadarSimPy builds for Windows GPU platforms.
@@ -272,7 +269,7 @@ jobs:
           ## Directory Structure
 
           ```
-          radarsimpy_windows_gpu_all/
+          radarsimpy_windows_cuda12_gpu_all/
           └── Windows_x86_64_GPU.zip
           ```
 
@@ -301,7 +298,7 @@ jobs:
       - name: Create compressed archive
         run: |
           cd packed
-          zip -r radarsimpy_windows_gpu_all_builds.zip radarsimpy_windows_gpu_all/
+          zip -r radarsimpy_windows_cuda12_gpu_all_builds.zip radarsimpy_windows_cuda12_gpu_all/
 
           echo "::group::Archive Information"
           ls -lh *.zip
@@ -310,8 +307,8 @@ jobs:
       - name: Upload packed artifacts
         uses: actions/upload-artifact@v6
         with:
-          name: radarsimpy_windows_gpu_all_builds
-          path: packed/radarsimpy_windows_gpu_all_builds.zip
+          name: radarsimpy_windows_cuda12_gpu_all_builds
+          path: packed/radarsimpy_windows_cuda12_gpu_all_builds.zip
           retention-days: 1
           compression-level: 0
 
@@ -331,7 +328,7 @@ jobs:
           echo "### Packed Artifacts" >> $GITHUB_STEP_SUMMARY
           if [ "${{ needs.build.result }}" == "success" ]; then
             echo "✅ **All artifacts successfully packed into ZIP file**" >> $GITHUB_STEP_SUMMARY
-            echo "- Archive: \`radarsimpy_windows_gpu_all_builds\`" >> $GITHUB_STEP_SUMMARY
+            echo "- Archive: \`radarsimpy_windows_cuda12_gpu_all_builds\`" >> $GITHUB_STEP_SUMMARY
             echo "- Format: zip" >> $GITHUB_STEP_SUMMARY
             echo "- Structure: Windows_x86_64_GPU.zip" >> $GITHUB_STEP_SUMMARY
             echo "- Contains: All 5 build variants" >> $GITHUB_STEP_SUMMARY

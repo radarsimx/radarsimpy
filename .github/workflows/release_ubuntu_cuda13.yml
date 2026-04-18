@@ -1,4 +1,4 @@
-name: Release on Ubuntu GPU
+name: Release on Ubuntu GPU CUDA13
 
 # GitHub Actions workflow for building and packaging RadarSimPy on Ubuntu platforms.
 #
@@ -57,62 +57,62 @@ jobs:
             c_compiler: gcc-11
             cxx_compiler: g++-11
             arch: gpu
-            artifact_name: radarsimpy_ubuntu_22_04_py3.10
+            artifact_name: radarsimpy_ubuntu_22_04_cuda13_py3.10
           - os: ubuntu-22.04
             python-version: "3.11"
             c_compiler: gcc-11
             cxx_compiler: g++-11
             arch: gpu
-            artifact_name: radarsimpy_ubuntu_22_04_py3.11
+            artifact_name: radarsimpy_ubuntu_22_04_cuda13_py3.11
           - os: ubuntu-22.04
             python-version: "3.12"
             c_compiler: gcc-11
             cxx_compiler: g++-11
             arch: gpu
-            artifact_name: radarsimpy_ubuntu_22_04_py3.12
+            artifact_name: radarsimpy_ubuntu_22_04_cuda13_py3.12
           - os: ubuntu-22.04
             python-version: "3.13"
             c_compiler: gcc-11
             cxx_compiler: g++-11
             arch: gpu
-            artifact_name: radarsimpy_ubuntu_22_04_py3.13
+            artifact_name: radarsimpy_ubuntu_22_04_cuda13_py3.13
           - os: ubuntu-22.04
             python-version: "3.14"
             c_compiler: gcc-11
             cxx_compiler: g++-11
             arch: gpu
-            artifact_name: radarsimpy_ubuntu_22_04_py3.14
+            artifact_name: radarsimpy_ubuntu_22_04_cuda13_py3.14
           # Ubuntu 24.04 with GCC-13 builds
           - os: ubuntu-24.04
             python-version: "3.10"
             c_compiler: gcc-13
             cxx_compiler: g++-13
             arch: gpu
-            artifact_name: radarsimpy_ubuntu_24_04_py3.10
+            artifact_name: radarsimpy_ubuntu_24_04_cuda13_py3.10
           - os: ubuntu-24.04
             python-version: "3.11"
             c_compiler: gcc-13
             cxx_compiler: g++-13
             arch: gpu
-            artifact_name: radarsimpy_ubuntu_24_04_py3.11
+            artifact_name: radarsimpy_ubuntu_24_04_cuda13_py3.11
           - os: ubuntu-24.04
             python-version: "3.12"
             c_compiler: gcc-13
             cxx_compiler: g++-13
             arch: gpu
-            artifact_name: radarsimpy_ubuntu_24_04_py3.12
+            artifact_name: radarsimpy_ubuntu_24_04_cuda13_py3.12
           - os: ubuntu-24.04
             python-version: "3.13"
             c_compiler: gcc-13
             cxx_compiler: g++-13
             arch: gpu
-            artifact_name: radarsimpy_ubuntu_24_04_py3.13
+            artifact_name: radarsimpy_ubuntu_24_04_cuda13_py3.13
           - os: ubuntu-24.04
             python-version: "3.14"
             c_compiler: gcc-13
             cxx_compiler: g++-13
             arch: gpu
-            artifact_name: radarsimpy_ubuntu_24_04_py3.14
+            artifact_name: radarsimpy_ubuntu_24_04_cuda13_py3.14
 
     steps:
       - name: Checkout repository
@@ -282,8 +282,8 @@ jobs:
         with:
           failOnError: false
           name: |
-            radarsimpy_ubuntu_24_04*
-            radarsimpy_ubuntu_22_04*
+            radarsimpy_ubuntu_24_04_cuda13*
+            radarsimpy_ubuntu_22_04_cuda13*
 
       - name: Display downloaded artifacts
         run: |
@@ -293,7 +293,7 @@ jobs:
 
       - name: Create artifact structure
         run: |
-          mkdir -p packed/radarsimpy_ubuntu_gpu_all
+          mkdir -p packed/radarsimpy_ubuntu_cuda13_gpu_all
 
           # Create temporary directories for building packages
           mkdir -p temp/Ubuntu22_x86_64_GPU/radarsimpy
@@ -329,45 +329,45 @@ jobs:
 
           # Create ZIP files for each Ubuntu version
           echo "Creating Ubuntu22_x86_64_GPU.zip..."
-          cd temp && zip -r ../packed/radarsimpy_ubuntu_gpu_all/Ubuntu22_x86_64_GPU.zip Ubuntu22_x86_64_GPU/ && cd ..
+          cd temp && zip -r ../packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu22_x86_64_GPU.zip Ubuntu22_x86_64_GPU/ && cd ..
 
           echo "Creating Ubuntu24_x86_64_GPU.zip..."
-          cd temp && zip -r ../packed/radarsimpy_ubuntu_gpu_all/Ubuntu24_x86_64_GPU.zip Ubuntu24_x86_64_GPU/ && cd ..
+          cd temp && zip -r ../packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu24_x86_64_GPU.zip Ubuntu24_x86_64_GPU/ && cd ..
 
           # Create tar.gz files for each Ubuntu version
           echo "Creating Ubuntu22_x86_64_GPU.tar.gz..."
-          cd temp && tar -czf ../packed/radarsimpy_ubuntu_gpu_all/Ubuntu22_x86_64_GPU.tar.gz Ubuntu22_x86_64_GPU/ && cd ..
+          cd temp && tar -czf ../packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu22_x86_64_GPU.tar.gz Ubuntu22_x86_64_GPU/ && cd ..
 
           echo "Creating Ubuntu24_x86_64_GPU.tar.gz..."
-          cd temp && tar -czf ../packed/radarsimpy_ubuntu_gpu_all/Ubuntu24_x86_64_GPU.tar.gz Ubuntu24_x86_64_GPU/ && cd ..
+          cd temp && tar -czf ../packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu24_x86_64_GPU.tar.gz Ubuntu24_x86_64_GPU/ && cd ..
 
       - name: Verify artifact structure
         run: |
           echo "::group::Artifact Structure Verification"
           echo "Final directory structure:"
-          find packed/radarsimpy_ubuntu_gpu_all -type f | sort
+          find packed/radarsimpy_ubuntu_cuda13_gpu_all -type f | sort
           echo ""
           echo "Verifying ZIP and tar.gz files exist:"
 
-          if [ -f "packed/radarsimpy_ubuntu_gpu_all/Ubuntu22_x86_64_GPU.zip" ]; then
+          if [ -f "packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu22_x86_64_GPU.zip" ]; then
             echo "✓ Ubuntu 22.04 GPU ZIP found"
           else
             echo "✗ Ubuntu 22.04 GPU ZIP missing"
           fi
 
-          if [ -f "packed/radarsimpy_ubuntu_gpu_all/Ubuntu22_x86_64_GPU.tar.gz" ]; then
+          if [ -f "packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu22_x86_64_GPU.tar.gz" ]; then
             echo "✓ Ubuntu 22.04 GPU tar.gz found"
           else
             echo "✗ Ubuntu 22.04 GPU tar.gz missing"
           fi
 
-          if [ -f "packed/radarsimpy_ubuntu_gpu_all/Ubuntu24_x86_64_GPU.zip" ]; then
+          if [ -f "packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu24_x86_64_GPU.zip" ]; then
             echo "✓ Ubuntu 24.04 GPU ZIP found"
           else
             echo "✗ Ubuntu 24.04 GPU ZIP missing"
           fi
 
-          if [ -f "packed/radarsimpy_ubuntu_gpu_all/Ubuntu24_x86_64_GPU.tar.gz" ]; then
+          if [ -f "packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu24_x86_64_GPU.tar.gz" ]; then
             echo "✓ Ubuntu 24.04 GPU tar.gz found"
           else
             echo "✗ Ubuntu 24.04 GPU tar.gz missing"
@@ -376,7 +376,7 @@ jobs:
 
       - name: Create README for packed artifacts
         run: |
-          cat > packed/radarsimpy_ubuntu_gpu_all/README.md << 'EOF'
+          cat > packed/radarsimpy_ubuntu_cuda13_gpu_all/README.md << 'EOF'
           # RadarSimPy Ubuntu GPU Build Artifacts
 
           This archive contains all RadarSimPy builds for Ubuntu GPU platforms organized by version.
@@ -386,7 +386,7 @@ jobs:
           The builds are organized in the following structure:
 
           ```
-          radarsimpy_ubuntu_gpu_all/
+          radarsimpy_ubuntu_cuda13_gpu_all/
           ├── Ubuntu22_x86_64_GPU.zip
           ├── Ubuntu22_x86_64_GPU.tar.gz
           ├── Ubuntu24_x86_64_GPU.zip
@@ -425,10 +425,10 @@ jobs:
       - name: Create compressed archive
         run: |
           cd packed
-          tar -czf radarsimpy_ubuntu_gpu_all_builds.tar.gz radarsimpy_ubuntu_gpu_all/
+          tar -czf radarsimpy_ubuntu_cuda13_gpu_all_builds.tar.gz radarsimpy_ubuntu_cuda13_gpu_all/
 
           # Create zip version as well
-          zip -r radarsimpy_ubuntu_gpu_all_builds.zip radarsimpy_ubuntu_gpu_all/
+          zip -r radarsimpy_ubuntu_cuda13_gpu_all_builds.zip radarsimpy_ubuntu_cuda13_gpu_all/
 
           echo "::group::Archive Information"
           ls -lh *.tar.gz *.zip
@@ -437,10 +437,10 @@ jobs:
       - name: Upload packed artifacts
         uses: actions/upload-artifact@v6
         with:
-          name: radarsimpy_ubuntu_gpu_all_builds
+          name: radarsimpy_ubuntu_cuda13_gpu_all_builds
           path: |
-            packed/radarsimpy_ubuntu_gpu_all_builds.tar.gz
-            packed/radarsimpy_ubuntu_gpu_all_builds.zip
+            packed/radarsimpy_ubuntu_cuda13_gpu_all_builds.tar.gz
+            packed/radarsimpy_ubuntu_cuda13_gpu_all_builds.zip
           retention-days: 1
           compression-level: 0
 
@@ -464,7 +464,7 @@ jobs:
           echo "### Packed Artifacts" >> $GITHUB_STEP_SUMMARY
           if [ "${{ needs.build.result }}" == "success" ]; then
             echo "✅ **All artifacts successfully packed into ZIP and tar.gz files**" >> $GITHUB_STEP_SUMMARY
-            echo "- Archive: \`radarsimpy_ubuntu_gpu_all_builds\`" >> $GITHUB_STEP_SUMMARY
+            echo "- Archive: \`radarsimpy_ubuntu_cuda13_gpu_all_builds\`" >> $GITHUB_STEP_SUMMARY
             echo "- Formats: tar.gz, zip" >> $GITHUB_STEP_SUMMARY
             echo "- Structure: 4 files (2 Ubuntu versions × 2 formats)" >> $GITHUB_STEP_SUMMARY
             echo "- Contains: All 10 GPU-enabled build variants organized by Ubuntu version" >> $GITHUB_STEP_SUMMARY
