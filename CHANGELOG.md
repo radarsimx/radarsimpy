@@ -4,6 +4,46 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [15.2.0] - 2026-04-19
+
+### Added
+
+- Normals, range, and intensity fields to LiDAR simulation output; intensity is computed using a Lambertian model ($\cos(\theta_i) / r^2$)
+- SSB (single-sideband) phase-noise parameters (`pn_f`, `pn_power`, `pn_fs`, `pn_seed`, `pn_validation`) in `Transmitter` for C++-side per-frame phase noise generation
+- Receiver noise simulator with deterministic noise generation
+- Phase noise generator with spectral noise shaping support
+- License data now includes organization and license type fields
+- Noise simulation test suite (`test_noise_simulation.py`)
+- Receiver noise and transmitter phase noise documentation pages
+- Warning when GPU execution is selected but CUDA is unavailable at runtime
+- CUDA error detection after kernel launches and device initialization
+- GPU memory reservation during device initialization
+
+### Changed
+
+- Replaced Python/NumPy receiver noise generation in `sim_radar` with C++ `NoiseSimulator` for performance and accuracy
+- Refactored `sim_radar`: centralized parameter validation, preallocated contiguous baseband/noise buffers, simplified CPU/GPU execution paths
+- Refactored Cython radar bindings with dedicated helpers for mesh loading, material parsing, and deprecated parameter handling
+- Reorganized Cython interface headers for readability; no API changes
+- Optimized antenna pattern precomputation and modulation handling to reduce per-sample overhead
+- Optimized BVH traversal, waveform phase calculation, and ray initialization for improved performance
+- Optimized phase noise LUT indexing and table sizes
+- Refactored interference simulator for improved clarity and performance
+- mbedTLS now built from source with static linking; removed vcpkg CI build steps
+
+### Removed
+
+- Batch build scripts (`batch_build.bat`, `batch_build.sh`)
+
+### Fixed
+
+- Error code propagation from C++ simulators (`RadarSim::Run`, `NoiseSimulator::Run`, `LidarSimulator::Run`, `InterferenceSimulator::Run`, `RcsSimulator::Run`) to Python
+- RCS simulator now raises `RuntimeError` on non-zero error codes
+- GPU availability check is now compile-guarded for non-CUDA builds
+- Fixed Cython exception handling in mesh loading helper
+
+---
+
 ## [15.1.0] - 2026-03-04
 
 ### Added
