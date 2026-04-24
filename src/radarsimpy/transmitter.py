@@ -104,8 +104,10 @@ class Transmitter:
         - **elevation_pattern** (*numpy.ndarray*): Elevation pattern in decibels (dB).
           Default: ``[0, 0]``.
         - **grid** (*float*):
-          The grid size in degrees (°) used to initially check the occupancy of a scene.
-          Default: ``1``.
+          The grid size in degrees (°) used to define the angular resolution for ray-tracing
+          and occupancy checking in scene simulation. Smaller grid sizes provide finer
+          angular resolution but increase computational load.
+          Default: ``1.0``.
         - **pulse_amp** (*numpy.ndarray*):
           Relative amplitude sequence for pulse amplitude modulation.
           Length must match ``pulses``. Default: ``1``.

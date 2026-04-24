@@ -640,3 +640,94 @@ class TestTransmitter:
         tx_large = Transmitter(f=f_large, t=t_large, pulses=1)
         assert len(tx_large.frequency) == 1000
         assert tx_large.pulse_length == 1e-3
+
+
+class TestTransmitterGrid:
+    """Test suite for the Transmitter `grid` parameter."""
+
+    def setup_method(self):
+        self.f = 10e9
+        self.t = 1e-6
+
+    def test_grid_default_value(self):
+        """Grid should default to 1.0 when not specified."""
+        tx = Transmitter(f=self.f, t=self.t, channels=[{"location": (0, 0, 0)}])
+        assert tx.txchannel_prop["grid"][0] == 1.0
+
+    def test_grid_custom_value(self):
+        """Grid should accept a custom float value per channel."""
+        tx = Transmitter(
+            f=self.f,
+            t=self.t,
+            channels=[
+                {"location": (0, 0, 0), "grid": 2.5},
+                {"location": (1, 0, 0), "grid": 0.5},
+            ],
+        )
+        assert tx.txchannel_prop["grid"][0] == 2.5
+        assert tx.txchannel_prop["grid"][1] == 0.5
+
+    def test_grid_zero_value(self):
+        """Grid should accept 0 (fine-grained ray casting)."""
+        tx = Transmitter(
+            f=self.f,
+            t=self.t,
+            channels=[{"location": (0, 0, 0), "grid": 0.0}],
+        )
+        assert tx.txchannel_prop["grid"][0] == 0.0
+
+    def test_grid_retrieved_via_get_channel_info(self):
+        """Grid value should be accessible via get_channel_info."""
+        tx = Transmitter(
+            f=self.f,
+            t=self.t,
+            channels=[{"location": (1, 2, 3), "grid": 3.0}],
+        )
+        info = tx.get_channel_info(0)
+        assert info["grid"] == 3.0
+
+    def test_grid_mixed_channels(self):
+        """Different channels can have different grid sizes."""
+        tx = Transmitter(
+            f=self.f,
+            t=self.t,
+            channels=[
+                {"location": (0, 0, 0)},
+                {"location": (1, 0, 0), "grid": 0.1},
+                {"location": (2, 0, 0), "grid": 5.0},
+            ],
+        )
+        assert tx.txchannel_prop["grid"][0] == 1.0  # default
+        assert tx.txchannel_prop["grid"][1] == 0.1
+        assert tx.txchannel_prop["grid"][2] == 5.0
+
+    def test_grid_value_types(self):
+        """Grid should accept integer and float values."""
+        tx = Transmitter(
+            f=self.f,
+            t=self.t,
+            channels=[
+                {"location": (0, 0, 0), "grid": 2},
+                {"location": (1, 0, 0), "grid": 1.5},
+            ],
+        )
+        assert tx.txchannel_prop["grid"][0] == 2.0
+        assert tx.txchannel_prop["grid"][1] == 1.5
+
+    def test_grid_large_value(self):
+        """Grid should handle large values for coarse simulation."""
+        tx = Transmitter(
+            f=self.f,
+            t=self.t,
+            channels=[{"location": (0, 0, 0), "grid": 90.0}],
+        )
+        assert tx.txchannel_prop["grid"][0] == 90.0
+
+    def test_grid_small_value(self):
+        """Grid should handle very small values for fine-grained simulation."""
+        tx = Transmitter(
+            f=self.f,
+            t=self.t,
+            channels=[{"location": (0, 0, 0), "grid": 1e-6}],
+        )
+        assert tx.txchannel_prop["grid"][0] == 1e-6

@@ -372,3 +372,131 @@ class TestReceiver:
         # Check default pattern values
         np.testing.assert_array_equal(channel_info["azimuth_pattern"], [0, 0])
         np.testing.assert_array_equal(channel_info["elevation_pattern"], [0, 0])
+
+
+class TestReceiverEdgeCases:
+    """Test suite for Receiver edge cases."""
+
+    def setup_method(self):
+        self.fs = 1e6
+
+    def test_minimal_fs(self):
+        """Very low sampling rate should be accepted."""
+        rx = Receiver(fs=1)
+        assert rx.sampling_rate == 1
+
+    def test_maximal_fs(self):
+        """Very high sampling rate should be accepted."""
+        rx = Receiver(fs=1e12)
+        assert rx.sampling_rate == 1e12
+
+    def test_zero_noise_figure(self):
+        """Noise figure of 0 dB (ideal receiver) should be accepted."""
+        rx = Receiver(fs=self.fs, noise_figure=0)
+        assert rx.rf_prop["noise_figure"] == 0
+
+    def test_negative_rf_gain(self):
+        """Negative RF gain (attenuation) should be accepted."""
+        rx = Receiver(fs=self.fs, rf_gain=-10)
+        assert rx.rf_prop["rf_gain"] == -10
+
+    def test_real_bb_type_bandwidth(self):
+        """Real baseband should have noise_bandwidth = fs/2."""
+        rx = Receiver(fs=10e6, bb_type="real")
+        assert rx.noise_bandwidth == 5e6
+
+    def test_complex_bb_type_bandwidth(self):
+        """Complex baseband should have noise_bandwidth = fs."""
+        rx = Receiver(fs=10e6, bb_type="complex")
+        assert rx.noise_bandwidth == 10e6
+
+    def test_invalid_bb_type_raises(self):
+        """Invalid baseband type should raise ValueError."""
+        with pytest.raises(ValueError, match="Invalid baseband type"):
+            Receiver(fs=self.fs, bb_type="invalid")
+
+    def test_negative_fs_raises(self):
+        """Negative sampling rate should raise ValueError."""
+        with pytest.raises(ValueError, match="Sampling rate .* must be positive"):
+            Receiver(fs=-1000)
+
+    def test_zero_fs_raises(self):
+        """Zero sampling rate should raise ValueError."""
+        with pytest.raises(ValueError, match="Sampling rate .* must be positive"):
+            Receiver(fs=0)
+
+    def test_negative_load_resistor_raises(self):
+        """Negative load resistor should raise ValueError."""
+        with pytest.raises(ValueError):
+            Receiver(fs=self.fs, load_resistor=-50)
+
+    def test_zero_load_resistor_raises(self):
+        """Zero load resistor should raise ValueError."""
+        with pytest.raises(ValueError):
+            Receiver(fs=self.fs, load_resistor=0)
+
+    def test_many_receiver_channels(self):
+        """Many receiver channels should be handled correctly."""
+        num_channels = 16
+        channels = [{"location": (i * 0.5, 0, 0)} for i in range(num_channels)]
+        rx = Receiver(fs=self.fs, channels=channels)
+        assert rx.num_channels == num_channels
+        expected_location = np.array([7.5, 0, 0])  # channel index 15
+        np.testing.assert_array_equal(
+            rx.get_channel_info(15)["location"], expected_location
+        )
+
+    def test_circular_polarization(self):
+        """Right-handed and left-handed circular polarization should be accepted."""
+        rx = Receiver(
+            fs=self.fs,
+            channels=[
+                {"location": (0, 0, 0), "polarization": [0, 1, 1j]},
+                {"location": (0, 0, 0), "polarization": [0, 1, -1j]},
+            ],
+        )
+        np.testing.assert_array_equal(
+            rx.rxchannel_prop["polarization"][0], [0, 1, 1j]
+        )
+        np.testing.assert_array_equal(
+            rx.rxchannel_prop["polarization"][1], [0, 1, -1j]
+        )
+
+    def test_high_noise_figure(self):
+        """Very high noise figure should be accepted."""
+        rx = Receiver(fs=self.fs, noise_figure=50)
+        assert rx.rf_prop["noise_figure"] == 50
+
+    def test_azimuth_elevation_pattern_mismatch_raises(self):
+        """Length mismatch between azimuth_angle and azimuth_pattern should raise."""
+        with pytest.raises(ValueError, match="Length mismatch"):
+            Receiver(
+                fs=self.fs,
+                channels=[
+                    {
+                        "location": (0, 0, 0),
+                        "azimuth_angle": [-90, 0, 90],
+                        "azimuth_pattern": [0, 0],
+                    }
+                ],
+            )
+
+    def test_elevation_pattern_mismatch_raises(self):
+        """Length mismatch between elevation_angle and elevation_pattern should raise."""
+        with pytest.raises(ValueError, match="Length mismatch"):
+            Receiver(
+                fs=self.fs,
+                channels=[
+                    {
+                        "location": (0, 0, 0),
+                        "elevation_angle": [-90, 0, 90],
+                        "elevation_pattern": [0, 0],
+                    }
+                ],
+            )
+
+    def test_get_channel_info_invalid_index(self):
+        """Requesting info for an out-of-range channel should raise IndexError."""
+        rx = Receiver(fs=self.fs)
+        with pytest.raises(IndexError):
+            rx.get_channel_info(5)
