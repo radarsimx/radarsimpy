@@ -50,36 +50,36 @@ jobs:
           # MacOS x64, GCC-14, Xcode 26.4.1
           - arch: x64
             runner: macos-26-intel
-            c_compiler: gcc-15
-            cxx_compiler: g++-15
+            c_compiler: clang
+            cxx_compiler: clang++
             xcode: "26.4.1"
             os_label: macosx64
             python-version: "3.10"
           - arch: x64
             runner: macos-26-intel
-            c_compiler: gcc-15
-            cxx_compiler: g++-15
+            c_compiler: clang
+            cxx_compiler: clang++
             xcode: "26.4.1"
             os_label: macosx64
             python-version: "3.11"
           - arch: x64
             runner: macos-26-intel
-            c_compiler: gcc-15
-            cxx_compiler: g++-15
+            c_compiler: clang
+            cxx_compiler: clang++
             xcode: "26.4.1"
             os_label: macosx64
             python-version: "3.12"
           - arch: x64
             runner: macos-26-intel
-            c_compiler: gcc-15
-            cxx_compiler: g++-15
+            c_compiler: clang
+            cxx_compiler: clang++
             xcode: "26.4.1"
             os_label: macosx64
             python-version: "3.13"
           - arch: x64
             runner: macos-26-intel
-            c_compiler: gcc-15
-            cxx_compiler: g++-15
+            c_compiler: clang
+            cxx_compiler: clang++
             xcode: "26.4.1"
             os_label: macosx64
             python-version: "3.14"
