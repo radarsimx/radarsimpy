@@ -26,7 +26,7 @@
 #
 # Requirements:
 #   - RADARSIMC SSH key secret for submodule access
-#   - Xcode 16.4 (x64), Xcode 16.4 (arm64), CMake, GCC/Clang, and Python dependencies
+#   - Xcode 26.4.1 (x64), Xcode 26.4.1 (arm64), CMake, GCC/Clang, and Python dependencies
 #   - build.sh script
 #
 # ==============================================================================
@@ -47,76 +47,76 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # MacOS x64, GCC-14, Xcode 16.4
+          # MacOS x64, GCC-14, Xcode 26.4.1
           - arch: x64
-            runner: macos-15-intel
+            runner: macos-26-intel
             c_compiler: gcc-14
             cxx_compiler: g++-14
-            xcode: "16.4"
+            xcode: "26.4.1"
             os_label: macosx64
             python-version: "3.10"
           - arch: x64
-            runner: macos-15-intel
+            runner: macos-26-intel
             c_compiler: gcc-14
             cxx_compiler: g++-14
-            xcode: "16.4"
+            xcode: "26.4.1"
             os_label: macosx64
             python-version: "3.11"
           - arch: x64
-            runner: macos-15-intel
+            runner: macos-26-intel
             c_compiler: gcc-14
             cxx_compiler: g++-14
-            xcode: "16.4"
+            xcode: "26.4.1"
             os_label: macosx64
             python-version: "3.12"
           - arch: x64
-            runner: macos-15-intel
+            runner: macos-26-intel
             c_compiler: gcc-14
             cxx_compiler: g++-14
-            xcode: "16.4"
+            xcode: "26.4.1"
             os_label: macosx64
             python-version: "3.13"
           - arch: x64
-            runner: macos-15-intel
+            runner: macos-26-intel
             c_compiler: gcc-14
             cxx_compiler: g++-14
-            xcode: "16.4"
+            xcode: "26.4.1"
             os_label: macosx64
             python-version: "3.14"
-          # MacOS arm64, Clang, Xcode 16.4
+          # MacOS arm64, Clang, Xcode 26.4.1
           - arch: arm64
-            runner: macos-15
+            runner: macos-26
             c_compiler: clang
             cxx_compiler: clang++
-            xcode: "16.4"
+            xcode: "26.4.1"
             os_label: macosarm64
             python-version: "3.10"
           - arch: arm64
-            runner: macos-15
+            runner: macos-26
             c_compiler: clang
             cxx_compiler: clang++
-            xcode: "16.4"
+            xcode: "26.4.1"
             os_label: macosarm64
             python-version: "3.11"
           - arch: arm64
-            runner: macos-15
+            runner: macos-26
             c_compiler: clang
             cxx_compiler: clang++
-            xcode: "16.4"
+            xcode: "26.4.1"
             os_label: macosarm64
             python-version: "3.12"
           - arch: arm64
-            runner: macos-15
+            runner: macos-26
             c_compiler: clang
             cxx_compiler: clang++
-            xcode: "16.4"
+            xcode: "26.4.1"
             os_label: macosarm64
             python-version: "3.13"
           - arch: arm64
-            runner: macos-15
+            runner: macos-26
             c_compiler: clang
             cxx_compiler: clang++
-            xcode: "16.4"
+            xcode: "26.4.1"
             os_label: macosarm64
             python-version: "3.14"
 
