@@ -66,7 +66,7 @@ pip install -r requirements.txt
 - **Generic Linux x86-64**
   - Try Ubuntu 22.04/24.04 module, or [request a custom build](https://radarsimx.com/request-a-custom-build/)
 - **MacOS**
-  - Intel: GCC 14 (`brew install gcc@14`)
+  - Intel: use default Clang (no extra dependency)
   - Apple Silicon: use default Clang (no extra dependency)
 
 ---
