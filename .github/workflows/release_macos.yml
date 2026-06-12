@@ -7,8 +7,8 @@ name: Release on MacOS
 # comprehensive macOS coverage.
 #
 # Build Matrix:
-# - macOS 13 (Intel x64): GCC-14 compiler, 5 builds (5 Python)
-# - macOS 15 (Apple Silicon ARM64): Clang compiler, 5 builds (5 Python)
+# - macOS 26 (Intel x64): Clang compiler, 5 builds (5 Python)
+# - macOS 26 (Apple Silicon ARM64): Clang compiler, 5 builds (5 Python)
 # - Python versions: 3.10, 3.11, 3.12, 3.13, 3.14
 # - Total builds: 10
 #
@@ -51,75 +51,75 @@ jobs:
       matrix:
         include:
           # MacOS x64 builds
-          - os: macos-15-intel
+          - os: macos-26-intel
             python-version: "3.10"
-            c_compiler: gcc-14
-            cxx_compiler: g++-14
-            xcode_version: "16.4"
+            c_compiler: clang
+            cxx_compiler: clang++
+            xcode_version: "26.4.1"
             arch: cpu
             artifact_name: radarsimpy_macos_py3.10
-          - os: macos-15-intel
+          - os: macos-26-intel
             python-version: "3.11"
-            c_compiler: gcc-14
-            cxx_compiler: g++-14
-            xcode_version: "16.4"
+            c_compiler: clang
+            cxx_compiler: clang++
+            xcode_version: "26.4.1"
             arch: cpu
             artifact_name: radarsimpy_macos_py3.11
-          - os: macos-15-intel
+          - os: macos-26-intel
             python-version: "3.12"
-            c_compiler: gcc-14
-            cxx_compiler: g++-14
-            xcode_version: "16.4"
+            c_compiler: clang
+            cxx_compiler: clang++
+            xcode_version: "26.4.1"
             arch: cpu
             artifact_name: radarsimpy_macos_py3.12
-          - os: macos-15-intel
+          - os: macos-26-intel
             python-version: "3.13"
-            c_compiler: gcc-14
-            cxx_compiler: g++-14
-            xcode_version: "16.4"
+            c_compiler: clang
+            cxx_compiler: clang++
+            xcode_version: "26.4.1"
             arch: cpu
             artifact_name: radarsimpy_macos_py3.13
-          - os: macos-15-intel
+          - os: macos-26-intel
             python-version: "3.14"
-            c_compiler: gcc-14
-            cxx_compiler: g++-14
-            xcode_version: "16.4"
+            c_compiler: clang
+            cxx_compiler: clang++
+            xcode_version: "26.4.1"
             arch: cpu
             artifact_name: radarsimpy_macos_py3.14
           # MacOS ARM64 (Apple Silicon) Standard builds
-          - os: macos-15
+          - os: macos-26
             python-version: "3.10"
             c_compiler: clang
             cxx_compiler: clang++
-            xcode_version: "16.4"
+            xcode_version: "26.4.1"
             arch: cpu
             artifact_name: radarsimpy_macos_arm_py3.10
-          - os: macos-15
+          - os: macos-26
             python-version: "3.11"
             c_compiler: clang
             cxx_compiler: clang++
-            xcode_version: "16.4"
+            xcode_version: "26.4.1"
             arch: cpu
             artifact_name: radarsimpy_macos_arm_py3.11
-          - os: macos-15
+          - os: macos-26
             python-version: "3.12"
             c_compiler: clang
             cxx_compiler: clang++
-            xcode_version: "16.4"
+            xcode_version: "26.4.1"
             arch: cpu
             artifact_name: radarsimpy_macos_arm_py3.12
-          - os: macos-15
+          - os: macos-26
             python-version: "3.13"
             c_compiler: clang
             cxx_compiler: clang++
-            xcode_version: "16.4"
+            xcode_version: "26.4.1"
             arch: cpu
             artifact_name: radarsimpy_macos_arm_py3.13
-          - os: macos-15
+          - os: macos-26
             python-version: "3.14"
             c_compiler: clang
             cxx_compiler: clang++
-            xcode_version: "16.4"
+            xcode_version: "26.4.1"
             arch: cpu
             artifact_name: radarsimpy_macos_arm_py3.14
 
@@ -386,12 +386,12 @@ jobs:
           ## Architecture Information
 
           ### MacOS_x86_64_CPU (Intel-based Macs)
-          - Built on macOS 13 with GCC 14 compiler
+          - Built on macOS 26 with Clang 14 compiler
           - Available in both ZIP and tar.gz formats
           - Each archive contains the complete radarsimpy module with all Python versions supported
 
           ### MacOS_ARM_CPU (Apple Silicon Macs)
-          - Built on macOS 15 with Clang compiler
+          - Built on macOS 26 with Clang compiler
           - Available in both ZIP and tar.gz formats
           - Each archive contains the complete radarsimpy module with all Python versions supported
 
@@ -441,8 +441,8 @@ jobs:
           echo "Total builds: 10 (5 Python versions × 2 architectures)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Architecture Distribution" >> $GITHUB_STEP_SUMMARY
-          echo "- **x64 (Intel)**: 5 builds on macos-15-intel with GCC-14" >> $GITHUB_STEP_SUMMARY
-          echo "- **ARM64 (Apple Silicon)**: 5 builds on macos-15 with Clang" >> $GITHUB_STEP_SUMMARY
+          echo "- **x64 (Intel)**: 5 builds on macos-26-intel with Clang" >> $GITHUB_STEP_SUMMARY
+          echo "- **ARM64 (Apple Silicon)**: 5 builds on macos-26 with Clang" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Python Versions" >> $GITHUB_STEP_SUMMARY
           echo "- Python 3.10, 3.11, 3.12, 3.13, 3.14" >> $GITHUB_STEP_SUMMARY

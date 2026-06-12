@@ -13,20 +13,20 @@
 #
 # Test Matrix:
 #   - Python versions: 3.10, 3.11, 3.12, 3.13, 3.14
-#   - Platform: MacOS 13 (x64), MacOS 15 (ARM64)
-#   - Compilers: GCC/G++ (x64), Clang/Clang++ (ARM64)
+#   - Platform: MacOS 26 (x64), MacOS 26 (ARM64)
+#   - Compilers: Clang/Clang++
 #   - Architecture: x64, arm64 (CPU-only builds)
 #
 # Key Features:
 #   - Pip package caching for faster builds
-#   - GCC/Clang and Xcode environment setup
+#   - Clang/Xcode environment setup
 #   - System information display for debugging
 #   - Timeout protection (60 minutes)
 #   - Fail-fast disabled to test all Python versions
 #
 # Requirements:
 #   - RADARSIMC SSH key secret for submodule access
-#   - Xcode 26.4.1 (x64), Xcode 26.4.1 (arm64), CMake, GCC/Clang, and Python dependencies
+#   - Xcode 26.4.1, Clang, and Python dependencies
 #   - build.sh script
 #
 # ==============================================================================
@@ -47,7 +47,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # MacOS x64, GCC-14, Xcode 26.4.1
+          # MacOS x64, Clang, Xcode 26.4.1
           - arch: x64
             runner: macos-26-intel
             c_compiler: clang
