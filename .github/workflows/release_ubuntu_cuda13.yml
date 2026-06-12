@@ -158,7 +158,7 @@ jobs:
       - name: Setup CUDA Toolkit
         uses: Jimver/cuda-toolkit@v0.2.35
         with:
-          cuda: "13.1.0"
+          cuda: "13.3.0"
           method: "network"
           sub-packages: '["nvcc"]'
           linux-local-args: '["--toolkit", "--silent"]'
