@@ -113,6 +113,37 @@ jobs:
             cxx_compiler: g++-13
             arch: gpu
             artifact_name: radarsimpy_ubuntu_24_04_cuda13_py3.14
+          # Ubuntu 26.04 with GCC-15 builds
+          - os: ubuntu-26.04
+            python-version: "3.10"
+            c_compiler: gcc-15
+            cxx_compiler: g++-15
+            arch: gpu
+            artifact_name: radarsimpy_ubuntu_26_04_cuda13_py3.10
+          - os: ubuntu-26.04
+            python-version: "3.11"
+            c_compiler: gcc-15
+            cxx_compiler: g++-15
+            arch: gpu
+            artifact_name: radarsimpy_ubuntu_26_04_cuda13_py3.11
+          - os: ubuntu-26.04
+            python-version: "3.12"
+            c_compiler: gcc-15
+            cxx_compiler: g++-15
+            arch: gpu
+            artifact_name: radarsimpy_ubuntu_26_04_cuda13_py3.12
+          - os: ubuntu-26.04
+            python-version: "3.13"
+            c_compiler: gcc-15
+            cxx_compiler: g++-15
+            arch: gpu
+            artifact_name: radarsimpy_ubuntu_26_04_cuda13_py3.13
+          - os: ubuntu-26.04
+            python-version: "3.14"
+            c_compiler: gcc-15
+            cxx_compiler: g++-15
+            arch: gpu
+            artifact_name: radarsimpy_ubuntu_26_04_cuda13_py3.14
 
     steps:
       - name: Checkout repository
@@ -282,6 +313,7 @@ jobs:
         with:
           failOnError: false
           name: |
+            radarsimpy_ubuntu_26_04_cuda13*
             radarsimpy_ubuntu_24_04_cuda13*
             radarsimpy_ubuntu_22_04_cuda13*
 
@@ -298,6 +330,7 @@ jobs:
           # Create temporary directories for building packages
           mkdir -p temp/Ubuntu22_x86_64_GPU/radarsimpy
           mkdir -p temp/Ubuntu24_x86_64_GPU/radarsimpy
+          mkdir -p temp/Ubuntu26_x86_64_GPU/radarsimpy
 
           # Copy each artifact to appropriate directory based on Ubuntu version
           for dir in artifacts/*/; do
@@ -306,7 +339,9 @@ jobs:
               echo "Processing artifact: $artifact_name"
               
               # Determine target directory based on artifact name
-              if [[ "$artifact_name" == *"ubuntu_24_04"* ]]; then
+              if [[ "$artifact_name" == *"ubuntu_26_04"* ]]; then
+                target_dir="temp/Ubuntu26_x86_64_GPU/radarsimpy"
+              elif [[ "$artifact_name" == *"ubuntu_24_04"* ]]; then
                 target_dir="temp/Ubuntu24_x86_64_GPU/radarsimpy"
               else
                 target_dir="temp/Ubuntu22_x86_64_GPU/radarsimpy"
@@ -334,12 +369,18 @@ jobs:
           echo "Creating Ubuntu24_x86_64_GPU.zip..."
           cd temp && zip -r ../packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu24_x86_64_GPU.zip Ubuntu24_x86_64_GPU/ && cd ..
 
+          echo "Creating Ubuntu26_x86_64_GPU.zip..."
+          cd temp && zip -r ../packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu26_x86_64_GPU.zip Ubuntu26_x86_64_GPU/ && cd ..
+
           # Create tar.gz files for each Ubuntu version
           echo "Creating Ubuntu22_x86_64_GPU.tar.gz..."
           cd temp && tar -czf ../packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu22_x86_64_GPU.tar.gz Ubuntu22_x86_64_GPU/ && cd ..
 
           echo "Creating Ubuntu24_x86_64_GPU.tar.gz..."
           cd temp && tar -czf ../packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu24_x86_64_GPU.tar.gz Ubuntu24_x86_64_GPU/ && cd ..
+
+          echo "Creating Ubuntu26_x86_64_GPU.tar.gz..."
+          cd temp && tar -czf ../packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu26_x86_64_GPU.tar.gz Ubuntu26_x86_64_GPU/ && cd ..
 
       - name: Verify artifact structure
         run: |
@@ -372,6 +413,18 @@ jobs:
           else
             echo "✗ Ubuntu 24.04 GPU tar.gz missing"
           fi
+
+          if [ -f "packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu26_x86_64_GPU.zip" ]; then
+            echo "✓ Ubuntu 26.04 GPU ZIP found"
+          else
+            echo "✗ Ubuntu 26.04 GPU ZIP missing"
+          fi
+
+          if [ -f "packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu26_x86_64_GPU.tar.gz" ]; then
+            echo "✓ Ubuntu 26.04 GPU tar.gz found"
+          else
+            echo "✗ Ubuntu 26.04 GPU tar.gz missing"
+          fi
           echo "::endgroup::"
 
       - name: Create README for packed artifacts
@@ -390,7 +443,9 @@ jobs:
           ├── Ubuntu22_x86_64_GPU.zip
           ├── Ubuntu22_x86_64_GPU.tar.gz
           ├── Ubuntu24_x86_64_GPU.zip
-          └── Ubuntu24_x86_64_GPU.tar.gz
+          ├── Ubuntu24_x86_64_GPU.tar.gz
+          ├── Ubuntu26_x86_64_GPU.zip
+          └── Ubuntu26_x86_64_GPU.tar.gz
           ```
 
           ## Version Information
@@ -405,10 +460,15 @@ jobs:
           - Available in both ZIP and tar.gz formats
           - Each archive contains the complete radarsimpy module with all Python versions supported
 
+          ### Ubuntu26_x86_64_GPU (Ubuntu 26.04 LTS)
+          - Built with GCC-15 compiler and CUDA support
+          - Available in both ZIP and tar.gz formats
+          - Each archive contains the complete radarsimpy module with all Python versions supported
+
           ## Build Information
 
-          - **Total Builds**: 10 (packaged into 4 files: 2 ZIP + 2 tar.gz)
-          - **Ubuntu Versions**: 22.04 LTS, 24.04 LTS
+          - **Total Builds**: 15 (packaged into 6 files: 3 ZIP + 3 tar.gz)
+          - **Ubuntu Versions**: 22.04 LTS, 24.04 LTS, 26.04 LTS
           - **Architecture**: x86_64
           - **GPU Support**: CUDA-enabled
           - **Python Versions**: 3.10, 3.11, 3.12, 3.13, 3.14
@@ -449,11 +509,12 @@ jobs:
           echo "# Ubuntu GPU Build Summary �" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Build Matrix Results" >> $GITHUB_STEP_SUMMARY
-          echo "Total builds: 10 (5 Python versions × 2 Ubuntu versions)" >> $GITHUB_STEP_SUMMARY
+          echo "Total builds: 15 (5 Python versions × 3 Ubuntu versions)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Ubuntu Version Distribution" >> $GITHUB_STEP_SUMMARY
           echo "- **Ubuntu 22.04 LTS**: 5 builds with GCC-11 and CUDA support" >> $GITHUB_STEP_SUMMARY
           echo "- **Ubuntu 24.04 LTS**: 5 builds with GCC-13 and CUDA support" >> $GITHUB_STEP_SUMMARY
+          echo "- **Ubuntu 26.04 LTS**: 5 builds with GCC-15 and CUDA support" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Python Versions" >> $GITHUB_STEP_SUMMARY
           echo "- Python 3.10, 3.11, 3.12, 3.13, 3.14" >> $GITHUB_STEP_SUMMARY
@@ -466,8 +527,8 @@ jobs:
             echo "✅ **All artifacts successfully packed into ZIP and tar.gz files**" >> $GITHUB_STEP_SUMMARY
             echo "- Archive: \`radarsimpy_ubuntu_cuda13_gpu_all_builds\`" >> $GITHUB_STEP_SUMMARY
             echo "- Formats: tar.gz, zip" >> $GITHUB_STEP_SUMMARY
-            echo "- Structure: 4 files (2 Ubuntu versions × 2 formats)" >> $GITHUB_STEP_SUMMARY
-            echo "- Contains: All 10 GPU-enabled build variants organized by Ubuntu version" >> $GITHUB_STEP_SUMMARY
+            echo "- Structure: 6 files (3 Ubuntu versions × 2 formats)" >> $GITHUB_STEP_SUMMARY
+            echo "- Contains: All 15 GPU-enabled build variants organized by Ubuntu version" >> $GITHUB_STEP_SUMMARY
           else
             echo "⚠️ **Artifact packing failed or was skipped**" >> $GITHUB_STEP_SUMMARY
           fi
