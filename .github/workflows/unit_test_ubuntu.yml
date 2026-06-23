@@ -123,7 +123,7 @@ jobs:
             c_compiler: gcc-15
             cxx_compiler: g++-15
             os_label: ubuntu24
-            python-version: "3.15"
+            python-version: "3.13"
           - runner: ubuntu-26.04
             c_compiler: gcc-15
             cxx_compiler: g++-15
