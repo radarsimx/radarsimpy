@@ -3,14 +3,15 @@ name: Release on Ubuntu GPU CUDA13
 # GitHub Actions workflow for building and packaging RadarSimPy on Ubuntu platforms.
 #
 # This workflow builds RadarSimPy across multiple Ubuntu LTS versions and Python versions.
-# It supports both Ubuntu 22.04 LTS and Ubuntu 24.04 LTS to provide comprehensive Linux
-# coverage with different GCC compiler versions.
+# It supports Ubuntu 22.04 LTS, Ubuntu 24.04 LTS, and Ubuntu 26.04 LTS to provide
+# comprehensive Linux coverage with different GCC compiler versions.
 #
 # Build Matrix:
 # - Ubuntu 22.04 LTS: GCC-11 compiler, 5 builds (5 Python versions)
 # - Ubuntu 24.04 LTS: GCC-13 compiler, 5 builds (5 Python versions)
+# - Ubuntu 26.04 LTS: GCC-15 compiler, 5 builds (5 Python versions)
 # - Python versions: 3.10, 3.11, 3.12, 3.13, 3.14
-# - Total builds: 10
+# - Total builds: 15
 #
 # Features:
 # - Comprehensive caching (pip, ccache)

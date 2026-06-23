@@ -1,9 +1,9 @@
 # ==============================================================================
-# GitHub Actions Workflow: Ubuntu x64 Unit Testing (22.04 & 24.04)
+# GitHub Actions Workflow: Ubuntu x64 Unit Testing (22.04, 24.04 & 26.04)
 # ==============================================================================
 #
 # This workflow performs continuous integration testing for RadarSimPy on
-# both Ubuntu 22.04 and 24.04 x64 platforms. It builds and tests the radar simulation
+# Ubuntu 22.04, 24.04, and 26.04 x64 platforms. It builds and tests the radar simulation
 # library across multiple Python versions to ensure compatibility and reliability.
 #
 # Triggers:
@@ -12,8 +12,8 @@
 #
 # Test Matrix:
 #   - Python versions: 3.10, 3.11, 3.12, 3.13, 3.14
-#   - Platform: Ubuntu 22.04, Ubuntu 24.04
-#   - Compilers: GCC-11 (22.04), GCC-13 (24.04)
+#   - Platform: Ubuntu 22.04, Ubuntu 24.04, Ubuntu 26.04
+#   - Compilers: GCC-11 (22.04), GCC-13 (24.04), GCC-15 (26.04)
 #   - Architecture: x64 (CPU-only builds)
 #
 # Key Features:
