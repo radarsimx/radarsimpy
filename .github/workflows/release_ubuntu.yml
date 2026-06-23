@@ -3,14 +3,15 @@ name: Release on Ubuntu
 # GitHub Actions workflow for building and packaging RadarSimPy on Ubuntu platforms.
 #
 # This workflow builds RadarSimPy across multiple Ubuntu LTS versions and Python versions.
-# It supports both Ubuntu 22.04 LTS and Ubuntu 24.04 LTS to provide comprehensive Linux
-# coverage with different GCC compiler versions.
+# It supports Ubuntu 22.04 LTS, Ubuntu 24.04 LTS, and Ubuntu 26.04 LTS to provide
+# comprehensive Linux coverage with different GCC compiler versions.
 #
 # Build Matrix:
 # - Ubuntu 22.04 LTS: GCC-11 compiler, 5 builds (5 Python versions)
 # - Ubuntu 24.04 LTS: GCC-13 compiler, 5 builds (5 Python versions)
+# - Ubuntu 26.04 LTS: GCC-15 compiler, 5 builds (5 Python versions)
 # - Python versions: 3.10, 3.11, 3.12, 3.13, 3.14
-# - Total builds: 10
+# - Total builds: 15
 #
 # Features:
 # - Comprehensive caching (pip, ccache)
@@ -113,6 +114,37 @@ jobs:
             cxx_compiler: g++-13
             arch: cpu
             artifact_name: radarsimpy_ubuntu_24_04_py3.14
+          # Ubuntu 26.04 with GCC-15 builds
+          - os: ubuntu-26.04
+            python-version: "3.10"
+            c_compiler: gcc-15
+            cxx_compiler: g++-15
+            arch: cpu
+            artifact_name: radarsimpy_ubuntu_26_04_py3.10
+          - os: ubuntu-26.04
+            python-version: "3.11"
+            c_compiler: gcc-15
+            cxx_compiler: g++-15
+            arch: cpu
+            artifact_name: radarsimpy_ubuntu_26_04_py3.11
+          - os: ubuntu-26.04
+            python-version: "3.12"
+            c_compiler: gcc-15
+            cxx_compiler: g++-15
+            arch: cpu
+            artifact_name: radarsimpy_ubuntu_26_04_py3.12
+          - os: ubuntu-26.04
+            python-version: "3.13"
+            c_compiler: gcc-15
+            cxx_compiler: g++-15
+            arch: cpu
+            artifact_name: radarsimpy_ubuntu_26_04_py3.13
+          - os: ubuntu-26.04
+            python-version: "3.14"
+            c_compiler: gcc-15
+            cxx_compiler: g++-15
+            arch: cpu
+            artifact_name: radarsimpy_ubuntu_26_04_py3.14
 
     steps:
       - name: Checkout repository
@@ -258,6 +290,7 @@ jobs:
         with:
           failOnError: false
           name: |
+            radarsimpy_ubuntu_26_04*
             radarsimpy_ubuntu_24_04*
             radarsimpy_ubuntu_22_04*
 
@@ -274,6 +307,7 @@ jobs:
           # Create temporary directories for building packages
           mkdir -p temp/Ubuntu22_x86_64_CPU/radarsimpy
           mkdir -p temp/Ubuntu24_x86_64_CPU/radarsimpy
+          mkdir -p temp/Ubuntu26_x86_64_CPU/radarsimpy
 
           # Copy each artifact to appropriate directory based on Ubuntu version
           for dir in artifacts/*/; do
@@ -282,7 +316,9 @@ jobs:
               echo "Processing artifact: $artifact_name"
               
               # Determine target directory based on artifact name
-              if [[ "$artifact_name" == *"ubuntu_24_04"* ]]; then
+              if [[ "$artifact_name" == *"ubuntu_26_04"* ]]; then
+                target_dir="temp/Ubuntu26_x86_64_CPU/radarsimpy"
+              elif [[ "$artifact_name" == *"ubuntu_24_04"* ]]; then
                 target_dir="temp/Ubuntu24_x86_64_CPU/radarsimpy"
               else
                 target_dir="temp/Ubuntu22_x86_64_CPU/radarsimpy"
@@ -310,12 +346,18 @@ jobs:
           echo "Creating Ubuntu24_x86_64_CPU.zip..."
           cd temp && zip -r ../packed/radarsimpy_ubuntu_cpu_all/Ubuntu24_x86_64_CPU.zip Ubuntu24_x86_64_CPU/ && cd ..
 
+          echo "Creating Ubuntu26_x86_64_CPU.zip..."
+          cd temp && zip -r ../packed/radarsimpy_ubuntu_cpu_all/Ubuntu26_x86_64_CPU.zip Ubuntu26_x86_64_CPU/ && cd ..
+
           # Create tar.gz files for each Ubuntu version
           echo "Creating Ubuntu22_x86_64_CPU.tar.gz..."
           cd temp && tar -czf ../packed/radarsimpy_ubuntu_cpu_all/Ubuntu22_x86_64_CPU.tar.gz Ubuntu22_x86_64_CPU/ && cd ..
 
           echo "Creating Ubuntu24_x86_64_CPU.tar.gz..."
           cd temp && tar -czf ../packed/radarsimpy_ubuntu_cpu_all/Ubuntu24_x86_64_CPU.tar.gz Ubuntu24_x86_64_CPU/ && cd ..
+
+          echo "Creating Ubuntu26_x86_64_CPU.tar.gz..."
+          cd temp && tar -czf ../packed/radarsimpy_ubuntu_cpu_all/Ubuntu26_x86_64_CPU.tar.gz Ubuntu26_x86_64_CPU/ && cd ..
 
       - name: Verify artifact structure
         run: |
@@ -348,6 +390,18 @@ jobs:
           else
             echo "✗ Ubuntu 24.04 tar.gz missing"
           fi
+
+          if [ -f "packed/radarsimpy_ubuntu_cpu_all/Ubuntu26_x86_64_CPU.zip" ]; then
+            echo "✓ Ubuntu 26.04 ZIP found"
+          else
+            echo "✗ Ubuntu 26.04 ZIP missing"
+          fi
+
+          if [ -f "packed/radarsimpy_ubuntu_cpu_all/Ubuntu26_x86_64_CPU.tar.gz" ]; then
+            echo "✓ Ubuntu 26.04 tar.gz found"
+          else
+            echo "✗ Ubuntu 26.04 tar.gz missing"
+          fi
           echo "::endgroup::"
 
       - name: Create README for packed artifacts
@@ -366,7 +420,9 @@ jobs:
           ├── Ubuntu22_x86_64_CPU.zip
           ├── Ubuntu22_x86_64_CPU.tar.gz
           ├── Ubuntu24_x86_64_CPU.zip
-          └── Ubuntu24_x86_64_CPU.tar.gz
+          ├── Ubuntu24_x86_64_CPU.tar.gz
+          ├── Ubuntu26_x86_64_CPU.zip
+          └── Ubuntu26_x86_64_CPU.tar.gz
           ```
 
           ## Version Information
@@ -381,10 +437,15 @@ jobs:
           - Available in both ZIP and tar.gz formats
           - Each archive contains the complete radarsimpy module with all Python versions supported
 
+          ### Ubuntu26_x86_64_CPU (Ubuntu 26.04 LTS)
+          - Built with GCC-15 compiler
+          - Available in both ZIP and tar.gz formats
+          - Each archive contains the complete radarsimpy module with all Python versions supported
+
           ## Build Information
 
-          - **Total Builds**: 10 (packaged into 4 files: 2 ZIP + 2 tar.gz)
-          - **Ubuntu Versions**: 22.04 LTS, 24.04 LTS
+          - **Total Builds**: 15 (packaged into 6 files: 3 ZIP + 3 tar.gz)
+          - **Ubuntu Versions**: 22.04 LTS, 24.04 LTS, 26.04 LTS
           - **Architecture**: x86_64
           - **Python Versions**: 3.10, 3.11, 3.12, 3.13, 3.14
           - **Formats**: ZIP and tar.gz for maximum compatibility
@@ -424,11 +485,12 @@ jobs:
           echo "# Ubuntu Build Summary 📊" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Build Matrix Results" >> $GITHUB_STEP_SUMMARY
-          echo "Total builds: 10 (5 Python versions × 2 Ubuntu versions)" >> $GITHUB_STEP_SUMMARY
+          echo "Total builds: 15 (5 Python versions × 3 Ubuntu versions)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Ubuntu Version Distribution" >> $GITHUB_STEP_SUMMARY
           echo "- **Ubuntu 22.04 LTS**: 5 builds with GCC-11" >> $GITHUB_STEP_SUMMARY
           echo "- **Ubuntu 24.04 LTS**: 5 builds with GCC-13" >> $GITHUB_STEP_SUMMARY
+          echo "- **Ubuntu 26.04 LTS**: 5 builds with GCC-15" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Python Versions" >> $GITHUB_STEP_SUMMARY
           echo "- Python 3.10, 3.11, 3.12, 3.13, 3.14" >> $GITHUB_STEP_SUMMARY
@@ -438,8 +500,8 @@ jobs:
             echo "✅ **All artifacts successfully packed into ZIP and tar.gz files**" >> $GITHUB_STEP_SUMMARY
             echo "- Archive: \`radarsimpy_ubuntu_cpu_all_builds\`" >> $GITHUB_STEP_SUMMARY
             echo "- Formats: tar.gz, zip" >> $GITHUB_STEP_SUMMARY
-            echo "- Structure: 4 files (2 Ubuntu versions × 2 formats)" >> $GITHUB_STEP_SUMMARY
-            echo "- Contains: All 10 build variants organized by Ubuntu version" >> $GITHUB_STEP_SUMMARY
+            echo "- Structure: 6 files (3 Ubuntu versions × 2 formats)" >> $GITHUB_STEP_SUMMARY
+            echo "- Contains: All 15 build variants organized by Ubuntu version" >> $GITHUB_STEP_SUMMARY
           else
             echo "⚠️ **Artifact packing failed or was skipped**" >> $GITHUB_STEP_SUMMARY
           fi
