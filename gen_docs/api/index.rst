@@ -8,3 +8,4 @@ API
    sim
    process
    tools
+   scene

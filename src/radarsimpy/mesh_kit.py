@@ -22,6 +22,7 @@ mesh processing libraries.
 """
 
 import importlib
+from typing import Union, List, Tuple, Dict, Any, Optional
 import numpy as np
 
 
@@ -155,3 +156,77 @@ def load_mesh(mesh_file_name: str, scale: float, mesh_module: object) -> dict:
         "4. meshio\n"
         "    • pip install meshio\n"
     )
+
+
+def get_target_mesh(
+    targets: Union[dict, List[dict], Tuple[dict, ...]],
+    radar: Any,
+    timestamp: Union[float, np.ndarray] = 0.0,
+) -> dict:
+    """
+    Get the transformed target mesh at query timestamps using C++ Target directly.
+
+    :param targets: A target dict or list/tuple of target dicts.
+    :param radar: Radar object containing system configuration.
+    :param timestamp: Float or numpy array of query timestamp(s). Default: ``0.0``.
+
+    :return: A dictionary containing:
+
+        * **points** (*numpy.ndarray*): Array of transformed vertex coordinates.
+          If `timestamp` is a scalar, shape is ``[N, 3]``.
+          If `timestamp` is an array of shape ``[...]``, shape is ``[..., N, 3]``.
+        * **cells** (*numpy.ndarray*): Array of face indices with shape ``[M, 3]``.
+    :rtype: dict
+    """
+    if isinstance(targets, (list, tuple)):
+        meshes = []
+        for t in targets:
+            if "model" in t:
+                meshes.append(
+                    get_target_mesh(t, radar, timestamp)
+                )
+        return merge_meshes(meshes)
+
+    if not isinstance(targets, dict):
+        raise TypeError("targets must be a dictionary or a list/tuple of dictionaries.")
+
+    if "model" not in targets:
+        raise ValueError("Target dictionary must contain the 'model' key for mesh loading.")
+
+    mesh_module = import_mesh_module()
+
+    sim_timestamp = None
+    if radar is not None:
+        sim_timestamp = radar.time_prop.get("timestamp", None)
+
+    from radarsimpy.lib.cp_radarsimc import cp_GetTargetMesh
+    return cp_GetTargetMesh(targets, timestamp, mesh_module, sim_timestamp)
+
+
+def merge_meshes(meshes: List[dict]) -> dict:
+    """
+    Merge multiple meshes into a single mesh.
+
+    :param list meshes: A list of dictionaries containing points and cells.
+    :return: A dictionary containing the merged points and cells.
+    :rtype: dict
+    """
+    if not meshes:
+        return {"points": np.zeros((0, 3)), "cells": np.zeros((0, 3), dtype=np.int32)}
+
+    total_points = []
+    total_cells = []
+    offset = 0
+
+    for m in meshes:
+        pts = m["points"]
+        cells = m["cells"]
+
+        N = pts.shape[-2]
+        total_cells.append(cells + offset)
+        total_points.append(pts)
+        offset += N
+
+    merged_points = np.concatenate(total_points, axis=-2)
+    merged_cells = np.concatenate(total_cells, axis=0)
+    return {"points": merged_points, "cells": merged_cells}

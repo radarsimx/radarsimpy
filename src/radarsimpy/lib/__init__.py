@@ -68,7 +68,7 @@ Performance Notes:
 
 # Import the compiled Cython module if available
 try:
-    from .cp_radarsimc import cp_Point, cp_Radar, cp_Target, cp_RCS_Target
+    from .cp_radarsimc import cp_GetTargetMesh, cp_GetSceneStateChannels
 
     _lib_available = True
     _import_error = None
@@ -83,10 +83,8 @@ __description__ = "Low-level C++ interface for RadarSimPy"
 # Public API - Internal functions (not typically used directly by end users)
 __all__ = (
     [
-        "cp_Point",
-        "cp_Radar",
-        "cp_Target",
-        "cp_RCS_Target",
+        "cp_GetTargetMesh",
+        "cp_GetSceneStateChannels",
         "is_available",
         "get_lib_info",
     ]
@@ -121,10 +119,8 @@ def get_lib_info():
 
     if _lib_available:
         info["functions"] = {
-            "cp_Point": "Create C++ Point target objects from Python data",
-            "cp_Radar": "Convert Python radar configuration to C++ Radar object",
-            "cp_Target": "Create C++ Target objects from 3D mesh data",
-            "cp_RCS_Target": "Create C++ Target objects optimized for RCS calculations",
+            "cp_GetTargetMesh": "Retrieve target meshes at given timestamps",
+            "cp_GetSceneStateChannels": "Compute global locations and boresights using C++ Rotate",
         }
         info["data_types"] = {
             "precision": "float32 (single precision for efficiency)",
@@ -217,42 +213,25 @@ def get_function_signatures():
         return {"error": "Library not available"}
 
     signatures = {
-        "cp_Point": {
-            "signature": "cp_Point(location, speed, rcs, phase, shape)",
+        "cp_GetTargetMesh": {
+            "signature": "cp_GetTargetMesh(target, timestamp, mesh_module, sim_timestamp=None)",
             "parameters": {
-                "location": "Point locations (array-like)",
-                "speed": "Point velocities (array-like)",
-                "rcs": "Radar cross-section values",
-                "phase": "Phase values in radians",
-                "shape": "Shape information",
-            },
-            "returns": "C++ Point object for simulation",
-        },
-        "cp_Radar": {
-            "signature": "cp_Radar(radar, frame_start_time)",
-            "parameters": {
-                "radar": "Python Radar configuration object",
-                "frame_start_time": "Frame timing information",
-            },
-            "returns": "C++ Radar object for simulation",
-        },
-        "cp_Target": {
-            "signature": "cp_Target(radar, target, timestamp, mesh_module)",
-            "parameters": {
-                "radar": "Radar configuration object",
-                "target": "Target configuration dictionary",
-                "timestamp": "Time information for target motion",
+                "target": "Target configuration dict",
+                "timestamp": "Query timestamp(s)",
                 "mesh_module": "Mesh processing module reference",
+                "sim_timestamp": "Simulation timestamps in the radar object",
             },
-            "returns": "C++ Target object for mesh-based simulation",
+            "returns": "Transformed target points and cells",
         },
-        "cp_RCS_Target": {
-            "signature": "cp_RCS_Target(target, mesh_module)",
+        "cp_GetSceneStateChannels": {
+            "signature": "cp_GetSceneStateChannels(tx_local_locs, rx_local_locs, q_locs, q_rots)",
             "parameters": {
-                "target": "Target configuration dictionary",
-                "mesh_module": "Mesh processing module reference",
+                "tx_local_locs": "Local coordinates of Transmitter channels",
+                "rx_local_locs": "Local coordinates of Receiver channels",
+                "q_locs": "Query platform locations",
+                "q_rots": "Query platform rotations (yaw, pitch, roll in rad)",
             },
-            "returns": "C++ Target object optimized for RCS calculations",
+            "returns": "Tuple of (tx_global_locs, rx_global_locs, radar_boresights)",
         },
     }
 

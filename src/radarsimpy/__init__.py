@@ -60,6 +60,9 @@ from . import tools
 # 3D mesh utilities
 from . import mesh_kit
 
+# Scene state retrieval
+from .scene import get_scene_state
+
 # =============================================================================
 # License Initialization
 # =============================================================================
@@ -91,6 +94,8 @@ __all__ = [
     "sim_radar",
     "sim_lidar",
     "sim_rcs",
+    # Scene Functions
+    "get_scene_state",
     # License Functions
     "set_license",
     "is_licensed",
@@ -181,6 +186,7 @@ def get_info():
             "processing": "Signal processing algorithms",
             "tools": "Analysis and characterization tools",
             "mesh_kit": "3D mesh file loading utilities",
+            "scene": "Scene state and snapshot utilities",
         },
         "simulation_engines": {
             "sim_radar": "Radar baseband simulation",

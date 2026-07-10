@@ -255,7 +255,49 @@ cdef extern from "points_manager.hpp":
                             const T & phase) except +            # Point phase value (rad)
 
 #------------------------------------------------------------------------------
+# Triangle and Target Representations
+#------------------------------------------------------------------------------
+cdef extern from "triangle.hpp":
+    cdef cppclass Triangle[T]:
+        Triangle() except +
+        Vec3[T] *vertex_
+
+cdef extern from "target.hpp":
+    cdef cppclass Target[T]:
+        Target() except +
+        Target(const T * points,
+               const int_t * cells,
+               const int_t & cell_size,
+               const Vec3[T] & origin,
+               const vector[Vec3[T]] & location_array,
+               const vector[Vec3[T]] & speed_array,
+               const vector[Vec3[T]] & rotation_array,
+               const vector[Vec3[T]] & rotrate_array,
+               const cpp_complex[T] & ep,
+               const cpp_complex[T] & mu,
+               const bool & skip_diffusion,
+               const T & density,
+               const bool & environment) except +
+
+        Target(const T * points,
+               const int_t * cells,
+               const int_t & cell_size,
+               const Vec3[T] & origin,
+               const Vec3[T] & location,
+               const Vec3[T] & speed,
+               const Vec3[T] & rotation,
+               const Vec3[T] & rotation_rate,
+               const bool & skip_diffusion,
+               const T & density,
+               const bool & environment) except +
+
+        void Move(int index, double time) except +
+        vector[Triangle[T]] vect_mesh_
+        int array_size_
+
+#------------------------------------------------------------------------------
 # Targets Manager
+
 # Container for managing multiple 3D mesh targets in radar simulation
 #------------------------------------------------------------------------------
 cdef extern from "targets_manager.hpp":
@@ -388,6 +430,7 @@ cdef extern from "simulator_noise.hpp":
                               H* noise_imag,                          # Output noise imag
                               unsigned long long seed)                # Random seed
 
-#------------------------------------------------------------------------------
-# End of RadarSimPy C++ Interface Declarations
-#------------------------------------------------------------------------------
+# --- C++ Motion Library Functions ---
+cdef extern from "libs/motion_lib.hpp":
+    cdef Vec3[T] Rotate[T](const Vec3[T] & vect, const Vec3[T] & rotation) except +
+
