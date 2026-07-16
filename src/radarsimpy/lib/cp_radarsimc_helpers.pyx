@@ -36,7 +36,9 @@ import warnings
 # Cython imports
 cimport numpy as np
 from libcpp.complex cimport complex as cpp_complex
-from radarsimpy.includes.type_def cimport int_t, float_t
+from radarsimpy.includes.radarsimc cimport Mem_Copy_Vec3
+from radarsimpy.includes.rsvector cimport Vec3
+from radarsimpy.includes.type_def cimport int_t, float_t, vector
 
 
 np.import_array()
@@ -187,3 +189,107 @@ cdef inline void _handle_deprecated_target_params(target) except *:
     if "is_ground" in target:
         target["skip_diffusion"] = target["is_ground"]
         _warn_deprecated_parameter("is_ground", "skip_diffusion")
+
+# ============================================================================
+# Private Helpers (time-varying kinematics expansion)
+# ============================================================================
+
+cdef inline float_t[:, :, :] _broadcast_time_varying(value, shape) except *:
+    """
+    Resolve a per-axis parameter that is either already time-varying (an
+    array matching ``shape``) or a scalar constant to broadcast across it.
+
+    :param value:
+        Either an array already shaped like ``shape``, or a scalar constant
+    :param tuple shape:
+        Target shape (channels, frames, pulses) to broadcast scalars to
+    :return: Value cast to np_float with the given shape
+    :rtype: float_t[:, :, :]
+    """
+    if np.size(value) > 1:
+        return value.astype(np_float)
+    return np.full(shape, value, dtype=np_float)
+
+cdef inline void _expand_time_varying_kinematics(
+    location,
+    speed,
+    rotation,
+    rotation_rate,
+    t,
+    vector[Vec3[float_t]] &loc_vt,
+    vector[Vec3[float_t]] &spd_vt,
+    vector[Vec3[float_t]] &rot_vt,
+    vector[Vec3[float_t]] &rrt_vt,
+) except *:
+    """
+    Expand per-axis location/speed/rotation/rotation_rate into time-varying
+    Vec3 vectors sampled at ``t``.
+
+    Each of the three elements of location/speed/rotation/rotation_rate is
+    either a scalar or an array already matching the shape of ``t``. Axes
+    that are still scalar are derived from the constant-motion equations
+    (location = location + speed * t, rotation = rotation + rotation_rate * t)
+    or broadcast to ``t``'s shape. Assumes the caller has already determined
+    that at least one input is time-varying.
+
+    :param list location, speed, rotation, rotation_rate:
+        3-element lists; each element is a scalar or an array shaped like ``t``
+    :param t:
+        Reference time array used to broadcast scalars and evaluate constant-
+        motion equations
+    :param vector[Vec3[float_t]] &loc_vt/spd_vt/rot_vt/rrt_vt:
+        Output vectors populated with one Vec3 per sample of ``t``
+    """
+    cdef float_t[:, :, :] locx_mv, locy_mv, locz_mv
+    cdef float_t[:, :, :] spdx_mv, spdy_mv, spdz_mv
+    cdef float_t[:, :, :] rotx_mv, roty_mv, rotz_mv
+    cdef float_t[:, :, :] rrtx_mv, rrty_mv, rrtz_mv
+
+    ts_shape = np.shape(t)
+    cdef int_t bbsize_c = <int_t>(ts_shape[0] * ts_shape[1] * ts_shape[2])
+
+    if np.size(location[0]) > 1:
+        locx_mv = location[0].astype(np_float)
+    else:
+        locx_mv = (location[0] + speed[0]*t).astype(np_float)
+
+    if np.size(location[1]) > 1:
+        locy_mv = location[1].astype(np_float)
+    else:
+        locy_mv = (location[1] + speed[1]*t).astype(np_float)
+
+    if np.size(location[2]) > 1:
+        locz_mv = location[2].astype(np_float)
+    else:
+        locz_mv = (location[2] + speed[2]*t).astype(np_float)
+
+    spdx_mv = _broadcast_time_varying(speed[0], ts_shape)
+    spdy_mv = _broadcast_time_varying(speed[1], ts_shape)
+    spdz_mv = _broadcast_time_varying(speed[2], ts_shape)
+
+    if np.size(rotation[0]) > 1:
+        rotx_mv = np.radians(rotation[0]).astype(np_float)
+    else:
+        rotx_mv = np.radians(
+            rotation[0] + rotation_rate[0]*t).astype(np_float)
+
+    if np.size(rotation[1]) > 1:
+        roty_mv = np.radians(rotation[1]).astype(np_float)
+    else:
+        roty_mv = np.radians(
+            rotation[1] + rotation_rate[1]*t).astype(np_float)
+
+    if np.size(rotation[2]) > 1:
+        rotz_mv = np.radians(rotation[2]).astype(np_float)
+    else:
+        rotz_mv = np.radians(
+            rotation[2] + rotation_rate[2]*t).astype(np_float)
+
+    rrtx_mv = _broadcast_time_varying(np.radians(rotation_rate[0]), ts_shape)
+    rrty_mv = _broadcast_time_varying(np.radians(rotation_rate[1]), ts_shape)
+    rrtz_mv = _broadcast_time_varying(np.radians(rotation_rate[2]), ts_shape)
+
+    Mem_Copy_Vec3(&locx_mv[0,0,0], &locy_mv[0,0,0], &locz_mv[0,0,0], bbsize_c, loc_vt)
+    Mem_Copy_Vec3(&spdx_mv[0,0,0], &spdy_mv[0,0,0], &spdz_mv[0,0,0], bbsize_c, spd_vt)
+    Mem_Copy_Vec3(&rotx_mv[0,0,0], &roty_mv[0,0,0], &rotz_mv[0,0,0], bbsize_c, rot_vt)
+    Mem_Copy_Vec3(&rrtx_mv[0,0,0], &rrty_mv[0,0,0], &rrtz_mv[0,0,0], bbsize_c, rrt_vt)

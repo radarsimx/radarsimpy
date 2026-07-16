@@ -35,7 +35,6 @@ from libcpp.complex cimport complex as cpp_complex
 from libcpp cimport bool
 from radarsimpy.includes.radarsimc cimport (
     TargetsManager,
-    Mem_Copy_Vec3,
     Target, Triangle, Rotate,
 )
 from radarsimpy.includes.rsvector cimport Vec3
@@ -75,15 +74,7 @@ cdef void cp_AddTarget(radar,
     cdef vector[Vec3[float_t]] rot_vt
     cdef vector[Vec3[float_t]] rrt_vt
 
-    cdef float_t[:, :, :] locx_mv, locy_mv, locz_mv
-    cdef float_t[:, :, :] spdx_mv, spdy_mv, spdz_mv
-    cdef float_t[:, :, :] rotx_mv, roty_mv, rotz_mv
-    cdef float_t[:, :, :] rrtx_mv, rrty_mv, rrtz_mv
-
     cdef cpp_complex[float_t] ep_c, mu_c
-
-    ts_shape = np.shape(timestamp)
-    cdef int_t bbsize_c = <int_t>(ts_shape[0] * ts_shape[1] * ts_shape[2])
 
     cdef float_t[:, :] points_mv
     cdef int_t[:, :] cells_mv
@@ -107,73 +98,10 @@ cdef void cp_AddTarget(radar,
     _parse_material_properties(target, &ep_c, &mu_c)
 
     if any(np.size(var) > 1 for var in location + speed + rotation + rotation_rate):
-        if np.size(location[0]) > 1:
-            locx_mv = location[0].astype(np_float)
-        else:
-            locx_mv = (location[0] + speed[0]*timestamp).astype(np_float)
-
-        if np.size(location[1]) > 1:
-            locy_mv = location[1].astype(np_float)
-        else:
-            locy_mv = (location[1] + speed[1]*timestamp).astype(np_float)
-
-        if np.size(location[2]) > 1:
-            locz_mv = location[2].astype(np_float)
-        else:
-            locz_mv = (location[2] + speed[2]*timestamp).astype(np_float)
-
-        if np.size(speed[0]) > 1:
-            spdx_mv = speed[0].astype(np_float)
-        else:
-            spdx_mv = np.full(ts_shape, speed[0], dtype=np_float)
-
-        if np.size(speed[1]) > 1:
-            spdy_mv = speed[1].astype(np_float)
-        else:
-            spdy_mv = np.full(ts_shape, speed[1], dtype=np_float)
-
-        if np.size(speed[2]) > 1:
-            spdz_mv = speed[2].astype(np_float)
-        else:
-            spdz_mv = np.full(ts_shape, speed[2], dtype=np_float)
-
-        if np.size(rotation[0]) > 1:
-            rotx_mv = np.radians(rotation[0]).astype(np_float)
-        else:
-            rotx_mv = np.radians(
-                rotation[0] + rotation_rate[0]*timestamp).astype(np_float)
-
-        if np.size(rotation[1]) > 1:
-            roty_mv = np.radians(rotation[1]).astype(np_float)
-        else:
-            roty_mv = np.radians(
-                rotation[1] + rotation_rate[1]*timestamp).astype(np_float)
-
-        if np.size(rotation[2]) > 1:
-            rotz_mv = np.radians(rotation[2]).astype(np_float)
-        else:
-            rotz_mv = np.radians(
-                rotation[2] + rotation_rate[2]*timestamp).astype(np_float)
-
-        if np.size(rotation_rate[0]) > 1:
-            rrtx_mv = np.radians(rotation_rate[0]).astype(np_float)
-        else:
-            rrtx_mv = np.full(ts_shape, np.radians(rotation_rate[0]), dtype=np_float)
-
-        if np.size(rotation_rate[1]) > 1:
-            rrty_mv = np.radians(rotation_rate[1]).astype(np_float)
-        else:
-            rrty_mv = np.full(ts_shape, np.radians(rotation_rate[1]), dtype=np_float)
-
-        if np.size(rotation_rate[2]) > 1:
-            rrtz_mv = np.radians(rotation_rate[2]).astype(np_float)
-        else:
-            rrtz_mv = np.full(ts_shape, np.radians(rotation_rate[2]), dtype=np_float)
-
-        Mem_Copy_Vec3(&locx_mv[0,0,0], &locy_mv[0,0,0], &locz_mv[0,0,0], bbsize_c, loc_vt)
-        Mem_Copy_Vec3(&spdx_mv[0,0,0], &spdy_mv[0,0,0], &spdz_mv[0,0,0], bbsize_c, spd_vt)
-        Mem_Copy_Vec3(&rotx_mv[0,0,0], &roty_mv[0,0,0], &rotz_mv[0,0,0], bbsize_c, rot_vt)
-        Mem_Copy_Vec3(&rrtx_mv[0,0,0], &rrty_mv[0,0,0], &rrtz_mv[0,0,0], bbsize_c, rrt_vt)
+        _expand_time_varying_kinematics(
+            location, speed, rotation, rotation_rate, timestamp,
+            loc_vt, spd_vt, rot_vt, rrt_vt,
+        )
 
     else:
         location_mv = np.array(location, dtype=np_float)
@@ -305,89 +233,18 @@ def cp_GetTargetMesh(target, timestamp, mesh_module, sim_timestamp=None):
     cdef vector[Vec3[float_t]] rot_vt
     cdef vector[Vec3[float_t]] rrt_vt
 
-    cdef float_t[:, :, :] locx_mv, locy_mv, locz_mv
-    cdef float_t[:, :, :] spdx_mv, spdy_mv, spdz_mv
-    cdef float_t[:, :, :] rotx_mv, roty_mv, rotz_mv
-    cdef float_t[:, :, :] rrtx_mv, rrty_mv, rrtz_mv
-
-    cdef int_t bbsize_c = 0
     cdef int_t sim_idx
 
     cdef double[:] timestamp_arr = np.atleast_1d(timestamp).astype(np.float64)
     cdef int_t K = <int_t>timestamp_arr.shape[0]
 
     cdef object ts = sim_timestamp if sim_timestamp is not None else timestamp
-    ts_shape = np.shape(ts)
 
     if any(np.size(var) > 1 for var in location + speed + rotation + rotation_rate):
-        bbsize_c = <int_t>(ts_shape[0] * ts_shape[1] * ts_shape[2])
-        if np.size(location[0]) > 1:
-            locx_mv = location[0].astype(np_float)
-        else:
-            locx_mv = (location[0] + speed[0]*ts).astype(np_float)
-
-        if np.size(location[1]) > 1:
-            locy_mv = location[1].astype(np_float)
-        else:
-            locy_mv = (location[1] + speed[1]*ts).astype(np_float)
-
-        if np.size(location[2]) > 1:
-            locz_mv = location[2].astype(np_float)
-        else:
-            locz_mv = (location[2] + speed[2]*ts).astype(np_float)
-
-        if np.size(speed[0]) > 1:
-            spdx_mv = speed[0].astype(np_float)
-        else:
-            spdx_mv = np.full(ts_shape, speed[0], dtype=np_float)
-
-        if np.size(speed[1]) > 1:
-            spdy_mv = speed[1].astype(np_float)
-        else:
-            spdy_mv = np.full(ts_shape, speed[1], dtype=np_float)
-
-        if np.size(speed[2]) > 1:
-            spdz_mv = speed[2].astype(np_float)
-        else:
-            spdz_mv = np.full(ts_shape, speed[2], dtype=np_float)
-
-        if np.size(rotation[0]) > 1:
-            rotx_mv = np.radians(rotation[0]).astype(np_float)
-        else:
-            rotx_mv = np.radians(
-                rotation[0] + rotation_rate[0]*ts).astype(np_float)
-
-        if np.size(rotation[1]) > 1:
-            roty_mv = np.radians(rotation[1]).astype(np_float)
-        else:
-            roty_mv = np.radians(
-                rotation[1] + rotation_rate[1]*ts).astype(np_float)
-
-        if np.size(rotation[2]) > 1:
-            rotz_mv = np.radians(rotation[2]).astype(np_float)
-        else:
-            rotz_mv = np.radians(
-                rotation[2] + rotation_rate[2]*ts).astype(np_float)
-
-        if np.size(rotation_rate[0]) > 1:
-            rrtx_mv = np.radians(rotation_rate[0]).astype(np_float)
-        else:
-            rrtx_mv = np.full(ts_shape, np.radians(rotation_rate[0]), dtype=np_float)
-
-        if np.size(rotation_rate[1]) > 1:
-            rrty_mv = np.radians(rotation_rate[1]).astype(np_float)
-        else:
-            rrty_mv = np.full(ts_shape, np.radians(rotation_rate[1]), dtype=np_float)
-
-        if np.size(rotation_rate[2]) > 1:
-            rrtz_mv = np.radians(rotation_rate[2]).astype(np_float)
-        else:
-            rrtz_mv = np.full(ts_shape, np.radians(rotation_rate[2]), dtype=np_float)
-
-        Mem_Copy_Vec3(&locx_mv[0,0,0], &locy_mv[0,0,0], &locz_mv[0,0,0], bbsize_c, loc_vt)
-        Mem_Copy_Vec3(&spdx_mv[0,0,0], &spdy_mv[0,0,0], &spdz_mv[0,0,0], bbsize_c, spd_vt)
-        Mem_Copy_Vec3(&rotx_mv[0,0,0], &roty_mv[0,0,0], &rotz_mv[0,0,0], bbsize_c, rot_vt)
-        Mem_Copy_Vec3(&rrtx_mv[0,0,0], &rrty_mv[0,0,0], &rrtz_mv[0,0,0], bbsize_c, rrt_vt)
+        _expand_time_varying_kinematics(
+            location, speed, rotation, rotation_rate, ts,
+            loc_vt, spd_vt, rot_vt, rrt_vt,
+        )
 
         target_c = new Target[float_t](&points_mv[0, 0],
                                        &cells_mv[0, 0],

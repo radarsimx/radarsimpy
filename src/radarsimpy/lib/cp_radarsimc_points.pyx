@@ -88,30 +88,11 @@ cdef void cp_AddPoint(location, speed, rcs, phase, shape, PointsManager[float_t]
     # Check if there are any time varying parameters
     if any(np.size(var) > 1 for var in list(location) + [rcs, phase]):
 
-        if np.size(location[0]) > 1:
-            locx_mv = location[0].astype(np_float)
-        else:
-            locx_mv = np.full(shape, location[0], dtype=np_float)
-
-        if np.size(location[1]) > 1:
-            locy_mv = location[1].astype(np_float)
-        else:
-            locy_mv = np.full(shape, location[1], dtype=np_float)
-
-        if np.size(location[2]) > 1:
-            locz_mv = location[2].astype(np_float)
-        else:
-            locz_mv = np.full(shape, location[2], dtype=np_float)
-
-        if np.size(rcs) > 1:
-            rcs_mv = rcs.astype(np_float)
-        else:
-            rcs_mv = np.full(shape, rcs, dtype=np_float)
-
-        if np.size(phase) > 1:
-            phs_mv = np.radians(phase).astype(np_float)
-        else:
-            phs_mv = np.full(shape, np.radians(phase), dtype=np_float)
+        locx_mv = _broadcast_time_varying(location[0], shape)
+        locy_mv = _broadcast_time_varying(location[1], shape)
+        locz_mv = _broadcast_time_varying(location[2], shape)
+        rcs_mv = _broadcast_time_varying(rcs, shape)
+        phs_mv = _broadcast_time_varying(np.radians(phase), shape)
 
         Mem_Copy(&rcs_mv[0,0,0], bbsize_c, rcs_vt)
         Mem_Copy(&phs_mv[0,0,0], bbsize_c, phs_vt)
