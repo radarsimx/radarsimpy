@@ -63,6 +63,9 @@ pip install -r requirements.txt
 - **Ubuntu 24.04**
   - GCC 13 (default)
   - GPU version (CUDA13) – see [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1)
+- **Ubuntu 26.04**
+  - GCC 15 (default)
+  - GPU version (CUDA13) – see [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1)
 - **Generic Linux x86-64**
   - Try Ubuntu 22.04/24.04 module, or [request a custom build](https://radarsimx.com/request-a-custom-build/)
 - **MacOS**

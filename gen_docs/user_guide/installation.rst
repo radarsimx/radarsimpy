@@ -17,7 +17,7 @@ Follow these steps to install RadarSimPy:
 **Supported Platforms**
 
 - Windows 10/11 (x64)
-- Linux (x64) - Ubuntu 20.04+ or equivalent
+- Linux (x64) - Ubuntu 22.04+ or equivalent
 - MacOS 10.15+ (x64 and ARM64/M1/M2)
 
 Directory Structure

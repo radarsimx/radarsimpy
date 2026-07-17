@@ -134,7 +134,7 @@ python build_config.py
 - `--test`: Enable testing (`on` or `off`)
 - `--license`: Enable license verification (`on` or `off`)
 
-## Ubuntu 22.04/24.04 and Other Linux Distributions
+## Ubuntu 22.04/24.04/26.04 and Other Linux Distributions
 
 ### Linux Prerequisites
 

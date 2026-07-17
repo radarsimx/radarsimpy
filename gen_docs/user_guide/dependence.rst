@@ -69,9 +69,9 @@ If using the CUDA-enabled version for GPU acceleration:
 Linux
 ^^^^^
 
-**Ubuntu 22.04/24.04 (Recommended)**
+**Ubuntu 22.04/24.04/26.04**
 
-* **Operating System**: Ubuntu 22.04 LTS or Ubuntu 24.04 LTS
+* **Operating System**: Ubuntu 22.04 LTS or Ubuntu 24.04 LTS or Ubuntu 26.04 LTS
 * **Architecture**: x86_64 (64-bit)
 * **Compiler Runtime**: GCC standard library (included by default)
 
@@ -117,16 +117,8 @@ MacOS
 
 **Platform-Specific Requirements**
 
-* **Intel Macs**: Require GCC 14 compiler runtime
-  
-  .. code-block:: bash
-
-      brew install gcc@14
-
-* **Apple Silicon Macs**: Use default Clang runtime (no additional dependencies required)
-
-.. note::
-   Apple Silicon users benefit from native ARM64 performance without needing Rosetta 2.
+  * Intel Macs: Use default Clang runtime (no additional dependencies required)
+  * Apple Silicon Macs: Use default Clang runtime (no additional dependencies required)
 
 Hardware Recommendations
 ------------------------
