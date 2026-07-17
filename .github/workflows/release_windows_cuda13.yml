@@ -90,9 +90,9 @@ jobs:
             ${{ runner.os }}-
 
       - name: Setup CUDA Toolkit
-        uses: Jimver/cuda-toolkit@v0.2.35
+        uses: radarsimx/cuda-toolkit@master
         with:
-          cuda: "13.3.0"
+          cuda: "13.3.1"
           method: "local"
           use-github-cache: false
 
