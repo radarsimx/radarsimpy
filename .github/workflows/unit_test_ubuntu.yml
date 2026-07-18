@@ -11,6 +11,9 @@
 #   - Pull requests targeting master branch
 #
 # Test Matrix:
+#   - Defined once, as JSON, in the `setup` job's "Define build matrix" step.
+#     The `build` job consumes it via job outputs, so adding/removing an
+#     Ubuntu version or Python version only requires editing that one step.
 #   - Python versions: 3.10, 3.11, 3.12, 3.13, 3.14
 #   - Platform: Ubuntu 22.04, Ubuntu 24.04, Ubuntu 26.04
 #   - Compilers: GCC-11 (22.04), GCC-13 (24.04), GCC-15 (26.04)
@@ -41,91 +44,45 @@ on:
     branches: [master]
 
 jobs:
+  # Single source of truth for the test matrix. The build job reads this
+  # instead of hardcoding Ubuntu versions/Python versions.
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Define test matrix
+        id: set-matrix
+        run: |
+          cat > matrix.json << 'EOF'
+          [
+            { "runner": "ubuntu-22.04", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22", "python-version": "3.10" },
+            { "runner": "ubuntu-22.04", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22", "python-version": "3.11" },
+            { "runner": "ubuntu-22.04", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22", "python-version": "3.12" },
+            { "runner": "ubuntu-22.04", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22", "python-version": "3.13" },
+            { "runner": "ubuntu-22.04", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22", "python-version": "3.14" },
+            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.10" },
+            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.11" },
+            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.12" },
+            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.13" },
+            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.14" },
+            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.10" },
+            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.11" },
+            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.12" },
+            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.13" },
+            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.14" }
+          ]
+          EOF
+          echo "matrix=$(jq -c . matrix.json)" >> "$GITHUB_OUTPUT"
+
   build:
+    needs: setup
     timeout-minutes: 60
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
-        include:
-          # Ubuntu 22.04, GCC-11
-          - runner: ubuntu-22.04
-            c_compiler: gcc-11
-            cxx_compiler: g++-11
-            os_label: ubuntu22
-            python-version: "3.10"
-          - runner: ubuntu-22.04
-            c_compiler: gcc-11
-            cxx_compiler: g++-11
-            os_label: ubuntu22
-            python-version: "3.11"
-          - runner: ubuntu-22.04
-            c_compiler: gcc-11
-            cxx_compiler: g++-11
-            os_label: ubuntu22
-            python-version: "3.12"
-          - runner: ubuntu-22.04
-            c_compiler: gcc-11
-            cxx_compiler: g++-11
-            os_label: ubuntu22
-            python-version: "3.13"
-          - runner: ubuntu-22.04
-            c_compiler: gcc-11
-            cxx_compiler: g++-11
-            os_label: ubuntu22
-            python-version: "3.14"
-          # Ubuntu 24.04, GCC-13
-          - runner: ubuntu-24.04
-            c_compiler: gcc-13
-            cxx_compiler: g++-13
-            os_label: ubuntu24
-            python-version: "3.10"
-          - runner: ubuntu-24.04
-            c_compiler: gcc-13
-            cxx_compiler: g++-13
-            os_label: ubuntu24
-            python-version: "3.11"
-          - runner: ubuntu-24.04
-            c_compiler: gcc-13
-            cxx_compiler: g++-13
-            os_label: ubuntu24
-            python-version: "3.12"
-          - runner: ubuntu-24.04
-            c_compiler: gcc-13
-            cxx_compiler: g++-13
-            os_label: ubuntu24
-            python-version: "3.13"
-          - runner: ubuntu-24.04
-            c_compiler: gcc-13
-            cxx_compiler: g++-13
-            os_label: ubuntu24
-            python-version: "3.14"
-          # Ubuntu 26.04, GCC-15
-          - runner: ubuntu-26.04
-            c_compiler: gcc-15
-            cxx_compiler: g++-15
-            os_label: ubuntu26
-            python-version: "3.10"
-          - runner: ubuntu-26.04
-            c_compiler: gcc-15
-            cxx_compiler: g++-15
-            os_label: ubuntu26
-            python-version: "3.11"
-          - runner: ubuntu-26.04
-            c_compiler: gcc-15
-            cxx_compiler: g++-15
-            os_label: ubuntu26
-            python-version: "3.12"
-          - runner: ubuntu-26.04
-            c_compiler: gcc-15
-            cxx_compiler: g++-15
-            os_label: ubuntu26
-            python-version: "3.13"
-          - runner: ubuntu-26.04
-            c_compiler: gcc-15
-            cxx_compiler: g++-15
-            os_label: ubuntu26
-            python-version: "3.14"
+        include: ${{ fromJson(needs.setup.outputs.matrix) }}
 
     steps:
       - name: Checkout repository

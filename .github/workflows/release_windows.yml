@@ -7,6 +7,10 @@ name: Release on Windows
 # comprehensive Windows-specific optimizations.
 #
 # Build Matrix:
+# - Defined once, as JSON, in the `setup` job's "Define build matrix" step.
+#   The `build`, `pack-artifacts`, and `build-summary` jobs all consume it via
+#   job outputs, so adding/removing a Python version only requires editing that
+#   one step — no other job needs to change.
 # - Windows x64: MSVC compiler, 5 builds (5 Python versions)
 # - Python versions: 3.10, 3.11, 3.12, 3.13, 3.14
 # - Total builds: 5
@@ -42,29 +46,35 @@ env:
   PYTHONDONTWRITEBYTECODE: 1
 
 jobs:
+  # Single source of truth for the build matrix. Every other job reads this
+  # instead of hardcoding Python versions.
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Define build matrix
+        id: set-matrix
+        run: |
+          cat > matrix.json << 'EOF'
+          [
+            { "python-version": "3.10", "arch": "cpu", "artifact_name": "radarsimpy_windows_py3.10" },
+            { "python-version": "3.11", "arch": "cpu", "artifact_name": "radarsimpy_windows_py3.11" },
+            { "python-version": "3.12", "arch": "cpu", "artifact_name": "radarsimpy_windows_py3.12" },
+            { "python-version": "3.13", "arch": "cpu", "artifact_name": "radarsimpy_windows_py3.13" },
+            { "python-version": "3.14", "arch": "cpu", "artifact_name": "radarsimpy_windows_py3.14" }
+          ]
+          EOF
+          echo "matrix=$(jq -c . matrix.json)" >> "$GITHUB_OUTPUT"
+
   build:
+    needs: setup
     runs-on: windows-2025
     timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
-        include:
-          # Windows builds
-          - python-version: "3.10"
-            arch: cpu
-            artifact_name: radarsimpy_windows_py3.10
-          - python-version: "3.11"
-            arch: cpu
-            artifact_name: radarsimpy_windows_py3.11
-          - python-version: "3.12"
-            arch: cpu
-            artifact_name: radarsimpy_windows_py3.12
-          - python-version: "3.13"
-            arch: cpu
-            artifact_name: radarsimpy_windows_py3.13
-          - python-version: "3.14"
-            arch: cpu
-            artifact_name: radarsimpy_windows_py3.14
+        include: ${{ fromJson(needs.setup.outputs.matrix) }}
 
     steps:
       - name: Checkout repository
@@ -159,9 +169,9 @@ jobs:
             *.log
           retention-days: 1
 
-  # Pack all artifacts and generate build summary
-  pack-artifacts-and-summary:
-    needs: build
+  # Pack all artifacts into a single file
+  pack-artifacts:
+    needs: [setup, build]
     runs-on: ubuntu-latest
     if: success()
     steps:
@@ -173,12 +183,22 @@ jobs:
         with:
           path: artifacts/
 
+      - name: Load build matrix
+        id: matrix-info
+        run: |
+          echo '${{ needs.setup.outputs.matrix }}' > matrix.json
+
+          # Names to purge from the run's artifact list once they're packed below
+          names=$(jq -r '.[].artifact_name | . + "*"' matrix.json)
+          echo "names<<MATRIX_EOF" >> "$GITHUB_OUTPUT"
+          echo "$names" >> "$GITHUB_OUTPUT"
+          echo "MATRIX_EOF" >> "$GITHUB_OUTPUT"
+
       - name: Delete downloaded artifacts
         uses: geekyeggo/delete-artifact@v6
         with:
           failOnError: false
-          name: |
-            radarsimpy_windows_py*
+          name: ${{ steps.matrix-info.outputs.names }}
 
       - name: Display downloaded artifacts
         run: |
@@ -198,10 +218,10 @@ jobs:
             if [ -d "$dir" ]; then
               artifact_name=$(basename "$dir")
               echo "Processing artifact: $artifact_name"
-              
+
               temp_dir="temp/radarsimpy"
               echo "Target temp directory: $temp_dir"
-              
+
               # Copy the radarsimpy module to temp directory
               source_radarsimpy="$dir/radarsimpy"
               if [ -d "$source_radarsimpy" ]; then
@@ -236,40 +256,43 @@ jobs:
 
       - name: Create README for packed artifacts
         run: |
-          cat > packed/radarsimpy_windows_cpu_all/README.md << 'EOF'
-          # RadarSimPy Windows Build Artifacts
+          total_builds=$(jq 'length' matrix.json)
+          python_versions=$(jq -r '[.[]."python-version"] | unique | join(", ")' matrix.json)
 
-          This archive contains all RadarSimPy builds for Windows platforms.
-
-          ## Directory Structure
-
-          The builds are organized in the following structure:
-
-          ```
-          radarsimpy_windows_cpu_all/
-          └── Windows_x86_64_CPU.zip
-          ```
-
-          ## Build Information
-
-          ### Windows_x86_64_CPU.zip (Windows x64)
-          - Built on Windows with MSVC compiler
-          - Contains the complete radarsimpy module with all Python versions supported
-          - Built with license features enabled
-
-          ## Build Details
-
-          - **Total Builds**: 5 (packaged into 1 ZIP file)
-          - **Architecture**: x64
-          - **Python Versions**: 3.10, 3.11, 3.12, 3.13, 3.14
-          - **Build Date**: $(date)
-
-          ## Usage
-
-          1. Extract the main archive
-          2. Extract the Windows_x86_64_CPU.zip file
-          3. The radarsimpy module will be ready for use
-          EOF
+          {
+            echo "# RadarSimPy Windows Build Artifacts"
+            echo
+            echo "This archive contains all RadarSimPy builds for Windows platforms."
+            echo
+            echo "## Directory Structure"
+            echo
+            echo "The builds are organized in the following structure:"
+            echo
+            echo '```'
+            echo "radarsimpy_windows_cpu_all/"
+            echo "└── Windows_x86_64_CPU.zip"
+            echo '```'
+            echo
+            echo "## Build Information"
+            echo
+            echo "### Windows_x86_64_CPU.zip (Windows x64)"
+            echo "- Built on Windows with MSVC compiler"
+            echo "- Contains the complete radarsimpy module with all Python versions supported"
+            echo "- Built with license features enabled"
+            echo
+            echo "## Build Details"
+            echo
+            echo "- **Total Builds**: ${total_builds} (packaged into 1 ZIP file)"
+            echo "- **Architecture**: x64"
+            echo "- **Python Versions**: ${python_versions}"
+            echo "- **Build Date**: $(date)"
+            echo
+            echo "## Usage"
+            echo
+            echo "1. Extract the main archive"
+            echo "2. Extract the Windows_x86_64_CPU.zip file"
+            echo "3. The radarsimpy module will be ready for use"
+          } > packed/radarsimpy_windows_cpu_all/README.md
 
       - name: Create compressed archive
         run: |
@@ -288,38 +311,43 @@ jobs:
           retention-days: 1
           compression-level: 0
 
+  # Summary job that runs after all builds complete
+  build-summary:
+    needs: [setup, build, pack-artifacts]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
       - name: Generate build summary
         run: |
+          echo '${{ needs.setup.outputs.matrix }}' > matrix.json
+          total_builds=$(jq 'length' matrix.json)
+          python_versions=$(jq -r '[.[]."python-version"] | unique | join(", ")' matrix.json)
+
           echo "# Windows Build Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Build Matrix Results" >> $GITHUB_STEP_SUMMARY
-          echo "Total builds: 5 [5 Python versions]" >> $GITHUB_STEP_SUMMARY
+          echo "Total builds: ${total_builds} [${total_builds} Python versions]" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Architecture Distribution" >> $GITHUB_STEP_SUMMARY
-          echo "- **Windows x64**: 5 builds on windows-latest" >> $GITHUB_STEP_SUMMARY
+          echo "- **Windows x64**: ${total_builds} builds on windows-2025" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Python Versions" >> $GITHUB_STEP_SUMMARY
-          echo "- Python 3.10, 3.11, 3.12, 3.13, 3.14" >> $GITHUB_STEP_SUMMARY
+          echo "- Python ${python_versions}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Packed Artifacts" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ needs.build.result }}" == "success" ]; then
+          if [ "${{ needs.pack-artifacts.result }}" == "success" ]; then
             echo "✅ **All artifacts successfully packed into ZIP file**" >> $GITHUB_STEP_SUMMARY
             echo "- Archive: \`radarsimpy_windows_cpu_all_builds\`" >> $GITHUB_STEP_SUMMARY
             echo "- Format: zip" >> $GITHUB_STEP_SUMMARY
             echo "- Structure: Windows_x86_64_CPU.zip" >> $GITHUB_STEP_SUMMARY
-            echo "- Contains: All 5 build variants with license features enabled" >> $GITHUB_STEP_SUMMARY
+            echo "- Contains: All ${total_builds} build variants with license features enabled" >> $GITHUB_STEP_SUMMARY
           else
             echo "⚠️ **Artifact packing failed or was skipped**" >> $GITHUB_STEP_SUMMARY
           fi
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Build Status" >> $GITHUB_STEP_SUMMARY
-          echo "Check individual job results above for detailed build information." >> $GITHUB_STEP_SUMMARY
-
-          # Check if any builds failed
-          if [ "${{ needs.build.result }}" != "success" ]; then
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "⚠️ **Some builds may have failed. Check individual job logs for details.**" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.build.result }}" == "success" ]; then
             echo "✅ **All builds completed successfully!**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ **Some builds may have failed. Check individual job logs for details.**" >> $GITHUB_STEP_SUMMARY
           fi

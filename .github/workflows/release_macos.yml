@@ -7,6 +7,10 @@ name: Release on MacOS
 # comprehensive macOS coverage.
 #
 # Build Matrix:
+# - Defined once, as JSON, in the `setup` job's "Define build matrix" step.
+#   The `build`, `pack-artifacts`, and `build-summary` jobs all consume it via
+#   job outputs, so adding/removing a macOS architecture or Python version only
+#   requires editing that one step — no other job needs to change.
 # - macOS 26 (Intel x64): Clang compiler, 5 builds (5 Python)
 # - macOS 26 (Apple Silicon ARM64): Clang compiler, 5 builds (5 Python)
 # - Python versions: 3.10, 3.11, 3.12, 3.13, 3.14
@@ -43,85 +47,40 @@ env:
   PYTHONDONTWRITEBYTECODE: 1
 
 jobs:
+  # Single source of truth for the build matrix. Every other job reads this
+  # instead of hardcoding macOS architectures/Python versions.
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Define build matrix
+        id: set-matrix
+        run: |
+          cat > matrix.json << 'EOF'
+          [
+            { "os": "macos-26-intel", "python-version": "3.10", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode_version": "26.4.1", "arch": "cpu", "dir_label": "x86_64", "platform_name": "Intel", "artifact_name": "radarsimpy_macos_py3.10" },
+            { "os": "macos-26-intel", "python-version": "3.11", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode_version": "26.4.1", "arch": "cpu", "dir_label": "x86_64", "platform_name": "Intel", "artifact_name": "radarsimpy_macos_py3.11" },
+            { "os": "macos-26-intel", "python-version": "3.12", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode_version": "26.4.1", "arch": "cpu", "dir_label": "x86_64", "platform_name": "Intel", "artifact_name": "radarsimpy_macos_py3.12" },
+            { "os": "macos-26-intel", "python-version": "3.13", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode_version": "26.4.1", "arch": "cpu", "dir_label": "x86_64", "platform_name": "Intel", "artifact_name": "radarsimpy_macos_py3.13" },
+            { "os": "macos-26-intel", "python-version": "3.14", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode_version": "26.4.1", "arch": "cpu", "dir_label": "x86_64", "platform_name": "Intel", "artifact_name": "radarsimpy_macos_py3.14" },
+            { "os": "macos-26", "python-version": "3.10", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode_version": "26.4.1", "arch": "cpu", "dir_label": "ARM", "platform_name": "Apple Silicon", "artifact_name": "radarsimpy_macos_arm_py3.10" },
+            { "os": "macos-26", "python-version": "3.11", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode_version": "26.4.1", "arch": "cpu", "dir_label": "ARM", "platform_name": "Apple Silicon", "artifact_name": "radarsimpy_macos_arm_py3.11" },
+            { "os": "macos-26", "python-version": "3.12", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode_version": "26.4.1", "arch": "cpu", "dir_label": "ARM", "platform_name": "Apple Silicon", "artifact_name": "radarsimpy_macos_arm_py3.12" },
+            { "os": "macos-26", "python-version": "3.13", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode_version": "26.4.1", "arch": "cpu", "dir_label": "ARM", "platform_name": "Apple Silicon", "artifact_name": "radarsimpy_macos_arm_py3.13" },
+            { "os": "macos-26", "python-version": "3.14", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode_version": "26.4.1", "arch": "cpu", "dir_label": "ARM", "platform_name": "Apple Silicon", "artifact_name": "radarsimpy_macos_arm_py3.14" }
+          ]
+          EOF
+          echo "matrix=$(jq -c . matrix.json)" >> "$GITHUB_OUTPUT"
+
   build:
+    needs: setup
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
-        include:
-          # MacOS x64 builds
-          - os: macos-26-intel
-            python-version: "3.10"
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode_version: "26.4.1"
-            arch: cpu
-            artifact_name: radarsimpy_macos_py3.10
-          - os: macos-26-intel
-            python-version: "3.11"
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode_version: "26.4.1"
-            arch: cpu
-            artifact_name: radarsimpy_macos_py3.11
-          - os: macos-26-intel
-            python-version: "3.12"
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode_version: "26.4.1"
-            arch: cpu
-            artifact_name: radarsimpy_macos_py3.12
-          - os: macos-26-intel
-            python-version: "3.13"
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode_version: "26.4.1"
-            arch: cpu
-            artifact_name: radarsimpy_macos_py3.13
-          - os: macos-26-intel
-            python-version: "3.14"
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode_version: "26.4.1"
-            arch: cpu
-            artifact_name: radarsimpy_macos_py3.14
-          # MacOS ARM64 (Apple Silicon) Standard builds
-          - os: macos-26
-            python-version: "3.10"
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode_version: "26.4.1"
-            arch: cpu
-            artifact_name: radarsimpy_macos_arm_py3.10
-          - os: macos-26
-            python-version: "3.11"
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode_version: "26.4.1"
-            arch: cpu
-            artifact_name: radarsimpy_macos_arm_py3.11
-          - os: macos-26
-            python-version: "3.12"
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode_version: "26.4.1"
-            arch: cpu
-            artifact_name: radarsimpy_macos_arm_py3.12
-          - os: macos-26
-            python-version: "3.13"
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode_version: "26.4.1"
-            arch: cpu
-            artifact_name: radarsimpy_macos_arm_py3.13
-          - os: macos-26
-            python-version: "3.14"
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode_version: "26.4.1"
-            arch: cpu
-            artifact_name: radarsimpy_macos_arm_py3.14
+        include: ${{ fromJson(needs.setup.outputs.matrix) }}
 
     steps:
       - name: Checkout repository
@@ -250,9 +209,9 @@ jobs:
             *.log
           retention-days: 1
 
-  # Pack all artifacts and generate build summary
-  pack-artifacts-and-summary:
-    needs: build
+  # Pack all artifacts into a single file
+  pack-artifacts:
+    needs: [setup, build]
     runs-on: ubuntu-latest
     if: success()
     steps:
@@ -264,13 +223,22 @@ jobs:
         with:
           path: artifacts/
 
+      - name: Load build matrix
+        id: matrix-info
+        run: |
+          echo '${{ needs.setup.outputs.matrix }}' > matrix.json
+
+          # Names to purge from the run's artifact list once they're packed below
+          names=$(jq -r '.[].artifact_name | . + "*"' matrix.json)
+          echo "names<<MATRIX_EOF" >> "$GITHUB_OUTPUT"
+          echo "$names" >> "$GITHUB_OUTPUT"
+          echo "MATRIX_EOF" >> "$GITHUB_OUTPUT"
+
       - name: Delete downloaded artifacts
         uses: geekyeggo/delete-artifact@v6
         with:
           failOnError: false
-          name: |
-            radarsimpy_macos_py*
-            radarsimpy_macos_arm_py*
+          name: ${{ steps.matrix-info.outputs.names }}
 
       - name: Display downloaded artifacts
         run: |
@@ -282,53 +250,46 @@ jobs:
         run: |
           mkdir -p packed/radarsimpy_macos_all
 
-          # Create temporary directories for building packages
-          mkdir -p temp/MacOS_x86_64_CPU/radarsimpy
-          mkdir -p temp/MacOS_ARM_CPU/radarsimpy
+          # Build artifact_name -> dir_label lookup table from the matrix
+          declare -A dir_label_for
+          while IFS=$'\t' read -r name label; do
+            dir_label_for["$name"]="$label"
+          done < <(jq -r '.[] | [.artifact_name, .dir_label] | @tsv' matrix.json)
 
-          # Copy each artifact to appropriate directory based on architecture
+          # Copy each artifact to its matrix-defined directory
           for dir in artifacts/*/; do
             if [ -d "$dir" ]; then
               artifact_name=$(basename "$dir")
               echo "Processing artifact: $artifact_name"
-              
-              # Determine target directory based on artifact name
-              if [[ "$artifact_name" == *"_arm_"* ]]; then
-                # ARM64 builds
-                target_dir="temp/MacOS_ARM_CPU/radarsimpy"
-              else
-                # x64 builds
-                target_dir="temp/MacOS_x86_64_CPU/radarsimpy"
+
+              label="${dir_label_for[$artifact_name]}"
+              if [ -z "$label" ]; then
+                echo "Unknown artifact $artifact_name, skipping"
+                continue
               fi
-              
-              # Ensure target directory exists
+              target_dir="temp/MacOS_${label}_CPU/radarsimpy"
+
               mkdir -p "$target_dir"
-              
+
               # Copy the radarsimpy module
               if [ -d "$dir/radarsimpy" ]; then
                 echo "Copying radarsimpy module from $dir/radarsimpy to $target_dir/"
                 cp -r "$dir/radarsimpy"/* "$target_dir/" 2>/dev/null || true
               else
                 echo "Copying all contents from $dir to $target_dir/"
-                # If radarsimpy is at root level
                 cp -r "$dir"/* "$target_dir/" 2>/dev/null || true
               fi
             fi
           done
 
-          # Create ZIP files for each architecture
-          echo "Creating MacOS_x86_64_CPU.zip..."
-          cd temp && zip -r ../packed/radarsimpy_macos_all/MacOS_x86_64_CPU.zip MacOS_x86_64_CPU/ && cd ..
-
-          echo "Creating MacOS_ARM_CPU.zip..."
-          cd temp && zip -r ../packed/radarsimpy_macos_all/MacOS_ARM_CPU.zip MacOS_ARM_CPU/ && cd ..
-
-          # Create tar.gz files for each architecture
-          echo "Creating MacOS_x86_64_CPU.tar.gz..."
-          cd temp && tar -czf ../packed/radarsimpy_macos_all/MacOS_x86_64_CPU.tar.gz MacOS_x86_64_CPU/ && cd ..
-
-          echo "Creating MacOS_ARM_CPU.tar.gz..."
-          cd temp && tar -czf ../packed/radarsimpy_macos_all/MacOS_ARM_CPU.tar.gz MacOS_ARM_CPU/ && cd ..
+          # Create one zip and one tar.gz per architecture actually produced
+          cd temp
+          for combo_dir in */; do
+            combo_dir="${combo_dir%/}"
+            zip -r "../packed/radarsimpy_macos_all/${combo_dir}.zip" "$combo_dir/"
+            tar -czf "../packed/radarsimpy_macos_all/${combo_dir}.tar.gz" "$combo_dir/"
+          done
+          cd ..
 
       - name: Verify artifact structure
         run: |
@@ -336,80 +297,66 @@ jobs:
           echo "Final directory structure:"
           find packed/radarsimpy_macos_all -type f | sort
           echo ""
-          echo "Verifying ZIP and tar.gz files exist:"
-
-          if [ -f "packed/radarsimpy_macos_all/MacOS_x86_64_CPU.zip" ]; then
-            echo "✓ macOS x86_64 ZIP found"
-          else
-            echo "✗ macOS x86_64 ZIP missing"
-          fi
-
-          if [ -f "packed/radarsimpy_macos_all/MacOS_x86_64_CPU.tar.gz" ]; then
-            echo "✓ macOS x86_64 tar.gz found"
-          else
-            echo "✗ macOS x86_64 tar.gz missing"
-          fi
-
-          if [ -f "packed/radarsimpy_macos_all/MacOS_ARM_CPU.zip" ]; then
-            echo "✓ macOS ARM ZIP found"
-          else
-            echo "✗ macOS ARM ZIP missing"
-          fi
-
-          if [ -f "packed/radarsimpy_macos_all/MacOS_ARM_CPU.tar.gz" ]; then
-            echo "✓ macOS ARM tar.gz found"
-          else
-            echo "✗ macOS ARM tar.gz missing"
-          fi
-
+          echo "Zip and tar.gz files created:"
+          ls -la packed/radarsimpy_macos_all/*.zip packed/radarsimpy_macos_all/*.tar.gz
           echo "::endgroup::"
 
       - name: Create README for packed artifacts
         run: |
-          cat > packed/radarsimpy_macos_all/README.md << 'EOF'
-          # RadarSimPy macOS Build Artifacts
+          total_builds=$(jq 'length' matrix.json)
+          arch_info=$(jq -r '[.[] | {label: .dir_label, name: .platform_name}] | unique_by(.label) | .[] | "\(.label)|\(.name)"' matrix.json)
+          num_archs=$(echo "$arch_info" | wc -l)
+          python_versions=$(jq -r '[.[]."python-version"] | unique | join(", ")' matrix.json)
+          names=$(echo "$arch_info" | awk -F'|' '{print "MacOS_"$1"_CPU.zip"}')
+          n=$(echo "$names" | wc -l)
 
-          This archive contains all RadarSimPy builds for macOS platforms organized by architecture.
-
-          ## Directory Structure
-
-          The builds are organized in the following structure:
-
-          ```
-          radarsimpy_macos_all/
-          ├── MacOS_x86_64_CPU.zip
-          ├── MacOS_x86_64_CPU.tar.gz
-          ├── MacOS_ARM_CPU.zip
-          └── MacOS_ARM_CPU.tar.gz
-          ```
-
-          ## Architecture Information
-
-          ### MacOS_x86_64_CPU (Intel-based Macs)
-          - Built on macOS 26 with Clang 14 compiler
-          - Available in both ZIP and tar.gz formats
-          - Each archive contains the complete radarsimpy module with all Python versions supported
-
-          ### MacOS_ARM_CPU (Apple Silicon Macs)
-          - Built on macOS 26 with Clang compiler
-          - Available in both ZIP and tar.gz formats
-          - Each archive contains the complete radarsimpy module with all Python versions supported
-
-          ## Build Information
-
-          - **Total Builds**: 10 (packaged into 4 files: 2 ZIP + 2 tar.gz)
-          - **Architectures**: x86_64 (Intel), ARM64 (Apple Silicon)
-          - **Python Versions**: 3.10, 3.11, 3.12, 3.13, 3.14
-          - **Formats**: ZIP and tar.gz for maximum compatibility
-          - **Build Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
-
-          ## Usage
-
-          1. Extract the main archive
-          2. Extract the appropriate architecture file (choose ZIP or tar.gz based on your preference)
-          3. The radarsimpy module will be ready for use
-
-          EOF
+          {
+            echo "# RadarSimPy macOS Build Artifacts"
+            echo
+            echo "This archive contains all RadarSimPy builds for macOS platforms organized by architecture."
+            echo
+            echo "## Directory Structure"
+            echo
+            echo "The builds are organized in the following structure:"
+            echo
+            echo '```'
+            echo "radarsimpy_macos_all/"
+            i=0
+            while IFS='|' read -r label name; do
+              i=$((i+1))
+              if [ "$i" -eq "$n" ]; then
+                echo "└── MacOS_${label}_CPU.zip"
+                echo "└── MacOS_${label}_CPU.tar.gz"
+              else
+                echo "├── MacOS_${label}_CPU.zip"
+                echo "├── MacOS_${label}_CPU.tar.gz"
+              fi
+            done <<< "$arch_info"
+            echo '```'
+            echo
+            echo "## Architecture Information"
+            while IFS='|' read -r label name; do
+              echo
+              echo "### MacOS_${label}_CPU (${name}-based Macs)"
+              echo "- Built on macOS 26 with Clang compiler"
+              echo "- Available in both ZIP and tar.gz formats"
+              echo "- Each archive contains the complete radarsimpy module with all Python versions supported"
+            done <<< "$arch_info"
+            echo
+            echo "## Build Information"
+            echo
+            echo "- **Total Builds**: ${total_builds} (packaged into $((num_archs * 2)) files: ${num_archs} ZIP + ${num_archs} tar.gz)"
+            echo "- **Architectures**: $(echo "$arch_info" | awk -F'|' '{printf "%s (%s), ", $1, $2}' | sed 's/, $//')"
+            echo "- **Python Versions**: ${python_versions}"
+            echo "- **Formats**: ZIP and tar.gz for maximum compatibility"
+            echo "- **Build Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+            echo
+            echo "## Usage"
+            echo
+            echo "1. Extract the main archive"
+            echo "2. Extract the appropriate architecture file (choose ZIP or tar.gz based on your preference)"
+            echo "3. The radarsimpy module will be ready for use"
+          } > packed/radarsimpy_macos_all/README.md
 
       - name: Create compressed archive
         run: |
@@ -433,39 +380,49 @@ jobs:
           retention-days: 1
           compression-level: 0
 
+  # Summary job that runs after all builds complete
+  build-summary:
+    needs: [setup, build, pack-artifacts]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
       - name: Generate build summary
         run: |
+          echo '${{ needs.setup.outputs.matrix }}' > matrix.json
+          total_builds=$(jq 'length' matrix.json)
+          arch_info=$(jq -r '[.[] | {label: .dir_label, name: .platform_name, os: .os}] | unique_by(.label) | .[] | "\(.label)|\(.name)|\(.os)"' matrix.json)
+          python_versions=$(jq -r '[.[]."python-version"] | unique | join(", ")' matrix.json)
+          num_python=$(jq -r '[.[]."python-version"] | unique | length' matrix.json)
+
           echo "# macOS Build Summary 🍎" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Build Matrix Results" >> $GITHUB_STEP_SUMMARY
-          echo "Total builds: 10 (5 Python versions × 2 architectures)" >> $GITHUB_STEP_SUMMARY
+          echo "Total builds: ${total_builds} (${num_python} Python versions × $(echo "$arch_info" | wc -l) architectures)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Architecture Distribution" >> $GITHUB_STEP_SUMMARY
-          echo "- **x64 (Intel)**: 5 builds on macos-26-intel with Clang" >> $GITHUB_STEP_SUMMARY
-          echo "- **ARM64 (Apple Silicon)**: 5 builds on macos-26 with Clang" >> $GITHUB_STEP_SUMMARY
+          while IFS='|' read -r label name os; do
+            count=$(jq -r --arg l "$label" '[.[] | select(.dir_label == $l)] | length' matrix.json)
+            echo "- **${label} (${name})**: ${count} builds on ${os} with Clang" >> $GITHUB_STEP_SUMMARY
+          done <<< "$arch_info"
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Python Versions" >> $GITHUB_STEP_SUMMARY
-          echo "- Python 3.10, 3.11, 3.12, 3.13, 3.14" >> $GITHUB_STEP_SUMMARY
+          echo "- Python ${python_versions}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Packed Artifacts" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ needs.build.result }}" == "success" ]; then
+          if [ "${{ needs.pack-artifacts.result }}" == "success" ]; then
+            num_archs=$(echo "$arch_info" | wc -l)
             echo "✅ **All artifacts successfully packed into ZIP and tar.gz files by architecture**" >> $GITHUB_STEP_SUMMARY
             echo "- Archive: \`radarsimpy_macos_all_builds\`" >> $GITHUB_STEP_SUMMARY
             echo "- Formats: tar.gz, zip" >> $GITHUB_STEP_SUMMARY
-            echo "- Structure: 4 files (2 architectures × 2 formats)" >> $GITHUB_STEP_SUMMARY
-            echo "- Contains: All 10 build variants organized by architecture" >> $GITHUB_STEP_SUMMARY
+            echo "- Structure: $((num_archs * 2)) files (${num_archs} architectures × 2 formats)" >> $GITHUB_STEP_SUMMARY
+            echo "- Contains: All ${total_builds} build variants organized by architecture" >> $GITHUB_STEP_SUMMARY
           else
             echo "⚠️ **Artifact packing failed or was skipped**" >> $GITHUB_STEP_SUMMARY
           fi
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Build Status" >> $GITHUB_STEP_SUMMARY
-          echo "Check individual job results above for detailed build information." >> $GITHUB_STEP_SUMMARY
-
-          # Check if any builds failed
-          if [ "${{ needs.build.result }}" != "success" ]; then
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "⚠️ **Some builds may have failed. Check individual job logs for details.**" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.build.result }}" == "success" ]; then
             echo "✅ **All macOS builds completed successfully!**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ **Some builds may have failed. Check individual job logs for details.**" >> $GITHUB_STEP_SUMMARY
           fi

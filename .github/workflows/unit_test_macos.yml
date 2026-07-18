@@ -12,6 +12,9 @@
 #   - Pull requests targeting master branch
 #
 # Test Matrix:
+#   - Defined once, as JSON, in the `setup` job's "Define build matrix" step.
+#     The `build` job consumes it via job outputs, so adding/removing a macOS
+#     architecture or Python version only requires editing that one step.
 #   - Python versions: 3.10, 3.11, 3.12, 3.13, 3.14
 #   - Platform: MacOS 26 (x64), MacOS 26 (ARM64)
 #   - Compilers: Clang/Clang++
@@ -40,85 +43,40 @@ on:
     branches: [master]
 
 jobs:
+  # Single source of truth for the test matrix. The build job reads this
+  # instead of hardcoding macOS architectures/Python versions.
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Define test matrix
+        id: set-matrix
+        run: |
+          cat > matrix.json << 'EOF'
+          [
+            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosx64", "python-version": "3.10" },
+            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosx64", "python-version": "3.11" },
+            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosx64", "python-version": "3.12" },
+            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosx64", "python-version": "3.13" },
+            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosx64", "python-version": "3.14" },
+            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosarm64", "python-version": "3.10" },
+            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosarm64", "python-version": "3.11" },
+            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosarm64", "python-version": "3.12" },
+            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosarm64", "python-version": "3.13" },
+            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosarm64", "python-version": "3.14" }
+          ]
+          EOF
+          echo "matrix=$(jq -c . matrix.json)" >> "$GITHUB_OUTPUT"
+
   build:
+    needs: setup
     timeout-minutes: 60
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
-        include:
-          # MacOS x64, Clang, Xcode 26.4.1
-          - arch: x64
-            runner: macos-26-intel
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode: "26.4.1"
-            os_label: macosx64
-            python-version: "3.10"
-          - arch: x64
-            runner: macos-26-intel
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode: "26.4.1"
-            os_label: macosx64
-            python-version: "3.11"
-          - arch: x64
-            runner: macos-26-intel
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode: "26.4.1"
-            os_label: macosx64
-            python-version: "3.12"
-          - arch: x64
-            runner: macos-26-intel
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode: "26.4.1"
-            os_label: macosx64
-            python-version: "3.13"
-          - arch: x64
-            runner: macos-26-intel
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode: "26.4.1"
-            os_label: macosx64
-            python-version: "3.14"
-          # MacOS arm64, Clang, Xcode 26.4.1
-          - arch: arm64
-            runner: macos-26
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode: "26.4.1"
-            os_label: macosarm64
-            python-version: "3.10"
-          - arch: arm64
-            runner: macos-26
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode: "26.4.1"
-            os_label: macosarm64
-            python-version: "3.11"
-          - arch: arm64
-            runner: macos-26
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode: "26.4.1"
-            os_label: macosarm64
-            python-version: "3.12"
-          - arch: arm64
-            runner: macos-26
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode: "26.4.1"
-            os_label: macosarm64
-            python-version: "3.13"
-          - arch: arm64
-            runner: macos-26
-            c_compiler: clang
-            cxx_compiler: clang++
-            xcode: "26.4.1"
-            os_label: macosarm64
-            python-version: "3.14"
+        include: ${{ fromJson(needs.setup.outputs.matrix) }}
 
     steps:
       - name: Checkout repository

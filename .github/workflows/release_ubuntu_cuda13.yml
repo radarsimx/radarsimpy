@@ -7,6 +7,10 @@ name: Release on Ubuntu GPU CUDA13
 # comprehensive Linux coverage with different GCC compiler versions.
 #
 # Build Matrix:
+# - Defined once, as JSON, in the `setup` job's "Define build matrix" step.
+#   The `build`, `pack-artifacts`, and `build-summary` jobs all consume it via
+#   job outputs, so adding/removing an Ubuntu version or Python version only
+#   requires editing that one step — no other job needs to change.
 # - Ubuntu 22.04 LTS: GCC-11 compiler, 5 builds (5 Python versions)
 # - Ubuntu 24.04 LTS: GCC-13 compiler, 5 builds (5 Python versions)
 # - Ubuntu 26.04 LTS: GCC-15 compiler, 5 builds (5 Python versions)
@@ -45,106 +49,45 @@ env:
   PYTHONDONTWRITEBYTECODE: 1
 
 jobs:
+  # Single source of truth for the build matrix. Every other job reads this
+  # instead of hardcoding Ubuntu versions/Python versions.
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Define build matrix
+        id: set-matrix
+        run: |
+          cat > matrix.json << 'EOF'
+          [
+            { "os": "ubuntu-22.04", "python-version": "3.10", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "gpu", "ubuntu_version": "22", "artifact_name": "radarsimpy_ubuntu_22_04_cuda13_py3.10" },
+            { "os": "ubuntu-22.04", "python-version": "3.11", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "gpu", "ubuntu_version": "22", "artifact_name": "radarsimpy_ubuntu_22_04_cuda13_py3.11" },
+            { "os": "ubuntu-22.04", "python-version": "3.12", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "gpu", "ubuntu_version": "22", "artifact_name": "radarsimpy_ubuntu_22_04_cuda13_py3.12" },
+            { "os": "ubuntu-22.04", "python-version": "3.13", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "gpu", "ubuntu_version": "22", "artifact_name": "radarsimpy_ubuntu_22_04_cuda13_py3.13" },
+            { "os": "ubuntu-22.04", "python-version": "3.14", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "gpu", "ubuntu_version": "22", "artifact_name": "radarsimpy_ubuntu_22_04_cuda13_py3.14" },
+            { "os": "ubuntu-24.04", "python-version": "3.10", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "gpu", "ubuntu_version": "24", "artifact_name": "radarsimpy_ubuntu_24_04_cuda13_py3.10" },
+            { "os": "ubuntu-24.04", "python-version": "3.11", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "gpu", "ubuntu_version": "24", "artifact_name": "radarsimpy_ubuntu_24_04_cuda13_py3.11" },
+            { "os": "ubuntu-24.04", "python-version": "3.12", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "gpu", "ubuntu_version": "24", "artifact_name": "radarsimpy_ubuntu_24_04_cuda13_py3.12" },
+            { "os": "ubuntu-24.04", "python-version": "3.13", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "gpu", "ubuntu_version": "24", "artifact_name": "radarsimpy_ubuntu_24_04_cuda13_py3.13" },
+            { "os": "ubuntu-24.04", "python-version": "3.14", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "gpu", "ubuntu_version": "24", "artifact_name": "radarsimpy_ubuntu_24_04_cuda13_py3.14" },
+            { "os": "ubuntu-26.04", "python-version": "3.10", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "gpu", "ubuntu_version": "26", "artifact_name": "radarsimpy_ubuntu_26_04_cuda13_py3.10" },
+            { "os": "ubuntu-26.04", "python-version": "3.11", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "gpu", "ubuntu_version": "26", "artifact_name": "radarsimpy_ubuntu_26_04_cuda13_py3.11" },
+            { "os": "ubuntu-26.04", "python-version": "3.12", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "gpu", "ubuntu_version": "26", "artifact_name": "radarsimpy_ubuntu_26_04_cuda13_py3.12" },
+            { "os": "ubuntu-26.04", "python-version": "3.13", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "gpu", "ubuntu_version": "26", "artifact_name": "radarsimpy_ubuntu_26_04_cuda13_py3.13" },
+            { "os": "ubuntu-26.04", "python-version": "3.14", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "gpu", "ubuntu_version": "26", "artifact_name": "radarsimpy_ubuntu_26_04_cuda13_py3.14" }
+          ]
+          EOF
+          echo "matrix=$(jq -c . matrix.json)" >> "$GITHUB_OUTPUT"
+
   build:
+    needs: setup
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
-        include:
-          # Ubuntu 22.04 with GCC-11 builds
-          - os: ubuntu-22.04
-            python-version: "3.10"
-            c_compiler: gcc-11
-            cxx_compiler: g++-11
-            arch: gpu
-            artifact_name: radarsimpy_ubuntu_22_04_cuda13_py3.10
-          - os: ubuntu-22.04
-            python-version: "3.11"
-            c_compiler: gcc-11
-            cxx_compiler: g++-11
-            arch: gpu
-            artifact_name: radarsimpy_ubuntu_22_04_cuda13_py3.11
-          - os: ubuntu-22.04
-            python-version: "3.12"
-            c_compiler: gcc-11
-            cxx_compiler: g++-11
-            arch: gpu
-            artifact_name: radarsimpy_ubuntu_22_04_cuda13_py3.12
-          - os: ubuntu-22.04
-            python-version: "3.13"
-            c_compiler: gcc-11
-            cxx_compiler: g++-11
-            arch: gpu
-            artifact_name: radarsimpy_ubuntu_22_04_cuda13_py3.13
-          - os: ubuntu-22.04
-            python-version: "3.14"
-            c_compiler: gcc-11
-            cxx_compiler: g++-11
-            arch: gpu
-            artifact_name: radarsimpy_ubuntu_22_04_cuda13_py3.14
-          # Ubuntu 24.04 with GCC-13 builds
-          - os: ubuntu-24.04
-            python-version: "3.10"
-            c_compiler: gcc-13
-            cxx_compiler: g++-13
-            arch: gpu
-            artifact_name: radarsimpy_ubuntu_24_04_cuda13_py3.10
-          - os: ubuntu-24.04
-            python-version: "3.11"
-            c_compiler: gcc-13
-            cxx_compiler: g++-13
-            arch: gpu
-            artifact_name: radarsimpy_ubuntu_24_04_cuda13_py3.11
-          - os: ubuntu-24.04
-            python-version: "3.12"
-            c_compiler: gcc-13
-            cxx_compiler: g++-13
-            arch: gpu
-            artifact_name: radarsimpy_ubuntu_24_04_cuda13_py3.12
-          - os: ubuntu-24.04
-            python-version: "3.13"
-            c_compiler: gcc-13
-            cxx_compiler: g++-13
-            arch: gpu
-            artifact_name: radarsimpy_ubuntu_24_04_cuda13_py3.13
-          - os: ubuntu-24.04
-            python-version: "3.14"
-            c_compiler: gcc-13
-            cxx_compiler: g++-13
-            arch: gpu
-            artifact_name: radarsimpy_ubuntu_24_04_cuda13_py3.14
-          # Ubuntu 26.04 with GCC-15 builds
-          - os: ubuntu-26.04
-            python-version: "3.10"
-            c_compiler: gcc-15
-            cxx_compiler: g++-15
-            arch: gpu
-            artifact_name: radarsimpy_ubuntu_26_04_cuda13_py3.10
-          - os: ubuntu-26.04
-            python-version: "3.11"
-            c_compiler: gcc-15
-            cxx_compiler: g++-15
-            arch: gpu
-            artifact_name: radarsimpy_ubuntu_26_04_cuda13_py3.11
-          - os: ubuntu-26.04
-            python-version: "3.12"
-            c_compiler: gcc-15
-            cxx_compiler: g++-15
-            arch: gpu
-            artifact_name: radarsimpy_ubuntu_26_04_cuda13_py3.12
-          - os: ubuntu-26.04
-            python-version: "3.13"
-            c_compiler: gcc-15
-            cxx_compiler: g++-15
-            arch: gpu
-            artifact_name: radarsimpy_ubuntu_26_04_cuda13_py3.13
-          - os: ubuntu-26.04
-            python-version: "3.14"
-            c_compiler: gcc-15
-            cxx_compiler: g++-15
-            arch: gpu
-            artifact_name: radarsimpy_ubuntu_26_04_cuda13_py3.14
+        include: ${{ fromJson(needs.setup.outputs.matrix) }}
 
     steps:
       - name: Checkout repository
@@ -295,9 +238,9 @@ jobs:
             *.log
           retention-days: 1
 
-  # Pack all artifacts and generate build summary
-  pack-artifacts-and-summary:
-    needs: build
+  # Pack all artifacts into a single file
+  pack-artifacts:
+    needs: [setup, build]
     runs-on: ubuntu-latest
     if: success()
     steps:
@@ -309,14 +252,22 @@ jobs:
         with:
           path: artifacts/
 
+      - name: Load build matrix
+        id: matrix-info
+        run: |
+          echo '${{ needs.setup.outputs.matrix }}' > matrix.json
+
+          # Names to purge from the run's artifact list once they're packed below
+          names=$(jq -r '.[].artifact_name | . + "*"' matrix.json)
+          echo "names<<MATRIX_EOF" >> "$GITHUB_OUTPUT"
+          echo "$names" >> "$GITHUB_OUTPUT"
+          echo "MATRIX_EOF" >> "$GITHUB_OUTPUT"
+
       - name: Delete downloaded artifacts
         uses: geekyeggo/delete-artifact@v6
         with:
           failOnError: false
-          name: |
-            radarsimpy_ubuntu_26_04_cuda13*
-            radarsimpy_ubuntu_24_04_cuda13*
-            radarsimpy_ubuntu_22_04_cuda13*
+          name: ${{ steps.matrix-info.outputs.names }}
 
       - name: Display downloaded artifacts
         run: |
@@ -328,60 +279,46 @@ jobs:
         run: |
           mkdir -p packed/radarsimpy_ubuntu_cuda13_gpu_all
 
-          # Create temporary directories for building packages
-          mkdir -p temp/Ubuntu22_x86_64_GPU/radarsimpy
-          mkdir -p temp/Ubuntu24_x86_64_GPU/radarsimpy
-          mkdir -p temp/Ubuntu26_x86_64_GPU/radarsimpy
+          # Build artifact_name -> ubuntu_version lookup table from the matrix
+          declare -A ubuntu_version_for
+          while IFS=$'\t' read -r name ver; do
+            ubuntu_version_for["$name"]="$ver"
+          done < <(jq -r '.[] | [.artifact_name, .ubuntu_version] | @tsv' matrix.json)
 
-          # Copy each artifact to appropriate directory based on Ubuntu version
+          # Copy each artifact to its matrix-defined directory
           for dir in artifacts/*/; do
             if [ -d "$dir" ]; then
               artifact_name=$(basename "$dir")
               echo "Processing artifact: $artifact_name"
-              
-              # Determine target directory based on artifact name
-              if [[ "$artifact_name" == *"ubuntu_26_04"* ]]; then
-                target_dir="temp/Ubuntu26_x86_64_GPU/radarsimpy"
-              elif [[ "$artifact_name" == *"ubuntu_24_04"* ]]; then
-                target_dir="temp/Ubuntu24_x86_64_GPU/radarsimpy"
-              else
-                target_dir="temp/Ubuntu22_x86_64_GPU/radarsimpy"
+
+              ver="${ubuntu_version_for[$artifact_name]}"
+              if [ -z "$ver" ]; then
+                echo "Unknown artifact $artifact_name, skipping"
+                continue
               fi
-              
-              # Ensure target directory exists
+              target_dir="temp/Ubuntu${ver}_x86_64_GPU/radarsimpy"
+
               mkdir -p "$target_dir"
-              
+
               # Copy the radarsimpy module
               if [ -d "$dir/radarsimpy" ]; then
                 echo "Copying radarsimpy module from $dir/radarsimpy to $target_dir/"
                 cp -r "$dir/radarsimpy"/* "$target_dir/" 2>/dev/null || true
               else
                 echo "Copying all contents from $dir to $target_dir/"
-                # If radarsimpy is at root level
                 cp -r "$dir"/* "$target_dir/" 2>/dev/null || true
               fi
             fi
           done
 
-          # Create ZIP files for each Ubuntu version
-          echo "Creating Ubuntu22_x86_64_GPU.zip..."
-          cd temp && zip -r ../packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu22_x86_64_GPU.zip Ubuntu22_x86_64_GPU/ && cd ..
-
-          echo "Creating Ubuntu24_x86_64_GPU.zip..."
-          cd temp && zip -r ../packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu24_x86_64_GPU.zip Ubuntu24_x86_64_GPU/ && cd ..
-
-          echo "Creating Ubuntu26_x86_64_GPU.zip..."
-          cd temp && zip -r ../packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu26_x86_64_GPU.zip Ubuntu26_x86_64_GPU/ && cd ..
-
-          # Create tar.gz files for each Ubuntu version
-          echo "Creating Ubuntu22_x86_64_GPU.tar.gz..."
-          cd temp && tar -czf ../packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu22_x86_64_GPU.tar.gz Ubuntu22_x86_64_GPU/ && cd ..
-
-          echo "Creating Ubuntu24_x86_64_GPU.tar.gz..."
-          cd temp && tar -czf ../packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu24_x86_64_GPU.tar.gz Ubuntu24_x86_64_GPU/ && cd ..
-
-          echo "Creating Ubuntu26_x86_64_GPU.tar.gz..."
-          cd temp && tar -czf ../packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu26_x86_64_GPU.tar.gz Ubuntu26_x86_64_GPU/ && cd ..
+          # Create one zip and one tar.gz per Ubuntu version actually produced
+          cd temp
+          for combo_dir in */; do
+            combo_dir="${combo_dir%/}"
+            zip -r "../packed/radarsimpy_ubuntu_cuda13_gpu_all/${combo_dir}.zip" "$combo_dir/"
+            tar -czf "../packed/radarsimpy_ubuntu_cuda13_gpu_all/${combo_dir}.tar.gz" "$combo_dir/"
+          done
+          cd ..
 
       - name: Verify artifact structure
         run: |
@@ -389,99 +326,63 @@ jobs:
           echo "Final directory structure:"
           find packed/radarsimpy_ubuntu_cuda13_gpu_all -type f | sort
           echo ""
-          echo "Verifying ZIP and tar.gz files exist:"
-
-          if [ -f "packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu22_x86_64_GPU.zip" ]; then
-            echo "✓ Ubuntu 22.04 GPU ZIP found"
-          else
-            echo "✗ Ubuntu 22.04 GPU ZIP missing"
-          fi
-
-          if [ -f "packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu22_x86_64_GPU.tar.gz" ]; then
-            echo "✓ Ubuntu 22.04 GPU tar.gz found"
-          else
-            echo "✗ Ubuntu 22.04 GPU tar.gz missing"
-          fi
-
-          if [ -f "packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu24_x86_64_GPU.zip" ]; then
-            echo "✓ Ubuntu 24.04 GPU ZIP found"
-          else
-            echo "✗ Ubuntu 24.04 GPU ZIP missing"
-          fi
-
-          if [ -f "packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu24_x86_64_GPU.tar.gz" ]; then
-            echo "✓ Ubuntu 24.04 GPU tar.gz found"
-          else
-            echo "✗ Ubuntu 24.04 GPU tar.gz missing"
-          fi
-
-          if [ -f "packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu26_x86_64_GPU.zip" ]; then
-            echo "✓ Ubuntu 26.04 GPU ZIP found"
-          else
-            echo "✗ Ubuntu 26.04 GPU ZIP missing"
-          fi
-
-          if [ -f "packed/radarsimpy_ubuntu_cuda13_gpu_all/Ubuntu26_x86_64_GPU.tar.gz" ]; then
-            echo "✓ Ubuntu 26.04 GPU tar.gz found"
-          else
-            echo "✗ Ubuntu 26.04 GPU tar.gz missing"
-          fi
+          echo "Zip and tar.gz files created:"
+          ls -la packed/radarsimpy_ubuntu_cuda13_gpu_all/*.zip packed/radarsimpy_ubuntu_cuda13_gpu_all/*.tar.gz
           echo "::endgroup::"
 
       - name: Create README for packed artifacts
         run: |
-          cat > packed/radarsimpy_ubuntu_cuda13_gpu_all/README.md << 'EOF'
-          # RadarSimPy Ubuntu GPU Build Artifacts
+          # ver/gcc pairs, one per unique Ubuntu version, sorted ascending
+          ubuntu_info=$(jq -r '
+            [.[] | {ver: .ubuntu_version, gcc: (.c_compiler | sub("gcc-";""))}]
+            | unique_by(.ver) | sort_by(.ver | tonumber) | .[] | "\(.ver) \(.gcc)"
+          ' matrix.json)
+          total_builds=$(jq 'length' matrix.json)
+          num_versions=$(echo "$ubuntu_info" | wc -l)
+          python_versions=$(jq -r '[.[]."python-version"] | unique | join(", ")' matrix.json)
 
-          This archive contains all RadarSimPy builds for Ubuntu GPU platforms organized by version.
-
-          ## Directory Structure
-
-          The builds are organized in the following structure:
-
-          ```
-          radarsimpy_ubuntu_cuda13_gpu_all/
-          ├── Ubuntu22_x86_64_GPU.zip
-          ├── Ubuntu22_x86_64_GPU.tar.gz
-          ├── Ubuntu24_x86_64_GPU.zip
-          ├── Ubuntu24_x86_64_GPU.tar.gz
-          ├── Ubuntu26_x86_64_GPU.zip
-          └── Ubuntu26_x86_64_GPU.tar.gz
-          ```
-
-          ## Version Information
-
-          ### Ubuntu22_x86_64_GPU (Ubuntu 22.04 LTS)
-          - Built with GCC-11 compiler and CUDA support
-          - Available in both ZIP and tar.gz formats
-          - Each archive contains the complete radarsimpy module with all Python versions supported
-
-          ### Ubuntu24_x86_64_GPU (Ubuntu 24.04 LTS)
-          - Built with GCC-13 compiler and CUDA support
-          - Available in both ZIP and tar.gz formats
-          - Each archive contains the complete radarsimpy module with all Python versions supported
-
-          ### Ubuntu26_x86_64_GPU (Ubuntu 26.04 LTS)
-          - Built with GCC-15 compiler and CUDA support
-          - Available in both ZIP and tar.gz formats
-          - Each archive contains the complete radarsimpy module with all Python versions supported
-
-          ## Build Information
-
-          - **Total Builds**: 15 (packaged into 6 files: 3 ZIP + 3 tar.gz)
-          - **Ubuntu Versions**: 22.04 LTS, 24.04 LTS, 26.04 LTS
-          - **Architecture**: x86_64
-          - **GPU Support**: CUDA-enabled
-          - **Python Versions**: 3.10, 3.11, 3.12, 3.13, 3.14
-          - **Formats**: ZIP and tar.gz for maximum compatibility
-          - **Build Date**: $(date)
-
-          ## Usage
-
-          1. Extract the main archive
-          2. Extract the appropriate Ubuntu version file (choose ZIP or tar.gz based on your preference)
-          3. The radarsimpy module will be ready for use with GPU acceleration
-          EOF
+          {
+            echo "# RadarSimPy Ubuntu GPU Build Artifacts"
+            echo
+            echo "This archive contains all RadarSimPy builds for Ubuntu GPU platforms organized by version."
+            echo
+            echo "## Directory Structure"
+            echo
+            echo "The builds are organized in the following structure:"
+            echo
+            echo '```'
+            echo "radarsimpy_ubuntu_cuda13_gpu_all/"
+            while read -r ver gcc; do
+              echo "├── Ubuntu${ver}_x86_64_GPU.zip"
+              echo "├── Ubuntu${ver}_x86_64_GPU.tar.gz"
+            done <<< "$ubuntu_info"
+            echo '```'
+            echo
+            echo "## Version Information"
+            while read -r ver gcc; do
+              echo
+              echo "### Ubuntu${ver}_x86_64_GPU (Ubuntu ${ver}.04 LTS)"
+              echo "- Built with GCC-${gcc} compiler and CUDA support"
+              echo "- Available in both ZIP and tar.gz formats"
+              echo "- Each archive contains the complete radarsimpy module with all Python versions supported"
+            done <<< "$ubuntu_info"
+            echo
+            echo "## Build Information"
+            echo
+            echo "- **Total Builds**: ${total_builds} (packaged into $((num_versions * 2)) files: ${num_versions} ZIP + ${num_versions} tar.gz)"
+            echo "- **Ubuntu Versions**: $(echo "$ubuntu_info" | awk '{printf "%s.04 LTS, ", $1}' | sed 's/, $//')"
+            echo "- **Architecture**: x86_64"
+            echo "- **GPU Support**: CUDA-enabled"
+            echo "- **Python Versions**: ${python_versions}"
+            echo "- **Formats**: ZIP and tar.gz for maximum compatibility"
+            echo "- **Build Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+            echo
+            echo "## Usage"
+            echo
+            echo "1. Extract the main archive"
+            echo "2. Extract the appropriate Ubuntu version file (choose ZIP or tar.gz based on your preference)"
+            echo "3. The radarsimpy module will be ready for use with GPU acceleration"
+          } > packed/radarsimpy_ubuntu_cuda13_gpu_all/README.md
 
       - name: Create compressed archive
         run: |
@@ -505,43 +406,53 @@ jobs:
           retention-days: 1
           compression-level: 0
 
+  # Summary job that runs after all builds complete
+  build-summary:
+    needs: [setup, build, pack-artifacts]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
       - name: Generate build summary
         run: |
-          echo "# Ubuntu GPU Build Summary �" >> $GITHUB_STEP_SUMMARY
+          echo '${{ needs.setup.outputs.matrix }}' > matrix.json
+          total_builds=$(jq 'length' matrix.json)
+          ubuntu_versions=$(jq -r '[.[].ubuntu_version] | unique | .[]' matrix.json)
+          num_versions=$(echo "$ubuntu_versions" | wc -l)
+          python_versions=$(jq -r '[.[]."python-version"] | unique | join(", ")' matrix.json)
+          num_python=$(jq -r '[.[]."python-version"] | unique | length' matrix.json)
+
+          echo "# Ubuntu GPU Build Summary 📊" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Build Matrix Results" >> $GITHUB_STEP_SUMMARY
-          echo "Total builds: 15 (5 Python versions × 3 Ubuntu versions)" >> $GITHUB_STEP_SUMMARY
+          echo "Total builds: ${total_builds} (${num_python} Python versions × ${num_versions} Ubuntu versions)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Ubuntu Version Distribution" >> $GITHUB_STEP_SUMMARY
-          echo "- **Ubuntu 22.04 LTS**: 5 builds with GCC-11 and CUDA support" >> $GITHUB_STEP_SUMMARY
-          echo "- **Ubuntu 24.04 LTS**: 5 builds with GCC-13 and CUDA support" >> $GITHUB_STEP_SUMMARY
-          echo "- **Ubuntu 26.04 LTS**: 5 builds with GCC-15 and CUDA support" >> $GITHUB_STEP_SUMMARY
+          while read -r ver; do
+            gcc=$(jq -r --arg v "$ver" '[.[] | select(.ubuntu_version == $v) | .c_compiler] | first' matrix.json)
+            count=$(jq -r --arg v "$ver" '[.[] | select(.ubuntu_version == $v)] | length' matrix.json)
+            echo "- **Ubuntu ${ver}.04 LTS**: ${count} builds with ${gcc} and CUDA support" >> $GITHUB_STEP_SUMMARY
+          done <<< "$ubuntu_versions"
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Python Versions" >> $GITHUB_STEP_SUMMARY
-          echo "- Python 3.10, 3.11, 3.12, 3.13, 3.14" >> $GITHUB_STEP_SUMMARY
+          echo "- Python ${python_versions}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### GPU Support" >> $GITHUB_STEP_SUMMARY
           echo "- **CUDA-enabled**: All builds include GPU acceleration support" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Packed Artifacts" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ needs.build.result }}" == "success" ]; then
+          if [ "${{ needs.pack-artifacts.result }}" == "success" ]; then
             echo "✅ **All artifacts successfully packed into ZIP and tar.gz files**" >> $GITHUB_STEP_SUMMARY
             echo "- Archive: \`radarsimpy_ubuntu_cuda13_gpu_all_builds\`" >> $GITHUB_STEP_SUMMARY
             echo "- Formats: tar.gz, zip" >> $GITHUB_STEP_SUMMARY
-            echo "- Structure: 6 files (3 Ubuntu versions × 2 formats)" >> $GITHUB_STEP_SUMMARY
-            echo "- Contains: All 15 GPU-enabled build variants organized by Ubuntu version" >> $GITHUB_STEP_SUMMARY
+            echo "- Structure: $((num_versions * 2)) files (${num_versions} Ubuntu versions × 2 formats)" >> $GITHUB_STEP_SUMMARY
+            echo "- Contains: All ${total_builds} GPU-enabled build variants organized by Ubuntu version" >> $GITHUB_STEP_SUMMARY
           else
             echo "⚠️ **Artifact packing failed or was skipped**" >> $GITHUB_STEP_SUMMARY
           fi
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Build Status" >> $GITHUB_STEP_SUMMARY
-          echo "Check individual job results above for detailed build information." >> $GITHUB_STEP_SUMMARY
-
-          # Check if any builds failed
-          if [ "${{ needs.build.result }}" != "success" ]; then
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "⚠️ **Some builds may have failed. Check individual job logs for details.**" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.build.result }}" == "success" ]; then
             echo "✅ **All GPU-accelerated builds completed successfully!**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ **Some builds may have failed. Check individual job logs for details.**" >> $GITHUB_STEP_SUMMARY
           fi
