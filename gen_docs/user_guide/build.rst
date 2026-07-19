@@ -17,21 +17,24 @@ Before building RadarSimPy, ensure you have the following installed:
 
 **Common Requirements**
 
-- Python >= 3.10
-- CMake >= 3.20
+- Python >= 3.10 (tested on 3.10 – 3.14)
+- CMake >= 3.18
 - Git (for cloning repositories)
 - C++ compiler with C++20 support
 
 **Platform-Specific Requirements**
 
 - **Windows**: Visual Studio 2022 or later with "Desktop development with C++" workload
-- **Linux**: GCC 11+
-- **MacOS**: Xcode Command Line Tools (Clang 13+)
+- **Linux**: GCC 11 (Ubuntu 22.04), GCC 13 (Ubuntu 24.04), or GCC 15 (Ubuntu 26.04) — the distribution's default compiler
+- **MacOS**: Xcode Command Line Tools (Clang)
 
 **For GPU Version**
 
-- NVIDIA CUDA Toolkit 12.x or later
-- NVIDIA GPU with Compute Capability 6.0 or higher
+- NVIDIA CUDA Toolkit 13.x
+- NVIDIA GPU with Compute Capability 7.5 (Turing) or higher
+
+.. note::
+   CUDA Toolkit 13 dropped offline compilation support for pre-Turing architectures (Maxwell, Pascal, Volta). GPUs older than Turing are not supported by CUDA13 builds.
 
 **Python Dependencies**
 
@@ -82,7 +85,8 @@ Navigate to the RadarSimPy root directory and run the appropriate build script.
 
 - ``--arch`` - Architecture: ``cpu`` or ``gpu`` (default: ``cpu``)
 - ``--test`` - Enable testing: ``on`` or ``off`` (default: ``on``)
-- ``--tier`` - Build tier: ``standard`` or ``free``
+- ``--license`` - Enable license verification: ``on`` or ``off`` (default: ``off``)
+- ``--jobs`` - Number of parallel build jobs (auto-detected by default)
 
 Linux
 ^^^^^
@@ -126,7 +130,8 @@ Verify CUDA installation:
 
 - ``--arch`` - Architecture: ``cpu`` or ``gpu`` (default: ``cpu``)
 - ``--test`` - Enable testing: ``on`` or ``off`` (default: ``on``)
-- ``--tier`` - Build tier: ``standard`` or ``free``
+- ``--license`` - Enable license verification: ``on`` or ``off`` (default: ``off``)
+- ``--jobs`` - Number of parallel build jobs (auto-detected by default)
 
 MacOS
 ^^^^^
@@ -175,7 +180,7 @@ Make the build script executable (first time only):
 
 - ``--arch`` - Architecture: ``cpu`` (only option for MacOS)
 - ``--test`` - Enable testing: ``on`` or ``off`` (default: ``on``)
-- ``--tier`` - Build tier: ``standard`` or ``free``
+- ``--license`` - Enable license verification: ``on`` or ``off`` (default: ``off``)
 - ``--jobs`` - Number of parallel build jobs (auto-detected by default)
 - ``--verbose`` - Enable verbose output
 - ``--clean`` - Clean build artifacts: ``true`` or ``false``

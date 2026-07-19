@@ -17,8 +17,8 @@ Follow these steps to install RadarSimPy:
 **Supported Platforms**
 
 - Windows 10/11 (x64)
-- Linux (x64) - Ubuntu 22.04+ or equivalent
-- MacOS 10.15+ (x64 and ARM64/M1/M2)
+- Linux (x64) - Ubuntu 22.04 / 24.04 / 26.04 LTS (or compatible distributions)
+- MacOS (Intel x64 and Apple Silicon ARM64) - builds are produced and tested on recent macOS releases
 
 Directory Structure
 -------------------
@@ -71,7 +71,7 @@ The package includes platform-specific compiled libraries:
     └── simulator.*.so          # Python extension module
 
 .. note::
-   The ``simulator.*.pyd`` or ``simulator.*.so`` filename includes Python version information (e.g., ``simulator.cpython-39-x86_64-linux-gnu.so``).
+   The ``simulator.*.pyd`` or ``simulator.*.so`` filename includes Python version information (e.g., ``simulator.cpython-312-x86_64-linux-gnu.so``).
 
 Verification
 ------------

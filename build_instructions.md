@@ -20,7 +20,7 @@ radarsimpy/
 │   │   ├── hdf5-lib-build/       # HDF5 library build files
 │   │   │   ├── hdf5/             # HDF5 source code (HDF Group)
 │   │   │   ├── libs/             # Platform-specific precompiled libraries
-│   │   │   │   ├── lib_linux_gcc11_x86_64/
+│   │   │   │   ├── lib_linux_x86_64/
 │   │   │   │   ├── lib_macos_arm64/
 │   │   │   │   ├── lib_macos_x86_64/
 │   │   │   │   └── lib_win_x86_64/
@@ -50,6 +50,7 @@ radarsimpy/
 │       ├── processing.py         # Signal processing
 │       ├── tools.py              # Utility tools
 │       ├── mesh_kit.py           # Mesh processing utilities
+│       ├── scene.py              # Scene/3D object handling
 │       └── __init__.py
 ├── tests/                        # Test suite (RadarSimPy)
 ├── build.bat                     # Windows build script
@@ -74,8 +75,8 @@ radarsimpy/
 
 ### System Requirements
 
-- **Python**: 3.10 or higher
-- **CMake**: 3.20 or higher
+- **Python**: 3.10 or higher (tested on 3.10 – 3.14)
+- **CMake**: 3.18 or higher
 - **C++ Compiler**: Support for C++20 or higher
 
 ### Python Dependencies
@@ -103,7 +104,7 @@ python build_config.py
 
 1. **Visual Studio 2022 or later** with "Desktop development with C++"
 2. **CMake** (Windows x64 Installer) - [Download here](https://cmake.org/download/)
-3. **CUDA Toolkit 12 or later** (Optional, required only for GPU builds) - [Download here](https://developer.nvidia.com/cuda-downloads)
+3. **CUDA Toolkit 13.x** (Optional, required only for GPU builds; needs a GPU with Compute Capability 7.5/Turing or higher) - [Download here](https://developer.nvidia.com/cuda-downloads)
 
 ### Windows Build Steps
 
@@ -151,7 +152,7 @@ python build_config.py
    sudo snap install cmake --classic
    ```
 
-2. **For GPU builds** (Optional):
+2. **For GPU builds** (Optional, requires CUDA Toolkit 13.x and a GPU with Compute Capability 7.5/Turing or higher):
 
    ```bash
    # Install CUDA following NVIDIA's official guide:

@@ -10,7 +10,7 @@ Python Requirements
 
 RadarSimPy requires the following Python packages:
 
-* **Python** >= 3.10
+* **Python** >= 3.10 (tested on 3.10 – 3.14)
 * **NumPy** >= 2.0 - Numerical computing and array operations
 * **SciPy** >= 1.11.0 - Scientific computing and signal processing algorithms
 
@@ -62,7 +62,7 @@ Windows
 If using the CUDA-enabled version for GPU acceleration:
 
 * **CUDA Version**: CUDA Toolkit 13.x compatible
-* **GPU**: NVIDIA GPU with Compute Capability 5.0 or higher
+* **GPU**: NVIDIA GPU with Compute Capability 7.5 (Turing) or higher — CUDA 13 dropped offline compilation support for Maxwell, Pascal, and Volta GPUs
 * **Drivers**: Latest NVIDIA drivers for your GPU
 * **Compatibility**: See `NVIDIA CUDA Compatibility Guide <https://docs.nvidia.com/deploy/cuda-compatibility/#id1>`_
 
@@ -87,7 +87,7 @@ If you encounter library issues, ensure system libraries are up to date:
 For CUDA support on Ubuntu:
 
 * **CUDA Version**: CUDA Toolkit 13.x
-* **GPU**: NVIDIA GPU with Compute Capability 5.0 or higher
+* **GPU**: NVIDIA GPU with Compute Capability 7.5 (Turing) or higher — CUDA 13 dropped offline compilation support for Maxwell, Pascal, and Volta GPUs
 * **Drivers**: Install latest NVIDIA drivers:
 
   .. code-block:: bash
@@ -109,11 +109,11 @@ MacOS
 
 **Supported Versions**
 
-* **Operating System**: MacOS 10.15 (Catalina) or later
-* **Architecture**: 
-  
+* **Operating System**: A recent macOS release (builds are produced and tested on macOS 26 "Tahoe" runners with Xcode 26.4.1; no minimum deployment target is pinned, but older macOS versions are untested)
+* **Architecture**:
+
   * Intel x64 (Intel-based Macs)
-  * ARM64 (Apple Silicon M1/M2/M3)
+  * ARM64 (Apple Silicon M1/M2/M3/M4)
 
 **Platform-Specific Requirements**
 
