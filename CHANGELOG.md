@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [15.3.0] - 2026-07-25
+
+### Added
+
+- `get_scene_state` function (`radarsimpy.scene`) to compute target meshes plus transmitter/receiver channel locations and radar boresight direction at one or more query timestamps, using C++-accelerated rotation
+- Ubuntu 26.04 (GCC-15) support across CI, release workflows, and build documentation
+- CUDA 13.3.1 toolkit support in CI/release workflows
+
+### Changed
+
+- Split the monolithic `cp_radarsimc.pyx` Cython module into `cp_radarsimc_helpers.pyx`, `cp_radarsimc_mesh.pyx`, `cp_radarsimc_points.pyx`, and `cp_radarsimc_radar.pyx` for maintainability
+- Improved handling of time-varying location/speed/rotation/rotation_rate parameters: per-axis scalars are now broadcast and combined with time-varying axes instead of requiring all axes to share the same shape
+- Centralized CI build/test matrices into a shared setup job and refactored artifact packaging (dynamic zip/tar packing, generated READMEs, build-summary output) across release and unit-test workflows
+- macOS CI now builds with Clang on macOS 26 (Xcode 26.4.1) instead of GCC
+- Updated documentation: CUDA 13 GPU compute-capability requirement (7.5+/Turing), supported Python range (3.10-3.14), lowered minimum CMake version to 3.18, `--tier` renamed to `--license` in build docs, added `--jobs`, refreshed macOS/Ubuntu platform support notes
+- Updated `radarsimcpp` submodule to v15.3.0 (conditional license-flag initialization, MSVC `/NODEFAULTLIB` linker fix, mbedTLS 4.2.0)
+
+---
+
 ## [15.2.0] - 2026-04-19
 
 ### Added
