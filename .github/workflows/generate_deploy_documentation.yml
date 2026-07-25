@@ -86,16 +86,16 @@ jobs:
         # This step saves the built documentation as an artifact for download/debugging.
 
       - name: Setup GitHub Pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v6
         # Prepares the workflow for GitHub Pages deployment.
 
       - name: Upload documentation for GitHub Pages
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: "./gen_docs/_build/html"
         # Uploads the documentation to be deployed to GitHub Pages.
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
         # Deploys the uploaded documentation to GitHub Pages.
