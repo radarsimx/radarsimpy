@@ -111,6 +111,7 @@ def get_exclude_patterns() -> tuple[Set[str], Set[str]]:
         ".github",
         ".vscode",
         ".idea",
+        ".claude",
         "debug",
         "release",
         "build_logs",
