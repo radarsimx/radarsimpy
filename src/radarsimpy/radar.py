@@ -34,6 +34,7 @@ if TYPE_CHECKING:
     from .receiver import Receiver
 
 # Constants
+SPEED_OF_LIGHT = 299792458.0  # m/s
 BOLTZMANN_CONSTANT = 1.38064852e-23  # J/K
 REALMIN_FALLBACK = 1e-30
 SQRT_HALF = 0.5**0.5
@@ -559,6 +560,7 @@ class Radar:
         The timestamp accounts for:
         - Transmitter channel delays
         - Pulse repetition period (chirp timing)
+        - Range-gate delay (when the receive window opens)
         - Sample timing within each pulse
 
         :return:
@@ -583,9 +585,16 @@ class Radar:
         ]  # Pulse repetition period
         tx_delays = self.radar_prop["transmitter"].txchannel_prop["delay"]
         fs = self.radar_prop["receiver"].bb_prop["fs"]
+        gate_delay = self.radar_prop["receiver"].bb_prop.get("gate_delay", 0.0)
 
         # 1. Calculate sample timing within each pulse (fastest varying dimension)
-        sample_times = np.arange(samples_per_pulse, dtype=np.float64) / fs
+        # The receive window opens gate_delay after the chirp start, so sampling
+        # starts there. This keeps timestamp aligned with the C++ sample clock,
+        # which matters because user-supplied time-varying motion arrays are
+        # built from timestamp and indexed positionally by the simulator.
+        sample_times = (
+            gate_delay + np.arange(samples_per_pulse, dtype=np.float64) / fs
+        )
 
         # 2. Calculate pulse timing (chirp repetition timing)
         pulse_start_times = np.cumsum(prp) - prp[0]  # Start from 0
@@ -877,6 +886,83 @@ class Radar:
         self.radar_prop["location"] = np.array(location)
         self.radar_prop["rotation"] = np.radians(np.array(rotation))
         self.radar_prop["rotation_rate"] = np.radians(np.array(rotation_rate))
+
+    @property
+    def chirp_slope(self) -> Optional[float]:
+        """
+        Get the chirp slope in Hz/s, or ``None`` if the waveform is not a
+        simple linear FM ramp (in which case a single slope is meaningless).
+
+        .. note::
+            Only meaningful for linear FM waveforms. Returns ``None`` for
+            arbitrary waveforms and ``0`` for single-tone (CW) transmitters.
+        """
+        wf_prop = self.radar_prop["transmitter"].waveform_prop
+        freq = np.asarray(wf_prop["f"])
+        pulse_length = wf_prop["pulse_length"]
+        if np.size(freq) != 2 or pulse_length <= 0:
+            return None
+        return float((freq[1] - freq[0]) / pulse_length)
+
+    @property
+    def unambiguous_range_span(self) -> Optional[float]:
+        """
+        Get the width in meters of the recoverable range window.
+
+        Equal to ``B_usable * c / (2 * |chirp_slope|)``, where ``B_usable`` is
+        the sampling rate for complex baseband and half of it for real baseband.
+        Returns ``None`` when the chirp slope is undefined.
+
+        See :attr:`unambiguous_range_window` for where the window sits.
+
+        .. note::
+            Describes **deramp (stretch) processing of a linear FM waveform**,
+            where range maps to beat frequency. It does not apply to pulsed,
+            CW, or arbitrary-waveform configurations, and returns ``None`` for
+            those.
+        """
+        slope = self.chirp_slope
+        if not slope:
+            return None
+        bb_prop = self.radar_prop["receiver"].bb_prop
+        usable_bw = bb_prop["fs"] if bb_prop["bb_type"] == "complex" else bb_prop["fs"] / 2
+        return usable_bw * SPEED_OF_LIGHT / (2 * abs(slope))
+
+    @property
+    def unambiguous_range_window(self) -> Optional[Tuple[float, float]]:
+        """
+        Get the ``(min, max)`` range in meters that deramps without aliasing.
+
+        Where the window sits depends on whether a range gate is configured:
+
+        - **Un-gated** (``gate_delay = 0``): every target has a positive
+          round-trip delay, so all beat tones are positive and the whole
+          ``[0, fs)`` band is usable. The window is ``[0, span]``.
+        - **Gated**: the residual delay ``tau - gate_delay`` is signed, so the
+          usable band is ``(-fs/2, +fs/2)`` and the window straddles the gate:
+          ``gate_range +/- span/2``.
+
+        Returns ``None`` when the chirp slope is undefined.
+
+        .. note::
+            Describes **deramp (stretch) processing of a linear FM waveform**.
+            It does not apply to pulsed, CW, or arbitrary-waveform
+            configurations, and returns ``None`` for those.
+
+        .. note::
+            Real baseband cannot distinguish the sign of the beat, so a gated
+            real-baseband receiver cannot tell a target inside the gate from one
+            the same distance outside it. The window returned is the
+            conservative two-sided one.
+        """
+        span = self.unambiguous_range_span
+        if span is None:
+            return None
+        gate_range = self.radar_prop["receiver"].gate_range
+        if gate_range == 0:
+            return (0.0, span)
+        half = span / 2
+        return (max(0.0, gate_range - half), gate_range + half)
 
     @property
     def num_channels(self) -> int:

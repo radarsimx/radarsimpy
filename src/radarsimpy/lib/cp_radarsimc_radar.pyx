@@ -336,12 +336,16 @@ cdef shared_ptr[Radar[double, float_t]] cp_Radar(radar, frame_start_time):
 
     # Receiver
     rx_bb = rx_obj.bb_prop
+    # gate_delay is passed as double, not float_t: at a 741 us gate a float32
+    # mantissa resolves only ~5.8e-11 s, which is ~0.5 cycles of carrier phase
+    # at 9 GHz and would randomize target phase.
     rx_c = make_shared[Receiver[float_t]](
         <float_t> rx_bb["fs"],
         <float_t> rx_obj.rf_prop["rf_gain"],
         <float_t> rx_bb["load_resistor"],
         <float_t> rx_bb["baseband_gain"],
-        <float_t> rx_bb["noise_bandwidth"]
+        <float_t> rx_bb["noise_bandwidth"],
+        <double> rx_bb.get("gate_delay", 0.0)
     )
     for idx_c in range(0, rxsize_c):
         cp_AddRxChannel(rx_obj, idx_c, rx_c.get())
