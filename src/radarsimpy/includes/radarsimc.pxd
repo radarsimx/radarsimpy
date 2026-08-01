@@ -195,11 +195,15 @@ cdef extern from "receiver.hpp":
         Receiver() except +
 
         # Receiver constructor with RF and baseband parameters
+        # gate_delay is deliberately double, not T: T is float in the Python
+        # build, and a float32 mantissa resolves only ~5.8e-11 s at a 741 us
+        # gate, i.e. ~0.5 cycles of carrier phase at 9 GHz.
         Receiver(const T & fs,                                   # Sampling frequency (Hz)
                  const T & rf_gain,                              # RF gain (dB)
                  const T & resistor,                             # Load resistor (Ohms)
                  const T & baseband_gain,                        # Baseband gain (dB)
-                 const T & baseband_bw) except +                 # Baseband bandwidth (Hz)
+                 const T & baseband_bw,                          # Baseband bandwidth (Hz)
+                 const double & gate_delay) except +             # Range gate delay (s)
 
         void AddChannel(const Vec3[T] & location,                # Antenna location
                         const Vec3[cpp_complex[T]] & polar,      # Polarization vector

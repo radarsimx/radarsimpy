@@ -29,6 +29,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 # Constants
+SPEED_OF_LIGHT = 299792458.0  # m/s
 DEFAULT_POLARIZATION = [0, 0, 1]  # Vertical polarization
 DEFAULT_AZIMUTH_RANGE = [-90, 90]
 DEFAULT_ELEVATION_RANGE = [-90, 90]
@@ -56,6 +57,36 @@ class Receiver:
     :param str bb_type:
         Baseband data type, either ``complex`` or ``real``.
         Defaults to ``complex``.
+    :param float gate_delay:
+        Range-gate / deramp reference delay in seconds (s). Defaults to ``0``.
+
+        The receive window opens this long after the chirp start, and the
+        deramp reference is the transmit chirp delayed by the same amount.
+        A target at range ``c * gate_delay / 2`` therefore produces a DC beat,
+        and a target offset by ``dR`` from that range beats at ``2 * k * dR / c``
+        where ``k`` is the chirp slope.
+
+        This is required for long-range stretch/FMCW processing. With the
+        default of ``0`` the reference sits at zero delay, so the beat frequency
+        is ``k * tau`` for the full round-trip delay, which exceeds Nyquist at
+        long range and aliases the target beyond recovery. For example, at a
+        chirp slope of 6e12 Hz/s a target at 111 km beats at 4.45 GHz.
+
+        Set it from the range you want to gate on::
+
+            gate_range = 111.12e3                     # m
+            gate_delay = 2 * gate_range / 299792458   # ~741.4 us
+
+        The unambiguous swath about the gate is ``+/- fs * c / (4 * k)``; targets
+        outside it alias just as they would without a gate.
+
+        .. note::
+            The echo of a gated return physically belongs to the chirp
+            transmitted ``round(gate_delay / prp)`` pulses earlier. Per-pulse
+            ``f_offset`` and ``pulse_amp`` / ``pulse_phs`` are applied using the
+            current pulse index, so frequency-hopped or phase-coded pulse trains
+            are not modeled exactly at long gate delays. Identical chirps, the
+            common FMCW case, are unaffected.
     :param list[dict] channels:
         A list of dictionaries defining the properties of receiver channels,
         where each dictionary contains the following keys:
@@ -98,6 +129,7 @@ class Receiver:
         - **load_resistor** (*float*): Load resistance in ohms (Ω).
         - **baseband_gain** (*float*): Baseband gain in decibels (dB).
         - **bb_type** (*str*): Baseband data type, either ``real`` or ``complex``.
+        - **gate_delay** (*float*): Range-gate / deramp reference delay in seconds (s).
 
     :ivar dict rxchannel_prop:
         Properties of the receiver channels:
@@ -155,11 +187,22 @@ class Receiver:
         load_resistor: float = 500,
         baseband_gain: float = 0,
         bb_type: str = "complex",
+        gate_delay: float = 0.0,
         channels: Optional[List[Dict]] = None,
     ):
         # Input validation
         if fs <= 0:
             raise ValueError("Sampling rate (fs) must be positive")
+        if not isinstance(gate_delay, (int, float)) or isinstance(gate_delay, bool):
+            raise ValueError("gate_delay must be a number")
+        if gate_delay < 0:
+            raise ValueError(
+                f"gate_delay must be non-negative, got {gate_delay}. "
+                "It is the delay from the chirp start to the opening of the "
+                "receive window, i.e. 2 * gate_range / c."
+            )
+        if not np.isfinite(gate_delay):
+            raise ValueError("gate_delay must be finite")
         if not isinstance(noise_figure, (int, float)):
             raise ValueError("noise_figure must be a number")
         if not isinstance(rf_gain, (int, float)):
@@ -185,6 +228,7 @@ class Receiver:
         self.bb_prop["load_resistor"] = load_resistor
         self.bb_prop["baseband_gain"] = baseband_gain
         self.bb_prop["bb_type"] = bb_type
+        self.bb_prop["gate_delay"] = float(gate_delay)
         if bb_type == "complex":
             self.bb_prop["noise_bandwidth"] = fs
         elif bb_type == "real":
@@ -315,6 +359,21 @@ class Receiver:
         return self.bb_prop["noise_bandwidth"]
 
     @property
+    def gate_delay(self) -> float:
+        """Get the range-gate / deramp reference delay in seconds."""
+        return self.bb_prop["gate_delay"]
+
+    @property
+    def gate_range(self) -> float:
+        """
+        Get the range the gate is centered on, in meters.
+
+        This is the range that produces a DC beat: ``gate_delay * c / 2``.
+        Returns ``0`` for the default un-gated receiver.
+        """
+        return self.bb_prop["gate_delay"] * SPEED_OF_LIGHT / 2
+
+    @property
     def num_channels(self) -> int:
         """Get the number of receiver channels."""
         return self.rxchannel_prop["size"]
@@ -366,5 +425,6 @@ class Receiver:
             f"load_resistor={self.bb_prop['load_resistor']}, "
             f"baseband_gain={self.bb_prop['baseband_gain']}, "
             f"bb_type='{self.bb_prop['bb_type']}', "
+            f"gate_delay={self.bb_prop['gate_delay']}, "
             f"channels={self.num_channels})"
         )
