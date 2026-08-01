@@ -122,6 +122,36 @@ __all__ = [
 # =============================================================================
 
 
+def _module_version(module):
+    """
+    Get the version string of an imported dependency.
+
+    Not every distribution exposes ``__version__`` on its top-level module
+    (``pymeshlab``, for instance, does not), so fall back to the installed
+    distribution metadata before giving up.
+
+    Parameters
+    ----------
+    module : module
+        An already-imported module.
+
+    Returns
+    -------
+    str
+        Version string, or ``"Unknown version"`` if it cannot be determined.
+    """
+    version = getattr(module, "__version__", None)
+    if version is not None:
+        return str(version)
+
+    from importlib.metadata import PackageNotFoundError, version as distribution_version
+
+    try:
+        return distribution_version(module.__name__)
+    except PackageNotFoundError:
+        return "Unknown version"
+
+
 def get_version():
     """
     Get the current version of RadarSimPy.
@@ -198,30 +228,30 @@ def get_info():
     # Check for optional dependencies
     optional_deps = {}
     try:
-        import numpy as np
+        import numpy
 
-        optional_deps["numpy"] = np.__version__
+        optional_deps["numpy"] = _module_version(numpy)
     except ImportError:
         optional_deps["numpy"] = "Not installed"
 
     try:
         import scipy
 
-        optional_deps["scipy"] = scipy.__version__
+        optional_deps["scipy"] = _module_version(scipy)
     except ImportError:
         optional_deps["scipy"] = "Not installed"
 
     try:
         import pymeshlab
 
-        optional_deps["pymeshlab"] = pymeshlab.__version__
+        optional_deps["pymeshlab"] = _module_version(pymeshlab)
     except ImportError:
         optional_deps["pymeshlab"] = "Not installed"
 
     try:
         import pyvista
 
-        optional_deps["pyvista"] = pyvista.__version__
+        optional_deps["pyvista"] = _module_version(pyvista)
     except ImportError:
         optional_deps["pyvista"] = "Not installed"
 
