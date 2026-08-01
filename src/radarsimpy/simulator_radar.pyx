@@ -56,14 +56,8 @@ from radarsimpy.includes.radarsimc cimport (
     gpu_policy
 )
 
-# Standard library
-import warnings
-
 # License management
 from radarsimpy.license import is_licensed
-
-# Range gate validation
-from radarsimpy.radar import check_gate_coverage
 
 # RadarSimX library components
 from radarsimpy.lib.cp_radarsimc cimport (
@@ -292,9 +286,6 @@ cpdef sim_radar(radar, targets, density=1, level=None, interf=None,
         )
 
     validate_free_tier_limits(radar, targets)
-
-    for gate_warning in check_gate_coverage(radar, targets):
-        warnings.warn(gate_warning, RuntimeWarning, stacklevel=2)
 
     #----------------------
     # Variable Declarations

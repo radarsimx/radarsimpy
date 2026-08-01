@@ -320,70 +320,6 @@ def cal_phase_noise(  # pylint: disable=too-many-arguments, too-many-locals
     return signal * phase_noise
 
 
-def check_gate_coverage(radar, targets: List[dict]) -> List[str]:
-    """
-    Check whether point targets fall inside the unambiguous range swath.
-
-    A deramp receiver produces a beat at ``chirp_slope * (tau - gate_delay)``.
-    When that falls outside the usable band the target aliases and cannot be
-    recovered, which is the failure mode a range gate exists to avoid. See
-    :attr:`Radar.unambiguous_range_window` for how the band is derived, which
-    differs between the gated and un-gated cases.
-
-    Only ideal point targets with a static location are checked. Mesh targets
-    have spatial extent that cannot be reduced to a single range cheaply, and
-    time-varying locations are skipped rather than guessed at.
-
-    :param Radar radar: The radar configuration.
-    :param list targets: The target list passed to :func:`sim_radar`.
-    :return: Human-readable warning messages, empty when everything is in range.
-    :rtype: list[str]
-    """
-    window = radar.unambiguous_range_window
-    if window is None:
-        return []
-    range_min, range_max = window
-
-    gate_range = radar.radar_prop["receiver"].gate_range
-    radar_location = radar.radar_prop["location"]
-    if np.size(radar_location) != 3:
-        return []  # time-varying platform motion, skip
-    radar_location = np.asarray(radar_location, dtype=np.float64).reshape(3)
-
-    warnings_out = []
-    for idx, target in enumerate(targets):
-        if "model" in target:
-            continue  # mesh target, has extent
-        location = target.get("location")
-        if location is None or np.size(location) != 3:
-            continue  # time-varying location, skip
-        location = np.asarray(location, dtype=np.float64).reshape(3)
-
-        target_range = float(np.linalg.norm(location - radar_location))
-        if range_min <= target_range <= range_max:
-            continue
-
-        offset = abs(target_range - gate_range)
-        beat = abs(radar.chirp_slope) * 2 * offset / SPEED_OF_LIGHT
-        message = (
-            f"Target {idx} at {target_range:.4g} m falls outside the "
-            f"unambiguous range window [{range_min:.4g}, {range_max:.4g}] m. "
-            f"Its beat tone is {beat:.4g} Hz against a sampling rate of "
-            f"{radar.radar_prop['receiver'].bb_prop['fs']:.4g} Hz, so it will "
-            f"alias."
-        )
-        if gate_range == 0:
-            message += (
-                " No range gate is configured; set Receiver(gate_delay=2*R/c) "
-                "to deramp against a reference delayed to the target's range."
-            )
-        else:
-            message += f" The range gate is at {gate_range:.4g} m."
-        warnings_out.append(message)
-
-    return warnings_out
-
-
 class Radar:
     """
     Defines the basic parameters and properties of a radar system.
@@ -956,6 +892,10 @@ class Radar:
         """
         Get the chirp slope in Hz/s, or ``None`` if the waveform is not a
         simple linear FM ramp (in which case a single slope is meaningless).
+
+        .. note::
+            Only meaningful for linear FM waveforms. Returns ``None`` for
+            arbitrary waveforms and ``0`` for single-tone (CW) transmitters.
         """
         wf_prop = self.radar_prop["transmitter"].waveform_prop
         freq = np.asarray(wf_prop["f"])
@@ -974,6 +914,12 @@ class Radar:
         Returns ``None`` when the chirp slope is undefined.
 
         See :attr:`unambiguous_range_window` for where the window sits.
+
+        .. note::
+            Describes **deramp (stretch) processing of a linear FM waveform**,
+            where range maps to beat frequency. It does not apply to pulsed,
+            CW, or arbitrary-waveform configurations, and returns ``None`` for
+            those.
         """
         slope = self.chirp_slope
         if not slope:
@@ -997,6 +943,11 @@ class Radar:
           ``gate_range +/- span/2``.
 
         Returns ``None`` when the chirp slope is undefined.
+
+        .. note::
+            Describes **deramp (stretch) processing of a linear FM waveform**.
+            It does not apply to pulsed, CW, or arbitrary-waveform
+            configurations, and returns ``None`` for those.
 
         .. note::
             Real baseband cannot distinguish the sign of the beat, so a gated

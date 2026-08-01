@@ -10,8 +10,7 @@ All notable changes to this project will be documented in this file.
 
 - `gate_delay` parameter in `Receiver` for range-gated deramp (stretch) processing. The receive window opens at this delay after the chirp start and the deramp reference is the transmit chirp delayed by the same amount, so a target at `c * gate_delay / 2` beats at DC. This makes long-range FMCW/stretch radars representable: previously the reference sat at zero delay, so a 111 km target at a 6e12 Hz/s chirp slope produced a 4.45 GHz beat tone that aliased past any practical ADC rate. Defaults to `0`, which reproduces the previous zero-delay behavior bit-for-bit
 - `Receiver.gate_delay` and `Receiver.gate_range` properties
-- `Radar.chirp_slope`, `Radar.unambiguous_range_span` and `Radar.unambiguous_range_window` properties. The window is one-sided `[0, span]` when un-gated (all beat tones are positive, so the full `[0, fs)` band is usable) and two-sided `gate_range +/- span/2` when gated (the residual delay is signed)
-- `radarsimpy.radar.check_gate_coverage` and a `RuntimeWarning` from `sim_radar` when an ideal point target falls outside the unambiguous swath and would alias
+- `Radar.chirp_slope`, `Radar.unambiguous_range_span` and `Radar.unambiguous_range_window` properties, describing deramp (stretch) processing of a linear FM waveform. The window is one-sided `[0, span]` when un-gated (all beat tones are positive, so the full `[0, fs)` band is usable) and two-sided `gate_range +/- span/2` when gated (the residual delay is signed). All three report `None` when the waveform is not a linear FM ramp
 - Range gate test suite (`test_system_range_gate.py`)
 
 ### Changed

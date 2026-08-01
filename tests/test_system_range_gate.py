@@ -23,8 +23,6 @@ recoverable beat about the gate.
 
 """
 
-import warnings
-
 import numpy as np
 import numpy.testing as npt
 import pytest
@@ -219,8 +217,7 @@ def test_ungated_long_range_target_aliases():
     radar = _build_radar(gate_delay=0.0)
     target = {"location": (GATE_RANGE, 0, 0), "rcs": 30}
 
-    with pytest.warns(RuntimeWarning, match="alias"):
-        result = sim_radar(radar, [target], device="cpu")
+    result = sim_radar(radar, [target], device="cpu")
 
     profile = _range_profile(result["baseband"])
     # The un-gated swath is +/-500 m about zero range, so a 111 km target
@@ -229,14 +226,14 @@ def test_ungated_long_range_target_aliases():
     assert abs(recovered - GATE_RANGE) > 1e3
 
 
-def test_ordinary_short_range_fmcw_not_flagged():
+def test_ordinary_short_range_fmcw_inside_window():
     """
-    A conventional un-gated short-range FMCW setup must not warn.
+    A conventional un-gated short-range FMCW target sits inside the window.
 
-    Regression test: a two-sided +/-fs/2 reading of the swath would flag this
-    perfectly ordinary configuration, because it ignores that un-gated beats are
-    always positive and so span the full [0, fs) band. Mirrors the geometry in
-    test_system_fmcw_radar.py.
+    Regression test for the window derivation: a two-sided +/-fs/2 reading
+    would place this perfectly ordinary 200 m target outside it, because that
+    ignores that un-gated beats are always positive and so span the full
+    [0, fs) band. Mirrors the geometry in test_system_fmcw_radar.py.
     """
     tx = Transmitter(
         f=[24.125e9 - 50e6, 24.125e9 + 50e6],
@@ -248,25 +245,24 @@ def test_ordinary_short_range_fmcw_not_flagged():
     rx = Receiver(fs=2e6, noise_figure=12, rf_gain=20, baseband_gain=30)
     radar = Radar(transmitter=tx, receiver=rx)
 
-    with warnings.catch_warnings(record=True) as caught:
-        warnings.simplefilter("always")
-        sim_radar(radar, [{"location": (200, 0, 0), "rcs": 20}], device="cpu")
-
-    aliasing = [w for w in caught if "alias" in str(w.message)]
-    assert not aliasing, f"ordinary FMCW config wrongly flagged: {aliasing}"
+    low, high = radar.unambiguous_range_window
+    assert low <= 200.0 <= high, f"200 m target outside window [{low}, {high}]"
 
 
-def test_no_warning_when_gated_correctly():
-    """A target inside the gated swath must not warn."""
-    radar = _build_radar()
-    target = {"location": (GATE_RANGE + 100.0, 0, 0), "rcs": 30}
+def test_window_is_none_for_non_linear_fm():
+    """
+    The window is deramp-specific and must not claim to describe other radars.
 
-    with warnings.catch_warnings(record=True) as caught:
-        warnings.simplefilter("always")
-        sim_radar(radar, [target], device="cpu")
+    A single-tone (CW) transmitter has no chirp slope, so range does not map to
+    beat frequency and the property reports that rather than guessing.
+    """
+    tx = Transmitter(f=24.125e9, t=80e-6, tx_power=10, pulses=4)
+    rx = Receiver(fs=2e6, noise_figure=12, rf_gain=20, baseband_gain=30)
+    radar = Radar(transmitter=tx, receiver=rx)
 
-    aliasing = [w for w in caught if "alias" in str(w.message)]
-    assert not aliasing, f"unexpected aliasing warning: {aliasing}"
+    assert radar.chirp_slope == 0
+    assert radar.unambiguous_range_span is None
+    assert radar.unambiguous_range_window is None
 
 
 # Ray tracing at 111 km is prohibitively expensive (ray count grows with the

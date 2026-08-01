@@ -155,10 +155,11 @@ simulation once per gate and stitch the results:
        rx = Receiver(..., gate_delay=2 * gate_range / const.c)
        ...
 
-Targets outside the swath alias exactly as they would without a gate.
-``sim_radar`` issues a ``RuntimeWarning`` when an ideal point target falls
-outside it. Mesh targets have spatial extent that cannot be reduced to a single
-range cheaply, so they are not checked — sizing the gate for them is up to you.
+Targets outside the swath alias exactly as they would without a gate. Sizing
+the gate is up to you; the simulator does not check target ranges against the
+window, since the beat-frequency relationship only applies to deramp processing
+of a linear FM waveform and not to the pulsed, CW, or arbitrary-waveform
+configurations RadarSimPy also supports.
 
 Effect on Phase Noise
 ---------------------
