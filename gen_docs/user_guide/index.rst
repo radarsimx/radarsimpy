@@ -11,6 +11,7 @@ User Guide
    coordinate
    conventions
    noise
+   range_gate
    ray_tracing_simulation
    examples
    build
