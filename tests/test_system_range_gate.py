@@ -269,6 +269,67 @@ def test_no_warning_when_gated_correctly():
     assert not aliasing, f"unexpected aliasing warning: {aliasing}"
 
 
+# Ray tracing at 111 km is prohibitively expensive (ray count grows with the
+# arc subtended by a grid cell at the target). The gate mechanism is
+# range-independent, so the mesh path is exercised at short range instead.
+MESH_TARGET_RANGE = 30.0
+MESH_GATE_RANGE = 10.0
+
+
+def test_mesh_gate_shifts_peak_by_predicted_bins():
+    """
+    Gating the mesh path moves the peak by exactly the predicted bin count.
+
+    Exercises simulator_mesh.cpp together with Snapshot::time_, which carry the
+    gate differently from the point simulator: the snapshot holds the gate and
+    mesh move_time is elapsed-since-snapshot, so the gate cancels there. A sign
+    error or a double count in either shows up directly as a wrong shift.
+    """
+    target = {"model": "./models/plate5x5.stl", "location": (MESH_TARGET_RANGE, 0, 0)}
+
+    ungated = sim_radar(_build_radar(gate_delay=0.0), [target], density=0.4,
+                        device="cpu")
+    gated = sim_radar(
+        _build_radar(gate_delay=2 * MESH_GATE_RANGE / const.c),
+        [target],
+        density=0.4,
+        device="cpu",
+    )
+
+    ungated_bin = int(np.argmax(_range_profile(ungated["baseband"])))
+    gated_bin = int(np.argmax(_range_profile(gated["baseband"])))
+    num_samples = ungated["baseband"].shape[2]
+
+    expected_shift = int(
+        round(CHIRP_SLOPE * 2 * MESH_GATE_RANGE / const.c * num_samples / FS)
+    )
+    assert ungated_bin - gated_bin == expected_shift, (
+        f"ungated bin {ungated_bin}, gated bin {gated_bin}, "
+        f"expected shift {expected_shift}"
+    )
+
+
+def test_mesh_agrees_with_point_under_gate():
+    """A gated mesh target lands in the same range bin as an equivalent point."""
+    gate_delay = 2 * MESH_GATE_RANGE / const.c
+    radar = _build_radar(gate_delay=gate_delay)
+    location = (MESH_TARGET_RANGE, 0, 0)
+
+    point = sim_radar(radar, [{"location": location, "rcs": 20}], device="cpu")
+    mesh = sim_radar(
+        radar,
+        [{"model": "./models/plate5x5.stl", "location": location}],
+        density=0.4,
+        device="cpu",
+    )
+
+    point_bin = int(np.argmax(_range_profile(point["baseband"])))
+    mesh_bin = int(np.argmax(_range_profile(mesh["baseband"])))
+
+    # The plate has extent, so allow a couple of 0.5 m range bins of slack
+    assert abs(mesh_bin - point_bin) <= 4, f"point {point_bin}, mesh {mesh_bin}"
+
+
 def test_doppler_preserved_across_gate():
     """
     The gate is a constant time shift, so it must not perturb Doppler.
