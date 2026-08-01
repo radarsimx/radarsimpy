@@ -330,6 +330,29 @@ def test_mesh_agrees_with_point_under_gate():
     assert abs(mesh_bin - point_bin) <= 4, f"point {point_bin}, mesh {mesh_bin}"
 
 
+def test_cpu_gpu_parity():
+    """
+    The gated path must agree between CPU and GPU.
+
+    gate_delay_ is a double member on a Receiver<float> that gets memcpy'd
+    wholesale to the device, so a layout or precision mismatch would show up
+    here as a shifted peak. Skipped automatically on CPU-only builds, where
+    device="gpu" falls back to CPU and the comparison is vacuous.
+    """
+    radar = _build_radar()
+    targets = [{"location": (GATE_RANGE + 100.0, 0, 0), "rcs": 30}]
+
+    cpu = sim_radar(radar, targets, device="cpu")["baseband"]
+    gpu = sim_radar(radar, targets, device="gpu")["baseband"]
+
+    cpu_bin = int(np.argmax(_range_profile(cpu)))
+    gpu_bin = int(np.argmax(_range_profile(gpu)))
+    assert cpu_bin == gpu_bin
+
+    relative = np.max(np.abs(cpu - gpu)) / np.max(np.abs(cpu))
+    assert relative < 1e-6, f"CPU/GPU relative difference {relative:.3e}"
+
+
 def test_doppler_preserved_across_gate():
     """
     The gate is a constant time shift, so it must not perturb Doppler.
