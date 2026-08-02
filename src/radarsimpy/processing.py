@@ -489,13 +489,19 @@ def cfar_os_2d(
         trailing = np.tile(trailing, 2)
 
     tg_sum = trailing + guard
+
+    # The training-cell count is needed by the ``k`` sanity check below
+    # regardless of how the threshold factor is obtained, so it must not be
+    # scoped to the ``offset is None`` branch. An empty training set makes
+    # ``samples[k]`` fail later with a bare IndexError, so reject it here for
+    # both paths.
+    t_num = (2 * tg_sum[0] + 1) * (2 * tg_sum[1] + 1)
+    g_num = (2 * guard[0] + 1) * (2 * guard[1] + 1)
+
+    if t_num == g_num:
+        raise ValueError("No trailing bins!")
+
     if offset is None:
-        t_num = (2 * tg_sum[0] + 1) * (2 * tg_sum[1] + 1)
-        g_num = (2 * guard[0] + 1) * (2 * guard[1] + 1)
-
-        if t_num == g_num:
-            raise ValueError("No trailing bins!")
-
         if detector == "squarelaw":
             a = os_cfar_threshold(k, t_num - g_num, pfa)
         elif detector == "linear":
