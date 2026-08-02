@@ -82,6 +82,18 @@ cdef extern from "core/execution_policy.hpp" namespace "radarsimx":
     cdef cpu_policy cpu
     cdef gpu_policy gpu
 
+    # Runtime probe: is a usable CUDA device present on this machine?
+    # The policy tags above resolve at compile time, so a CUDA build needs this
+    # to pick cpu_policy on a machine with no GPU. Always False in a CPU-only
+    # build, where gpu_policy is already CPU.
+    bool gpu_available()
+
+# Compile-time flag: was this module built with CUDA support? True only when
+# gpu_policy is a genuine GPU policy, which distinguishes "GPU build without a
+# device" from "CPU-only build".
+cdef extern from "core/execution_policy.hpp":
+    cdef bint CUDA_BUILD "radarsimx::gpu_policy::is_gpu"
+
 #------------------------------------------------------------------------------
 # Error Handling
 # Error codes for radar simulation operations
@@ -382,7 +394,7 @@ cdef extern from "simulator_mesh.hpp":
 # --- Radar Cross Section (RCS) Calculation ---
 # RCS calculation using physical optics and scattering theory.
 cdef extern from "simulator_rcs.hpp":
-    cdef cppclass RcsSimulator[T]:
+    cdef cppclass RcsSimulator[T, ExecutionPolicy]:
         RcsSimulator() except +
 
         RadarSimErrorCode Run(const shared_ptr[TargetsManager[float]] & targets_manager,  # Targets manager
@@ -398,7 +410,7 @@ cdef extern from "simulator_rcs.hpp":
 # --- LiDAR Point Cloud Generation ---
 # LiDAR simulation for generating 3D point clouds from mesh targets.
 cdef extern from "simulator_lidar.hpp":
-    cdef cppclass LidarSimulator[T]:
+    cdef cppclass LidarSimulator[T, ExecutionPolicy]:
         LidarSimulator() except +
 
         RadarSimErrorCode Run(const shared_ptr[TargetsManager[T]] & targets_manager,  # Targets manager

@@ -12,6 +12,8 @@ All notable changes to this project will be documented in this file.
 - `Receiver.gate_delay` and `Receiver.gate_range` properties
 - `Radar.chirp_slope`, `Radar.unambiguous_range_span` and `Radar.unambiguous_range_window` properties, describing deramp (stretch) processing of a linear FM waveform. The window is one-sided `[0, span]` when un-gated (all beat tones are positive, so the full `[0, fs)` band is usable) and two-sided `gate_range +/- span/2` when gated (the residual delay is signed). All three report `None` when the waveform is not a linear FM ramp
 - Range gate test suite (`test_system_range_gate.py`)
+- Runtime CPU fallback for machines without a GPU. The execution policies resolve at compile time, so a GPU-enabled build would attempt CUDA execution even where no device exists; `sim_radar`, `sim_rcs` and `sim_lidar` now probe for a usable CUDA device and dispatch to the CPU policy when there is none. `sim_radar(device="gpu")` reports the fallback as a `RuntimeWarning`. A CPU-only build is unaffected, and an explicit `device="cpu"` request is unchanged
+- CPU fallback test suite (`test_system_cpu_fallback.py`)
 
 ### Changed
 

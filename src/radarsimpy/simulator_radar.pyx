@@ -25,6 +25,9 @@ ray-tracing, interference modeling, and noise simulation.
 
 """
 
+# Standard library imports
+import warnings
+
 # NumPy imports
 import numpy as np
 cimport numpy as np
@@ -53,7 +56,9 @@ from radarsimpy.includes.radarsimc cimport (
     NoiseSimulator,
     RadarSimErrorCode,
     cpu_policy,
-    gpu_policy
+    gpu_policy,
+    gpu_available,
+    CUDA_BUILD
 )
 
 # License management
@@ -205,9 +210,12 @@ cpdef sim_radar(radar, targets, density=1, level=None, interf=None,
     :param str device:
         Execution device for the simulation. Default: ``"gpu"``.
 
-        - ``"gpu"``: Execute simulation on GPU using CUDA (if available, falls back to CPU).
+        - ``"gpu"``: Execute simulation on GPU using CUDA. When the module was not built with
+          CUDA support, or when the machine has no usable CUDA device, the simulation
+          automatically falls back to CPU execution. The fallback caused by a missing device
+          is reported as a ``RuntimeWarning``.
         - ``"cpu"``: Execute simulation on CPU only.
-        
+
         .. note::
             **Performance Consideration**: When using a GPU-compiled module with ``device="cpu"``, 
             OpenMP parallelization is not available for CPU execution, resulting in slower 
@@ -260,6 +268,21 @@ cpdef sim_radar(radar, targets, density=1, level=None, interf=None,
             f"- 'cpu': Execute simulation on CPU\n\n"
             f"Please choose 'gpu' or 'cpu'."
         )
+
+    # The execution policies are compile-time tags, so a GPU-enabled build would
+    # otherwise launch CUDA kernels on a machine that has no CUDA device. Probe
+    # for a device and run on the CPU when there is none.
+    if device_lower == "gpu" and not gpu_available():
+        if CUDA_BUILD:
+            warnings.warn(
+                "No CUDA device was detected on this machine. "
+                "Running the simulation on the CPU instead. "
+                "Note that a GPU-enabled build has no OpenMP parallelization "
+                "for CPU execution, so this will be slower than a CPU-only build.",
+                RuntimeWarning,
+                stacklevel=2
+            )
+        device_lower = "cpu"
 
     level_map = {None: 0, "frame": 0, "pulse": 1, "sample": 2}
     if level not in level_map:

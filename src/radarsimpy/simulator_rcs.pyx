@@ -33,7 +33,14 @@ cimport numpy as np
 # Local imports
 from radarsimpy.includes.rsvector cimport Vec3
 from radarsimpy.includes.type_def cimport vector
-from radarsimpy.includes.radarsimc cimport RcsSimulator, TargetsManager, RadarSimErrorCode
+from radarsimpy.includes.radarsimc cimport (
+    RcsSimulator,
+    TargetsManager,
+    RadarSimErrorCode,
+    cpu_policy,
+    gpu_policy,
+    gpu_available
+)
 from radarsimpy.lib.cp_radarsimc cimport cp_RCS_Target
 from libcpp.complex cimport complex as cpp_complex
 
@@ -231,21 +238,42 @@ cpdef sim_rcs(
         ))
 
     # Calculate RCS
-    cdef RcsSimulator[double] rcs_sim_c
+    # The execution policy is a compile-time tag, so the GPU one is only usable
+    # when this machine actually has a CUDA device. Fall back to the CPU policy
+    # otherwise, which is also what a CPU-only build always uses.
+    cdef:
+        RcsSimulator[double, cpu_policy] rcs_sim_cpu
+        RcsSimulator[double, gpu_policy] rcs_sim_gpu
+        bint use_gpu = gpu_available()
+        RadarSimErrorCode err
+        vector[double] rcs_vect
 
-    cdef RadarSimErrorCode err = rcs_sim_c.Run(
-        targets_manager,
-        inc_dir,
-        obs_dir,
-        inc_pol_cpp,
-        obs_pol_cpp,
-        <double>f,
-        <double>density)
+    if use_gpu:
+        err = rcs_sim_gpu.Run(
+            targets_manager,
+            inc_dir,
+            obs_dir,
+            inc_pol_cpp,
+            obs_pol_cpp,
+            <double>f,
+            <double>density)
+    else:
+        err = rcs_sim_cpu.Run(
+            targets_manager,
+            inc_dir,
+            obs_dir,
+            inc_pol_cpp,
+            obs_pol_cpp,
+            <double>f,
+            <double>density)
 
     if err:
         raise RuntimeError(f"RCS simulation error occurred with code: {err}")
 
-    cdef vector[double] rcs_vect = rcs_sim_c.GetRcs()
+    if use_gpu:
+        rcs_vect = rcs_sim_gpu.GetRcs()
+    else:
+        rcs_vect = rcs_sim_cpu.GetRcs()
 
     rcs=np.zeros(array_size)
 

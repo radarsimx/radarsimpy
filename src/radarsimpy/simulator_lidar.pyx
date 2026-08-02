@@ -30,7 +30,7 @@ cimport cython
 
 # RadarSimX imports
 from radarsimpy.includes.radarsimc cimport LidarSimulator, TargetsManager, RadarSimErrorCode
-from radarsimpy.includes.radarsimc cimport Mem_Copy
+from radarsimpy.includes.radarsimc cimport Mem_Copy, Ray, cpu_policy, gpu_policy, gpu_available
 from radarsimpy.includes.rsvector cimport Vec3
 from radarsimpy.includes.type_def cimport float_t, int_t, vector
 
@@ -109,7 +109,13 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
           Return intensity based on Lambertian reflectance model,
           computed as ``cos(angle_of_incidence) / range^2``.
     """
-    cdef LidarSimulator[float_t] lidar_sim_c
+    # The execution policy is a compile-time tag, so the GPU one is only usable
+    # when this machine actually has a CUDA device. Fall back to the CPU policy
+    # otherwise, which is also what a CPU-only build always uses.
+    cdef LidarSimulator[float_t, cpu_policy] lidar_sim_cpu
+    cdef LidarSimulator[float_t, gpu_policy] lidar_sim_gpu
+    cdef bint use_gpu = gpu_available()
+    cdef vector[Ray[float_t]] *cloud
 
     cdef shared_ptr[TargetsManager[float_t]] targets_manager = make_shared[TargetsManager[float_t]]()
 
@@ -171,10 +177,20 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
     Mem_Copy(&theta_mv[0], <int_t>(theta_mv.shape[0]), theta_vt)
 
     # Perform ray tracing
-    cdef RadarSimErrorCode err = lidar_sim_c.Run(targets_manager,
-                    phi_vt,
-                    theta_vt,
-                    Vec3[float_t](&position_mv[0]))
+    cdef RadarSimErrorCode err
+    if use_gpu:
+        err = lidar_sim_gpu.Run(targets_manager,
+                        phi_vt,
+                        theta_vt,
+                        Vec3[float_t](&position_mv[0]))
+        cloud = &lidar_sim_gpu.cloud_
+    else:
+        err = lidar_sim_cpu.Run(targets_manager,
+                        phi_vt,
+                        theta_vt,
+                        Vec3[float_t](&position_mv[0]))
+        cloud = &lidar_sim_cpu.cloud_
+
     if err != RadarSimErrorCode.SUCCESS:
         raise RuntimeError(f"LiDAR simulation error occurred with code: {err}")
 
@@ -184,27 +200,27 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
                         ("normals", np_float, (3,)),
                         ("range", np_float),
                         ("intensity", np_float)])
-    rays = np.zeros(lidar_sim_c.cloud_.size(), dtype=ray_type)
+    rays = np.zeros(cloud[0].size(), dtype=ray_type)
 
-    for idx_c in range(0, <int_t> lidar_sim_c.cloud_.size()):
-        rays[idx_c]["positions"][0] = lidar_sim_c.cloud_[idx_c].location_[1][0]
-        rays[idx_c]["positions"][1] = lidar_sim_c.cloud_[idx_c].location_[1][1]
-        rays[idx_c]["positions"][2] = lidar_sim_c.cloud_[idx_c].location_[1][2]
-        rays[idx_c]["directions"][0] = lidar_sim_c.cloud_[idx_c].direction_[1][0]
-        rays[idx_c]["directions"][1] = lidar_sim_c.cloud_[idx_c].direction_[1][1]
-        rays[idx_c]["directions"][2] = lidar_sim_c.cloud_[idx_c].direction_[1][2]
-        rays[idx_c]["normals"][0] = lidar_sim_c.cloud_[idx_c].normal_[1][0]
-        rays[idx_c]["normals"][1] = lidar_sim_c.cloud_[idx_c].normal_[1][1]
-        rays[idx_c]["normals"][2] = lidar_sim_c.cloud_[idx_c].normal_[1][2]
-        rays[idx_c]["range"] = lidar_sim_c.cloud_[idx_c].range_[1]
+    for idx_c in range(0, <int_t> cloud[0].size()):
+        rays[idx_c]["positions"][0] = cloud[0][idx_c].location_[1][0]
+        rays[idx_c]["positions"][1] = cloud[0][idx_c].location_[1][1]
+        rays[idx_c]["positions"][2] = cloud[0][idx_c].location_[1][2]
+        rays[idx_c]["directions"][0] = cloud[0][idx_c].direction_[1][0]
+        rays[idx_c]["directions"][1] = cloud[0][idx_c].direction_[1][1]
+        rays[idx_c]["directions"][2] = cloud[0][idx_c].direction_[1][2]
+        rays[idx_c]["normals"][0] = cloud[0][idx_c].normal_[1][0]
+        rays[idx_c]["normals"][1] = cloud[0][idx_c].normal_[1][1]
+        rays[idx_c]["normals"][2] = cloud[0][idx_c].normal_[1][2]
+        rays[idx_c]["range"] = cloud[0][idx_c].range_[1]
 
         # Intensity based on Lambertian reflectance: cos(angle_of_incidence) / range^2
         cos_inc = -(
-            lidar_sim_c.cloud_[idx_c].direction_[0][0] * lidar_sim_c.cloud_[idx_c].normal_[1][0]
-            + lidar_sim_c.cloud_[idx_c].direction_[0][1] * lidar_sim_c.cloud_[idx_c].normal_[1][1]
-            + lidar_sim_c.cloud_[idx_c].direction_[0][2] * lidar_sim_c.cloud_[idx_c].normal_[1][2]
+            cloud[0][idx_c].direction_[0][0] * cloud[0][idx_c].normal_[1][0]
+            + cloud[0][idx_c].direction_[0][1] * cloud[0][idx_c].normal_[1][1]
+            + cloud[0][idx_c].direction_[0][2] * cloud[0][idx_c].normal_[1][2]
         )
-        r = lidar_sim_c.cloud_[idx_c].range_[1]
+        r = cloud[0][idx_c].range_[1]
         if cos_inc > 0 and r > 0:
             rays[idx_c]["intensity"] = cos_inc / (r * r)
         else:
