@@ -19,8 +19,12 @@ A Python module for radar simulation
 """
 
 import numpy as np
+import pytest
 
 from radarsimpy.simulator import sim_lidar  # pylint: disable=no-name-in-module
+
+# Every test here loads an .stl model.
+pytestmark = pytest.mark.mesh
 
 
 def test_lidar_scene_basic():

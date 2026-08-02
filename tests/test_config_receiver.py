@@ -372,3 +372,28 @@ class TestReceiver:
         # Check default pattern values
         np.testing.assert_array_equal(channel_info["azimuth_pattern"], [0, 0])
         np.testing.assert_array_equal(channel_info["elevation_pattern"], [0, 0])
+
+    @pytest.mark.parametrize("gate_delay", [True, False, "0", None, [0.0]])
+    def test_non_numeric_gate_delay_is_rejected(self, gate_delay):
+        """``gate_delay`` must be a real number; bools are explicitly excluded."""
+        with pytest.raises(ValueError, match="gate_delay must be a number"):
+            Receiver(fs=10e6, gate_delay=gate_delay)
+
+    @pytest.mark.parametrize("gate_delay", [float("nan"), float("inf"), -float("inf")])
+    def test_non_finite_gate_delay_is_rejected(self, gate_delay):
+        """NaN and infinities are not usable receive-window delays."""
+        with pytest.raises(ValueError):
+            Receiver(fs=10e6, gate_delay=gate_delay)
+
+    def test_negative_gate_delay_is_rejected(self):
+        """The gate opens after the chirp starts, never before."""
+        with pytest.raises(ValueError, match="gate_delay must be non-negative"):
+            Receiver(fs=10e6, gate_delay=-1e-6)
+
+    def test_zero_gate_delay_is_the_default(self):
+        """An ungated receiver has a zero delay."""
+        assert Receiver(fs=10e6).bb_prop["gate_delay"] == 0.0
+
+    def test_positive_gate_delay_is_stored(self):
+        """A valid delay is kept verbatim."""
+        assert Receiver(fs=10e6, gate_delay=2e-6).bb_prop["gate_delay"] == 2e-6

@@ -24,6 +24,9 @@ import numpy.testing as npt
 
 from radarsimpy.simulator import sim_rcs  # pylint: disable=no-name-in-module
 
+# Every test here loads an .stl model.
+pytestmark = pytest.mark.mesh
+
 
 def test_rcs_momostatic():
     """

@@ -272,6 +272,7 @@ MESH_TARGET_RANGE = 30.0
 MESH_GATE_RANGE = 10.0
 
 
+@pytest.mark.mesh
 def test_mesh_gate_shifts_peak_by_predicted_bins():
     """
     Gating the mesh path moves the peak by exactly the predicted bin count.
@@ -305,6 +306,7 @@ def test_mesh_gate_shifts_peak_by_predicted_bins():
     )
 
 
+@pytest.mark.mesh
 def test_mesh_agrees_with_point_under_gate():
     """A gated mesh target lands in the same range bin as an equivalent point."""
     gate_delay = 2 * MESH_GATE_RANGE / const.c

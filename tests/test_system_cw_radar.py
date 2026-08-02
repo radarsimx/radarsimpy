@@ -19,6 +19,7 @@ System level test for raytracing-based sim_radar simulation
 """
 
 import numpy as np
+import pytest
 from radarsimpy import Radar, Transmitter, Receiver
 from radarsimpy.simulator import sim_radar  # pylint: disable=no-name-in-module
 
@@ -82,6 +83,7 @@ def test_sim_cw():
     )
 
 
+@pytest.mark.mesh
 def test_sim_cw_raytracing():
     """
     Test the CW radar simulator.

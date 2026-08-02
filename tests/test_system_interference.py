@@ -19,12 +19,14 @@ A Python module for radar simulation
 """
 
 import numpy as np
+import pytest
 import numpy.testing as npt
 
 from radarsimpy import Radar, Transmitter, Receiver
 from radarsimpy.simulator import sim_radar  # pylint: disable=no-name-in-module
 
 
+@pytest.mark.mesh
 def test_scene_interference():
     """
     This function tests the interference simulation in the scene simulator

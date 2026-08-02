@@ -19,9 +19,13 @@ A Python module for radar simulation
 """
 
 import numpy as np
+import pytest
 
 from radarsimpy import Radar, Transmitter, Receiver
 from radarsimpy.simulator import sim_radar  # pylint: disable=no-name-in-module
+
+# Every test here loads an .stl model.
+pytestmark = pytest.mark.mesh
 
 
 def test_scene_single_target():

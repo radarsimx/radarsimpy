@@ -20,6 +20,7 @@ System level test for DoA processing
 
 import numpy as np
 import numpy.testing as npt
+import pytest
 
 import radarsimpy.processing as proc
 
@@ -1191,3 +1192,178 @@ def test_doa_capon():
         ),
         decimal=1,
     )
+
+
+# =============================================================================
+# Analytic checks against a synthesised ULA covariance matrix
+# =============================================================================
+
+N_ELEMENTS = 8
+SPACING = 0.5
+TRUE_ANGLES = (-20.0, 15.0)
+
+
+def _steering_matrix(angles_deg, n_elements=N_ELEMENTS, spacing=SPACING):
+    """Steering matrix of a ULA for ``angles_deg``, shape ``[n_elements, n_angles]``."""
+    positions = np.arange(n_elements)[:, np.newaxis] * spacing
+    sines = np.sin(np.radians(np.asarray(angles_deg, dtype=float)))[np.newaxis, :]
+    return np.exp(1j * 2 * np.pi * positions * sines)
+
+
+@pytest.fixture(scope="module")
+def noiseless_covmat():
+    """Rank-deficient covariance from two equal-power sources, no noise."""
+    steering = _steering_matrix(TRUE_ANGLES)
+    return steering @ steering.conj().T
+
+
+@pytest.fixture(scope="module")
+def noisy_covmat():
+    """Full-rank covariance: two sources plus 20 dB-down white noise."""
+    steering = _steering_matrix(TRUE_ANGLES)
+    return steering @ steering.conj().T + 0.01 * np.eye(N_ELEMENTS)
+
+
+class TestSubspaceEstimators:
+    """MUSIC / root-MUSIC / ESPRIT recover the synthesised angles."""
+
+    def test_music_finds_both_sources(self, noisy_covmat):
+        """The MUSIC pseudo-spectrum peaks at the true angles."""
+        angles, indices, spectrum = proc.doa_music(noisy_covmat, nsig=2)
+
+        assert len(angles) == 2
+        assert len(indices) == 2
+        assert spectrum.shape == (181,)
+        npt.assert_allclose(np.sort(angles), sorted(TRUE_ANGLES), atol=1.0)
+
+    def test_music_honours_a_custom_scan_grid(self, noisy_covmat):
+        """A finer scan grid changes the spectrum length, not the answer."""
+        scanangles = np.linspace(-90, 90, 721)
+
+        angles, _, spectrum = proc.doa_music(
+            noisy_covmat, nsig=2, scanangles=scanangles
+        )
+
+        assert spectrum.shape == scanangles.shape
+        npt.assert_allclose(np.sort(angles), sorted(TRUE_ANGLES), atol=0.5)
+
+    def test_root_music_on_a_noiseless_covariance(self, noiseless_covmat):
+        """
+        A noiseless covariance puts polynomial roots exactly on the unit
+        circle, which the duplicate-root pruning has to handle.
+        """
+        angles = proc.doa_root_music(noiseless_covmat, nsig=2)
+
+        npt.assert_allclose(np.sort(angles), sorted(TRUE_ANGLES), atol=1e-4)
+
+    def test_root_music_on_a_noisy_covariance(self, noisy_covmat):
+        """The usual (strictly inside the unit circle) path also works."""
+        angles = proc.doa_root_music(noisy_covmat, nsig=2)
+
+        npt.assert_allclose(np.sort(angles), sorted(TRUE_ANGLES), atol=1.0)
+
+    def test_esprit_on_a_noisy_covariance(self, noisy_covmat):
+        """ESPRIT recovers the same angles without a scan grid."""
+        angles = proc.doa_esprit(noisy_covmat, nsig=2)
+
+        npt.assert_allclose(np.sort(angles), sorted(TRUE_ANGLES), atol=1.0)
+
+    @pytest.mark.parametrize(
+        "estimator", [proc.doa_root_music, proc.doa_esprit]
+    )
+    def test_gridless_estimators_return_one_angle_per_source(
+        self, estimator, noisy_covmat
+    ):
+        """``nsig`` controls how many angles come back."""
+        assert len(estimator(noisy_covmat, nsig=1)) == 1
+        assert len(estimator(noisy_covmat, nsig=2)) == 2
+
+    def test_spacing_is_respected(self):
+        """A quarter-wavelength array needs the matching ``spacing`` argument."""
+        spacing = 0.25
+        steering = _steering_matrix(TRUE_ANGLES, spacing=spacing)
+        covmat = steering @ steering.conj().T + 0.01 * np.eye(N_ELEMENTS)
+
+        angles = proc.doa_root_music(covmat, nsig=2, spacing=spacing)
+
+        npt.assert_allclose(np.sort(angles), sorted(TRUE_ANGLES), atol=1.0)
+
+
+class TestBeamformers:
+    """Bartlett and Capon produce dB spectra peaking near the sources."""
+
+    @pytest.mark.parametrize("beamformer", [proc.doa_bartlett, proc.doa_capon])
+    def test_spectrum_shape_and_peak(self, beamformer, noisy_covmat):
+        """The spectrum spans the scan grid and peaks near a true angle."""
+        scanangles = np.arange(-90, 91)
+
+        spectrum = beamformer(noisy_covmat, scanangles=scanangles)
+
+        assert spectrum.shape == scanangles.shape
+        assert np.isrealobj(spectrum)
+        peak = scanangles[np.argmax(spectrum)]
+        assert min(abs(peak - a) for a in TRUE_ANGLES) <= 2.0
+
+    def test_capon_resolves_more_sharply_than_bartlett(self, noisy_covmat):
+        """Capon's adaptive weights narrow the response around a source."""
+        scanangles = np.arange(-90, 91)
+
+        bartlett = proc.doa_bartlett(noisy_covmat, scanangles=scanangles)
+        capon = proc.doa_capon(noisy_covmat, scanangles=scanangles)
+
+        # Normalise, then measure the width 3 dB below each peak.
+        def width_3db(spectrum):
+            normalised = spectrum - spectrum.max()
+            return np.count_nonzero(normalised > -3.0)
+
+        assert width_3db(capon) < width_3db(bartlett)
+
+
+class TestIAA:
+    """``doa_iaa`` estimates power on an arbitrary steering grid."""
+
+    @staticmethod
+    def _grid(scanangles):
+        """Normalised steering matrix for the scan grid."""
+        return _steering_matrix(scanangles) / np.sqrt(N_ELEMENTS)
+
+    def test_spectrum_peaks_at_the_sources(self):
+        """With default initialisation the peaks land on the true angles."""
+        scanangles = np.arange(-90, 91)
+        snapshots = _steering_matrix(TRUE_ANGLES) @ np.ones((2, 16))
+
+        spectrum = proc.doa_iaa(snapshots, self._grid(scanangles), num_it=8)
+
+        assert spectrum.shape == scanangles.shape
+        peak = scanangles[np.argmax(spectrum)]
+        assert min(abs(peak - a) for a in TRUE_ANGLES) <= 2.0
+
+    def test_explicit_initialisation_is_accepted(self):
+        """Supplying ``p_init`` skips the default power initialisation."""
+        scanangles = np.arange(-90, 91)
+        steering = self._grid(scanangles)
+        snapshots = _steering_matrix(TRUE_ANGLES) @ np.ones((2, 16))
+
+        default_init = proc.doa_iaa(snapshots, steering, num_it=8)
+        flat_init = proc.doa_iaa(
+            snapshots,
+            steering,
+            num_it=8,
+            p_init=np.ones(scanangles.size, dtype=complex),
+        )
+
+        assert flat_init.shape == scanangles.shape
+        # Both initialisations converge on the same sources.
+        npt.assert_allclose(
+            scanangles[np.argmax(flat_init)], scanangles[np.argmax(default_init)]
+        )
+
+    def test_single_snapshot(self):
+        """A single snapshot (num_snap == 1) is a valid input."""
+        scanangles = np.arange(-90, 91)
+        snapshots = _steering_matrix(TRUE_ANGLES) @ np.ones((2, 1))
+
+        spectrum = proc.doa_iaa(snapshots, self._grid(scanangles), num_it=5)
+
+        assert spectrum.shape == scanangles.shape
+        assert np.all(np.isfinite(spectrum))

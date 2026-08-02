@@ -511,3 +511,238 @@ class TestRadar:
         np.testing.assert_allclose(
             radar.virtual_array_locations, radar.array_prop["virtual_array"]
         )
+
+    # -------------------------------------------------------------------------
+    # cal_phase_noise
+    # -------------------------------------------------------------------------
+
+    def test_cal_phase_noise_seed_is_reproducible(self):
+        """The same seed produces the same phase-noise realisation."""
+        signal = np.ones((4, 128), dtype=complex)
+        freq = np.array([1e3, 1e4, 1e5])
+        power = np.array([-100, -110, -120])
+
+        first = cal_phase_noise(signal, 10e6, freq, power, seed=42)
+        second = cal_phase_noise(signal, 10e6, freq, power, seed=42)
+        other = cal_phase_noise(signal, 10e6, freq, power, seed=7)
+
+        np.testing.assert_allclose(first, second)
+        assert not np.allclose(first, other)
+
+    def test_cal_phase_noise_odd_sample_count(self):
+        """An odd number of samples takes the ``(num_samples + 1) / 2`` branch."""
+        signal = np.ones((3, 101), dtype=complex)
+
+        phase_noise = cal_phase_noise(
+            signal, 10e6, np.array([1e3, 1e4]), np.array([-100, -110]), seed=1
+        )
+
+        assert phase_noise.shape == (3, 101)
+        np.testing.assert_allclose(np.abs(phase_noise), 1, atol=1e-9)
+
+    def test_cal_phase_noise_sorts_and_truncates_the_mask(self):
+        """Out-of-order points are sorted and points above fs/2 are dropped."""
+        signal = np.ones((2, 64), dtype=complex)
+        fs = 10e6
+
+        ordered = cal_phase_noise(
+            signal, fs, np.array([1e3, 1e4, 1e5]), np.array([-100, -110, -120]), seed=3
+        )
+        shuffled = cal_phase_noise(
+            signal, fs, np.array([1e5, 1e3, 1e4]), np.array([-120, -100, -110]), seed=3
+        )
+        np.testing.assert_allclose(ordered, shuffled)
+
+        # A point beyond the Nyquist frequency is discarded.
+        truncated = cal_phase_noise(
+            signal,
+            fs,
+            np.array([1e3, 1e4, 1e5, fs]),
+            np.array([-100, -110, -120, -130]),
+            seed=3,
+        )
+        np.testing.assert_allclose(ordered, truncated)
+
+    # -------------------------------------------------------------------------
+    # Construction-time validation
+    # -------------------------------------------------------------------------
+
+    def test_samples_per_pulse_must_be_positive(self):
+        """A pulse shorter than one sampling period cannot be simulated."""
+        tx = Transmitter(f=10e9, t=1e-9, tx_power=10, pulses=1, prp=2e-6)
+        rx = Receiver(fs=1e6)
+
+        with pytest.raises(ValueError, match="samples_per_pulse must be greater than 0"):
+            Radar(transmitter=tx, receiver=rx)
+
+    def test_transmitter_rejects_mismatched_phase_noise_arrays(self):
+        """``pn_f`` and ``pn_power`` are paired point-by-point."""
+        with pytest.raises(ValueError, match="`pn_f` and `pn_power`"):
+            Transmitter(
+                f=[10e9, 10.1e9],
+                t=1e-6,
+                tx_power=10,
+                pulses=2,
+                prp=2e-6,
+                pn_f=np.array([1e3, 1e4, 1e5]),
+                pn_power=np.array([-100, -110]),
+            )
+
+    def test_radar_re_checks_phase_noise_array_lengths(self):
+        """
+        ``Radar`` re-validates the mask, catching a transmitter mutated after
+        construction.
+        """
+        tx = Transmitter(
+            f=[10e9, 10.1e9],
+            t=1e-6,
+            tx_power=10,
+            pulses=2,
+            prp=2e-6,
+            pn_f=np.array([1e3, 1e4, 1e5]),
+            pn_power=np.array([-100, -110, -120]),
+        )
+        tx.rf_prop["pn_power"] = np.array([-100, -110])
+
+        with pytest.raises(ValueError, match="pn_f and pn_power must have the same"):
+            Radar(transmitter=tx, receiver=Receiver(fs=20e6))
+
+    def test_phase_noise_frequencies_must_be_non_negative(self):
+        """Offset frequencies in an SSB phase-noise mask are non-negative."""
+        tx = Transmitter(
+            f=[10e9, 10.1e9],
+            t=1e-6,
+            tx_power=10,
+            pulses=2,
+            prp=2e-6,
+            pn_f=np.array([-1e3, 1e4]),
+            pn_power=np.array([-100, -110]),
+        )
+        rx = Receiver(fs=20e6)
+
+        with pytest.raises(ValueError, match="pn_f frequency values must be non-neg"):
+            Radar(transmitter=tx, receiver=rx)
+
+    # -------------------------------------------------------------------------
+    # Time-varying motion validation
+    # -------------------------------------------------------------------------
+
+    @pytest.fixture
+    def moving_radar_parts(self):
+        """A Tx/Rx pair plus the timestamp shape a matching motion array needs."""
+        tx = Transmitter(f=[10e9, 10.1e9], t=1e-6, tx_power=10, pulses=4, prp=2e-6)
+        rx = Receiver(fs=20e6)
+        shape = Radar(transmitter=tx, receiver=rx).time_prop["timestamp_shape"]
+        return tx, rx, shape
+
+    def test_time_varying_location_rejects_non_zero_rotation_rate(
+        self, moving_radar_parts
+    ):
+        """Motion must be expressed either as arrays or as rates, never both."""
+        tx, rx, shape = moving_radar_parts
+
+        with pytest.raises(ValueError, match="rotation_rate must be"):
+            Radar(
+                transmitter=tx,
+                receiver=rx,
+                location=(np.zeros(shape), 0, 0),
+                rotation_rate=(10, 0, 0),
+            )
+
+    def test_time_varying_location_rejects_non_zero_speed(self, moving_radar_parts):
+        """The same rule applies to a constant velocity."""
+        tx, rx, shape = moving_radar_parts
+
+        with pytest.raises(ValueError, match="speed must be"):
+            Radar(
+                transmitter=tx,
+                receiver=rx,
+                location=(np.zeros(shape), 0, 0),
+                speed=(10, 0, 0),
+            )
+
+    def test_time_varying_location_shape_must_match_timestamp(
+        self, moving_radar_parts
+    ):
+        """A mis-shaped location array is rejected with the expected shape."""
+        tx, rx, shape = moving_radar_parts
+
+        with pytest.raises(ValueError, match=r"location\[x\] must be a scalar"):
+            Radar(transmitter=tx, receiver=rx, location=(np.zeros(shape[:-1]), 0, 0))
+
+    def test_time_varying_rotation_shape_must_match_timestamp(
+        self, moving_radar_parts
+    ):
+        """The same shape rule applies to rotation arrays."""
+        tx, rx, shape = moving_radar_parts
+
+        with pytest.raises(ValueError, match=r"rotation\[y\] must be a scalar"):
+            Radar(transmitter=tx, receiver=rx, rotation=(0, np.zeros(shape[:-1]), 0))
+
+    def test_speed_arrays_are_not_supported(self, moving_radar_parts):
+        """Time-varying speed must be expressed as a location array instead."""
+        tx, rx, shape = moving_radar_parts
+
+        with pytest.raises(ValueError, match=r"speed\[x\] must be a scalar"):
+            Radar(
+                transmitter=tx,
+                receiver=rx,
+                location=(np.zeros(shape), 0, 0),
+                speed=(np.zeros(shape), np.zeros(shape), np.zeros(shape)),
+            )
+
+    def test_rotation_rate_arrays_are_not_supported(self, moving_radar_parts):
+        """Likewise for a time-varying rotation rate."""
+        tx, rx, shape = moving_radar_parts
+
+        with pytest.raises(ValueError, match=r"rotation_rate\[x\] must be a scalar"):
+            Radar(
+                transmitter=tx,
+                receiver=rx,
+                rotation=(np.zeros(shape), 0, 0),
+                rotation_rate=(np.zeros(shape), np.zeros(shape), np.zeros(shape)),
+            )
+
+    def test_time_varying_rotation_is_applied_in_radians(self, moving_radar_parts):
+        """A rotation array is stored in radians on the timestamp grid."""
+        tx, rx, shape = moving_radar_parts
+        yaw_deg = np.full(shape, 30.0)
+
+        radar = Radar(transmitter=tx, receiver=rx, rotation=(yaw_deg, 0, 0))
+
+        assert radar.radar_prop["rotation"].shape == shape + (3,)
+        np.testing.assert_allclose(
+            radar.radar_prop["rotation"][..., 0], np.radians(30.0)
+        )
+        np.testing.assert_allclose(radar.radar_prop["rotation"][..., 1], 0.0)
+
+    # -------------------------------------------------------------------------
+    # Derived waveform properties
+    # -------------------------------------------------------------------------
+
+    def test_chirp_slope_for_a_linear_ramp(self):
+        """A two-point ramp has slope ``(f1 - f0) / pulse_length``."""
+        tx = Transmitter(f=[24e9, 24.1e9], t=1e-4, tx_power=10, pulses=2, prp=2e-4)
+        radar = Radar(transmitter=tx, receiver=Receiver(fs=2e6))
+
+        np.testing.assert_allclose(radar.chirp_slope, 0.1e9 / 1e-4)
+
+    def test_chirp_slope_is_zero_for_a_single_tone(self):
+        """A CW transmitter has a flat ramp."""
+        tx = Transmitter(f=24e9, t=1e-4, tx_power=10, pulses=2, prp=2e-4)
+        radar = Radar(transmitter=tx, receiver=Receiver(fs=2e6))
+
+        assert radar.chirp_slope == 0.0
+
+    def test_chirp_slope_is_none_for_an_arbitrary_waveform(self):
+        """A multi-point frequency profile has no single slope."""
+        tx = Transmitter(
+            f=[24e9, 24.05e9, 24.1e9],
+            t=[0, 0.5e-4, 1e-4],
+            tx_power=10,
+            pulses=2,
+            prp=2e-4,
+        )
+        radar = Radar(transmitter=tx, receiver=Receiver(fs=2e6))
+
+        assert radar.chirp_slope is None

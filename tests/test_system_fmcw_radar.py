@@ -20,6 +20,7 @@ System level test for raytracing-based scene simulation
 
 import scipy.constants as const
 import numpy as np
+import pytest
 import numpy.testing as npt
 from scipy import signal
 
@@ -207,6 +208,7 @@ def test_sim_fmcw():
     )
 
 
+@pytest.mark.mesh
 def test_fmcw_raytracing():
     """
     This function tests an FMCW radar using raytracing.
@@ -340,6 +342,7 @@ def test_fmcw_raytracing():
     npt.assert_almost_equal(phs4, 157.27, decimal=0)
 
 
+@pytest.mark.mesh
 def test_fmcw_raytracing_tx_azimuth():
     """
     This function tests the transmitter's azimuth pattern in an FMCW radar using raytracing.
@@ -407,6 +410,7 @@ def test_fmcw_raytracing_tx_azimuth():
     npt.assert_almost_equal(phs, 152.265, decimal=0)
 
 
+@pytest.mark.mesh
 def test_fmcw_raytracing_tx_elevation():
     """
     This function tests the transmitter's elevation pattern in an FMCW radar using raytracing.
@@ -474,6 +478,7 @@ def test_fmcw_raytracing_tx_elevation():
     npt.assert_almost_equal(phs, 151.81, decimal=0)
 
 
+@pytest.mark.mesh
 def test_fmcw_raytracing_rx_azimuth():
     """
     This function tests the receiver's azimuth pattern in an FMCW radar using raytracing.
@@ -541,6 +546,7 @@ def test_fmcw_raytracing_rx_azimuth():
     npt.assert_almost_equal(phs, 152.258, decimal=0)
 
 
+@pytest.mark.mesh
 def test_fmcw_raytracing_rx_elevation():
     """
     This function tests the receiver's elevation pattern in an FMCW radar using raytracing.
@@ -606,6 +612,7 @@ def test_fmcw_raytracing_rx_elevation():
     npt.assert_almost_equal(phs, 151.81, decimal=0)
 
 
+@pytest.mark.mesh
 def test_fmcw_raytracing_radar_rotation():
     """
     This function tests the rotation of an FMCW radar using raytracing.
@@ -668,6 +675,7 @@ def test_fmcw_raytracing_radar_rotation():
     npt.assert_almost_equal(phs, -65.29, decimal=0)
 
 
+@pytest.mark.mesh
 def test_fmcw_raytracing_radar_speed():
     """
     This function tests the speed of an FMCW radar using raytracing.

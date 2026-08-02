@@ -19,6 +19,7 @@ System level test for arbitrary waveform
 """
 
 import numpy as np
+import pytest
 
 from radarsimpy import Radar, Transmitter, Receiver
 from radarsimpy.simulator import sim_radar  # pylint: disable=no-name-in-module
@@ -222,6 +223,7 @@ def test_arbitrary_waveform():
     )
 
 
+@pytest.mark.mesh
 def test_arbitrary_waveform_raytracing():
     """
     This function tests the arbitrary waveform.

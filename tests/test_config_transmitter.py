@@ -640,3 +640,101 @@ class TestTransmitter:
         tx_large = Transmitter(f=f_large, t=t_large, pulses=1)
         assert len(tx_large.frequency) == 1000
         assert tx_large.pulse_length == 1e-3
+
+    @pytest.mark.parametrize("tx_power", ["10", None, [10], complex(10, 0)])
+    def test_non_numeric_tx_power_is_rejected(self, tx_power):
+        """``tx_power`` must be a real number."""
+        with pytest.raises(ValueError, match="tx_power must be a number"):
+            Transmitter(f=10e9, t=1e-6, tx_power=tx_power, prp=2e-6, pulses=1)
+
+    @pytest.mark.parametrize("pulses", [0, -1, -10])
+    def test_non_positive_pulse_count_is_rejected(self, pulses):
+        """At least one pulse must be transmitted."""
+        with pytest.raises(ValueError, match="at least 1"):
+            Transmitter(f=10e9, t=1e-6, tx_power=10, prp=2e-6, pulses=pulses)
+
+    def test_scalar_frequency_becomes_a_single_tone(self):
+        """A scalar ``f`` is expanded to a constant two-point waveform."""
+        tx = Transmitter(f=10e9, t=1e-6, tx_power=10, prp=2e-6, pulses=1)
+
+        np.testing.assert_allclose(tx.waveform_prop["f"], [10e9, 10e9])
+
+    def test_scalar_pulse_length_is_expanded_from_zero(self):
+        """A scalar ``t`` is expanded to ``[0, t]``."""
+        tx = Transmitter(f=[10e9, 10.1e9], t=1e-6, tx_power=10, prp=2e-6, pulses=1)
+
+        np.testing.assert_allclose(tx.waveform_prop["t"], [0, 1e-6])
+        assert tx.waveform_prop["pulse_length"] == 1e-6
+
+    def test_elevation_pattern_length_mismatch_is_rejected(self):
+        """``elevation_angle`` and ``elevation_pattern`` must match in length."""
+        with pytest.raises(ValueError, match="elevation_angle"):
+            Transmitter(
+                f=[10e9, 10.1e9],
+                t=1e-6,
+                tx_power=10,
+                prp=2e-6,
+                pulses=1,
+                channels=[
+                    {
+                        "location": (0, 0, 0),
+                        "elevation_angle": [-90, 0, 90],
+                        "elevation_pattern": [0, 0],
+                    }
+                ],
+            )
+
+    def test_azimuth_pattern_length_mismatch_is_rejected(self):
+        """The same rule applies on the azimuth cut."""
+        with pytest.raises(ValueError, match="azimuth_angle"):
+            Transmitter(
+                f=[10e9, 10.1e9],
+                t=1e-6,
+                tx_power=10,
+                prp=2e-6,
+                pulses=1,
+                channels=[
+                    {
+                        "location": (0, 0, 0),
+                        "azimuth_angle": [-90, 0, 90],
+                        "azimuth_pattern": [0, 0],
+                    }
+                ],
+            )
+
+    def test_ensure_array_expands_a_scalar(self):
+        """A scalar without a default is duplicated into a two-point array."""
+        np.testing.assert_allclose(Transmitter._ensure_array(5.0), [5.0, 5.0])
+
+    def test_ensure_array_uses_the_default_as_the_first_point(self):
+        """A scalar with a default becomes ``[default, value]``."""
+        np.testing.assert_allclose(Transmitter._ensure_array(5.0, 0.0), [0.0, 5.0])
+
+    def test_ensure_array_passes_sequences_through(self):
+        """Lists, tuples and arrays are converted without being expanded."""
+        for sequence in ([1.0, 2.0, 3.0], (1.0, 2.0, 3.0), np.array([1.0, 2.0, 3.0])):
+            np.testing.assert_allclose(
+                Transmitter._ensure_array(sequence, 0.0), [1.0, 2.0, 3.0]
+            )
+
+    def test_scalar_modulation_timestamp_starts_at_zero(self):
+        """``mod_t`` given as a scalar is expanded to ``[0, mod_t]``."""
+        tx = Transmitter(
+            f=[10e9, 10.1e9],
+            t=1e-6,
+            tx_power=10,
+            prp=2e-6,
+            pulses=1,
+            channels=[
+                {
+                    "location": (0, 0, 0),
+                    "mod_t": 1e-6,
+                    "amp": [1, 1],
+                    "phs": [0, 0],
+                }
+            ],
+        )
+
+        modulation = tx.txchannel_prop["waveform_mod"][0]
+        assert modulation["enabled"] is True
+        np.testing.assert_allclose(modulation["t"], [0, 1e-6])
