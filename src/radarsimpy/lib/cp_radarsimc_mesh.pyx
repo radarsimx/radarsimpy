@@ -205,6 +205,10 @@ cdef void cp_RCS_Target(target, mesh_module, TargetsManager[float_t] * targets_m
 def cp_GetTargetMesh(target, timestamp, mesh_module, sim_timestamp=None):
     """
     Get transformed target mesh at query timestamps using C++ Target directly.
+
+    ``timestamp`` may be a scalar or an array of any dimensionality. Query
+    times are flattened for the transform loop and the returned ``points``
+    are reshaped back to ``np.shape(timestamp) + (num_points, 3)``.
     """
     cdef float_t scale = _safe_unit_conversion(target.get("unit", "m"))
     points_arr, cells_arr = _load_and_validate_mesh(target, mesh_module)
@@ -235,7 +239,16 @@ def cp_GetTargetMesh(target, timestamp, mesh_module, sim_timestamp=None):
 
     cdef int_t sim_idx
 
-    cdef double[:] timestamp_arr = np.atleast_1d(timestamp).astype(np.float64)
+    # Flatten the query times so any timestamp shape (scalar, 1-D, or N-D)
+    # binds to the 1-D memoryview below. ``query_shape`` restores the caller's
+    # shape on the returned points at the end of this function.
+    # ``asarray`` (not ``ascontiguousarray``) keeps a scalar 0-D, so a scalar
+    # query still returns points shaped [num_points, 3] rather than [1, ...].
+    timestamp_np = np.asarray(timestamp, dtype=np.float64)
+    query_shape = timestamp_np.shape
+    timestamp_np = timestamp_np.ravel()
+
+    cdef double[:] timestamp_arr = timestamp_np
     cdef int_t K = <int_t>timestamp_arr.shape[0]
 
     cdef object ts = sim_timestamp if sim_timestamp is not None else timestamp
@@ -324,7 +337,7 @@ def cp_GetTargetMesh(target, timestamp, mesh_module, sim_timestamp=None):
         if target_c != NULL:
             del target_c
 
-    out_shape = list(np.shape(timestamp)) + [point_size, 3]
+    out_shape = list(query_shape) + [point_size, 3]
     return {"points": points_out.reshape(out_shape), "cells": cells_arr}
 
 
