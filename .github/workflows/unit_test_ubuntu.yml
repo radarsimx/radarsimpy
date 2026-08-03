@@ -11,26 +11,36 @@
 #   - Pull requests targeting master branch
 #
 # Test Matrix:
-#   - Defined once, as JSON, in the `setup` job's "Define build matrix" step.
-#     The `build` job consumes it via job outputs, so adding/removing an
-#     Ubuntu version or Python version only requires editing that one step.
-#   - Python versions: 3.10, 3.11, 3.12, 3.13, 3.14
+#   - Defined once, as JSON, in the `setup` job's "Define test matrix" step.
+#     The `build` job consumes it via job outputs, so adding/removing an entry
+#     only requires editing that one step.
+#   - CPU builds: Python 3.10, 3.11, 3.12, 3.13, 3.14 on each Ubuntu version
+#   - GPU build: Ubuntu 24.04 / Python 3.13 only
 #   - Platform: Ubuntu 22.04, Ubuntu 24.04, Ubuntu 26.04
 #   - Compilers: GCC-11 (22.04), GCC-13 (24.04), GCC-15 (26.04)
-#   - Architecture: x64 (CPU-only builds)
+#
+# About the GPU entry:
+#   GitHub-hosted runners have no CUDA device, so this entry does not exercise
+#   any GPU code path. What it covers is that a CUDA-enabled build compiles and
+#   then falls back to CPU execution at runtime: `gpu_available()` reports no
+#   device, `sim_radar`/`sim_rcs`/`sim_lidar` dispatch to the CPU policy, and
+#   the C++ GPU-policy tests skip instead of failing. That behavior does not
+#   vary by Python version or Ubuntu release, which the CPU entries already
+#   cover, so one entry is enough. Add more entries below if that changes.
 #
 # Key Features:
 #   - Pip package caching for faster builds
 #   - GCC environment setup for C++ compilation
+#   - CUDA toolkit installation for the GPU entry only
 #   - System information display for debugging
-#   - Build log capture on failure
-#   - Test result artifact upload
-#   - Timeout protection (60 minutes)
-#   - Fail-fast disabled to test all Python versions
+#   - Build and C++ test log capture on failure
+#   - Timeout protection (90 minutes, sized for the slower CUDA build)
+#   - Fail-fast disabled so every entry reports independently
 #
 # Requirements:
 #   - RADARSIMC SSH key secret for submodule access
 #   - CMake, GCC, and Python dependencies
+#   - CUDA toolkit (GPU entry only)
 #   - build.sh script
 #
 # ==============================================================================
@@ -45,7 +55,7 @@ on:
 
 jobs:
   # Single source of truth for the test matrix. The build job reads this
-  # instead of hardcoding Ubuntu versions/Python versions.
+  # instead of hardcoding Ubuntu versions/Python versions/architectures.
   setup:
     runs-on: ubuntu-latest
     outputs:
@@ -56,28 +66,32 @@ jobs:
         run: |
           cat > matrix.json << 'EOF'
           [
-            { "runner": "ubuntu-22.04", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22", "python-version": "3.10" },
-            { "runner": "ubuntu-22.04", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22", "python-version": "3.11" },
-            { "runner": "ubuntu-22.04", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22", "python-version": "3.12" },
-            { "runner": "ubuntu-22.04", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22", "python-version": "3.13" },
-            { "runner": "ubuntu-22.04", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22", "python-version": "3.14" },
-            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.10" },
-            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.11" },
-            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.12" },
-            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.13" },
-            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.14" },
-            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.10" },
-            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.11" },
-            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.12" },
-            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.13" },
-            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.14" }
+            { "runner": "ubuntu-22.04", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22", "python-version": "3.10", "arch": "cpu" },
+            { "runner": "ubuntu-22.04", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22", "python-version": "3.11", "arch": "cpu" },
+            { "runner": "ubuntu-22.04", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22", "python-version": "3.12", "arch": "cpu" },
+            { "runner": "ubuntu-22.04", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22", "python-version": "3.13", "arch": "cpu" },
+            { "runner": "ubuntu-22.04", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22", "python-version": "3.14", "arch": "cpu" },
+            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.10", "arch": "cpu" },
+            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.11", "arch": "cpu" },
+            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.12", "arch": "cpu" },
+            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.13", "arch": "cpu" },
+            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.14", "arch": "cpu" },
+            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.10", "arch": "cpu" },
+            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.11", "arch": "cpu" },
+            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.12", "arch": "cpu" },
+            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.13", "arch": "cpu" },
+            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.14", "arch": "cpu" },
+            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.13", "arch": "gpu" }
           ]
           EOF
           echo "matrix=$(jq -c . matrix.json)" >> "$GITHUB_OUTPUT"
 
   build:
     needs: setup
-    timeout-minutes: 60
+    name: ${{ matrix.os_label }} / ${{ matrix.arch }} / Python ${{ matrix.python-version }}
+    # Sized for the GPU entry: nvcc compiles the whole library from scratch,
+    # which does not fit in the 60 minutes the CPU entries need.
+    timeout-minutes: 90
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
@@ -103,6 +117,31 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements-dev.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
+
+      - name: Setup CUDA Toolkit
+        if: matrix.arch == 'gpu'
+        uses: radarsimx/cuda-toolkit@master
+        with:
+          cuda: "13.3.1"
+          method: "network"
+          sub-packages: '["nvcc"]'
+          linux-local-args: '["--toolkit", "--silent"]'
+
+      - name: Install CUDA cuRAND development headers
+        if: matrix.arch == 'gpu'
+        run: |
+          sudo apt-get install -y libcurand-dev-13-3
+
+      - name: Verify CUDA installation
+        if: matrix.arch == 'gpu'
+        run: |
+          echo "::group::CUDA Verification"
+          nvcc --version
+          echo "CUDA_PATH: $CUDA_PATH"
+          echo "LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
+          ls -la /usr/local/cuda/bin/ || echo "CUDA bin directory not found"
+          ls -la /usr/local/cuda/lib64/ || echo "CUDA lib64 directory not found"
+          echo "::endgroup::"
 
       - name: Install dependencies
         run: |
@@ -137,25 +176,33 @@ jobs:
         run: |
           sudo chown -R $USER:$USER /home/runner/work/radarsimpy
           chmod +x build.sh
-          ./build.sh --license=on --arch=cpu --test=on
+          ./build.sh --license=on --arch=${{ matrix.arch }} --test=on
 
       - name: Display build logs on failure
         if: failure()
         run: |
-          if [ -f "build/CMakeFiles/CMakeOutput.log" ]; then
-            echo "=== CMake Output Log ==="
-            tail -n 100 "build/CMakeFiles/CMakeOutput.log"
+          # ctest captures the full C++ test output here. The console copy can be
+          # cut short, so this is the reliable record of a crashed test binary.
+          if [ -f "src/radarsimcpp/build/Testing/Temporary/LastTest.log" ]; then
+            echo "=== C++ Test Log (ctest) ==="
+            tail -n 200 "src/radarsimcpp/build/Testing/Temporary/LastTest.log"
           fi
-          if [ -f "build/CMakeFiles/CMakeError.log" ]; then
+          if [ -f "src/radarsimcpp/build/CMakeFiles/CMakeOutput.log" ]; then
+            echo "=== CMake Output Log ==="
+            tail -n 100 "src/radarsimcpp/build/CMakeFiles/CMakeOutput.log"
+          fi
+          if [ -f "src/radarsimcpp/build/CMakeFiles/CMakeError.log" ]; then
             echo "=== CMake Error Log ==="
-            tail -n 100 "build/CMakeFiles/CMakeError.log"
+            tail -n 100 "src/radarsimcpp/build/CMakeFiles/CMakeError.log"
           fi
 
       - name: Upload build logs
         if: always()
         uses: actions/upload-artifact@v6
         with:
-          name: build-logs-python-${{ matrix.python-version }}-${{ matrix.os_label }}
+          # arch is part of the name because the CPU and GPU entries share an
+          # Ubuntu version and Python version; upload-artifact rejects duplicates.
+          name: build-logs-python-${{ matrix.python-version }}-${{ matrix.os_label }}-${{ matrix.arch }}
           path: build_logs/
           retention-days: 1
           if-no-files-found: warn

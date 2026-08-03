@@ -145,13 +145,19 @@ jobs:
       - name: Display build logs on failure
         if: failure()
         run: |
-          if [ -f "build/CMakeFiles/CMakeOutput.log" ]; then
-            echo "=== CMake Output Log ==="
-            tail -n 100 "build/CMakeFiles/CMakeOutput.log"
+          # ctest captures the full C++ test output here. The console copy can be
+          # cut short, so this is the reliable record of a crashed test binary.
+          if [ -f "src/radarsimcpp/build/Testing/Temporary/LastTest.log" ]; then
+            echo "=== C++ Test Log (ctest) ==="
+            tail -n 200 "src/radarsimcpp/build/Testing/Temporary/LastTest.log"
           fi
-          if [ -f "build/CMakeFiles/CMakeError.log" ]; then
+          if [ -f "src/radarsimcpp/build/CMakeFiles/CMakeOutput.log" ]; then
+            echo "=== CMake Output Log ==="
+            tail -n 100 "src/radarsimcpp/build/CMakeFiles/CMakeOutput.log"
+          fi
+          if [ -f "src/radarsimcpp/build/CMakeFiles/CMakeError.log" ]; then
             echo "=== CMake Error Log ==="
-            tail -n 100 "build/CMakeFiles/CMakeError.log"
+            tail -n 100 "src/radarsimcpp/build/CMakeFiles/CMakeError.log"
           fi
 
       - name: Upload build logs
