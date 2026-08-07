@@ -1,0 +1,44 @@
+# ==============================================================================
+# Dependabot Configuration: GitHub Actions
+# ==============================================================================
+#
+# Keeps the actions used by the workflows in `.github/workflows/` up to date.
+# Dependabot scans every workflow in that directory and opens a pull request
+# when a newer version of a referenced action is published.
+#
+# Notes:
+#   - `directory: "/"` is the required value for the github-actions ecosystem;
+#     it always means "the repository's .github/workflows directory".
+#   - Updates are grouped so a weekly run produces one PR instead of one per
+#     action. Major bumps are kept separate because they may require workflow
+#     changes (e.g. new required inputs, dropped Node runtime).
+#   - Only GitHub Actions are covered here. Python dependencies are pinned as
+#     minimum versions in requirements*.txt and are resolved at install time,
+#     so they are intentionally not managed by Dependabot.
+# ==============================================================================
+
+version: 2
+
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    groups:
+      actions-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
+      actions-major:
+        applies-to: version-updates
+        update-types:
+          - "major"
