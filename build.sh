@@ -36,12 +36,17 @@
 #   --jobs=N            Number of parallel build jobs (default: auto-detect)
 #   --clean=CLEAN       Clean build artifacts: 'true' or 'false' (default: true)
 #   --verbose           Enable verbose output (default: true)
+#   --deps=<repo|release> Source of the prebuilt third-party libraries:
+#                       'repo' uses the committed libs/ tree in the
+#                       radarsimx-deps submodule, 'release' downloads the
+#                       radarsimx-deps GitHub release archives (default: repo)
 #   --cmake-args=ARGS   Additional CMake arguments
 #
 # EXAMPLES:
 #   ./build.sh                                    # Default build
 #   ./build.sh --license=on --arch=gpu          # GPU build with license verification
 #   ./build.sh --jobs=8 --verbose               # 8-core parallel build
+#   ./build.sh --deps=release                   # Download prebuilt deps from a release
 #   ./build.sh --cmake-args="-DCUSTOM_FLAG=ON"  # Custom CMake flags
 #
 # EXIT CODES:
@@ -154,12 +159,16 @@ OPTIONS:
     --jobs=N            Number of parallel build jobs (default: auto-detect)
     --clean             Clean build artifacts before building (default: true)
     --verbose           Enable verbose output (default: false)
+    --deps=DEPS         Prebuilt dependency source: 'repo' or 'release' (default: repo)
+                          repo    - committed libs/ tree in the radarsimx-deps submodule
+                          release - radarsimx-deps GitHub release archives (needs network)
     --cmake-args=ARGS   Additional CMake arguments
 
 EXAMPLES:
     $0                                  # Default build
     $0 --license=on --arch=gpu        # GPU build with license verification
     $0 --jobs=4 --verbose              # Parallel build with verbose output
+    $0 --deps=release                  # Download prebuilt dependencies from a release
     $0 --cmake-args="-DCUSTOM_FLAG=ON" # Custom CMake arguments
 
 PLATFORM-SPECIFIC NOTES:
@@ -397,6 +406,7 @@ check_requirements() {
 #   JOBS - Number of parallel build jobs
 #   CLEAN - Clean build artifacts flag (true/false)
 #   VERBOSE - Verbose output flag (true/false)
+#   DEPS - Prebuilt dependency source (repo/release)
 #   CMAKE_ARGS - Additional CMake arguments
 # Supported Options:
 #   --help: Shows help and exits
@@ -406,6 +416,7 @@ check_requirements() {
 #   --jobs=VALUE: Sets parallel job count
 #   --clean=VALUE: Enables/disables cleanup
 #   --verbose: Enables verbose output
+#   --deps=VALUE: Selects the prebuilt dependency source
 #   --cmake-args=VALUE: Passes additional CMake arguments
 # Exit:
 #   Exits with code 0 on --help
@@ -418,10 +429,11 @@ parse_arguments() {
     JOBS=""                # Number of parallel jobs (auto-detect if empty)
     CLEAN="true"           # Clean build artifacts before building
     VERBOSE="true"        # Enable verbose output
+    DEPS="repo"            # Prebuilt dependency source (repo/release)
     CMAKE_ARGS=""          # Additional CMake arguments
-    
+
     # Parse command line arguments
-    # Supports --help, --license, --arch, --test, --jobs, --clean, --verbose, and --cmake-args parameters
+    # Supports --help, --license, --arch, --test, --jobs, --clean, --verbose, --deps, and --cmake-args parameters
     for i in "$@"; do
         case $i in
             --help*)
@@ -450,6 +462,10 @@ parse_arguments() {
                 ;;
             --verbose*)
                 VERBOSE="true"
+                shift
+                ;;
+            --deps=*)
+                DEPS="${i#*=}"
                 shift
                 ;;
             --cmake-args=*)
@@ -487,12 +503,14 @@ parse_arguments() {
 #   TEST - Validated against 'on' and 'off'
 #   JOBS - Validated as positive integer
 #   CLEAN - Validated against 'true' and 'false'
+#   DEPS - Validated against 'repo' and 'release'
 # Validation Rules:
 #   - LICENSE: Must be 'on' or 'off' (case insensitive)
 #   - ARCH: Must be 'cpu' or 'gpu' (case insensitive)
 #   - TEST: Must be 'on' or 'off' (case insensitive)
 #   - JOBS: Must be positive integer >= 1
 #   - CLEAN: Must be 'true' or 'false' (case insensitive)
+#   - DEPS: Must be 'repo' or 'release' (case insensitive)
 # Exit:
 #   Exits with code 1 if any validation errors are found
 validate_parameters() {
@@ -543,7 +561,17 @@ validate_parameters() {
             errors=$((errors + 1))
             ;;
     esac
-    
+
+    # Validate prebuilt dependency source parameter
+    deps_lower=$(echo "${DEPS}" | tr '[:upper:]' '[:lower:]')
+    case "${deps_lower}" in
+        "repo"|"release") ;;
+        *)
+            log_error "Invalid --deps parameter: '$DEPS'. Choose 'repo' or 'release'"
+            errors=$((errors + 1))
+            ;;
+    esac
+
     if [ $errors -gt 0 ]; then
         log_error "Parameter validation failed with $errors error(s)"
         exit 1
@@ -568,6 +596,7 @@ validate_parameters() {
 #   JOBS - Number of parallel jobs
 #   CLEAN - Clean build setting
 #   VERBOSE - Verbose output setting
+#   DEPS - Prebuilt dependency source
 #   LOG_FILE - Log file path
 #   CMAKE_ARGS - Additional CMake arguments (if any)
 # Output:
@@ -596,6 +625,7 @@ display_banner() {
     echo "  - Parallel Jobs: ${JOBS}"
     echo "  - Clean Build: $(echo "${CLEAN}" | tr '[:lower:]' '[:upper:]')"
     echo "  - Verbose: $(echo "${VERBOSE}" | tr '[:lower:]' '[:upper:]')"
+    echo "  - Prebuilt Dependencies: $(echo "${DEPS}" | tr '[:lower:]' '[:upper:]')"
     echo "  - Log File: ${LOG_FILE}"
     [ -n "$CMAKE_ARGS" ] && echo "  - CMake Args: ${CMAKE_ARGS}"
     echo
@@ -667,6 +697,7 @@ clean_build_artifacts() {
 #   ARCH - Determines GPU build flags
 #   LICENSE - Determines ENABLE_LICENSE build flag
 #   TEST - Controls Google Test compilation
+#   DEPS - Determines RADARSIMCPP_DEPS_PREFER_DOWNLOAD build flag
 #   CMAKE_ARGS - Additional CMake arguments
 #   JOBS - Number of parallel compilation jobs
 #   VERBOSE - Controls build output verbosity
@@ -683,6 +714,7 @@ clean_build_artifacts() {
 #   - GPU_BUILD=ON (if ARCH=gpu)
 #   - ENABLE_LICENSE=ON/OFF (based on LICENSE setting)
 #   - GTEST=ON/OFF (based on TEST setting)
+#   - RADARSIMCPP_DEPS_PREFER_DOWNLOAD=ON/OFF (based on DEPS setting)
 #   - Custom flags from CMAKE_ARGS
 build_cpp_library() {
     local build_start=$(date +%s)
@@ -719,7 +751,17 @@ build_cpp_library() {
     else
         cmake_args+=" -DGTEST=OFF"
     fi
-    
+
+    # Select where the prebuilt third-party libraries come from. 'repo' uses the
+    # committed libs/ tree in the radarsimx-deps submodule and needs no network;
+    # 'release' downloads the checksum-pinned archives from the deps release.
+    deps_lower=$(echo "${DEPS}" | tr '[:upper:]' '[:lower:]')
+    if [ "${deps_lower}" = "release" ]; then
+        cmake_args+=" -DRADARSIMCPP_DEPS_PREFER_DOWNLOAD=ON"
+    else
+        cmake_args+=" -DRADARSIMCPP_DEPS_PREFER_DOWNLOAD=OFF"
+    fi
+
     # Add custom CMake arguments
     if [ -n "$CMAKE_ARGS" ]; then
         cmake_args+=" $CMAKE_ARGS"
