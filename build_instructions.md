@@ -17,24 +17,23 @@ radarsimpy/
 ├── models/                       # 3D model files for simulation
 ├── src/                          # Source code
 │   ├── radarsimcpp/              # C++ source code
-│   │   ├── hdf5-lib-build/       # HDF5 library build files
-│   │   │   ├── hdf5/             # HDF5 source code (HDF Group)
-│   │   │   ├── libs/             # Platform-specific precompiled libraries
-│   │   │   │   ├── lib_linux_x86_64/
-│   │   │   │   ├── lib_macos_arm64/
-│   │   │   │   ├── lib_macos_x86_64/
-│   │   │   │   └── lib_win_x86_64/
+│   │   ├── deps/                 # Submodule: prebuilt third-party libraries
+│   │   │   ├── libs/hdf5/        # Precompiled HDF5, per platform
+│   │   │   ├── libs/mbedtls/     # Precompiled mbedTLS, per platform
+│   │   │   ├── recipes/          # One CMake project per dependency
 │   │   │   ├── build.bat         # Windows build script
 │   │   │   ├── build.sh          # Linux/macOS build script
 │   │   │   └── README.md
-│   │   │   # Note: RadarSimCpp uses precompiled HDF5 libraries.
-│   │   │   # To build HDF5 from source, see: https://github.com/radarsimx/hdf5-lib-build
+│   │   │   # Note: RadarSimCpp never compiles HDF5 or mbedTLS. They are built
+│   │   │   # once here and consumed as static libraries. To rebuild them, see
+│   │   │   # https://github.com/radarsimx/radarsimx-deps
+│   │   ├── cmake/                # PrebuiltDeps.cmake + the dependency manifest
 │   │   ├── includes/             # Header files
 │   │   │   ├── libs/             # Core library headers
 │   │   │   └── rsvector/         # Custom vector implementations
 │   │   ├── src/                  # C++/CUDA implementation files
 │   │   ├── tests/                # C++ unit tests (Google Test)
-│   │   ├── CMakeLists.txt        # CMake configuration (Config path to precompiled HDF5 library)
+│   │   ├── CMakeLists.txt        # CMake configuration
 │   │   └── README.md
 │   └── radarsimpy/               # Python source code
 │       ├── includes/             # Cython declaration files

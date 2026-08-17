@@ -132,8 +132,13 @@ def get_exclude_patterns() -> tuple[Set[str], Set[str]]:
         # Specific paths to exclude (relative to project root)
         "./radarsimpy",  # Top-level radarsimpy folder (not src/radarsimpy)
         "./references",
-        "./src/radarsimcpp/hdf5-lib-build/hdf5",
-        "./src/radarsimcpp/hdf5-lib-build/hdf5lib",
+        # Build leftovers inside the prebuilt-dependency submodule. The
+        # committed libs/ tree is kept - that is what a source package needs to
+        # build without network access.
+        "./src/radarsimcpp/deps/build",
+        "./src/radarsimcpp/deps/output",
+        "./src/radarsimcpp/deps/dist",
+        "./src/radarsimcpp/.deps-cache",
         "./src/radarsimcpp/autocoder",
         "./src/radarsimcpp/entry",
     }
@@ -185,7 +190,7 @@ def should_exclude(path: Path, exclude_dirs: Set[str], exclude_files: Set[str]) 
 
     # Check if path matches any exclude pattern
     for exclude_pattern in exclude_dirs:
-        # Handle full path patterns (e.g., './src/radarsimcpp/hdf5-lib-build/hdf5')
+        # Handle full path patterns (e.g., './src/radarsimcpp/deps/build')
         if "/" in exclude_pattern or "\\" in exclude_pattern:
             # Normalize the pattern
             normalized_pattern = exclude_pattern.lstrip("./").lstrip(".\\")
