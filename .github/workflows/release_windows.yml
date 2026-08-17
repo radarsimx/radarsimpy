@@ -123,7 +123,7 @@ jobs:
       - name: Build RadarSimPy
         run: |
           echo "::group::Build Process"
-          .\build.bat --license=on --arch=${{ matrix.arch }} --test=off
+          .\build.bat --license=on --arch=${{ matrix.arch }} --test=off --deps=release
           echo "::endgroup::"
         shell: cmd
 

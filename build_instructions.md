@@ -133,6 +133,7 @@ python build_config.py
 - `--arch`: Architecture (`cpu` or `gpu`)
 - `--test`: Enable testing (`on` or `off`)
 - `--license`: Enable license verification (`on` or `off`)
+- `--deps`: Prebuilt dependency source (`repo` or `release`)
 
 ## Ubuntu 22.04/24.04/26.04 and Other Linux Distributions
 
@@ -193,6 +194,7 @@ python build_config.py
 - `--arch`: Architecture (`cpu` or `gpu`)
 - `--test`: Enable testing (`on` or `off`)
 - `--license`: Enable license verification (`on` or `off`)
+- `--deps`: Prebuilt dependency source (`repo` or `release`)
 
 ## macOS
 
@@ -251,10 +253,42 @@ python build_config.py
 - `--arch`: Architecture (`cpu`)
 - `--test`: Enable testing (`on` or `off`)
 - `--license`: Enable license verification (`on` or `off`)
+- `--deps`: Prebuilt dependency source (`repo` or `release`)
 - `--jobs`: Number of parallel build jobs (auto-detected by default)
 - `--verbose`: Enable verbose output
 - `--clean`: Clean build artifacts (`true` or `false`)
 - `--cmake-args`: Additional CMake arguments
+
+## Prebuilt Dependency Source
+
+RadarSimCpp links third-party libraries (HDF5, and mbedTLS when license
+verification is enabled) as prebuilt static libraries. They are never compiled
+as part of a RadarSimPy build; `--deps` only chooses where they are read from.
+
+| `--deps` | Where the libraries come from | Network needed |
+|---|---|---|
+| `repo` (default) | The committed `libs/` tree in the `radarsimx-deps` submodule, reached through `src/radarsimcpp/deps` | No |
+| `release` | The checksum-pinned release archives published by [`radarsimx/radarsimx-deps`](https://github.com/radarsimx/radarsimx-deps), downloaded and cached under `src/radarsimcpp/.deps-cache/` | Yes, on the first build |
+
+```bash
+# Linux/macOS
+./build.sh --deps=release
+
+# Windows
+build.bat --deps=release
+```
+
+`repo` is the default because it needs no network and pins the dependencies to
+the submodule commit, which makes it the right choice for local and offline
+builds. The GitHub Actions workflows all pass `--deps=release`, so CI links the
+same tagged, checksum-verified archives every time.
+
+Downloaded archives are verified against the SHA-256 checksums pinned in
+`src/radarsimcpp/cmake/deps_manifest.cmake`; a mismatch fails the build rather
+than linking something unverified. The cache lives outside the build directory,
+so a clean build does not re-download. Note that `--deps=release` only works
+for platforms that the pinned release actually published; if one is missing,
+the build stops with the reason instead of silently falling back.
 
 ## Building Documentation
 

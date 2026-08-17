@@ -154,7 +154,7 @@ jobs:
 
       - name: Build & Test
         run: |
-          .\build.bat --license=on --arch=${{ matrix.arch }} --test=on
+          .\build.bat --license=on --arch=${{ matrix.arch }} --test=on --deps=release
         env:
           PYTHONPATH: ${{ github.workspace }}
 
