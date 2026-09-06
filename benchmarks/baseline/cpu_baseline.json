@@ -1,0 +1,265 @@
+{
+  "environment": {
+    "platform": "Windows-11-10.0.29648-SP0",
+    "processor": "Intel64 Family 6 Model 141 Stepping 1, GenuineIntel",
+    "cpu_count": 16,
+    "omp_num_threads": null,
+    "python": "3.13.12",
+    "radarsimpy_rev": "v15.3.0-34-ge665fe2-dirty",
+    "radarsimcpp_rev": "v15.3.0-24-gceb73ea6-dirty"
+  },
+  "settings": {
+    "device": "cpu",
+    "model": "ball_1m",
+    "distance": 20.0,
+    "repeat": 1,
+    "dry_run": false
+  },
+  "results": [
+    {
+      "sweep": "density",
+      "params": {
+        "density": 0.25,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.2382851999718696,
+      "cpu_s": 3.625,
+      "threads_busy": 15.212862571523301
+    },
+    {
+      "sweep": "density",
+      "params": {
+        "density": 0.5,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.4484735999722034,
+      "cpu_s": 3.59375,
+      "threads_busy": 8.013292198744235
+    },
+    {
+      "sweep": "density",
+      "params": {
+        "density": 1.0,
+        "model": "ball_1m"
+      },
+      "wall_s": 1.1904265000484884,
+      "cpu_s": 4.328125,
+      "threads_busy": 3.6357767571737583
+    },
+    {
+      "sweep": "density",
+      "params": {
+        "density": 2.0,
+        "model": "ball_1m"
+      },
+      "wall_s": 3.7143302999902517,
+      "cpu_s": 6.8125,
+      "threads_busy": 1.8341125989839622
+    },
+    {
+      "sweep": "density",
+      "params": {
+        "density": 4.0,
+        "model": "ball_1m"
+      },
+      "wall_s": 6.60238890000619,
+      "cpu_s": 9.328125,
+      "threads_busy": 1.412840888544335
+    },
+    {
+      "sweep": "level",
+      "params": {
+        "level": null,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.5245886000338942,
+      "cpu_s": 3.359375,
+      "threads_busy": 6.403827684747529
+    },
+    {
+      "sweep": "level",
+      "params": {
+        "level": "frame",
+        "model": "ball_1m"
+      },
+      "wall_s": 0.547634799964726,
+      "cpu_s": 3.71875,
+      "threads_busy": 6.790565537908713
+    },
+    {
+      "sweep": "level",
+      "params": {
+        "level": "pulse",
+        "model": "ball_1m"
+      },
+      "wall_s": 0.9908151000272483,
+      "cpu_s": 10.46875,
+      "threads_busy": 10.565795777347459
+    },
+    {
+      "sweep": "level",
+      "params": {
+        "level": "sample",
+        "model": "ball_1m"
+      },
+      "wall_s": 10.737911999924108,
+      "cpu_s": 162.4375,
+      "threads_busy": 15.127475434809677
+    },
+    {
+      "sweep": "tx",
+      "params": {
+        "tx_channels": 1,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.4597686999477446,
+      "cpu_s": 3.78125,
+      "threads_busy": 8.224244061045829
+    },
+    {
+      "sweep": "tx",
+      "params": {
+        "tx_channels": 2,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.6559722002130002,
+      "cpu_s": 5.5625,
+      "threads_busy": 8.479780085488082
+    },
+    {
+      "sweep": "tx",
+      "params": {
+        "tx_channels": 4,
+        "model": "ball_1m"
+      },
+      "wall_s": 1.0063449000008404,
+      "cpu_s": 9.5,
+      "threads_busy": 9.440103487375021
+    },
+    {
+      "sweep": "rx",
+      "params": {
+        "rx_channels": 1,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.43991239997558296,
+      "cpu_s": 3.34375,
+      "threads_busy": 7.6009450976730655
+    },
+    {
+      "sweep": "rx",
+      "params": {
+        "rx_channels": 2,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.4917189998086542,
+      "cpu_s": 3.609375,
+      "threads_busy": 7.340320389093241
+    },
+    {
+      "sweep": "rx",
+      "params": {
+        "rx_channels": 4,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.5141179000493139,
+      "cpu_s": 3.5625,
+      "threads_busy": 6.929344416248271
+    },
+    {
+      "sweep": "rx",
+      "params": {
+        "rx_channels": 8,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.6654107000213116,
+      "cpu_s": 3.75,
+      "threads_busy": 5.635617220883127
+    },
+    {
+      "sweep": "model",
+      "params": {
+        "model": "cr"
+      },
+      "wall_s": 0.06382000003941357,
+      "cpu_s": 0.890625,
+      "threads_busy": 13.95526479865204
+    },
+    {
+      "sweep": "model",
+      "params": {
+        "model": "plate5x5"
+      },
+      "wall_s": 14.59970759996213,
+      "cpu_s": 15.625,
+      "threads_busy": 1.0702269133143825
+    },
+    {
+      "sweep": "model",
+      "params": {
+        "model": "ball_1m"
+      },
+      "wall_s": 1.2646804000250995,
+      "cpu_s": 3.8125,
+      "threads_busy": 3.0145956242575873
+    },
+    {
+      "sweep": "model",
+      "params": {
+        "model": "half_ring"
+      },
+      "wall_s": 3.8175766998901963,
+      "cpu_s": 5.8125,
+      "threads_busy": 1.522562729431784
+    },
+    {
+      "sweep": "model",
+      "params": {
+        "model": "turbine"
+      },
+      "wall_s": 0.41287890006788075,
+      "cpu_s": 3.046875,
+      "threads_busy": 7.379585150752601
+    },
+    {
+      "sweep": "pulses",
+      "params": {
+        "pulses": 1,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.41952300001867115,
+      "cpu_s": 3.5,
+      "threads_busy": 8.342808379622166
+    },
+    {
+      "sweep": "pulses",
+      "params": {
+        "pulses": 2,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.4764781999401748,
+      "cpu_s": 3.390625,
+      "threads_busy": 7.11601286360156
+    },
+    {
+      "sweep": "pulses",
+      "params": {
+        "pulses": 4,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.5212408998049796,
+      "cpu_s": 3.640625,
+      "threads_busy": 6.984534408873377
+    },
+    {
+      "sweep": "pulses",
+      "params": {
+        "pulses": 8,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.6583271999843419,
+      "cpu_s": 3.640625,
+      "threads_busy": 5.530114812340416
+    }
+  ]
+}
