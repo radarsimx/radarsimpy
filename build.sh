@@ -740,7 +740,9 @@ build_cpp_library() {
     # of its compile time. Set RADARSIMX_CUDA_ARCHITECTURES to build for one card
     # instead, e.g. `RADARSIMX_CUDA_ARCHITECTURES=86 ./build.sh --arch=gpu`.
     # Leave it unset for release and CI builds so the fat binary stays complete.
-    if [ -n "${RADARSIMX_CUDA_ARCHITECTURES}" ]; then
+    # The :- default matters: this script runs under `set -u`, so naming an
+    # unset variable aborts the build rather than testing as empty.
+    if [ -n "${RADARSIMX_CUDA_ARCHITECTURES:-}" ]; then
         cmake_args+=" -DRADARSIMX_CUDA_ARCHITECTURES=${RADARSIMX_CUDA_ARCHITECTURES}"
     fi
 
