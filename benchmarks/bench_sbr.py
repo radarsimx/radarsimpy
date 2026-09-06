@@ -43,7 +43,10 @@ for _path in (os.path.dirname(_HERE), _HERE):
 
 import scenes  # noqa: E402  (needs the path insert above)
 
-from radarsimpy.simulator import sim_radar  # pylint: disable=no-name-in-module
+from radarsimpy.simulator import (  # pylint: disable=no-name-in-module
+    sim_radar,
+    sim_rcs,
+)
 
 try:
     import psutil
@@ -51,7 +54,7 @@ except ImportError:  # pragma: no cover - psutil is a dev-only dependency
     psutil = None
 
 
-ALL_SWEEPS = ["density", "level", "tx", "rx", "model", "pulses"]
+ALL_SWEEPS = ["density", "level", "tx", "rx", "model", "pulses", "rcs"]
 
 
 def _cpu_seconds():
@@ -67,6 +70,22 @@ def time_once(radar, targets, **kwargs):
     cpu_before = _cpu_seconds()
     wall_before = time.perf_counter()
     sim_radar(radar, targets, **kwargs)
+    wall = time.perf_counter() - wall_before
+    cpu = None if cpu_before is None else _cpu_seconds() - cpu_before
+    record = {"wall_s": wall, "cpu_s": cpu}
+    if cpu is not None and wall > 0:
+        record["threads_busy"] = cpu / wall
+    return record
+
+
+def time_rcs(model, frequency, density):
+    """Run one monostatic sim_rcs evaluation and time it."""
+    target = {"model": scenes.model_path(model), "location": (0, 0, 0)}
+    phi = 0.0
+    theta = 90.0
+    cpu_before = _cpu_seconds()
+    wall_before = time.perf_counter()
+    sim_rcs([target], frequency, phi, theta, inc_pol=[0, 0, 1], density=density)
     wall = time.perf_counter() - wall_before
     cpu = None if cpu_before is None else _cpu_seconds() - cpu_before
     record = {"wall_s": wall, "cpu_s": cpu}
@@ -157,6 +176,28 @@ def build_cases(sweeps, model, device):
     for case in cases:
         case["sim_kwargs"]["device"] = device
         case["params"].setdefault("model", model)
+
+    # RCS runs through a different entry point, so its cases carry no radar and
+    # are dispatched separately in run().
+    if "rcs" in sweeps:
+        for rcs_model, frequency, rcs_density in [
+            ("plate5x5", 24e9, 2.0),
+            ("plate5x5", 77e9, 0.5),
+            ("plate5x5", 77e9, 1.0),
+            ("ball_1m", 77e9, 2.0),
+        ]:
+            cases.append(
+                {
+                    "name": "rcs",
+                    "params": {
+                        "model": rcs_model,
+                        "f": frequency,
+                        "density": rcs_density,
+                    },
+                    "radar_kwargs": None,
+                    "sim_kwargs": None,
+                }
+            )
     return cases
 
 
@@ -203,6 +244,22 @@ def run(args):
     results = []
     for case in cases:
         model = case["params"].get("model", args.model)
+
+        if case["name"] == "rcs":
+            best = None
+            for _ in range(args.repeat):
+                record = time_rcs(model, case["params"]["f"],
+                                  case["params"]["density"])
+                if best is None or record["wall_s"] < best["wall_s"]:
+                    best = record
+            entry = {"sweep": "rcs", "params": case["params"], **best}
+            results.append(entry)
+            busy = entry.get("threads_busy")
+            busy_txt = "" if busy is None else f"  threads_busy={busy:5.2f}"
+            params = ", ".join(f"{k}={v}" for k, v in case["params"].items())
+            print(f"  [{'rcs':8}] {params:44} {entry['wall_s']:8.3f} s{busy_txt}")
+            continue
+
         radar = scenes.make_radar(**case["radar_kwargs"])
         targets = scenes.make_targets(model=model, distance=args.distance)
         sim_kwargs = dict(case["sim_kwargs"])
