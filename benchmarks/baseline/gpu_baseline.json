@@ -1,0 +1,265 @@
+{
+  "environment": {
+    "platform": "Windows-11-10.0.29648-SP0",
+    "processor": "Intel64 Family 6 Model 141 Stepping 1, GenuineIntel",
+    "cpu_count": 16,
+    "omp_num_threads": null,
+    "python": "3.13.12",
+    "radarsimpy_rev": "v15.3.0-35-g07a043d-dirty",
+    "radarsimcpp_rev": "v15.3.0-25-g0843ff80-dirty"
+  },
+  "settings": {
+    "device": "gpu",
+    "model": "ball_1m",
+    "distance": 20.0,
+    "repeat": 3,
+    "dry_run": false
+  },
+  "results": [
+    {
+      "sweep": "density",
+      "params": {
+        "density": 0.25,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.02921559987589717,
+      "cpu_s": 0.03125,
+      "threads_busy": 1.0696340356776726
+    },
+    {
+      "sweep": "density",
+      "params": {
+        "density": 0.5,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.0564968001563102,
+      "cpu_s": 0.046875,
+      "threads_busy": 0.8296930068660617
+    },
+    {
+      "sweep": "density",
+      "params": {
+        "density": 1.0,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.1290911000687629,
+      "cpu_s": 0.140625,
+      "threads_busy": 1.0893469799629358
+    },
+    {
+      "sweep": "density",
+      "params": {
+        "density": 2.0,
+        "model": "ball_1m"
+      },
+      "wall_s": 1.1028867000713944,
+      "cpu_s": 0.6875,
+      "threads_busy": 0.6233641224937205
+    },
+    {
+      "sweep": "density",
+      "params": {
+        "density": 4.0,
+        "model": "ball_1m"
+      },
+      "wall_s": 1.1113354999106377,
+      "cpu_s": 0.8125,
+      "threads_busy": 0.7311023539384218
+    },
+    {
+      "sweep": "level",
+      "params": {
+        "level": null,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.05202649999409914,
+      "cpu_s": 0.046875,
+      "threads_busy": 0.9009831529185429
+    },
+    {
+      "sweep": "level",
+      "params": {
+        "level": "frame",
+        "model": "ball_1m"
+      },
+      "wall_s": 0.05355240008793771,
+      "cpu_s": 0.046875,
+      "threads_busy": 0.8753109089980498
+    },
+    {
+      "sweep": "level",
+      "params": {
+        "level": "pulse",
+        "model": "ball_1m"
+      },
+      "wall_s": 0.07000910001806915,
+      "cpu_s": 0.078125,
+      "threads_busy": 1.1159263578568523
+    },
+    {
+      "sweep": "level",
+      "params": {
+        "level": "sample",
+        "model": "ball_1m"
+      },
+      "wall_s": 0.4994804000016302,
+      "cpu_s": 0.484375,
+      "threads_busy": 0.9697577722737851
+    },
+    {
+      "sweep": "tx",
+      "params": {
+        "tx_channels": 1,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.0496352999471128,
+      "cpu_s": 0.0625,
+      "threads_busy": 1.259184493024012
+    },
+    {
+      "sweep": "tx",
+      "params": {
+        "tx_channels": 2,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.05581380007788539,
+      "cpu_s": 0.0625,
+      "threads_busy": 1.1197947445396004
+    },
+    {
+      "sweep": "tx",
+      "params": {
+        "tx_channels": 4,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.06862029992043972,
+      "cpu_s": 0.0625,
+      "threads_busy": 0.9108091930881129
+    },
+    {
+      "sweep": "rx",
+      "params": {
+        "rx_channels": 1,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.04831029986962676,
+      "cpu_s": 0.046875,
+      "threads_busy": 0.9702899821880603
+    },
+    {
+      "sweep": "rx",
+      "params": {
+        "rx_channels": 2,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.050619599875062704,
+      "cpu_s": 0.046875,
+      "threads_busy": 0.9260247041797055
+    },
+    {
+      "sweep": "rx",
+      "params": {
+        "rx_channels": 4,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.05452610016800463,
+      "cpu_s": 0.0625,
+      "threads_busy": 1.1462400539819713
+    },
+    {
+      "sweep": "rx",
+      "params": {
+        "rx_channels": 8,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.06583460001274943,
+      "cpu_s": 0.0625,
+      "threads_busy": 0.9493488224717146
+    },
+    {
+      "sweep": "model",
+      "params": {
+        "model": "cr"
+      },
+      "wall_s": 0.008939299965277314,
+      "cpu_s": 0.0,
+      "threads_busy": 0.0
+    },
+    {
+      "sweep": "model",
+      "params": {
+        "model": "plate5x5"
+      },
+      "wall_s": 1.2726559999864548,
+      "cpu_s": 0.90625,
+      "threads_busy": 0.7120934486692755
+    },
+    {
+      "sweep": "model",
+      "params": {
+        "model": "ball_1m"
+      },
+      "wall_s": 0.14027120009995997,
+      "cpu_s": 0.140625,
+      "threads_busy": 1.002522256170817
+    },
+    {
+      "sweep": "model",
+      "params": {
+        "model": "half_ring"
+      },
+      "wall_s": 1.1070324000902474,
+      "cpu_s": 0.734375,
+      "threads_busy": 0.6633726347486599
+    },
+    {
+      "sweep": "model",
+      "params": {
+        "model": "turbine"
+      },
+      "wall_s": 0.04474599985405803,
+      "cpu_s": 0.046875,
+      "threads_busy": 1.047579675342731
+    },
+    {
+      "sweep": "pulses",
+      "params": {
+        "pulses": 1,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.04814040008932352,
+      "cpu_s": 0.03125,
+      "threads_busy": 0.6491429224106212
+    },
+    {
+      "sweep": "pulses",
+      "params": {
+        "pulses": 2,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.049374200170859694,
+      "cpu_s": 0.046875,
+      "threads_busy": 0.9493824677217818
+    },
+    {
+      "sweep": "pulses",
+      "params": {
+        "pulses": 4,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.05324560008011758,
+      "cpu_s": 0.0625,
+      "threads_busy": 1.1738059089569375
+    },
+    {
+      "sweep": "pulses",
+      "params": {
+        "pulses": 8,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.05580720002762973,
+      "cpu_s": 0.0625,
+      "threads_busy": 1.1199271773007196
+    }
+  ]
+}
