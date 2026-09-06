@@ -215,12 +215,6 @@ cpdef sim_radar(radar, targets, density=1, level=None, interf=None,
           automatically falls back to CPU execution. The fallback caused by a missing device
           is reported as a ``RuntimeWarning``.
         - ``"cpu"``: Execute simulation on CPU only.
-
-        .. note::
-            **Performance Consideration**: When using a GPU-compiled module with ``device="cpu"``, 
-            OpenMP parallelization is not available for CPU execution, resulting in slower 
-            performance compared to a CPU-only compiled module. For optimal CPU performance, 
-            use a module compiled without GPU support.
     :param str or None log_path:
         Path to save ray-tracing data. Default: ``None`` (does not save data).
     :param bool dry_run:
@@ -276,9 +270,7 @@ cpdef sim_radar(radar, targets, density=1, level=None, interf=None,
         if CUDA_BUILD:
             warnings.warn(
                 "No CUDA device was detected on this machine. "
-                "Running the simulation on the CPU instead. "
-                "Note that a GPU-enabled build has no OpenMP parallelization "
-                "for CPU execution, so this will be slower than a CPU-only build.",
+                "Running the simulation on the CPU instead.",
                 RuntimeWarning,
                 stacklevel=2
             )

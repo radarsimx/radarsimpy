@@ -469,6 +469,14 @@ REM   Sets CMAKE_FAILED=1 and exits on any CMake failures
     set CMAKE_OPTIONS=-DENABLE_LICENSE=!LICENSE_FLAG! -DGTEST=!GTEST_FLAG! -DRADARSIMCPP_DEPS_PREFER_DOWNLOAD=!DEPS_DOWNLOAD_FLAG!
     if /I "%ARCH%" == "gpu" set CMAKE_OPTIONS=-DGPU_BUILD=ON !CMAKE_OPTIONS!
 
+    REM A GPU build generates code for every supported architecture, which is
+    REM most of its compile time. Set RADARSIMX_CUDA_ARCHITECTURES to build for
+    REM one card instead, e.g. `set RADARSIMX_CUDA_ARCHITECTURES=86`. Leave it
+    REM unset for release and CI builds so the fat binary stays complete.
+    if defined RADARSIMX_CUDA_ARCHITECTURES (
+        set CMAKE_OPTIONS=-DRADARSIMX_CUDA_ARCHITECTURES=!RADARSIMX_CUDA_ARCHITECTURES! !CMAKE_OPTIONS!
+    )
+
     cmake !CMAKE_OPTIONS! ..
 
     if %errorlevel% neq 0 (

@@ -735,7 +735,15 @@ build_cpp_library() {
     if [ "${arch_lower}" = "gpu" ]; then
         cmake_args+=" -DGPU_BUILD=ON"
     fi
-    
+
+    # A GPU build generates code for every supported architecture, which is most
+    # of its compile time. Set RADARSIMX_CUDA_ARCHITECTURES to build for one card
+    # instead, e.g. `RADARSIMX_CUDA_ARCHITECTURES=86 ./build.sh --arch=gpu`.
+    # Leave it unset for release and CI builds so the fat binary stays complete.
+    if [ -n "${RADARSIMX_CUDA_ARCHITECTURES}" ]; then
+        cmake_args+=" -DRADARSIMX_CUDA_ARCHITECTURES=${RADARSIMX_CUDA_ARCHITECTURES}"
+    fi
+
     # Add license verification flag
     license_lower=$(echo "${LICENSE}" | tr '[:upper:]' '[:lower:]')
     if [ "${license_lower}" = "on" ]; then

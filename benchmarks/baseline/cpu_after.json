@@ -1,0 +1,309 @@
+{
+  "environment": {
+    "platform": "Windows-11-10.0.29648-SP0",
+    "processor": "Intel64 Family 6 Model 141 Stepping 1, GenuineIntel",
+    "cpu_count": 16,
+    "omp_num_threads": null,
+    "python": "3.13.12",
+    "radarsimpy_rev": "v15.3.0-43-gaa1bf71-dirty",
+    "radarsimcpp_rev": "v15.3.0-33-g7b23ae59-dirty"
+  },
+  "settings": {
+    "device": "cpu",
+    "model": "ball_1m",
+    "distance": 20.0,
+    "repeat": 2,
+    "dry_run": false
+  },
+  "results": [
+    {
+      "sweep": "density",
+      "params": {
+        "density": 0.25,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.04374550003558397,
+      "cpu_s": 0.71875,
+      "threads_busy": 16.430261384950363
+    },
+    {
+      "sweep": "density",
+      "params": {
+        "density": 0.5,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.08704809984192252,
+      "cpu_s": 1.03125,
+      "threads_busy": 11.846898460422777
+    },
+    {
+      "sweep": "density",
+      "params": {
+        "density": 1.0,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.21804639999754727,
+      "cpu_s": 3.203125,
+      "threads_busy": 14.690107243394209
+    },
+    {
+      "sweep": "density",
+      "params": {
+        "density": 2.0,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.661856799852103,
+      "cpu_s": 5.59375,
+      "threads_busy": 8.45160161722289
+    },
+    {
+      "sweep": "density",
+      "params": {
+        "density": 4.0,
+        "model": "ball_1m"
+      },
+      "wall_s": 1.2135385000146925,
+      "cpu_s": 14.71875,
+      "threads_busy": 12.128787014026994
+    },
+    {
+      "sweep": "level",
+      "params": {
+        "level": null,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.08892529993318021,
+      "cpu_s": 0.9375,
+      "threads_busy": 10.542556513213354
+    },
+    {
+      "sweep": "level",
+      "params": {
+        "level": "frame",
+        "model": "ball_1m"
+      },
+      "wall_s": 0.09772169985808432,
+      "cpu_s": 1.578125,
+      "threads_busy": 16.149176716039747
+    },
+    {
+      "sweep": "level",
+      "params": {
+        "level": "pulse",
+        "model": "ball_1m"
+      },
+      "wall_s": 0.16376649984158576,
+      "cpu_s": 2.421875,
+      "threads_busy": 14.788586202567208
+    },
+    {
+      "sweep": "level",
+      "params": {
+        "level": "sample",
+        "model": "ball_1m"
+      },
+      "wall_s": 1.7273065999615937,
+      "cpu_s": 25.71875,
+      "threads_busy": 14.88951064076977
+    },
+    {
+      "sweep": "tx",
+      "params": {
+        "tx_channels": 1,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.08493019989691675,
+      "cpu_s": 1.5,
+      "threads_busy": 17.661562104182156
+    },
+    {
+      "sweep": "tx",
+      "params": {
+        "tx_channels": 2,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.11189999990165234,
+      "cpu_s": 1.953125,
+      "threads_busy": 17.454200194071312
+    },
+    {
+      "sweep": "tx",
+      "params": {
+        "tx_channels": 4,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.16356720007024705,
+      "cpu_s": 2.359375,
+      "threads_busy": 14.424499526718813
+    },
+    {
+      "sweep": "rx",
+      "params": {
+        "rx_channels": 1,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.08498290018178523,
+      "cpu_s": 1.5,
+      "threads_busy": 17.650609673138714
+    },
+    {
+      "sweep": "rx",
+      "params": {
+        "rx_channels": 2,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.09191020019352436,
+      "cpu_s": 1.390625,
+      "threads_busy": 15.130257545647018
+    },
+    {
+      "sweep": "rx",
+      "params": {
+        "rx_channels": 4,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.10297590005211532,
+      "cpu_s": 1.703125,
+      "threads_busy": 16.539063986214845
+    },
+    {
+      "sweep": "rx",
+      "params": {
+        "rx_channels": 8,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.13375260005705059,
+      "cpu_s": 1.984375,
+      "threads_busy": 14.836160187940932
+    },
+    {
+      "sweep": "model",
+      "params": {
+        "model": "cr"
+      },
+      "wall_s": 0.022084200056269765,
+      "cpu_s": 0.3125,
+      "threads_busy": 14.150388024187473
+    },
+    {
+      "sweep": "model",
+      "params": {
+        "model": "plate5x5"
+      },
+      "wall_s": 2.233874399913475,
+      "cpu_s": 22.125,
+      "threads_busy": 9.904316912740024
+    },
+    {
+      "sweep": "model",
+      "params": {
+        "model": "ball_1m"
+      },
+      "wall_s": 0.19941759994253516,
+      "cpu_s": 2.609375,
+      "threads_busy": 13.084978461038174
+    },
+    {
+      "sweep": "model",
+      "params": {
+        "model": "half_ring"
+      },
+      "wall_s": 0.6562975000124425,
+      "cpu_s": 7.546875,
+      "threads_busy": 11.499167679073777
+    },
+    {
+      "sweep": "model",
+      "params": {
+        "model": "turbine"
+      },
+      "wall_s": 0.06511219986714423,
+      "cpu_s": 0.828125,
+      "threads_busy": 12.718430673356405
+    },
+    {
+      "sweep": "pulses",
+      "params": {
+        "pulses": 1,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.08386990008875728,
+      "cpu_s": 1.375,
+      "threads_busy": 16.394439465706697
+    },
+    {
+      "sweep": "pulses",
+      "params": {
+        "pulses": 2,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.09120690007694066,
+      "cpu_s": 1.125,
+      "threads_busy": 12.334593096037343
+    },
+    {
+      "sweep": "pulses",
+      "params": {
+        "pulses": 4,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.10158760007470846,
+      "cpu_s": 1.359375,
+      "threads_busy": 13.381308338815987
+    },
+    {
+      "sweep": "pulses",
+      "params": {
+        "pulses": 8,
+        "model": "ball_1m"
+      },
+      "wall_s": 0.10673679993487895,
+      "cpu_s": 1.609375,
+      "threads_busy": 15.0779768644169
+    },
+    {
+      "sweep": "rcs",
+      "params": {
+        "model": "plate5x5",
+        "f": 24000000000.0,
+        "density": 2.0
+      },
+      "wall_s": 0.7533172001130879,
+      "cpu_s": 4.46875,
+      "threads_busy": 5.932096067007565
+    },
+    {
+      "sweep": "rcs",
+      "params": {
+        "model": "plate5x5",
+        "f": 77000000000.0,
+        "density": 0.5
+      },
+      "wall_s": 0.45484440005384386,
+      "cpu_s": 3.75,
+      "threads_busy": 8.244577705158248
+    },
+    {
+      "sweep": "rcs",
+      "params": {
+        "model": "plate5x5",
+        "f": 77000000000.0,
+        "density": 1.0
+      },
+      "wall_s": 2.0866400999948382,
+      "cpu_s": 7.265625,
+      "threads_busy": 3.4819732449395433
+    },
+    {
+      "sweep": "rcs",
+      "params": {
+        "model": "ball_1m",
+        "f": 77000000000.0,
+        "density": 2.0
+      },
+      "wall_s": 0.4799695999827236,
+      "cpu_s": 3.8125,
+      "threads_busy": 7.943211403674796
+    }
+  ]
+}
