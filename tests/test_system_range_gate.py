@@ -29,7 +29,10 @@ import pytest
 import scipy.constants as const
 
 from radarsimpy import Radar, Transmitter, Receiver
-from radarsimpy.simulator import sim_radar  # pylint: disable=no-name-in-module
+from radarsimpy.simulator import (  # pylint: disable=no-name-in-module
+    gpu_available,
+    sim_radar,
+)
 
 # X-band stretch radar imaging ships at 60 nmi
 CARRIER = 9e9
@@ -328,14 +331,20 @@ def test_mesh_agrees_with_point_under_gate():
     assert abs(mesh_bin - point_bin) <= 4, f"point {point_bin}, mesh {mesh_bin}"
 
 
+@pytest.mark.skipif(
+    not gpu_available(),
+    reason="CPU-only build or no usable CUDA device: device='gpu' would fall "
+    "back to the CPU and the comparison would pass against itself",
+)
 def test_cpu_gpu_parity():
     """
     The gated path must agree between CPU and GPU.
 
     gate_delay_ is a double member on a Receiver<float> that gets memcpy'd
     wholesale to the device, so a layout or precision mismatch would show up
-    here as a shifted peak. Skipped automatically on CPU-only builds, where
-    device="gpu" falls back to CPU and the comparison is vacuous.
+    here as a shifted peak. Skipped on CPU-only builds and on machines with no
+    CUDA device, where device="gpu" falls back to the CPU and this would
+    compare the CPU result against itself -- passing while testing nothing.
     """
     radar = _build_radar()
     targets = [{"location": (GATE_RANGE + 100.0, 0, 0), "rcs": 30}]

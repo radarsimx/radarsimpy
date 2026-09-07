@@ -30,7 +30,7 @@ cimport cython
 
 # RadarSimX imports
 from radarsimpy.includes.radarsimc cimport LidarSimulator, TargetsManager, RadarSimErrorCode
-from radarsimpy.includes.radarsimc cimport Mem_Copy, Ray, cpu_policy, gpu_policy, gpu_available
+from radarsimpy.includes.radarsimc cimport Mem_Copy, Ray, cpu_policy, gpu_policy, gpu_available as _gpu_available_c
 from radarsimpy.includes.rsvector cimport Vec3
 from radarsimpy.includes.type_def cimport float_t, int_t, vector
 
@@ -114,7 +114,7 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
     # otherwise, which is also what a CPU-only build always uses.
     cdef LidarSimulator[float_t, cpu_policy] lidar_sim_cpu
     cdef LidarSimulator[float_t, gpu_policy] lidar_sim_gpu
-    cdef bint use_gpu = gpu_available()
+    cdef bint use_gpu = _gpu_available_c()
     cdef vector[Ray[float_t]] *cloud
 
     cdef shared_ptr[TargetsManager[float_t]] targets_manager = make_shared[TargetsManager[float_t]]()

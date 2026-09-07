@@ -57,7 +57,7 @@ from radarsimpy.includes.radarsimc cimport (
     RadarSimErrorCode,
     cpu_policy,
     gpu_policy,
-    gpu_available,
+    gpu_available as _gpu_available_c,
     CUDA_BUILD
 )
 
@@ -148,10 +148,10 @@ cdef inline raise_err(RadarSimErrorCode err):
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cpdef sim_radar(radar, targets, density=1, level=None, interf=None,
-                ray_filter=None, back_propagating=False, device="gpu", log_path=None, dry_run=False):
+                ray_filter=None, back_propagating=False, device="auto", log_path=None, dry_run=False):
     """
     sim_radar(radar, targets, density=1, level=None, interf=None, ray_filter=None,
-              back_propagating=False, device="gpu", log_path=None, dry_run=False)
+              back_propagating=False, device="auto", log_path=None, dry_run=False)
 
     Simulates the radar's baseband response for a given scene.
 
@@ -208,12 +208,16 @@ cpdef sim_radar(radar, targets, density=1, level=None, interf=None,
         Whether to enable back propagation in the simulation. When enabled, the simulation will consider
         rays that propagate back towards the radar after reflecting off targets. Default: ``False``.
     :param str device:
-        Execution device for the simulation. Default: ``"gpu"``.
+        Execution device for the simulation. Default: ``"auto"``.
 
+        - ``"auto"``: Use the GPU when this build has CUDA support and the machine has a
+          usable CUDA device, otherwise use the CPU. No warning is raised, because no
+          specific device was requested.
         - ``"gpu"``: Execute simulation on GPU using CUDA. When the module was not built with
           CUDA support, or when the machine has no usable CUDA device, the simulation
-          automatically falls back to CPU execution. The fallback caused by a missing device
-          is reported as a ``RuntimeWarning``.
+          falls back to CPU execution and reports it as a ``RuntimeWarning`` -- an explicit
+          request that could not be honoured is worth knowing about, particularly when
+          timing a run.
         - ``"cpu"``: Execute simulation on CPU only.
     :param str or None log_path:
         Path to save ray-tracing data. Default: ``None`` (does not save data).
@@ -252,21 +256,30 @@ cpdef sim_radar(radar, targets, density=1, level=None, interf=None,
     # Parameter Validation
     #----------------------
     device_lower = device.lower()
-    if device_lower not in ("gpu", "cpu"):
+    if device_lower not in ("auto", "gpu", "cpu"):
         raise ValueError(
             f"\nInvalid Device Selection\n"
             f"------------------------\n"
             f"The specified device '{device}' is not recognized.\n\n"
             f"Available devices:\n"
+            f"- 'auto': Use the GPU when one is usable, otherwise the CPU\n"
             f"- 'gpu': Execute simulation on GPU (CUDA)\n"
             f"- 'cpu': Execute simulation on CPU\n\n"
-            f"Please choose 'gpu' or 'cpu'."
+            f"Please choose 'auto', 'gpu' or 'cpu'."
         )
 
     # The execution policies are compile-time tags, so a GPU-enabled build would
     # otherwise launch CUDA kernels on a machine that has no CUDA device. Probe
-    # for a device and run on the CPU when there is none.
-    if device_lower == "gpu" and not gpu_available():
+    # for a device and run on the CPU when there is none. _gpu_available_c() is
+    # false on a CPU-only build and caches its device probe, so this costs
+    # nothing to ask on every call.
+    if device_lower == "auto":
+        # Picking the CPU here is the documented behaviour, not a failed
+        # request, so it is silent. This is why "auto" is the default: it keeps
+        # the warning below meaningful, firing only when a caller asked for the
+        # GPU by name and did not get it.
+        device_lower = "gpu" if _gpu_available_c() else "cpu"
+    elif device_lower == "gpu" and not _gpu_available_c():
         # Warn in both cases. Staying silent on a CPU-only build means anyone
         # benchmarking with device="gpu" on a CPU wheel records CPU timings
         # believing they are GPU timings, with nothing on screen to say so.

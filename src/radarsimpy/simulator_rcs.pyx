@@ -39,7 +39,7 @@ from radarsimpy.includes.radarsimc cimport (
     RadarSimErrorCode,
     cpu_policy,
     gpu_policy,
-    gpu_available
+    gpu_available as _gpu_available_c
 )
 from radarsimpy.lib.cp_radarsimc cimport cp_RCS_Target
 from libcpp.complex cimport complex as cpp_complex
@@ -244,7 +244,7 @@ cpdef sim_rcs(
     cdef:
         RcsSimulator[double, cpu_policy] rcs_sim_cpu
         RcsSimulator[double, gpu_policy] rcs_sim_gpu
-        bint use_gpu = gpu_available()
+        bint use_gpu = _gpu_available_c()
         RadarSimErrorCode err
         vector[double] rcs_vect
 

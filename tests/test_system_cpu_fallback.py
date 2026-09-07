@@ -41,6 +41,7 @@ from pathlib import Path
 import pytest
 
 import radarsimpy
+from radarsimpy.simulator import gpu_available, sim_radar
 
 #: Directory holding the ``radarsimpy`` package, so the child imports the same one.
 PACKAGE_PARENT = str(Path(radarsimpy.__file__).resolve().parent.parent)
@@ -55,7 +56,7 @@ import warnings
 import numpy as np
 
 from radarsimpy import Radar, Receiver, Transmitter
-from radarsimpy.simulator import sim_radar
+from radarsimpy.simulator import gpu_available, sim_radar
 
 tx = Transmitter(
     f=[24.075e9, 24.175e9], t=80e-6, tx_power=10, prp=100e-6, pulses=2,
@@ -69,16 +70,20 @@ radar = Radar(transmitter=tx, receiver=rx)
 targets = [{"location": (150, 0, 0), "speed": (-5, 0, 0), "rcs": 20, "phase": 0}]
 
 
-def run(device):
+def run(device=None):
+    # Omitting the argument entirely is how the default gets exercised.
+    kwargs = {} if device is None else {"device": device}
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
-        result = sim_radar(radar, targets, device=device)
+        result = sim_radar(radar, targets, **kwargs)
     messages = [str(w.message) for w in caught if issubclass(w.category, RuntimeWarning)]
     return result, messages
 
 
 gpu_request, gpu_warnings = run("gpu")
 cpu_request, cpu_warnings = run("cpu")
+auto_request, auto_warnings = run("auto")
+default_request, default_warnings = run()
 
 json.dump(
     {
@@ -86,6 +91,15 @@ json.dump(
         "shape": list(gpu_request["baseband"].shape),
         "gpu_warnings": gpu_warnings,
         "cpu_warnings": cpu_warnings,
+        "auto_match": bool(
+            np.allclose(auto_request["baseband"], cpu_request["baseband"])
+        ),
+        "auto_warnings": auto_warnings,
+        "default_match": bool(
+            np.allclose(default_request["baseband"], cpu_request["baseband"])
+        ),
+        "default_warnings": default_warnings,
+        "gpu_available": bool(gpu_available()),
     },
     sys.stdout,
 )
@@ -142,3 +156,59 @@ def test_fallback_is_reported(fallback_run):
 def test_explicit_cpu_request_does_not_warn(fallback_run):
     """Asking for the CPU is not a fallback, so it stays silent."""
     assert fallback_run["cpu_warnings"] == []
+
+
+def test_auto_runs_on_the_cpu_when_no_device_is_visible(fallback_run):
+    """``device="auto"`` resolves to the CPU and produces the CPU result."""
+    assert fallback_run["auto_match"]
+
+
+def test_auto_does_not_warn(fallback_run):
+    """``"auto"`` choosing the CPU is the documented behaviour, not a fallback.
+
+    Warning here would fire on every call for every CPU-only user, which is
+    what makes the ``device="gpu"`` warning worth reading when it does appear.
+    """
+    assert fallback_run["auto_warnings"] == []
+
+
+def test_default_device_is_auto(fallback_run):
+    """Omitting ``device`` behaves exactly like ``device="auto"``."""
+    assert fallback_run["default_match"]
+    assert fallback_run["default_warnings"] == []
+
+
+def test_gpu_available_agrees_with_the_device_actually_used(fallback_run):
+    """``gpu_available()`` is what ``"auto"`` decides on, so they must agree.
+
+    With every CUDA device hidden it has to report False, whatever the build.
+    Tying the two together here is the point: a helper that disagreed with the
+    selection it drives would make the skip guards that depend on it silently
+    wrong.
+    """
+    assert fallback_run["gpu_available"] is False
+    assert fallback_run["auto_match"], "auto did not run on the CPU"
+
+
+def test_gpu_available_is_a_bool_on_this_machine():
+    """The public helper answers without needing a simulation to be run."""
+    assert isinstance(gpu_available(), bool)
+
+
+def test_unknown_device_is_rejected():
+    """An unrecognised device name fails loudly rather than picking one."""
+    # No child process needed: this is rejected during validation, before any
+    # device is touched, so the outcome does not depend on the machine.
+    transmitter = radarsimpy.Transmitter(
+        f=[24.075e9, 24.175e9], t=80e-6, tx_power=10, prp=100e-6, pulses=2,
+        channels=[{"location": (0, 0, 0)}],
+    )
+    receiver = radarsimpy.Receiver(
+        fs=2e6, noise_figure=12, rf_gain=20, load_resistor=500,
+        baseband_gain=30, channels=[{"location": (0, 0, 0)}],
+    )
+    radar = radarsimpy.Radar(transmitter=transmitter, receiver=receiver)
+    targets = [{"location": (150, 0, 0), "rcs": 20}]
+
+    with pytest.raises(ValueError, match="not recognized"):
+        sim_radar(radar, targets, device="cuda")
