@@ -8,6 +8,8 @@ Provides:
 * ``models_dir`` / ``model_path`` for referring to bundled 3D models.
 * ``mesh_module`` plus the ``mesh`` marker, which skip ray-tracing tests when
   no optional mesh-processing library is installed.
+* ``gltf_module`` plus the ``gltf`` marker, which do the same for the
+  optional glTF library used by ``radarsimpy.animation_kit``.
 * ``make_transmitter`` / ``make_receiver`` / ``make_radar`` factories for the
   small radar configurations that many tests need.
 
@@ -40,6 +42,9 @@ from radarsimpy.mesh_kit import check_module_installed
 #: Mesh libraries ``radarsimpy.mesh_kit.import_mesh_module`` knows how to use.
 MESH_MODULES = ("trimesh", "pyvista", "pymeshlab", "meshio")
 
+#: Library ``radarsimpy.animation_kit.import_gltf_module`` needs.
+GLTF_MODULE = "pygltflib"
+
 #: Repository root, i.e. the directory holding ``models/``.
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -58,17 +63,25 @@ def _any_mesh_module_installed():
 
 
 def pytest_collection_modifyitems(config, items):  # pylint: disable=unused-argument
-    """Skip ``mesh``-marked tests when no mesh-processing library is available."""
-    if _any_mesh_module_installed() is not None:
-        return
+    """Skip marked tests whose optional library is not installed."""
+    skip_mesh = None
+    if _any_mesh_module_installed() is None:
+        skip_mesh = pytest.mark.skip(
+            reason="no mesh-processing library installed "
+            f"(install one of: {', '.join(MESH_MODULES)})"
+        )
 
-    skip_mesh = pytest.mark.skip(
-        reason="no mesh-processing library installed "
-        f"(install one of: {', '.join(MESH_MODULES)})"
-    )
+    skip_gltf = None
+    if not check_module_installed(GLTF_MODULE):
+        skip_gltf = pytest.mark.skip(
+            reason=f"{GLTF_MODULE} is not installed (pip install {GLTF_MODULE})"
+        )
+
     for item in items:
-        if "mesh" in item.keywords:
+        if skip_mesh is not None and "mesh" in item.keywords:
             item.add_marker(skip_mesh)
+        if skip_gltf is not None and "gltf" in item.keywords:
+            item.add_marker(skip_gltf)
 
 
 # =============================================================================
@@ -130,6 +143,12 @@ def mesh_module():
     if name is None:
         pytest.skip(f"no mesh-processing library installed ({', '.join(MESH_MODULES)})")
     return pytest.importorskip(name)
+
+
+@pytest.fixture(scope="session")
+def gltf_module():
+    """The glTF module used by ``animation_kit``, skipping the test if missing."""
+    return pytest.importorskip(GLTF_MODULE)
 
 
 # =============================================================================

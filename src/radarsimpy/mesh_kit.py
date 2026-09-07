@@ -70,7 +70,7 @@ def import_mesh_module() -> object:
     """
     Import the first available mesh processing module from a predefined list
 
-    Tries to import modules in this order: pyvista, pymeshlab, trimesh, meshio
+    Tries to import modules in this order: trimesh, pyvista, pymeshlab, meshio
 
     :return: The mesh processing module object
     :rtype: object
@@ -99,11 +99,17 @@ def import_mesh_module() -> object:
     )
 
 
-def load_mesh(mesh_file_name: str, scale: float, mesh_module: object) -> dict:
+def load_mesh(
+    mesh_file_name: Union[str, Dict[str, Any]], scale: float, mesh_module: object
+) -> dict:
     """
-    Load a 3D mesh file using the specified module
+    Load a 3D mesh from a file, or pass an in-memory mesh straight through
 
-    :param str mesh_file_name: Path to the mesh file
+    :param mesh_file_name: Path to the mesh file, or a dictionary holding the
+        geometry directly as ``{"points": [N, 3], "cells": [M, 3]}``. The
+        in-memory form lets callers supply generated geometry, and is how
+        :mod:`radarsimpy.animation_kit` hands over the parts it extracts from
+        an animated model.
     :param float scale: Scale factor to apply to the mesh vertices
     :param object mesh_module: The mesh processing module object
 
@@ -112,6 +118,12 @@ def load_mesh(mesh_file_name: str, scale: float, mesh_module: object) -> dict:
         - points (numpy.ndarray): Array of vertex coordinates
         - cells (numpy.ndarray): Array of face indices
     """
+    if isinstance(mesh_file_name, dict):
+        return {
+            "points": np.asarray(mesh_file_name["points"], dtype=float) / scale,
+            "cells": np.asarray(mesh_file_name["cells"]),
+        }
+
     if mesh_module.__name__ == "pyvista":
         mesh_data = mesh_module.read(mesh_file_name)
         points = np.array(mesh_data.points) / scale

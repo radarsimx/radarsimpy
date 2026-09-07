@@ -13,5 +13,6 @@ User Guide
    noise
    range_gate
    ray_tracing_simulation
+   animated_targets
    examples
    build

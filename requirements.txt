@@ -12,5 +12,9 @@ scipy>=1.9.0
 # pyvista>=0.36.0        # 3D visualization and mesh processing
 # meshio>=5.0.0          # Mesh I/O operations
 
+# Optional Dependency for Animated 3D Models
+# Install for glTF 2.0 / GLB keyframe animation support (radarsimpy.animation_kit):
+# pygltflib>=1.16.0      # glTF 2.0 / GLB parsing
+
 # Currently included for basic mesh support
 trimesh>=3.15.0
