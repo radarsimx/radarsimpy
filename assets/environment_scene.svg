@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 360" width="780" height="360"
+     role="img" aria-label="Scene roles: primary targets versus environment surfaces">
+  <title>Scene roles: primary targets versus environment surfaces</title>
+  <style>
+    .bg   { fill:#ffffff; stroke:#d5d9e0; stroke-width:1 }
+    .ttl  { font:600 17px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#14181f }
+    .sub  { font:13px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#5b6472 }
+    .lbl  { font:12px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#5b6472 }
+    .cap  { font:12px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#5b6472 }
+    .code { font:12.5px 'IBM Plex Mono',Consolas,'Courier New',monospace }
+    .env  { fill:#0f8a7e }
+    .tgt  { fill:#d61f1f }
+    .ray  { fill:#1919ff }
+    .leader { stroke:#b6bcc6; stroke-width:1 }
+  </style>
+  <defs>
+    <marker id="arrB" markerWidth="9" markerHeight="8" refX="7.6" refY="3.2" orient="auto">
+      <path d="M0,0 L8,3.2 L0,6.4 z" fill="#1919ff"/>
+    </marker>
+    <pattern id="soil" width="11" height="11" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="11" stroke="#0f8a7e" stroke-width="1.3" opacity="0.45"/>
+    </pattern>
+  </defs>
+
+  <rect class="bg" x="0.5" y="0.5" width="779" height="359" rx="8"/>
+  <text class="ttl" x="24" y="32">Scene roles: primary targets vs. environment surfaces</text>
+  <text class="sub" x="24" y="52">Every object still scatters. The flag only tells the simulator how to budget rays for it.</text>
+
+  <!-- ground -->
+  <rect x="40" y="251" width="705" height="14" fill="url(#soil)"/>
+  <line x1="40" y1="250" x2="745" y2="250" stroke="#0f8a7e" stroke-width="2.2"/>
+
+  <!-- wall / barrier -->
+  <rect x="640" y="123" width="22" height="127" fill="#0f8a7e" fill-opacity="0.14" stroke="#0f8a7e" stroke-width="2"/>
+
+  <!-- radar -->
+  <rect x="64" y="217" width="52" height="33" rx="4" fill="#1919ff" fill-opacity="0.12" stroke="#1919ff" stroke-width="2"/>
+  <text class="code ray" x="90" y="238" text-anchor="middle">radar</text>
+
+  <!-- vehicle of interest -->
+  <path d="M300,250 L300,222 L318,222 L331,201 L392,201 L405,222 L424,222 L424,250 Z"
+        fill="#d61f1f" fill-opacity="0.12" stroke="#d61f1f" stroke-width="2" stroke-linejoin="round"/>
+  <circle cx="326" cy="248" r="8" fill="#ffffff" stroke="#d61f1f" stroke-width="2"/>
+  <circle cx="398" cy="248" r="8" fill="#ffffff" stroke="#d61f1f" stroke-width="2"/>
+
+  <!-- direct path -->
+  <line x1="118" y1="215" x2="294" y2="213" stroke="#1919ff" stroke-width="2" marker-end="url(#arrB)"/>
+  <text class="lbl ray" x="205" y="206" text-anchor="middle">direct path</text>
+
+  <!-- ground-bounce path -->
+  <polyline points="118,231 212,250 296,231" fill="none" stroke="#1919ff" stroke-width="2"
+            stroke-dasharray="6 4" marker-end="url(#arrB)"/>
+  <circle cx="212" cy="250" r="3.4" fill="#1919ff"/>
+  <line class="leader" x1="212" y1="264" x2="212" y2="270"/>
+  <text class="lbl ray" x="212" y="283" text-anchor="middle">multi-bounce via the ground</text>
+
+  <!-- vehicle labels -->
+  <text class="code tgt" x="362" y="167" text-anchor="middle">"environment": False</text>
+  <text class="lbl" x="362" y="185" text-anchor="middle">vehicle of interest &#8212; the radar target</text>
+  <line class="leader" x1="362" y1="191" x2="362" y2="199"/>
+
+  <!-- wall labels -->
+  <text class="code env" x="651" y="91" text-anchor="middle">"environment": True</text>
+  <text class="lbl" x="651" y="109" text-anchor="middle">wall / barrier</text>
+  <line class="leader" x1="651" y1="115" x2="651" y2="121"/>
+
+  <!-- ground labels -->
+  <text class="code env" x="48" y="304">"environment": True</text>
+  <text class="lbl" x="48" y="322">ground plane / terrain &#8212; large, always in view</text>
+
+  <text class="cap" x="24" y="345">Mark the surroundings, not the thing you are measuring: the flag changes ray budgeting, never the physics of the reflection.</text>
+</svg>

@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 372" width="860" height="372"
+     role="img" aria-label="How the environment flag changes physical-optics surface sampling">
+  <title>How the environment flag changes physical-optics surface sampling</title>
+  <style>
+    .bg    { fill:#ffffff; stroke:#d5d9e0; stroke-width:1 }
+    .panel { fill:#fafbfc; stroke:#dde1e7; stroke-width:1 }
+    .ttl   { font:600 17px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#14181f }
+    .sub   { font:13px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#5b6472 }
+    .lbl   { font:11.5px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#5b6472 }
+    .cap   { font:12px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#5b6472 }
+    .code  { font:13px 'IBM Plex Mono',Consolas,'Courier New',monospace }
+    .mono  { font:12px 'IBM Plex Mono',Consolas,'Courier New',monospace }
+    .env   { fill:#0f8a7e }
+    .ray   { fill:#1919ff }
+    .ink   { fill:#14181f }
+  </style>
+
+  <rect class="bg" x="0.5" y="0.5" width="859" height="371" rx="8"/>
+  <text class="ttl" x="24" y="32">What that means for the physical-optics result</text>
+  <text class="sub" x="24" y="52">Every ray that lands on a surface contributes one surface-current sample to the PO integral, so ray density is surface sampling.</text>
+
+  <rect class="panel" x="24.5" y="72.5" width="401" height="228" rx="6"/>
+  <text class="code ink" x="225" y="98"  text-anchor="middle">"environment": False</text>
+  <text class="lbl"      x="225" y="117" text-anchor="middle">a surface whose scattering you are measuring</text>
+  <g transform="translate(225,200) skewX(-24)">
+    <rect x="-110" y="-38" width="220" height="76" fill="#1919ff" fill-opacity="0.05" stroke="#1919ff" stroke-width="1.6"/>
+    <g stroke="#1919ff" stroke-width="0.9" opacity="0.6">
+      <line x1="-90.0" y1="-38" x2="-90.0" y2="38"/>
+      <line x1="-70.0" y1="-38" x2="-70.0" y2="38"/>
+      <line x1="-50.0" y1="-38" x2="-50.0" y2="38"/>
+      <line x1="-30.0" y1="-38" x2="-30.0" y2="38"/>
+      <line x1="-10.0" y1="-38" x2="-10.0" y2="38"/>
+      <line x1="10.0" y1="-38" x2="10.0" y2="38"/>
+      <line x1="30.0" y1="-38" x2="30.0" y2="38"/>
+      <line x1="50.0" y1="-38" x2="50.0" y2="38"/>
+      <line x1="70.0" y1="-38" x2="70.0" y2="38"/>
+      <line x1="90.0" y1="-38" x2="90.0" y2="38"/>
+      <line x1="-110" y1="-19.0" x2="110" y2="-19.0"/>
+      <line x1="-110" y1="0.0" x2="110" y2="0.0"/>
+      <line x1="-110" y1="19.0" x2="110" y2="19.0"/>
+    </g>
+    <g fill="#1919ff">
+      <circle cx="-100.0" cy="-28.5" r="2.4"/>
+      <circle cx="-80.0" cy="-28.5" r="2.4"/>
+      <circle cx="-60.0" cy="-28.5" r="2.4"/>
+      <circle cx="-40.0" cy="-28.5" r="2.4"/>
+      <circle cx="-20.0" cy="-28.5" r="2.4"/>
+      <circle cx="0.0" cy="-28.5" r="2.4"/>
+      <circle cx="20.0" cy="-28.5" r="2.4"/>
+      <circle cx="40.0" cy="-28.5" r="2.4"/>
+      <circle cx="60.0" cy="-28.5" r="2.4"/>
+      <circle cx="80.0" cy="-28.5" r="2.4"/>
+      <circle cx="100.0" cy="-28.5" r="2.4"/>
+      <circle cx="-100.0" cy="-9.5" r="2.4"/>
+      <circle cx="-80.0" cy="-9.5" r="2.4"/>
+      <circle cx="-60.0" cy="-9.5" r="2.4"/>
+      <circle cx="-40.0" cy="-9.5" r="2.4"/>
+      <circle cx="-20.0" cy="-9.5" r="2.4"/>
+      <circle cx="0.0" cy="-9.5" r="2.4"/>
+      <circle cx="20.0" cy="-9.5" r="2.4"/>
+      <circle cx="40.0" cy="-9.5" r="2.4"/>
+      <circle cx="60.0" cy="-9.5" r="2.4"/>
+      <circle cx="80.0" cy="-9.5" r="2.4"/>
+      <circle cx="100.0" cy="-9.5" r="2.4"/>
+      <circle cx="-100.0" cy="9.5" r="2.4"/>
+      <circle cx="-80.0" cy="9.5" r="2.4"/>
+      <circle cx="-60.0" cy="9.5" r="2.4"/>
+      <circle cx="-40.0" cy="9.5" r="2.4"/>
+      <circle cx="-20.0" cy="9.5" r="2.4"/>
+      <circle cx="0.0" cy="9.5" r="2.4"/>
+      <circle cx="20.0" cy="9.5" r="2.4"/>
+      <circle cx="40.0" cy="9.5" r="2.4"/>
+      <circle cx="60.0" cy="9.5" r="2.4"/>
+      <circle cx="80.0" cy="9.5" r="2.4"/>
+      <circle cx="100.0" cy="9.5" r="2.4"/>
+      <circle cx="-100.0" cy="28.5" r="2.4"/>
+      <circle cx="-80.0" cy="28.5" r="2.4"/>
+      <circle cx="-60.0" cy="28.5" r="2.4"/>
+      <circle cx="-40.0" cy="28.5" r="2.4"/>
+      <circle cx="-20.0" cy="28.5" r="2.4"/>
+      <circle cx="0.0" cy="28.5" r="2.4"/>
+      <circle cx="20.0" cy="28.5" r="2.4"/>
+      <circle cx="40.0" cy="28.5" r="2.4"/>
+      <circle cx="60.0" cy="28.5" r="2.4"/>
+      <circle cx="80.0" cy="28.5" r="2.4"/>
+      <circle cx="100.0" cy="28.5" r="2.4"/>
+    </g>
+  </g>
+  <text class="mono ray" x="225" y="268" text-anchor="middle">44 samples</text>
+  <text class="lbl"      x="225" y="287" text-anchor="middle">small facets &#8212; curvature and detail are resolved</text>
+
+  <rect class="panel" x="434.5" y="72.5" width="401" height="228" rx="6"/>
+  <text class="code env" x="635" y="98"  text-anchor="middle">"environment": True</text>
+  <text class="lbl"      x="635" y="117" text-anchor="middle">a large, mostly flat surrounding surface</text>
+  <g transform="translate(635,200) skewX(-24)">
+    <rect x="-110" y="-38" width="220" height="76" fill="#1919ff" fill-opacity="0.05" stroke="#1919ff" stroke-width="1.6"/>
+    <g stroke="#1919ff" stroke-width="0.9" opacity="0.6">
+      <line x1="-55.0" y1="-38" x2="-55.0" y2="38"/>
+      <line x1="0.0" y1="-38" x2="0.0" y2="38"/>
+      <line x1="55.0" y1="-38" x2="55.0" y2="38"/>
+      <line x1="-110" y1="0.0" x2="110" y2="0.0"/>
+    </g>
+    <g fill="#1919ff">
+      <circle cx="-82.5" cy="-19.0" r="2.4"/>
+      <circle cx="-27.5" cy="-19.0" r="2.4"/>
+      <circle cx="27.5" cy="-19.0" r="2.4"/>
+      <circle cx="82.5" cy="-19.0" r="2.4"/>
+      <circle cx="-82.5" cy="19.0" r="2.4"/>
+      <circle cx="-27.5" cy="19.0" r="2.4"/>
+      <circle cx="27.5" cy="19.0" r="2.4"/>
+      <circle cx="82.5" cy="19.0" r="2.4"/>
+    </g>
+  </g>
+  <text class="mono ray" x="635" y="268" text-anchor="middle">8 samples over the same area</text>
+  <text class="lbl"      x="635" y="287" text-anchor="middle">large facets &#8212; ample for a flat ground plane or wall</text>
+
+  <text class="cap" x="24" y="330">The samples still use the permittivity you set and still feed the same PO integral. Coarser sampling only limits how much surface detail that integral can resolve.</text>
+  <text class="cap" x="24" y="350">So flag large, mostly flat surroundings &#8212; and leave the flag off for anything small, strongly curved, or whose scattering you are actually measuring.</text>
+</svg>

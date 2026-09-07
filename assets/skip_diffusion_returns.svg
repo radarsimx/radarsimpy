@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 430" width="860" height="430"
+     role="img" aria-label="Which bounces send energy back to the receiver, with and without skip_diffusion">
+  <title>Which bounces send energy back to the receiver</title>
+  <style>
+    .bg    { fill:#ffffff; stroke:#d5d9e0; stroke-width:1 }
+    .panel { fill:#fafbfc; stroke:#dde1e7; stroke-width:1 }
+    .ttl   { font:600 17px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#14181f }
+    .sub   { font:13px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#5b6472 }
+    .lbl   { font:11.5px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#5b6472 }
+    .cap   { font:12px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#5b6472 }
+    .code  { font:13px 'IBM Plex Mono',Consolas,'Courier New',monospace }
+    .mono  { font:11.5px 'IBM Plex Mono',Consolas,'Courier New',monospace }
+    .env   { fill:#0f8a7e }
+    .ray   { fill:#1919ff }
+    .tgt   { fill:#d61f1f }
+    .ink   { fill:#14181f }
+  </style>
+  <defs>
+    <marker id="sArr" markerWidth="8" markerHeight="7" refX="6.6" refY="2.8" orient="auto">
+      <path d="M0,0 L7,2.8 L0,5.6 z" fill="#1919ff"/>
+    </marker>
+    <marker id="sRet" markerWidth="8" markerHeight="7" refX="6.6" refY="2.8" orient="auto">
+      <path d="M0,0 L7,2.8 L0,5.6 z" fill="#d61f1f"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0.5" y="0.5" width="859" height="429" rx="8"/>
+  <text class="ttl" x="24" y="32">Which bounces send energy back to the receiver</text>
+  <text class="sub" x="24" y="52">A skipped surface still redirects rays. It just does not add a return of its own until the ray has touched a surface that is not skipped.</text>
+
+  <!-- ================= LEFT PANEL ================= -->
+  <rect class="panel" x="24.5" y="72.5" width="401" height="278" rx="6"/>
+  <text class="code ink" x="225" y="98"  text-anchor="middle">"skip_diffusion": False</text>
+  <text class="lbl"      x="225" y="117" text-anchor="middle">the ground scatters like any other surface</text>
+
+  <line x1="44" y1="290" x2="412" y2="290" stroke="#0f8a7e" stroke-width="2.2"/>
+  <path d="M296,290 L296,270 L308,270 L318,250 L352,250 L362,270 L368,270 L368,290 Z"
+        fill="#d61f1f" fill-opacity="0.10" stroke="#d61f1f" stroke-width="1.8" stroke-linejoin="round"/>
+  <circle cx="309" cy="289" r="7" fill="#ffffff" stroke="#d61f1f" stroke-width="1.6"/>
+  <circle cx="355" cy="289" r="7" fill="#ffffff" stroke="#d61f1f" stroke-width="1.6"/>
+
+  <rect x="48" y="160" width="40" height="24" rx="3" fill="#1919ff" fill-opacity="0.12" stroke="#1919ff" stroke-width="1.8"/>
+  <text class="mono ray" x="68" y="176" text-anchor="middle">Tx</text>
+
+  <g fill="none" stroke="#1919ff" stroke-width="1.6" opacity="0.6">
+    <polyline points="88,172 150,290 211,174" marker-end="url(#sArr)"/>
+    <line x1="88" y1="172" x2="328" y2="249"/>
+    <polyline points="88,172 268,290 295,272"/>
+  </g>
+  <g fill="none" stroke="#d61f1f" stroke-width="1.6" stroke-dasharray="5 3">
+    <line x1="150" y1="290" x2="134" y2="260" marker-end="url(#sRet)"/>
+    <line x1="268" y1="290" x2="240" y2="271" marker-end="url(#sRet)"/>
+    <line x1="296" y1="272" x2="265" y2="257" marker-end="url(#sRet)"/>
+    <line x1="330" y1="250" x2="298" y2="240" marker-end="url(#sRet)"/>
+  </g>
+  <g fill="#d61f1f">
+    <circle cx="150" cy="290" r="5"/><circle cx="330" cy="250" r="5"/>
+    <circle cx="268" cy="290" r="5"/><circle cx="296" cy="272" r="5"/>
+  </g>
+
+  <text class="lbl tgt" x="44" y="318">every bounce adds a return, the ground included</text>
+  <text class="lbl" x="44" y="336">a ray that only ever sees the ground still costs a full evaluation</text>
+
+  <!-- ================= RIGHT PANEL ================= -->
+  <rect class="panel" x="434.5" y="72.5" width="401" height="278" rx="6"/>
+  <text class="code env" x="635" y="98"  text-anchor="middle">"skip_diffusion": True</text>
+  <text class="lbl"      x="635" y="117" text-anchor="middle">the ground behaves as a mirror and nothing more</text>
+
+  <line x1="454" y1="290" x2="822" y2="290" stroke="#0f8a7e" stroke-width="2.2"/>
+  <path d="M706,290 L706,270 L718,270 L728,250 L762,250 L772,270 L778,270 L778,290 Z"
+        fill="#d61f1f" fill-opacity="0.10" stroke="#d61f1f" stroke-width="1.8" stroke-linejoin="round"/>
+  <circle cx="719" cy="289" r="7" fill="#ffffff" stroke="#d61f1f" stroke-width="1.6"/>
+  <circle cx="765" cy="289" r="7" fill="#ffffff" stroke="#d61f1f" stroke-width="1.6"/>
+
+  <rect x="458" y="160" width="40" height="24" rx="3" fill="#1919ff" fill-opacity="0.12" stroke="#1919ff" stroke-width="1.8"/>
+  <text class="mono ray" x="478" y="176" text-anchor="middle">Tx</text>
+
+  <g fill="none" stroke="#1919ff" stroke-width="1.6" opacity="0.6">
+    <polyline points="498,172 560,290 621,174" marker-end="url(#sArr)"/>
+    <line x1="498" y1="172" x2="738" y2="249"/>
+    <polyline points="498,172 678,290 705,272"/>
+  </g>
+  <g fill="none" stroke="#d61f1f" stroke-width="1.6" stroke-dasharray="5 3">
+    <line x1="706" y1="272" x2="675" y2="257" marker-end="url(#sRet)"/>
+    <line x1="740" y1="250" x2="708" y2="240" marker-end="url(#sRet)"/>
+  </g>
+  <g fill="#ffffff" stroke="#9aa2ae" stroke-width="1.8">
+    <circle cx="560" cy="290" r="5"/><circle cx="678" cy="290" r="5"/>
+  </g>
+  <g fill="#d61f1f">
+    <circle cx="740" cy="250" r="5"/><circle cx="706" cy="272" r="5"/>
+  </g>
+
+  <text class="lbl env" x="454" y="318">a bounce on the ground only redirects the ray</text>
+  <text class="lbl tgt" x="454" y="336">the ground-to-vehicle multipath return is unchanged</text>
+
+  <!-- legend -->
+  <circle cx="30" cy="372" r="5" fill="#d61f1f"/>
+  <text class="lbl" x="42" y="376">bounce returns energy to the receiver</text>
+  <circle cx="278" cy="372" r="5" fill="#ffffff" stroke="#9aa2ae" stroke-width="1.8"/>
+  <text class="lbl" x="290" y="376">bounce redirects the ray only</text>
+  <line x1="490" y1="372" x2="514" y2="372" stroke="#d61f1f" stroke-width="1.6" stroke-dasharray="5 3" marker-end="url(#sRet)"/>
+  <text class="lbl" x="522" y="376">return path to the receiver</text>
+
+  <text class="cap" x="24" y="404">A ray returns energy only once it has touched a surface that is not skipped. Radar to ground to vehicle and back is preserved in full &#8212; what is dropped is the return from a ray that has seen nothing but the flat reflector.</text>
+</svg>

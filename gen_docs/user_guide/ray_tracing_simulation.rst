@@ -123,13 +123,53 @@ to modify how the simulator handles them.
 :Type: ``bool``
 :Default: ``False``
 
-When set to ``True``, the simulator **skips the diffusion (diffraction)
-calculation** for this target.
+Marks a surface as a **pure reflector**. It goes on redirecting rays exactly
+as before, but it no longer contributes a scattered return of its own.
 
-This flag is primarily intended for **large flat reflectors** such as ground
-planes, walls, or other surfaces where diffusion effects are negligible
-compared to specular reflection. Enabling it reduces the computational load
-for these targets.
+This is meant for **large flat reflectors** — ground planes, building walls,
+the inside of a tunnel — where the surface reflects specularly, away from the
+radar, so its own backscatter is negligible next to the targets in the scene.
+
+Effect on the returned signal
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A ray sends energy back to the receiver only once it has touched a surface
+that is **not** skipped. Bounces on skipped surfaces before that point
+redirect the ray and do nothing else:
+
+.. image:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/skip_diffusion_returns.svg
+    :width: 100%
+    :alt: Which bounce points return energy to the receiver, with and without skip_diffusion
+
+So a ray that leaves the radar, strikes the ground and carries on out of the
+scene contributes nothing at all, while radar → ground → vehicle → radar is
+captured in full, along with every bounce after the vehicle. The multipath
+structure of the scene survives intact; what disappears is the direct return
+of the flat surface itself.
+
+Effect on cost
+^^^^^^^^^^^^^^
+
+In a scene framed by a ground plane, a large share of the rays land on the
+ground and nowhere else. Each of those would otherwise contribute a scattering
+evaluation against every receive channel, and those evaluations are the
+dominant cost of a mesh simulation — so dropping them is usually the largest
+single saving available on a ground-plane scene.
+
+When to use it
+^^^^^^^^^^^^^^
+
+Set ``skip_diffusion=True`` for:
+
+- ground planes and terrain surfaces
+- building walls, tunnel linings and large barriers
+- any surface flat and large enough that its own backscatter does not matter
+
+Leave it at ``False`` for:
+
+- the targets whose returns you are measuring
+- curved or faceted surfaces, which do scatter back towards the radar
+- small surfaces, where "large and flat" does not really hold
 
 ``environment``
 ~~~~~~~~~~~~~~~
@@ -137,15 +177,104 @@ for these targets.
 :Type: ``bool``
 :Default: ``False``
 
-Marks a target as an **environment object** rather than a primary scattering
-target. Environment objects define the physical surroundings of the scene
-(e.g., a ground plane, building wall, or terrain surface) and participate
-in multi-bounce reflections, but are not the primary radar targets of
-interest.
+Marks a target as part of the **surroundings** rather than as something you
+are measuring. Ground planes, terrain, building walls and tunnel linings are
+environment objects; the vehicle, pedestrian or corner reflector under test
+is not.
 
-Environment objects such as ground planes or building walls typically have
-very large meshes. Without this flag, the simulator would allocate a large
-number of rays to these surfaces based on their size, which is
-computationally wasteful. Setting ``environment=True`` reduces the ray
-density for these objects, significantly improving simulation efficiency
-while still allowing them to participate in multi-bounce reflections.
+.. image:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/environment_scene.svg
+    :width: 100%
+    :alt: Which objects in a scene should be marked as environment targets
+
+An environment object still takes part in the simulation in exactly the same
+way as any other target. It reflects according to its permittivity, it
+contributes its own return, and multi-bounce paths that run through it —
+radar to ground to vehicle and back — are traced as usual. The flag does not
+change the physics of a reflection. It changes how many rays are spent on it.
+
+Effect on ray density
+^^^^^^^^^^^^^^^^^^^^^
+
+Rays are a finite budget, and the simulator spreads that budget across the
+surfaces it can see. Surrounding surfaces are almost always the largest meshes
+in a scene and fill most of the field of view, so without the flag they absorb
+the bulk of the rays — and the target you actually care about is left with
+whatever remains.
+
+Setting ``environment=True`` lowers the ray density on those surfaces, and the
+budget shifts onto the primary targets:
+
+.. image:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/environment_ray_density.svg
+    :width: 100%
+    :alt: Ray landings on the ground and on the vehicle, with and without the environment flag
+
+This is where the speed-up comes from. In a scene with a large ground plane or
+a long wall, the surroundings are what most of the rays are spent on, so
+lowering their share is the single most effective way to bring the run time of
+the scene down.
+
+Effect on the PO calculation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Every ray that lands on a surface contributes one surface-current sample to
+the Physical Optics integral, so ray density is really surface sampling
+density. A coarser share of the budget means larger facets on the environment
+surface:
+
+.. image:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/environment_po_sampling.svg
+    :width: 100%
+    :alt: Fine versus coarse physical-optics surface sampling over the same area
+
+Those samples still use the permittivity you set and still feed the same PO
+integral. What coarser sampling costs is **surface detail**. A large flat
+ground plane or wall scatters much the same whether it is sampled finely or
+coarsely, which is precisely why the flag is safe there. A small, curved or
+intricate surface does not, so it should keep the full density.
+
+When to use it
+^^^^^^^^^^^^^^
+
+Set ``environment=True`` for:
+
+- ground planes and terrain surfaces
+- building walls, tunnel linings, guardrails and barriers
+- any large, mostly flat surface that frames the scene rather than being
+  measured in it
+
+Leave it at ``False`` for:
+
+- the vehicles, pedestrians or reflectors whose returns you are measuring
+- small or strongly curved objects, where surface detail drives the result
+- any surface whose own RCS is the quantity of interest
+
+Choosing between the two flags
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The two flags are easy to confuse because they are recommended for the same
+kinds of object, but they act on different things and neither implies the
+other:
+
+.. image:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/skip_diffusion_vs_environment.svg
+    :width: 100%
+    :alt: skip_diffusion changes what a surface returns, environment changes how finely it is sampled
+
+- ``skip_diffusion`` decides **what the surface sends back**. Set it when the
+  surface is flat enough that its own return is not worth computing.
+- ``environment`` decides **how finely the surface is sampled**. Set it when
+  the surface is large enough that sampling it at full density would starve
+  the real targets of rays.
+
+A ground plane, a long wall or a terrain mesh is usually both, so the two are
+commonly set together::
+
+    ground = {
+        "model": "./models/ground.stl",
+        "location": (0, 0, 0),
+        "skip_diffusion": True,
+        "environment": True,
+    }
+
+A large but curved surface — a tunnel bore, say — may want ``environment``
+without ``skip_diffusion``, since it does scatter back towards the radar. A
+small flat plate is the opposite case: its own return may be negligible, but
+it is far too small to be worth coarsening.

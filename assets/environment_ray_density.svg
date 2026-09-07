@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 424" width="860" height="424"
+     role="img" aria-label="Where the ray budget goes with and without the environment flag">
+  <title>Where the ray budget goes with and without the environment flag</title>
+  <style>
+    .bg    { fill:#ffffff; stroke:#d5d9e0; stroke-width:1 }
+    .panel { fill:#fafbfc; stroke:#dde1e7; stroke-width:1 }
+    .ttl   { font:600 17px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#14181f }
+    .sub   { font:13px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#5b6472 }
+    .lbl   { font:11.5px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#5b6472 }
+    .cap   { font:12px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#5b6472 }
+    .code  { font:13px 'IBM Plex Mono',Consolas,'Courier New',monospace }
+    .mono  { font:11.5px 'IBM Plex Mono',Consolas,'Courier New',monospace }
+    .env   { fill:#0f8a7e }
+    .ray   { fill:#1919ff }
+    .tgt   { fill:#d61f1f }
+    .ink   { fill:#14181f }
+  </style>
+  <defs>
+    <marker id="rArr" markerWidth="8" markerHeight="7" refX="6.6" refY="2.8" orient="auto">
+      <path d="M0,0 L7,2.8 L0,5.6 z" fill="#1919ff"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0.5" y="0.5" width="859" height="423" rx="8"/>
+  <text class="ttl" x="24" y="32">Where the ray budget goes</text>
+  <text class="sub" x="24" y="52">Ray density decides how many rays are launched at each part of the scene. The flag moves that budget off the surroundings and onto the targets.</text>
+
+  <!-- ================= LEFT PANEL ================= -->
+  <rect class="panel" x="24.5" y="72.5" width="401" height="278" rx="6"/>
+  <text class="code ink" x="225" y="98"  text-anchor="middle">"environment": False</text>
+  <text class="lbl"      x="225" y="117" text-anchor="middle">the ground is sampled like a target of interest</text>
+
+  <line x1="44" y1="286" x2="412" y2="286" stroke="#0f8a7e" stroke-width="2.2"/>
+  <path d="M290,286 L290,266 L302,266 L312,246 L346,246 L356,266 L362,266 L362,286 Z"
+        fill="#d61f1f" fill-opacity="0.10" stroke="#d61f1f" stroke-width="1.8" stroke-linejoin="round"/>
+  <circle cx="303" cy="285" r="7" fill="#ffffff" stroke="#d61f1f" stroke-width="1.6"/>
+  <circle cx="349" cy="285" r="7" fill="#ffffff" stroke="#d61f1f" stroke-width="1.6"/>
+
+  <rect x="48" y="168" width="40" height="24" rx="3" fill="#1919ff" fill-opacity="0.12" stroke="#1919ff" stroke-width="1.8"/>
+  <text class="mono ray" x="68" y="184" text-anchor="middle">Tx</text>
+  <g stroke="#1919ff" stroke-width="1.3" opacity="0.5">
+    <line x1="88" y1="180" x2="143" y2="284" marker-end="url(#rArr)"/>
+    <line x1="88" y1="180" x2="233" y2="284" marker-end="url(#rArr)"/>
+    <line x1="88" y1="180" x2="288" y2="279" marker-end="url(#rArr)"/>
+    <line x1="88" y1="180" x2="328" y2="245" marker-end="url(#rArr)"/>
+  </g>
+
+  <!-- ray landings: dense on the ground, sparse on the vehicle -->
+  <g fill="#1919ff">
+    <circle cx="100" cy="286" r="2.7"/><circle cx="109" cy="286" r="2.7"/>
+    <circle cx="118" cy="286" r="2.7"/><circle cx="127" cy="286" r="2.7"/>
+    <circle cx="136" cy="286" r="2.7"/><circle cx="145" cy="286" r="2.7"/>
+    <circle cx="154" cy="286" r="2.7"/><circle cx="163" cy="286" r="2.7"/>
+    <circle cx="172" cy="286" r="2.7"/><circle cx="181" cy="286" r="2.7"/>
+    <circle cx="190" cy="286" r="2.7"/><circle cx="199" cy="286" r="2.7"/>
+    <circle cx="208" cy="286" r="2.7"/><circle cx="217" cy="286" r="2.7"/>
+    <circle cx="226" cy="286" r="2.7"/><circle cx="235" cy="286" r="2.7"/>
+    <circle cx="244" cy="286" r="2.7"/><circle cx="253" cy="286" r="2.7"/>
+    <circle cx="262" cy="286" r="2.7"/><circle cx="271" cy="286" r="2.7"/>
+    <circle cx="280" cy="286" r="2.7"/>
+    <circle cx="290" cy="280" r="2.7"/><circle cx="297" cy="266" r="2.7"/>
+    <circle cx="308" cy="254" r="2.7"/><circle cx="330" cy="246" r="2.7"/>
+    <circle cx="344" cy="246" r="2.7"/>
+  </g>
+
+  <text class="lbl env" x="44" y="316">most of the budget lands on the ground</text>
+  <text class="lbl tgt" x="44" y="334">the vehicle is left with a handful of rays</text>
+
+  <!-- ================= RIGHT PANEL ================= -->
+  <rect class="panel" x="434.5" y="72.5" width="401" height="278" rx="6"/>
+  <text class="code env" x="635" y="98"  text-anchor="middle">"environment": True</text>
+  <text class="lbl"      x="635" y="117" text-anchor="middle">the ground is sampled as scenery, not as a target</text>
+
+  <line x1="454" y1="286" x2="822" y2="286" stroke="#0f8a7e" stroke-width="2.2"/>
+  <path d="M700,286 L700,266 L712,266 L722,246 L756,246 L766,266 L772,266 L772,286 Z"
+        fill="#d61f1f" fill-opacity="0.10" stroke="#d61f1f" stroke-width="1.8" stroke-linejoin="round"/>
+  <circle cx="713" cy="285" r="7" fill="#ffffff" stroke="#d61f1f" stroke-width="1.6"/>
+  <circle cx="759" cy="285" r="7" fill="#ffffff" stroke="#d61f1f" stroke-width="1.6"/>
+
+  <rect x="458" y="168" width="40" height="24" rx="3" fill="#1919ff" fill-opacity="0.12" stroke="#1919ff" stroke-width="1.8"/>
+  <text class="mono ray" x="478" y="184" text-anchor="middle">Tx</text>
+  <g stroke="#1919ff" stroke-width="1.3" opacity="0.5">
+    <line x1="498" y1="180" x2="572" y2="284" marker-end="url(#rArr)"/>
+    <line x1="498" y1="180" x2="662" y2="284" marker-end="url(#rArr)"/>
+    <line x1="498" y1="180" x2="698" y2="279" marker-end="url(#rArr)"/>
+    <line x1="498" y1="180" x2="736" y2="245" marker-end="url(#rArr)"/>
+  </g>
+
+  <!-- ray landings: sparse on the ground, dense on the vehicle -->
+  <g fill="#1919ff">
+    <circle cx="514" cy="286" r="2.7"/><circle cx="544" cy="286" r="2.7"/>
+    <circle cx="574" cy="286" r="2.7"/><circle cx="604" cy="286" r="2.7"/>
+    <circle cx="634" cy="286" r="2.7"/><circle cx="664" cy="286" r="2.7"/>
+    <circle cx="694" cy="286" r="2.7"/>
+    <circle cx="700" cy="270" r="2.7"/><circle cx="700" cy="276" r="2.7"/>
+    <circle cx="700" cy="282" r="2.7"/>
+    <circle cx="704" cy="266" r="2.7"/><circle cx="709" cy="266" r="2.7"/>
+    <circle cx="714" cy="262" r="2.7"/><circle cx="717" cy="256" r="2.7"/>
+    <circle cx="720" cy="250" r="2.7"/>
+    <circle cx="724" cy="246" r="2.7"/><circle cx="730" cy="246" r="2.7"/>
+    <circle cx="736" cy="246" r="2.7"/><circle cx="742" cy="246" r="2.7"/>
+    <circle cx="748" cy="246" r="2.7"/><circle cx="754" cy="246" r="2.7"/>
+  </g>
+
+  <text class="lbl env" x="454" y="316">the ground gets a coarse share, enough for a big flat reflector</text>
+  <text class="lbl tgt" x="454" y="334">the vehicle keeps the fine sampling</text>
+
+  <!-- legend + captions -->
+  <circle cx="30" cy="376" r="2.7" fill="#1919ff"/>
+  <text class="lbl" x="40" y="380">one dot = one ray landing on a surface</text>
+  <line x1="264" y1="376" x2="288" y2="376" stroke="#1919ff" stroke-width="1.3" opacity="0.5" marker-end="url(#rArr)"/>
+  <text class="lbl" x="296" y="380">a few of those rays, drawn in full</text>
+
+  <text class="cap" x="24" y="404">Nothing about the reflection changes: the surface keeps its permittivity, its specular return, and every multi-bounce path that runs through it. The flag only changes how many rays are spent sampling it &#8212; which is what drives the cost of a large scene.</text>
+</svg>
