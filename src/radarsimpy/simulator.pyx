@@ -40,42 +40,8 @@ The module supports a wide range of functionalities, including:
 
 """
 
+include "simulator_device.pyx"
 include "simulator_radar.pyx"
 include "simulator_lidar.pyx"
 include "simulator_rcs.pyx"
 
-
-def gpu_available():
-    """
-    gpu_available()
-
-    Whether this build can actually run a simulation on the GPU.
-
-    Two separate things have to be true, and this reports their conjunction:
-    the module has to have been compiled with CUDA support, and the machine has
-    to expose at least one usable CUDA device. Either one missing means the
-    simulators run on the CPU.
-
-    This is what ``sim_radar(..., device="auto")`` calls to choose a device, so
-    it also answers "what will auto pick?". ``sim_lidar`` and ``sim_rcs`` have
-    no device argument and always follow it.
-
-    The underlying device probe runs once and is cached for the lifetime of the
-    process, so this is cheap to call repeatedly. It follows
-    ``CUDA_VISIBLE_DEVICES``, which means a child process started with that set
-    to ``-1`` will report ``False`` here even on a CUDA build.
-
-    :return:
-        ``True`` when a CUDA device is usable, ``False`` otherwise.
-    :rtype: bool
-
-    :example:
-        >>> from radarsimpy.simulator import gpu_available
-        >>> gpu_available()
-        True
-    """
-    # Not `bool(...)`: the included simulator files cimport the C++ `bool`,
-    # which shadows the Python builtin in this shared namespace. A `bint`
-    # converts to a genuine Python bool on return.
-    cdef bint available = _gpu_available_c()
-    return available

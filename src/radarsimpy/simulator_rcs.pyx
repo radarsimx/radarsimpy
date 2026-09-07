@@ -38,8 +38,7 @@ from radarsimpy.includes.radarsimc cimport (
     TargetsManager,
     RadarSimErrorCode,
     cpu_policy,
-    gpu_policy,
-    gpu_available as _gpu_available_c
+    gpu_policy
 )
 from radarsimpy.lib.cp_radarsimc cimport cp_RCS_Target
 from libcpp.complex cimport complex as cpp_complex
@@ -64,7 +63,8 @@ cpdef sim_rcs(
     obs_phi=None,
     obs_theta=None,
     obs_pol=None,
-    density=1.0
+    density=1.0,
+    device="auto"
 ):
     """Calculate the Radar Cross Section (RCS) of targets using the Shooting and Bouncing Rays (SBR) method.
 
@@ -123,6 +123,17 @@ cpdef sim_rcs(
         Higher ray density improves accuracy but increases computational cost.  
         Default: ``1.0``.
 
+    :param str device:
+        Execution device for the simulation. Default: ``"auto"``.
+
+        - ``"auto"``: Use the GPU when this build has CUDA support and the machine has a
+          usable CUDA device, otherwise use the CPU. No warning is raised, because no
+          specific device was requested.
+        - ``"gpu"``: Execute simulation on GPU using CUDA. When the module was not built with
+          CUDA support, or when the machine has no usable CUDA device, the simulation
+          falls back to CPU execution and reports it as a ``RuntimeWarning``.
+        - ``"cpu"``: Execute simulation on CPU only.
+
     :return:  
         The Radar Cross Section (RCS) of the target(s) in square meters (m²).  
         Returns a single float value if input angles are scalars, or a numpy array if input angles are arrays.
@@ -130,6 +141,10 @@ cpdef sim_rcs(
         ``10 * log10(RCS)``.
     :rtype: float or numpy.ndarray
     """
+    # Resolved up front: an unrecognised name should fail before the
+    # meshes are loaded, and resolve_device() may warn, so call it once.
+    device_lower = resolve_device(device)
+
     if not is_licensed():
         if len(targets) > 3:
             raise RuntimeError(
@@ -244,7 +259,7 @@ cpdef sim_rcs(
     cdef:
         RcsSimulator[double, cpu_policy] rcs_sim_cpu
         RcsSimulator[double, gpu_policy] rcs_sim_gpu
-        bint use_gpu = _gpu_available_c()
+        bint use_gpu = device_lower == "gpu"
         RadarSimErrorCode err
         vector[double] rcs_vect
 

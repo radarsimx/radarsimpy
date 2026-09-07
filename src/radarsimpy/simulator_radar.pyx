@@ -25,9 +25,6 @@ ray-tracing, interference modeling, and noise simulation.
 
 """
 
-# Standard library imports
-import warnings
-
 # NumPy imports
 import numpy as np
 cimport numpy as np
@@ -56,9 +53,7 @@ from radarsimpy.includes.radarsimc cimport (
     NoiseSimulator,
     RadarSimErrorCode,
     cpu_policy,
-    gpu_policy,
-    gpu_available as _gpu_available_c,
-    CUDA_BUILD
+    gpu_policy
 )
 
 # License management
@@ -255,48 +250,7 @@ cpdef sim_radar(radar, targets, density=1, level=None, interf=None,
     #----------------------
     # Parameter Validation
     #----------------------
-    device_lower = device.lower()
-    if device_lower not in ("auto", "gpu", "cpu"):
-        raise ValueError(
-            f"\nInvalid Device Selection\n"
-            f"------------------------\n"
-            f"The specified device '{device}' is not recognized.\n\n"
-            f"Available devices:\n"
-            f"- 'auto': Use the GPU when one is usable, otherwise the CPU\n"
-            f"- 'gpu': Execute simulation on GPU (CUDA)\n"
-            f"- 'cpu': Execute simulation on CPU\n\n"
-            f"Please choose 'auto', 'gpu' or 'cpu'."
-        )
-
-    # The execution policies are compile-time tags, so a GPU-enabled build would
-    # otherwise launch CUDA kernels on a machine that has no CUDA device. Probe
-    # for a device and run on the CPU when there is none. _gpu_available_c() is
-    # false on a CPU-only build and caches its device probe, so this costs
-    # nothing to ask on every call.
-    if device_lower == "auto":
-        # Picking the CPU here is the documented behaviour, not a failed
-        # request, so it is silent. This is why "auto" is the default: it keeps
-        # the warning below meaningful, firing only when a caller asked for the
-        # GPU by name and did not get it.
-        device_lower = "gpu" if _gpu_available_c() else "cpu"
-    elif device_lower == "gpu" and not _gpu_available_c():
-        # Warn in both cases. Staying silent on a CPU-only build means anyone
-        # benchmarking with device="gpu" on a CPU wheel records CPU timings
-        # believing they are GPU timings, with nothing on screen to say so.
-        if CUDA_BUILD:
-            reason = "No CUDA device was detected on this machine."
-        else:
-            reason = (
-                "This build of radarsimpy was compiled without CUDA support "
-                "(CPU-only build)."
-            )
-        warnings.warn(
-            f"{reason} Running the simulation on the CPU instead, so any "
-            "timing from this run is a CPU timing.",
-            RuntimeWarning,
-            stacklevel=2
-        )
-        device_lower = "cpu"
+    device_lower = resolve_device(device)
 
     level_map = {None: 0, "frame": 0, "pulse": 1, "sample": 2}
     if level not in level_map:

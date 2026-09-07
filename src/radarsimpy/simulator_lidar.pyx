@@ -30,7 +30,7 @@ cimport cython
 
 # RadarSimX imports
 from radarsimpy.includes.radarsimc cimport LidarSimulator, TargetsManager, RadarSimErrorCode
-from radarsimpy.includes.radarsimc cimport Mem_Copy, Ray, cpu_policy, gpu_policy, gpu_available as _gpu_available_c
+from radarsimpy.includes.radarsimc cimport Mem_Copy, Ray, cpu_policy, gpu_policy
 from radarsimpy.includes.rsvector cimport Vec3
 from radarsimpy.includes.type_def cimport float_t, int_t, vector
 
@@ -43,9 +43,9 @@ np_float = np.float32
 @cython.cdivision(True)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef sim_lidar(lidar, targets, frame_time=0):
+cpdef sim_lidar(lidar, targets, frame_time=0, device="auto"):
     """
-    sim_lidar(lidar, targets, frame_time=0)
+    sim_lidar(lidar, targets, frame_time=0, device="auto")
 
     Simulate a Lidar scene and compute ray interactions with targets.
 
@@ -90,6 +90,16 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
     :param float frame_time:
         Simulation timestamp in seconds (s). This parameter determines the time reference for the Lidar's scanning operation and target positions.  
         Default: ``0``.
+    :param str device:
+        Execution device for the simulation. Default: ``"auto"``.
+
+        - ``"auto"``: Use the GPU when this build has CUDA support and the machine has a
+          usable CUDA device, otherwise use the CPU. No warning is raised, because no
+          specific device was requested.
+        - ``"gpu"``: Execute simulation on GPU using CUDA. When the module was not built with
+          CUDA support, or when the machine has no usable CUDA device, the simulation
+          falls back to CPU execution and reports it as a ``RuntimeWarning``.
+        - ``"cpu"``: Execute simulation on CPU only.
 
     :return:  
         Simulated Lidar point cloud with per-point attributes.
@@ -114,7 +124,7 @@ cpdef sim_lidar(lidar, targets, frame_time=0):
     # otherwise, which is also what a CPU-only build always uses.
     cdef LidarSimulator[float_t, cpu_policy] lidar_sim_cpu
     cdef LidarSimulator[float_t, gpu_policy] lidar_sim_gpu
-    cdef bint use_gpu = _gpu_available_c()
+    cdef bint use_gpu = resolve_device(device) == "gpu"
     cdef vector[Ray[float_t]] *cloud
 
     cdef shared_ptr[TargetsManager[float_t]] targets_manager = make_shared[TargetsManager[float_t]]()

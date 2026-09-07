@@ -41,7 +41,10 @@ from pathlib import Path
 import pytest
 
 import radarsimpy
-from radarsimpy.simulator import gpu_available, sim_radar
+from radarsimpy.simulator import (  # pylint: disable=no-name-in-module
+    gpu_available,
+    sim_radar,
+)
 
 #: Directory holding the ``radarsimpy`` package, so the child imports the same one.
 PACKAGE_PARENT = str(Path(radarsimpy.__file__).resolve().parent.parent)
@@ -56,7 +59,7 @@ import warnings
 import numpy as np
 
 from radarsimpy import Radar, Receiver, Transmitter
-from radarsimpy.simulator import gpu_available, sim_radar
+from radarsimpy.simulator import gpu_available, sim_lidar, sim_radar, sim_rcs
 
 tx = Transmitter(
     f=[24.075e9, 24.175e9], t=80e-6, tx_power=10, prp=100e-6, pulses=2,
@@ -85,6 +88,32 @@ cpu_request, cpu_warnings = run("cpu")
 auto_request, auto_warnings = run("auto")
 default_request, default_warnings = run()
 
+
+def run_other(fn, device=None):
+    # sim_rcs / sim_lidar under the same device selection. A comment, not a
+    # docstring: this whole script lives inside a triple-quoted string.
+    kwargs = {} if device is None else {"device": device}
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        result = fn(**kwargs)
+    messages = [str(w.message) for w in caught if issubclass(w.category, RuntimeWarning)]
+    return result, messages
+
+
+mesh = [{"model": "models/plate5x5.stl"}]
+rcs = lambda **kw: sim_rcs(mesh, 77e9, 0, 90, density=0.2, **kw)
+lidar = lambda **kw: sim_lidar(
+    {"position": [0, 0, 0], "phi": [0], "theta": [90]},
+    [{"model": "models/plate5x5.stl", "location": (20, 0, 0)}],
+    **kw,
+)
+
+rcs_auto, rcs_auto_warnings = run_other(rcs, "auto")
+rcs_gpu, rcs_gpu_warnings = run_other(rcs, "gpu")
+rcs_cpu, _ = run_other(rcs, "cpu")
+lidar_auto, lidar_auto_warnings = run_other(lidar, "auto")
+lidar_gpu, lidar_gpu_warnings = run_other(lidar, "gpu")
+
 json.dump(
     {
         "match": bool(np.allclose(gpu_request["baseband"], cpu_request["baseband"])),
@@ -100,6 +129,12 @@ json.dump(
         ),
         "default_warnings": default_warnings,
         "gpu_available": bool(gpu_available()),
+        "rcs_auto_matches_cpu": bool(np.allclose(rcs_auto, rcs_cpu)),
+        "rcs_auto_warnings": rcs_auto_warnings,
+        "rcs_gpu_warnings": rcs_gpu_warnings,
+        "lidar_auto_size": int(len(lidar_auto)),
+        "lidar_auto_warnings": lidar_auto_warnings,
+        "lidar_gpu_warnings": lidar_gpu_warnings,
     },
     sys.stdout,
 )
@@ -188,6 +223,30 @@ def test_gpu_available_agrees_with_the_device_actually_used(fallback_run):
     """
     assert fallback_run["gpu_available"] is False
     assert fallback_run["auto_match"], "auto did not run on the CPU"
+
+
+def test_rcs_and_lidar_accept_auto_and_stay_silent(fallback_run):
+    """``sim_rcs`` and ``sim_lidar`` follow the same rules as ``sim_radar``.
+
+    They used to probe for a device with no way for the caller to say
+    otherwise, so the risk in adding the option is that the three drift apart.
+    """
+    assert fallback_run["rcs_auto_matches_cpu"], "sim_rcs auto != sim_rcs cpu"
+    assert fallback_run["lidar_auto_size"] > 0, "sim_lidar auto returned nothing"
+    assert fallback_run["rcs_auto_warnings"] == []
+    assert fallback_run["lidar_auto_warnings"] == []
+
+
+def test_rcs_and_lidar_report_a_denied_gpu_request(fallback_run):
+    """An explicit ``device="gpu"`` is reported by every entry point, not just
+    ``sim_radar``."""
+    for key in ("rcs_gpu_warnings", "lidar_gpu_warnings"):
+        messages = fallback_run[key]
+        assert messages, f"{key}: the fallback to the CPU was not reported"
+        assert any(
+            "No CUDA device" in message or "without CUDA support" in message
+            for message in messages
+        ), f"{key}: no warning explained the fallback: {messages}"
 
 
 def test_gpu_available_is_a_bool_on_this_machine():
