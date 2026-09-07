@@ -746,6 +746,16 @@ build_cpp_library() {
         cmake_args+=" -DRADARSIMX_CUDA_ARCHITECTURES=${RADARSIMX_CUDA_ARCHITECTURES}"
     fi
 
+    # Fast math trades IEEE conformance for speed in CUDA device code. The
+    # CMake option exists but the build scripts wipe the CMake cache on every
+    # run, so setting it with a bare `cmake -D` does not survive; this is how
+    # it is reached. Off unless asked for, because it changes results --
+    # benchmarks/capture_reference.py is the tool for deciding whether the
+    # change is acceptable.
+    if [ -n "${RADARSIMX_CUDA_FAST_MATH:-}" ]; then
+        cmake_args+=" -DRADARSIMX_CUDA_FAST_MATH=${RADARSIMX_CUDA_FAST_MATH}"
+    fi
+
     # Add license verification flag
     license_lower=$(echo "${LICENSE}" | tr '[:upper:]' '[:lower:]')
     if [ "${license_lower}" = "on" ]; then

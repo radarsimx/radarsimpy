@@ -477,6 +477,16 @@ REM   Sets CMAKE_FAILED=1 and exits on any CMake failures
         set CMAKE_OPTIONS=-DRADARSIMX_CUDA_ARCHITECTURES=!RADARSIMX_CUDA_ARCHITECTURES! !CMAKE_OPTIONS!
     )
 
+    REM Fast math trades IEEE conformance for speed in CUDA device code. The
+    REM CMake option exists but this script wipes the CMake cache on every run,
+    REM so setting it with a bare `cmake -D` does not survive; this is how it is
+    REM reached, e.g. `set RADARSIMX_CUDA_FAST_MATH=ON`. Off unless asked for,
+    REM because it changes results -- benchmarks/capture_reference.py is the
+    REM tool for deciding whether the change is acceptable.
+    if defined RADARSIMX_CUDA_FAST_MATH (
+        set CMAKE_OPTIONS=-DRADARSIMX_CUDA_FAST_MATH=!RADARSIMX_CUDA_FAST_MATH! !CMAKE_OPTIONS!
+    )
+
     cmake !CMAKE_OPTIONS! ..
 
     if %errorlevel% neq 0 (
