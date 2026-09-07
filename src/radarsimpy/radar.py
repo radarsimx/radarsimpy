@@ -419,10 +419,24 @@ class Radar:
     ):
         self.time_prop: dict[str, Any] = {}
 
-        # Calculate samples per pulse and validate
-        samples_per_pulse = int(
+        # Calculate samples per pulse and validate.
+        #
+        # Truncating the raw product loses a sample whenever the intended count
+        # is exact but lands a hair below it in binary. `fs = N / 20e-6` for
+        # N = 64, 128, 256, 512... gives N - 1e-13, so int() yields N - 1. The
+        # C++ side forms the same product from a float-narrowed fs and rounds
+        # the other way, so the two counts disagree and sim_radar rejects the
+        # radar outright. Snap to the nearest integer when the product is
+        # within rounding noise of one; anything genuinely fractional still
+        # truncates as before.
+        _raw_samples = (
             transmitter.waveform_prop["pulse_length"] * receiver.bb_prop["fs"]
         )
+        _nearest = round(_raw_samples)
+        if abs(_raw_samples - _nearest) <= 1e-9 * max(1.0, abs(_raw_samples)):
+            samples_per_pulse = int(_nearest)
+        else:
+            samples_per_pulse = int(_raw_samples)
         if samples_per_pulse <= 0:
             pulse_length = transmitter.waveform_prop["pulse_length"]
             fs = receiver.bb_prop["fs"]

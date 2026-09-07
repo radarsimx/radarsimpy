@@ -267,13 +267,22 @@ cpdef sim_radar(radar, targets, density=1, level=None, interf=None,
     # otherwise launch CUDA kernels on a machine that has no CUDA device. Probe
     # for a device and run on the CPU when there is none.
     if device_lower == "gpu" and not gpu_available():
+        # Warn in both cases. Staying silent on a CPU-only build means anyone
+        # benchmarking with device="gpu" on a CPU wheel records CPU timings
+        # believing they are GPU timings, with nothing on screen to say so.
         if CUDA_BUILD:
-            warnings.warn(
-                "No CUDA device was detected on this machine. "
-                "Running the simulation on the CPU instead.",
-                RuntimeWarning,
-                stacklevel=2
+            reason = "No CUDA device was detected on this machine."
+        else:
+            reason = (
+                "This build of radarsimpy was compiled without CUDA support "
+                "(CPU-only build)."
             )
+        warnings.warn(
+            f"{reason} Running the simulation on the CPU instead, so any "
+            "timing from this run is a CPU timing.",
+            RuntimeWarning,
+            stacklevel=2
+        )
         device_lower = "cpu"
 
     level_map = {None: 0, "frame": 0, "pulse": 1, "sample": 2}
