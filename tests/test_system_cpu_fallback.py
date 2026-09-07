@@ -11,7 +11,9 @@ The child process is required: the device probe is cached for the lifetime of
 the process, so the environment has to be set before ``radarsimpy`` is imported.
 
 These tests pass on a CPU-only build too, where the request is served on the CPU
-for a different reason (no GPU code was compiled in) and no warning is raised.
+for a different reason: no GPU code was compiled in. Both reasons are reported,
+because a silent fallback lets a caller benchmark ``device="gpu"`` and record
+CPU timings with nothing on screen to say so.
 
 ---
 
@@ -123,11 +125,18 @@ def test_fallback_matches_explicit_cpu_request(fallback_run):
 
 
 def test_fallback_is_reported(fallback_run):
-    """Any warning raised by the fallback names the missing CUDA device."""
-    # A CPU-only build warns about nothing at all: gpu_policy is already CPU
-    # there, so no fallback took place.
-    for message in fallback_run["gpu_warnings"]:
-        assert "No CUDA device" in message
+    """A ``device="gpu"`` request served on the CPU always says so, and why."""
+    # Two distinct reasons reach this point and both have to be reported: a
+    # CUDA build with no visible device fell back at runtime, and a CPU-only
+    # build never had GPU code to fall back from. The second used to be silent,
+    # which meant a CPU-only wheel would run device="gpu" at CPU speed with no
+    # indication -- easy to mistake for a slow GPU.
+    messages = fallback_run["gpu_warnings"]
+    assert messages, "the fallback to the CPU was not reported at all"
+    assert any(
+        "No CUDA device" in message or "without CUDA support" in message
+        for message in messages
+    ), f"no warning explained why the GPU was not used: {messages}"
 
 
 def test_explicit_cpu_request_does_not_warn(fallback_run):
