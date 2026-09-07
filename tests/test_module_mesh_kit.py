@@ -2,7 +2,8 @@
 Tests for ``radarsimpy.mesh_kit``
 
 Covers module discovery (``check_module_installed``, ``safe_import``,
-``import_mesh_module``), the per-backend branches of ``load_mesh``,
+``import_mesh_module``), the inline-geometry and per-backend branches of
+``load_mesh``,
 ``merge_meshes`` and the input handling of ``get_target_mesh``.
 
 ---
@@ -108,6 +109,33 @@ class TestLoadMesh:
 
         npt.assert_allclose(scaled["points"], unscaled["points"] / 2.0)
         npt.assert_array_equal(scaled["cells"], unscaled["cells"])
+
+    def test_inline_geometry_bypasses_the_backend(self):
+        """
+        A dict of arrays is passed straight through, with no backend involved.
+
+        ``animation_kit`` hands the parts it extracts from an animated model
+        over this way, and callers can use it for generated geometry too.
+        """
+        points = np.array([[0.0, 0, 0], [2.0, 0, 0], [0, 2.0, 0]])
+        cells = np.array([[0, 1, 2]])
+        module = self._stub("no_such_backend")
+
+        mesh = mesh_kit.load_mesh({"points": points, "cells": cells}, 1.0, module)
+
+        npt.assert_allclose(mesh["points"], points)
+        npt.assert_array_equal(mesh["cells"], cells)
+
+    def test_inline_geometry_honours_scale(self):
+        """``scale`` divides inline vertices just as it does file vertices."""
+        points = np.array([[0.0, 0, 0], [2.0, 0, 0], [0, 2.0, 0]])
+        module = self._stub("no_such_backend")
+
+        mesh = mesh_kit.load_mesh(
+            {"points": points, "cells": [[0, 1, 2]]}, 1000.0, module
+        )
+
+        npt.assert_allclose(mesh["points"], points / 1000.0)
 
     def test_pyvista_branch(self):
         """The pyvista branch reads ``points`` and unpacks the ``faces`` array."""

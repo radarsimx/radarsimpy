@@ -60,6 +60,9 @@ from . import tools
 # 3D mesh utilities
 from . import mesh_kit
 
+# Animated 3D model (glTF 2.0 / GLB) utilities
+from . import animation_kit
+
 # Scene state retrieval
 from .scene import get_scene_state
 
@@ -104,6 +107,7 @@ __all__ = [
     "processing",
     "tools",
     "mesh_kit",
+    "animation_kit",
     # Metadata
     "__version__",
     "__author__",

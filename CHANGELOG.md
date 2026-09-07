@@ -8,6 +8,9 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- `radarsimpy.animation_kit`, which turns a keyframe-animated glTF 2.0 / GLB model into ordinary target dictionaries. Each animated node becomes its own target whose `location`, `speed`, `rotation` and `rotation_rate` are sampled at `radar.time_prop["timestamp"]`, so a spinning rotor, a turning wheel or a keyframed flight path is simulated from the motion authored in the file instead of being re-derived by hand. Velocity and angular rate come from the analytic derivative of the keyframe interpolation, not from differencing the sample grid, because the timestamp restarts at every channel and frame. `STEP`, `LINEAR` and `CUBICSPLINE` samplers, nested node hierarchies and the glTF Y-up to RadarSimPy Z-up conversion are handled; skinning, morph targets and animated scale raise a descriptive `NotImplementedError`, since the ray tracer transforms each target rigidly. Requires the optional `pygltflib` package, discovered at runtime the same way the mesh backends are
+- `radarsimpy.mesh_kit.load_mesh` accepts an in-memory `{"points": ..., "cells": ...}` dictionary in place of a file path, so generated geometry can be simulated without a temporary file. This is how `animation_kit` hands over the parts it extracts from an animated model
+- `gltf` pytest marker, which skips the animated-model tests when `pygltflib` is not installed
 - `benchmarks/bench_sbr.py`, a timing harness for the mesh (SBR) simulator. Sweeps the parameters that drive ray-tracing cost -- `density`, `level`, transmit/receive channel count, model, pulse count -- writes a self-describing JSON record, and turns two such records into a speedup table with `--compare`. `--omp-scaling` re-runs the sweeps in a subprocess per `OMP_NUM_THREADS` value, which is the only way to vary it (the OpenMP runtime reads it at load time) and the measurement that distinguishes real parallel speedup from lock contention
 - `benchmarks/capture_reference.py`, which records the baseband of six scenes chosen to exercise distinct code paths and diffs a fresh capture against a saved one, so a change to the tracer can be reviewed as a numerical delta instead of a wall of failing asserts
 - `benchmarks/baseline/`, holding the pre-optimization CPU and GPU sweeps and reference captures
@@ -19,6 +22,10 @@ All notable changes to this project will be documented in this file.
 - `--deps` build option (`build.sh` / `build.bat`) selecting where the prebuilt third-party libraries come from: `repo` (default) reads the committed `libs/` tree in the `radarsimx-deps` submodule and needs no network, `release` downloads the checksum-pinned `radarsimx-deps` GitHub release archives into a cache outside the build directory. All GitHub Actions workflows now build with `--deps=release`
 - Runtime CPU fallback for machines without a GPU. The execution policies resolve at compile time, so a GPU-enabled build would attempt CUDA execution even where no device exists; `sim_radar`, `sim_rcs` and `sim_lidar` now probe for a usable CUDA device and dispatch to the CPU policy when there is none. `sim_radar(device="gpu")` reports the fallback as a `RuntimeWarning`. A CPU-only build is unaffected, and an explicit `device="cpu"` request is unchanged
 - CPU fallback test suite (`test_system_cpu_fallback.py`)
+
+### Fixed
+
+- `radarsimpy.mesh_kit.import_mesh_module` docstring listed the backend search order as pyvista first; the code has always tried trimesh first
 
 ### Changed
 

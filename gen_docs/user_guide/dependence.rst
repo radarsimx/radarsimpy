@@ -26,6 +26,17 @@ For 3D object simulation and RCS calculation, at least one of the following mesh
 .. note::
    You only need to install one mesh processing library. ``trimesh`` is recommended for most users due to its simplicity and minimal dependencies.
 
+**Animated 3D Models**
+
+To load keyframe-animated glTF 2.0 / GLB models with :mod:`radarsimpy.animation_kit`, install:
+
+* **pygltflib** >= 1.16.0 - glTF 2.0 / GLB parsing
+
+.. note::
+   This is only needed for animated models. Static ``.stl``, ``.ply`` and ``.obj``
+   files are handled by the mesh processing library above. See
+   :doc:`animated_targets`.
+
 **Installation**
 
 Install all required dependencies using:
@@ -39,6 +50,12 @@ Or install individually:
 .. code-block:: bash
 
     pip install numpy scipy trimesh
+
+For animated glTF models:
+
+.. code-block:: bash
+
+    pip install pygltflib
 
 System Requirements
 -------------------
@@ -140,4 +157,5 @@ See Also
 --------
 
 * :doc:`installation` - Installation instructions
+* :doc:`animated_targets` - Simulating keyframe-animated 3D models
 * :doc:`build` - Building from source (for developers with source access)

@@ -9,3 +9,4 @@ API
    process
    tools
    scene
+   animation
