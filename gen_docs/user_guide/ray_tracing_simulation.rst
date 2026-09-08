@@ -295,23 +295,27 @@ When to use it
 
 Set ``environment=True`` for:
 
-- ground planes and terrain surfaces
-- building walls, tunnel linings, guardrails and barriers
-- any large, mostly flat surface that frames the scene rather than being
-  measured in it
+- terrain, embankments and other large surroundings that still scatter
+  usefully back towards the radar
+- any large surface that frames the scene rather than being measured in it,
+  and whose own return you want to keep
 
 Leave it at ``False`` for:
 
 - the vehicles, pedestrians or reflectors whose returns you are measuring
 - small or strongly curved objects, where surface detail drives the result
 - any surface whose own RCS is the quantity of interest
+- anything already marked ``skip_diffusion=True`` — that flag covers the same
+  sampling treatment, so ``environment`` adds nothing. See
+  :ref:`choosing-between-the-two-flags` below.
+
+.. _choosing-between-the-two-flags:
 
 Choosing between the two flags
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The two flags are easy to confuse because they are recommended for the same
-kinds of object, but they act on different things and neither implies the
-other:
+kinds of object. They do act on different things:
 
 .. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/skip_diffusion_vs_environment.svg
     :width: 100%
@@ -327,17 +331,40 @@ other:
   the surface is large enough that sampling it at full density would starve
   the real targets of rays.
 
-A ground plane, a long wall or a terrain mesh is usually both, so the two are
-commonly set together::
+They are not independent in practice, though, because ``skip_diffusion``
+already carries the sampling treatment that ``environment`` asks for. A
+surface with *either* flag keeps its own triangles in the coarse pass instead
+of being replaced by a bounding box, and is not inflated by the grid margin.
 
-    ground = {
-        "model": "./models/ground.stl",
-        "location": (0, 0, 0),
-        "skip_diffusion": True,
-        "environment": True,
-    }
+.. important::
 
-A large but curved surface — a tunnel bore, say — may want ``environment``
-without ``skip_diffusion``, since it does scatter back towards the radar. A
-small flat plate is the opposite case: its own return may be negligible, but
-it is far too small to be worth coarsening.
+   On a surface that already has ``skip_diffusion=True``, adding
+   ``environment=True`` changes nothing — with one narrow exception. When a
+   ray's first two hits are *both* skipped surfaces, ``environment`` keeps
+   that grid cell alive instead of discarding it, which spends **more** rays,
+   not fewer. Setting both flags on a ground plane is therefore redundant at
+   best.
+
+So in practice:
+
+- **Large flat reflector whose own return does not matter** — a ground plane,
+  a wall, a tunnel lining. ``skip_diffusion=True`` on its own is enough::
+
+      ground = {
+          "model": "./models/ground.stl",
+          "location": (0, 0, 0),
+          "skip_diffusion": True,
+      }
+
+- **Large surrounding surface whose return you do want**, but which is too
+  big to be sampled like a target — a broad embankment, a terrain mesh you
+  are bouncing signals off. ``environment=True`` on its own is the flag for
+  this, and it is the only case where ``environment`` does real work::
+
+      terrain = {
+          "model": "./models/terrain.stl",
+          "location": (0, 0, 0),
+          "environment": True,
+      }
+
+- **A target you are measuring** — neither flag.
