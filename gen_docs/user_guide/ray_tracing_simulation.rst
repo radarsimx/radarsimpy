@@ -97,10 +97,15 @@ discrepancy — so the level you need is set by how much the scene changes
 Choosing a level
 ^^^^^^^^^^^^^^^^
 
-- ``None`` or ``"frame"`` — static scenes, or targets translating steadily.
-  The fastest option, and the right starting point.
-- ``"pulse"`` — moving targets, where range-Doppler processing matters. A good
-  balance, and the usual recommendation once anything in the scene is moving.
+- ``None`` or ``"frame"`` — static scenes, and any motion that is linear or
+  close enough to it across one frame. That covers more ground than it sounds:
+  when the pulse repetition rate is high compared with the rate at which the
+  target's motion changes, a whole frame spans only a small slice of that
+  motion, and the straight line holds well. The fastest option, and the right
+  starting point.
+- ``"pulse"`` — motion that curves appreciably over a frame but not within a
+  single pulse. A good balance when the frame is long enough, or the dynamics
+  fast enough, that one straight line no longer covers it.
 - ``"sample"`` — rotating, vibrating or accelerating targets. Required for
   micro-Doppler work: the modulation you are trying to see lives *inside* a
   pulse, which is exactly what the lower levels smooth away.
