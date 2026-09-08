@@ -60,9 +60,12 @@ How often the scene is re-traced
 A radar frame is a grid of pulses and samples, and the level decides how that
 grid is carved up into ray-tracing passes:
 
-.. image:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/fidelity_level_passes.svg
+.. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/fidelity_level_passes.svg
     :width: 100%
     :alt: One ray-tracing pass per frame, per pulse, or per sample
+
+    Each grid is one radar frame of a single transmit channel: rows are
+    pulses, columns are ADC samples. A blue region is what one pass covers.
 
 For a frame of ``P`` pulses of ``S`` samples, each transmit channel costs one
 pass at ``"frame"``, ``P`` passes at ``"pulse"``, and ``P × S`` passes at
@@ -77,9 +80,14 @@ from the traced instant at its **range rate** — a straight line at constant
 speed. That is exact for a target translating at constant velocity, and
 progressively wrong for anything else:
 
-.. image:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/fidelity_level_motion.svg
+.. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/fidelity_level_motion.svg
     :width: 100%
     :alt: Straight-line extrapolation of target motion between ray-tracing passes
+
+    Horizontal axis: time within one frame; vertical axis: range to a point
+    on the target. Teal is the true motion, blue is what the simulator uses,
+    red is where they disagree. Each pass restarts from the true geometry, so
+    the blue track steps back onto the curve at every one.
 
 Rotation, vibration, angular acceleration and any curved path are what the
 straight line misses. The further a pass has to reach, the larger the
@@ -176,9 +184,12 @@ A ray sends energy back to the receiver only once it has touched a surface
 that is **not** skipped. Bounces on skipped surfaces before that point
 redirect the ray and do nothing else:
 
-.. image:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/skip_diffusion_returns.svg
+.. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/skip_diffusion_returns.svg
     :width: 100%
     :alt: Which bounce points return energy to the receiver, with and without skip_diffusion
+
+    A filled marker is a bounce that returns energy to the receiver; a hollow
+    one only redirects the ray onwards.
 
 So a ray that leaves the radar, strikes the ground and carries on out of the
 scene contributes nothing at all, while radar → ground → vehicle → radar is
@@ -221,9 +232,12 @@ are measuring. Ground planes, terrain, building walls and tunnel linings are
 environment objects; the vehicle, pedestrian or corner reflector under test
 is not.
 
-.. image:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/environment_scene.svg
+.. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/environment_scene.svg
     :width: 100%
     :alt: Which objects in a scene should be marked as environment targets
+
+    The surroundings carry the flag, the vehicle under test does not. Both
+    still scatter, and the ground-bounce path is simulated either way.
 
 An environment object still takes part in the simulation in exactly the same
 way as any other target. It reflects according to its permittivity, it
@@ -243,9 +257,12 @@ whatever remains.
 Setting ``environment=True`` lowers the ray density on those surfaces, and the
 budget shifts onto the primary targets:
 
-.. image:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/environment_ray_density.svg
+.. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/environment_ray_density.svg
     :width: 100%
     :alt: Ray landings on the ground and on the vehicle, with and without the environment flag
+
+    One dot is one ray landing on a surface. Only four of those rays are
+    drawn in full, to keep the fan readable.
 
 This is where the speed-up comes from. In a scene with a large ground plane or
 a long wall, the surroundings are what most of the rays are spent on, so
@@ -260,9 +277,12 @@ the Physical Optics integral, so ray density is really surface sampling
 density. A coarser share of the budget means larger facets on the environment
 surface:
 
-.. image:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/environment_po_sampling.svg
+.. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/environment_po_sampling.svg
     :width: 100%
     :alt: Fine versus coarse physical-optics surface sampling over the same area
+
+    The same patch of surface at two sampling densities. Each dot is one ray
+    landing, and so one surface-current sample in the PO integral.
 
 Those samples still use the permittivity you set and still feed the same PO
 integral. What coarser sampling costs is **surface detail**. A large flat
@@ -293,9 +313,13 @@ The two flags are easy to confuse because they are recommended for the same
 kinds of object, but they act on different things and neither implies the
 other:
 
-.. image:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/skip_diffusion_vs_environment.svg
+.. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/skip_diffusion_vs_environment.svg
     :width: 100%
     :alt: skip_diffusion changes what a surface returns, environment changes how finely it is sampled
+
+    Left: the bounce is drawn hollow because the surface adds no return of
+    its own. Right: one surface sampled densely as a target, sparsely as
+    environment.
 
 - ``skip_diffusion`` decides **what the surface sends back**. Set it when the
   surface is flat enough that its own return is not worth computing.

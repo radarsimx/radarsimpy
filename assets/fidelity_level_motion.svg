@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 432" width="860" height="432"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 281" width="860" height="281"
      role="img" aria-label="What the simulator assumes about target motion between ray-tracing passes">
   <title>What the simulator assumes about target motion between ray-tracing passes</title>
   <style>
@@ -16,9 +16,8 @@
     .ink   { fill:#14181f }
   </style>
 
-  <rect class="bg" x="0.5" y="0.5" width="859" height="431" rx="8"/>
-  <text class="ttl" x="24" y="32">What happens between passes</text>
-  <text class="sub" x="24" y="52">Between passes a target is carried forward in a straight line at constant range rate &#8212; the further that reaches, the more it misses.</text>
+  <rect class="bg" x="0.5" y="0.5" width="859" height="280" rx="8"/>
+  <g id="fig" transform="translate(0,-62.5)">
   <rect class="panel" x="24.5" y="76.5" width="263" height="224" rx="6"/>
   <text class="code ink" x="156" y="102" text-anchor="middle">level=None  or  "frame"</text>
   <text class="lbl" x="156" y="121" text-anchor="middle">extrapolated across the whole frame</text>
@@ -190,8 +189,5 @@
   <text class="lbl" x="440" y="326">a ray-tracing pass</text>
   <rect x="576" y="316" width="24" height="12" fill="#d61f1f" fill-opacity="0.16"/>
   <text class="lbl" x="608" y="326">where the two disagree</text>
-  <text class="lbl" x="24" y="352">Horizontal axis: time within one radar frame; vertical axis: range to a point on the target.</text>
-  <text class="lbl" x="24" y="370">Every pass starts again from the true geometry, so the track steps back onto the curve at each one.</text>
-  <text class="cap" x="24" y="396">A straight line is exact for a target translating at constant velocity &#8212; rotation, vibration and acceleration are what it misses.</text>
-  <text class="cap" x="24" y="416">That is why micro-Doppler work needs level="sample".</text>
+  </g>
 </svg>

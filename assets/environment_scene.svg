@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 360" width="780" height="360"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 275" width="780" height="275"
      role="img" aria-label="Scene roles: primary targets versus environment surfaces">
   <title>Scene roles: primary targets versus environment surfaces</title>
   <style>
@@ -22,9 +22,8 @@
     </pattern>
   </defs>
 
-  <rect class="bg" x="0.5" y="0.5" width="779" height="359" rx="8"/>
-  <text class="ttl" x="24" y="32">Scene roles: primary targets vs. environment surfaces</text>
-  <text class="sub" x="24" y="52">Every object still scatters. The flag only tells the simulator how to budget rays for it.</text>
+  <rect class="bg" x="0.5" y="0.5" width="779" height="274" rx="8"/>
+  <g id="fig" transform="translate(0,-63.7)">
 
   <!-- ground -->
   <rect x="40" y="251" width="705" height="14" fill="url(#soil)"/>
@@ -68,5 +67,5 @@
   <text class="code env" x="48" y="304">"environment": True</text>
   <text class="lbl" x="48" y="322">ground plane / terrain &#8212; large, always in view</text>
 
-  <text class="cap" x="24" y="345">Mark the surroundings, not the thing you are measuring: the flag changes ray budgeting, never the physics of the reflection.</text>
+  </g>
 </svg>

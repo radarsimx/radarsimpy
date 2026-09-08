@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 384" width="860" height="384"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 256" width="860" height="256"
      role="img" aria-label="How skip_diffusion and environment differ">
   <title>How skip_diffusion and environment differ</title>
   <style>
@@ -22,9 +22,8 @@
     </marker>
   </defs>
 
-  <rect class="bg" x="0.5" y="0.5" width="859" height="383" rx="8"/>
-  <text class="ttl" x="24" y="32">The two flags do different things</text>
-  <text class="sub" x="24" y="52">One changes what a surface sends back. The other changes how finely it is sampled. They are independent.</text>
+  <rect class="bg" x="0.5" y="0.5" width="859" height="255" rx="8"/>
+  <g id="fig" transform="translate(0,-58.5)">
 
   <!-- ================= CARD 1 ================= -->
   <rect class="panel" x="24.5" y="72.5" width="401" height="228" rx="6"/>
@@ -75,7 +74,5 @@
   <text class="lbl" x="470" y="282">for large surroundings that fill much of the field of view</text>
 
   <!-- ================= COMBINED ================= -->
-  <rect x="24.5" y="316.5" width="811" height="40" rx="6" fill="#f4f6f8" stroke="#dde1e7"/>
-  <text class="mono" x="44" y="342">"skip_diffusion": True, "environment": True</text>
-  <text class="lbl"  x="406" y="342">&#8212; the usual pairing for a ground plane, a wall, or terrain</text>
+  </g>
 </svg>

@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 372" width="860" height="372"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 256" width="860" height="256"
      role="img" aria-label="How the environment flag changes physical-optics surface sampling">
   <title>How the environment flag changes physical-optics surface sampling</title>
   <style>
@@ -15,9 +15,8 @@
     .ink   { fill:#14181f }
   </style>
 
-  <rect class="bg" x="0.5" y="0.5" width="859" height="371" rx="8"/>
-  <text class="ttl" x="24" y="32">What that means for the physical-optics result</text>
-  <text class="sub" x="24" y="52">Every ray that lands on a surface contributes one surface-current sample to the PO integral, so ray density is surface sampling.</text>
+  <rect class="bg" x="0.5" y="0.5" width="859" height="255" rx="8"/>
+  <g id="fig" transform="translate(0,-58.5)">
 
   <rect class="panel" x="24.5" y="72.5" width="401" height="228" rx="6"/>
   <text class="code ink" x="225" y="98"  text-anchor="middle">"environment": False</text>
@@ -114,6 +113,5 @@
   <text class="mono ray" x="635" y="268" text-anchor="middle">8 samples over the same area</text>
   <text class="lbl"      x="635" y="287" text-anchor="middle">large facets &#8212; ample for a flat ground plane or wall</text>
 
-  <text class="cap" x="24" y="330">The samples still use the permittivity you set and feed the same PO integral. Coarser sampling only limits how much surface detail it can resolve.</text>
-  <text class="cap" x="24" y="350">So flag large, mostly flat surroundings &#8212; and leave the flag off for anything small, strongly curved, or whose scattering you are actually measuring.</text>
+  </g>
 </svg>

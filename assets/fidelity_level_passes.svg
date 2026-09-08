@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 372" width="860" height="372"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 252" width="860" height="252"
      role="img" aria-label="How often the scene geometry is re-traced for each fidelity level">
   <title>How often the scene geometry is re-traced for each fidelity level</title>
   <style>
@@ -16,9 +16,8 @@
     .ink   { fill:#14181f }
   </style>
 
-  <rect class="bg" x="0.5" y="0.5" width="859" height="371" rx="8"/>
-  <text class="ttl" x="24" y="32">How often the scene is re-traced</text>
-  <text class="sub" x="24" y="52">Each blue region is covered by a single ray-tracing pass. Inside a region the geometry is carried forward by a straight-line extrapolation.</text>
+  <rect class="bg" x="0.5" y="0.5" width="859" height="251" rx="8"/>
+  <g id="fig" transform="translate(0,-62.5)">
   <rect class="panel" x="24.5" y="76.5" width="263" height="224" rx="6"/>
   <text class="code ink" x="156" y="102" text-anchor="middle">level=None  or  "frame"</text>
   <text class="lbl" x="156" y="121" text-anchor="middle">one pass per frame</text>
@@ -165,6 +164,5 @@
     <circle cx="795" cy="241" r="2.2"/>
   </g>
   <text class="mono ray" x="704" y="278" text-anchor="middle">32 passes, one per sample</text>
-  <text class="lbl" x="24" y="326">Each grid is one radar frame of a single transmit channel: rows are pulses, columns are ADC samples.</text>
-  <text class="cap" x="24" y="350">Per frame and per transmit channel the simulator runs 1 pass, P passes, or P &#215; S passes, for P pulses of S samples. That count is what the run time follows.</text>
+  </g>
 </svg>
