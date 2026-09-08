@@ -201,10 +201,13 @@ Effect on cost
 ^^^^^^^^^^^^^^
 
 In a scene framed by a ground plane, a large share of the rays land on the
-ground and nowhere else. Each of those would otherwise contribute a scattering
-evaluation against every receive channel, and those evaluations are the
-dominant cost of a mesh simulation — so dropping them is usually the largest
-single saving available on a ground-plane scene.
+ground and nowhere else. ``skip_diffusion`` removes that work twice over:
+directions that see nothing but a skipped surface are dropped before any rays
+are launched into them, and the bounces that do happen on it add no scattering
+evaluation against the receive channels. Those evaluations are the dominant
+cost of a mesh simulation, so this is usually the largest single saving
+available on a ground-plane scene — and a much larger one than ``environment``
+offers.
 
 When to use it
 ^^^^^^^^^^^^^^
@@ -254,8 +257,8 @@ in a scene and fill most of the field of view, so without the flag they absorb
 the bulk of the rays — and the target you actually care about is left with
 whatever remains.
 
-Setting ``environment=True`` lowers the ray density on those surfaces, and the
-budget shifts onto the primary targets:
+Setting ``environment=True`` shifts part of that budget away from the surface
+and onto the primary targets:
 
 .. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/environment_ray_density.svg
     :width: 100%
@@ -264,10 +267,16 @@ budget shifts onto the primary targets:
     One dot is one ray landing on a surface. Only four of those rays are
     drawn in full, to keep the fan readable.
 
-This is where the speed-up comes from. In a scene with a large ground plane or
-a long wall, the surroundings are what most of the rays are spent on, so
-lowering their share is the single most effective way to bring the run time of
-the scene down.
+The saving is real but modest. It comes from the surface no longer claiming
+directions its geometry does not actually cover, and from a target behind it
+setting the sampling rather than the surface itself. Rays that land on the
+surface and nowhere else are still launched, and still evaluated.
+
+.. note::
+
+   If what you want is those rays gone, ``skip_diffusion`` is the flag that
+   does it, and it saves considerably more than ``environment`` does. Reach
+   for ``environment`` when the surface still has to scatter properly.
 
 Effect on the PO calculation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -331,19 +340,11 @@ kinds of object. They do act on different things:
   the surface is large enough that sampling it at full density would starve
   the real targets of rays.
 
-They are not independent in practice, though, because ``skip_diffusion``
-already carries the sampling treatment that ``environment`` asks for. A
-surface with *either* flag keeps its own triangles in the coarse pass instead
-of being replaced by a bounding box, and is not inflated by the grid margin.
-
 .. important::
 
-   On a surface that already has ``skip_diffusion=True``, adding
-   ``environment=True`` changes nothing — with one narrow exception. When a
-   ray's first two hits are *both* skipped surfaces, ``environment`` keeps
-   that grid cell alive instead of discarding it, which spends **more** rays,
-   not fewer. Setting both flags on a ground plane is therefore redundant at
-   best.
+   ``skip_diffusion=True`` already covers what ``environment`` does to
+   sampling. Setting both on the same surface gains nothing, and can cost
+   extra rays — pick one.
 
 So in practice:
 
