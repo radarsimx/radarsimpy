@@ -14,11 +14,9 @@ Follow these steps to install RadarSimPy:
 2. **Extract** the downloaded package to a temporary location
 3. **Copy** the ``radarsimpy/`` folder into your project directory
 
-**Supported Platforms**
-
-- Windows 10/11 (x64)
-- Linux (x64) - Ubuntu 22.04 / 24.04 / 26.04 LTS (or compatible distributions)
-- MacOS (Intel x64 and Apple Silicon ARM64) - builds are produced and tested on recent macOS releases
+Pre-built modules are available for Windows, Linux and MacOS. See
+:doc:`dependencies` for the supported OS versions, architectures and runtime
+components each platform needs.
 
 Directory Structure
 -------------------
@@ -178,6 +176,14 @@ If no valid license file is found, RadarSimPy automatically operates in free tie
 Building from Source
 ---------------------
 
-Building ``radarsimpy`` requires access to the source code of ``radarsimcpp``. If you don't have access to ``radarsimcpp``, please use the `pre-built module <https://radarsimx.com/product/radarsimpy/>`_. 
+Most users should install the pre-built module as described above. If you have
+access to the ``radarsimcpp`` source code and need custom modifications, see
+:doc:`build`.
 
-For organizations seeking full source code access for customization or advanced integration, please submit a `Quote for Source Code <https://radarsimx.com/quote-for-source-code/>`_.
+See Also
+--------
+
+* :doc:`dependencies` - Platform requirements and Python packages
+* :doc:`overview` - What RadarSimPy can simulate
+* :doc:`examples` - Worked examples to run once installed
+* :doc:`build` - Building from source (requires ``radarsimcpp`` access)

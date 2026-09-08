@@ -123,3 +123,10 @@ Summary
 .. note::
 
    **Both conventions are mathematically correct** — the difference lies only in the choice of coordinate system and how radial velocity is defined. In RadarSimPy's convention, radial velocity is negative when approaching (closing) and positive when receding (opening). Other systems may define radial velocity with the opposite sign, resulting in positive Doppler for approaching targets. The physical phenomenon remains the same; only the sign convention differs.
+
+See Also
+--------
+
+* :doc:`coordinate_systems` - How position and velocity vectors are defined
+* :doc:`noise` - Phase noise and its effect on the Doppler dimension
+* :doc:`../api/radar` - ``Radar``, ``Transmitter`` and ``Receiver`` reference

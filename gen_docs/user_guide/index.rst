@@ -1,18 +1,36 @@
 User Guide
 ==========
 
+Guides for installing RadarSimPy, understanding the conventions it follows, and
+configuring the simulator for your scenario.
+
 .. toctree::
    :maxdepth: 2
-   :caption: Get started
+   :caption: Getting Started
 
-   features
-   dependence
+   overview
+   dependencies
    installation
-   coordinate
-   conventions
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Concepts & Conventions
+
+   coordinate_systems
+   doppler_convention
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Simulation Guides
+
    noise
-   range_gate
    ray_tracing_simulation
    animated_targets
+   stretch_processing
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Resources & Development
+
    examples
    build

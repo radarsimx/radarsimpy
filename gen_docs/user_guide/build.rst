@@ -31,10 +31,9 @@ Before building RadarSimPy, ensure you have the following installed:
 **For GPU Version**
 
 - NVIDIA CUDA Toolkit 13.x
-- NVIDIA GPU with Compute Capability 7.5 (Turing) or higher
 
-.. note::
-   CUDA Toolkit 13 dropped offline compilation support for pre-Turing architectures (Maxwell, Pascal, Volta). GPUs older than Turing are not supported by CUDA13 builds.
+See :doc:`dependencies` for the GPU hardware and driver requirements the
+resulting build will run against.
 
 **Python Dependencies**
 
@@ -81,13 +80,6 @@ Navigate to the RadarSimPy root directory and run the appropriate build script.
 
     build.bat --arch=gpu --test=on
 
-**Build Options**
-
-- ``--arch`` - Architecture: ``cpu`` or ``gpu`` (default: ``cpu``)
-- ``--test`` - Enable testing: ``on`` or ``off`` (default: ``on``)
-- ``--license`` - Enable license verification: ``on`` or ``off`` (default: ``off``)
-- ``--jobs`` - Number of parallel build jobs (auto-detected by default)
-
 Linux
 ^^^^^
 
@@ -125,13 +117,6 @@ Verify CUDA installation:
 .. code-block:: bash
 
     nvcc --version
-
-**Build Options**
-
-- ``--arch`` - Architecture: ``cpu`` or ``gpu`` (default: ``cpu``)
-- ``--test`` - Enable testing: ``on`` or ``off`` (default: ``on``)
-- ``--license`` - Enable license verification: ``on`` or ``off`` (default: ``off``)
-- ``--jobs`` - Number of parallel build jobs (auto-detected by default)
 
 MacOS
 ^^^^^
@@ -176,15 +161,56 @@ Make the build script executable (first time only):
 .. note::
    GPU (CUDA) builds are not supported on MacOS. Apple Silicon Macs use native ARM64 CPU optimization.
 
-**Build Options**
+Build Options
+-------------
 
-- ``--arch`` - Architecture: ``cpu`` (only option for MacOS)
-- ``--test`` - Enable testing: ``on`` or ``off`` (default: ``on``)
-- ``--license`` - Enable license verification: ``on`` or ``off`` (default: ``off``)
-- ``--jobs`` - Number of parallel build jobs (auto-detected by default)
-- ``--verbose`` - Enable verbose output
-- ``--clean`` - Clean build artifacts: ``true`` or ``false``
-- ``--cmake-args`` - Additional CMake arguments
+Both build scripts accept the same core options. ``build.sh`` accepts three
+additional flags that ``build.bat`` does not.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 45 20 15
+
+   * - Option
+     - Description
+     - Default
+     - Available in
+   * - ``--arch``
+     - Build architecture: ``cpu`` or ``gpu``
+     - ``cpu``
+     - Both
+   * - ``--test``
+     - Run unit tests after building: ``on`` or ``off``
+     - ``on``
+     - Both
+   * - ``--license``
+     - Enable license verification: ``on`` or ``off``
+     - ``off``
+     - Both
+   * - ``--jobs``
+     - Number of parallel build jobs
+     - auto-detect
+     - Both
+   * - ``--deps``
+     - Source of the prebuilt third-party libraries: ``repo`` uses the
+       committed ``libs/`` tree in the ``radarsimx-deps`` submodule,
+       ``release`` downloads the ``radarsimx-deps`` GitHub release archives
+     - ``repo``
+     - Both
+   * - ``--clean``
+     - Clean build artifacts before building: ``true`` or ``false``
+     - ``true``
+     - ``build.sh``
+   * - ``--verbose``
+     - Enable verbose build output
+     - ``false``
+     - ``build.sh``
+   * - ``--cmake-args``
+     - Additional arguments passed through to CMake
+     - none
+     - ``build.sh``
+
+Run ``build.bat --help`` or ``./build.sh --help`` for the authoritative list.
 
 Build Process
 -------------
@@ -268,6 +294,6 @@ After building, open ``gen_docs/_build/html/index.html`` in your browser.
 See Also
 --------
 
-- :doc:`installation` - Installation instructions for pre-built modules
-- :doc:`dependence` - Detailed dependency information
-- :doc:`examples` - Usage examples and tutorials
+* :doc:`installation` - Installing the pre-built module
+* :doc:`dependencies` - Runtime platform and package requirements
+* :doc:`examples` - Worked examples to run once built

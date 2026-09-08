@@ -194,3 +194,9 @@ Near the edges of the window the reference and echo chirps only partially
 overlap. The simulator extrapolates the chirp there, modeling an ideal infinite
 chirp, which keeps the full window usable. Real hardware would see reduced
 correlation gain over roughly :math:`|\Delta \tau| f_s` samples.
+
+See Also
+--------
+
+* :doc:`noise` - The phase noise model this page's range gate interacts with
+* :doc:`../api/radar` - ``Receiver.gate_delay`` and the derived range properties

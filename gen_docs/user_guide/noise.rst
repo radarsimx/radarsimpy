@@ -316,3 +316,10 @@ Example
        channels=[{"location": (0, 0, 0)}],
    )
    radar = Radar(transmitter=tx, receiver=rx, seed=0)
+
+See Also
+--------
+
+* :doc:`stretch_processing` - Range correlation when a range gate is configured
+* :doc:`doppler_convention` - Doppler sign convention for the baseband signal
+* :doc:`../api/radar` - ``Radar``, ``Transmitter`` and ``Receiver`` reference

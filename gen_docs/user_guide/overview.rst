@@ -1,5 +1,5 @@
-Key Features
-============
+Overview
+========
 
 RadarSimPy provides comprehensive tools for radar system modeling, simulation, and signal processing. This page outlines the core capabilities available in the library.
 
@@ -139,5 +139,10 @@ RadarSimPy leverages optimized C++ implementations for computationally intensive
 * **Efficient memory management** for large-scale scenarios
 * **GPU acceleration** support (where applicable)
 
-.. note::
-   For detailed API documentation and usage examples, refer to the :doc:`../api/index` and :doc:`examples` sections.
+See Also
+--------
+
+* :doc:`dependencies` - What you need installed to use these features
+* :doc:`installation` - Installing the pre-built module
+* :doc:`examples` - Worked examples for the capabilities listed above
+* :doc:`../api/index` - Complete API reference

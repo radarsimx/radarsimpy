@@ -374,3 +374,10 @@ So in practice:
       }
 
 - **A target you are measuring** — neither flag.
+
+See Also
+--------
+
+* :doc:`animated_targets` - Driving mesh targets from keyframed glTF motion
+* :doc:`coordinate_systems` - Placing and orienting targets in the scene
+* :doc:`examples` - Ray-tracing and RCS examples

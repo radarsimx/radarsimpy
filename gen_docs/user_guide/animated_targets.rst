@@ -61,7 +61,7 @@ derives hit-point velocity from those two keys rather than from successive
 positions, so getting them right is what makes the Doppler correct.
 
 **Frames are converted.** glTF is Y-up; RadarSimPy is Z-up (see
-:doc:`coordinate`). Geometry, poses and rates are rotated accordingly. Pass
+:doc:`coordinate_systems`). Geometry, poses and rates are rotated accordingly. Pass
 ``up_axis="z"`` for an asset already exported Z-up.
 
 Placing and driving the whole model
@@ -181,6 +181,6 @@ animated part is its own target.
 See Also
 --------
 
-* :doc:`coordinate` - The Z-up frame and the yaw/pitch/roll convention
+* :doc:`coordinate_systems` - The Z-up frame and the yaw/pitch/roll convention
 * :doc:`ray_tracing_simulation` - How mesh targets are simulated
-* :doc:`dependence` - Optional package requirements
+* :doc:`dependencies` - Optional package requirements

@@ -118,3 +118,10 @@ Notes
 - All distances use meters as the base unit
 - Right-handed coordinate systems ensure consistency with standard conventions
 - The coordinate transformation order matters: always apply yaw, then pitch, then roll
+
+See Also
+--------
+
+* :doc:`ray_tracing_simulation` - Placing and orienting 3D mesh targets
+* :doc:`animated_targets` - Frame conversion for glTF assets (Y-up to Z-up)
+* :doc:`doppler_convention` - The sign convention for radial velocity
