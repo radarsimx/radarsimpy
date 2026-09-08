@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 424" width="860" height="424"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 444" width="860" height="444"
      role="img" aria-label="Where the ray budget goes with and without the environment flag">
   <title>Where the ray budget goes with and without the environment flag</title>
   <style>
@@ -21,9 +21,9 @@
     </marker>
   </defs>
 
-  <rect class="bg" x="0.5" y="0.5" width="859" height="423" rx="8"/>
+  <rect class="bg" x="0.5" y="0.5" width="859" height="443" rx="8"/>
   <text class="ttl" x="24" y="32">Where the ray budget goes</text>
-  <text class="sub" x="24" y="52">Ray density decides how many rays are launched at each part of the scene. The flag moves that budget off the surroundings and onto the targets.</text>
+  <text class="sub" x="24" y="52">Ray density decides how many rays go to each part of the scene. The flag moves that budget off the surroundings and onto the targets.</text>
 
   <!-- ================= LEFT PANEL ================= -->
   <rect class="panel" x="24.5" y="72.5" width="401" height="278" rx="6"/>
@@ -111,5 +111,6 @@
   <line x1="264" y1="376" x2="288" y2="376" stroke="#1919ff" stroke-width="1.3" opacity="0.5" marker-end="url(#rArr)"/>
   <text class="lbl" x="296" y="380">a few of those rays, drawn in full</text>
 
-  <text class="cap" x="24" y="404">Nothing about the reflection changes: the surface keeps its permittivity, its specular return, and every multi-bounce path that runs through it. The flag only changes how many rays are spent sampling it &#8212; which is what drives the cost of a large scene.</text>
+  <text class="cap" x="24" y="404">Nothing about the reflection changes: the surface keeps its permittivity, its specular return, and every multi-bounce path that runs through it.</text>
+  <text class="cap" x="24" y="424">The flag only changes how many rays are spent sampling it &#8212; which is what drives the cost of a large scene.</text>
 </svg>

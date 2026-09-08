@@ -47,23 +47,62 @@ relative to the wavelength.
 :Type: ``str`` or ``None``
 :Default: ``None``
 
-Controls the **simulation fidelity** by determining how often ray-tracing is
-performed across the radar frame:
+Sets the **simulation fidelity**: how often the scene geometry is re-traced as
+the radar works its way through a frame.
 
-- ``None`` or ``"frame"`` — Perform **one** ray-tracing simulation for the
-  entire frame. Target positions are evaluated once. This is the fastest
-  option and is suitable for static or slowly moving targets.
-- ``"pulse"`` — Perform ray-tracing **for each pulse**. Target positions are
-  updated at each pulse time, capturing intra-frame motion. This provides a
-  good balance between accuracy and speed for moving targets.
-- ``"sample"`` — Perform ray-tracing **for each sample**. Target positions
-  are updated at every ADC sample time. This is the highest-fidelity mode and
-  captures rapid target dynamics, as well as non-linear motion. For
-  micro-Doppler effect simulation, ``level="sample"`` is recommended.
-  This mode is significantly more computationally expensive.
+- ``None`` or ``"frame"`` — one ray-tracing pass per frame
+- ``"pulse"`` — one pass per pulse
+- ``"sample"`` — one pass per ADC sample
 
-The choice of level affects both simulation accuracy and runtime. For most
-scenarios involving moving targets, ``"pulse"`` level is recommended.
+How often the scene is re-traced
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A radar frame is a grid of pulses and samples, and the level decides how that
+grid is carved up into ray-tracing passes:
+
+.. image:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/fidelity_level_passes.svg
+    :width: 100%
+    :alt: One ray-tracing pass per frame, per pulse, or per sample
+
+For a frame of ``P`` pulses of ``S`` samples, each transmit channel costs one
+pass at ``"frame"``, ``P`` passes at ``"pulse"``, and ``P × S`` passes at
+``"sample"``. A 128-pulse, 256-sample frame is therefore 1 pass, 128 passes,
+or 32768 passes — and the run time follows that count closely.
+
+What happens between passes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Within a pass the scene is not simply frozen. Each target is carried forward
+from the traced instant at its **range rate** — a straight line at constant
+speed. That is exact for a target translating at constant velocity, and
+progressively wrong for anything else:
+
+.. image:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/fidelity_level_motion.svg
+    :width: 100%
+    :alt: Straight-line extrapolation of target motion between ray-tracing passes
+
+Rotation, vibration, angular acceleration and any curved path are what the
+straight line misses. The further a pass has to reach, the larger the
+discrepancy — so the level you need is set by how much the scene changes
+*during one frame*, not by how fast the targets are moving in absolute terms.
+
+Choosing a level
+^^^^^^^^^^^^^^^^
+
+- ``None`` or ``"frame"`` — static scenes, or targets translating steadily.
+  The fastest option, and the right starting point.
+- ``"pulse"`` — moving targets, where range-Doppler processing matters. A good
+  balance, and the usual recommendation once anything in the scene is moving.
+- ``"sample"`` — rotating, vibrating or accelerating targets. Required for
+  micro-Doppler work: the modulation you are trying to see lives *inside* a
+  pulse, which is exactly what the lower levels smooth away.
+
+.. note::
+
+   Because cost tracks the number of passes, ``"sample"`` can be orders of
+   magnitude slower than ``"frame"`` on the same scene. When a micro-Doppler
+   study genuinely needs it, it is usually worth trimming the frame down to
+   the pulses you actually intend to process.
 
 ``ray_filter``
 ~~~~~~~~~~~~~~

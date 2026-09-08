@@ -114,6 +114,6 @@
   <text class="mono ray" x="635" y="268" text-anchor="middle">8 samples over the same area</text>
   <text class="lbl"      x="635" y="287" text-anchor="middle">large facets &#8212; ample for a flat ground plane or wall</text>
 
-  <text class="cap" x="24" y="330">The samples still use the permittivity you set and still feed the same PO integral. Coarser sampling only limits how much surface detail that integral can resolve.</text>
+  <text class="cap" x="24" y="330">The samples still use the permittivity you set and feed the same PO integral. Coarser sampling only limits how much surface detail it can resolve.</text>
   <text class="cap" x="24" y="350">So flag large, mostly flat surroundings &#8212; and leave the flag off for anything small, strongly curved, or whose scattering you are actually measuring.</text>
 </svg>

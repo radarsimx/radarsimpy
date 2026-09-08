@@ -1,0 +1,170 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 372" width="860" height="372"
+     role="img" aria-label="How often the scene geometry is re-traced for each fidelity level">
+  <title>How often the scene geometry is re-traced for each fidelity level</title>
+  <style>
+    .bg    { fill:#ffffff; stroke:#d5d9e0; stroke-width:1 }
+    .panel { fill:#fafbfc; stroke:#dde1e7; stroke-width:1 }
+    .ttl   { font:600 17px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#14181f }
+    .sub   { font:13px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#5b6472 }
+    .lbl   { font:11.5px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#5b6472 }
+    .cap   { font:12px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#5b6472 }
+    .code  { font:12.5px 'IBM Plex Mono',Consolas,'Courier New',monospace }
+    .mono  { font:11.5px 'IBM Plex Mono',Consolas,'Courier New',monospace }
+    .env   { fill:#0f8a7e }
+    .ray   { fill:#1919ff }
+    .tgt   { fill:#d61f1f }
+    .ink   { fill:#14181f }
+  </style>
+
+  <rect class="bg" x="0.5" y="0.5" width="859" height="371" rx="8"/>
+  <text class="ttl" x="24" y="32">How often the scene is re-traced</text>
+  <text class="sub" x="24" y="52">Each blue region is covered by a single ray-tracing pass. Inside a region the geometry is carried forward by a straight-line extrapolation.</text>
+  <rect class="panel" x="24.5" y="76.5" width="263" height="224" rx="6"/>
+  <text class="code ink" x="156" y="102" text-anchor="middle">level=None  or  "frame"</text>
+  <text class="lbl" x="156" y="121" text-anchor="middle">one pass per frame</text>
+  <g stroke="#c9cfd8" stroke-width="0.8">
+    <line x1="52" y1="150" x2="52" y2="254"/>
+    <line x1="78" y1="150" x2="78" y2="254"/>
+    <line x1="104" y1="150" x2="104" y2="254"/>
+    <line x1="130" y1="150" x2="130" y2="254"/>
+    <line x1="156" y1="150" x2="156" y2="254"/>
+    <line x1="182" y1="150" x2="182" y2="254"/>
+    <line x1="208" y1="150" x2="208" y2="254"/>
+    <line x1="234" y1="150" x2="234" y2="254"/>
+    <line x1="260" y1="150" x2="260" y2="254"/>
+    <line x1="52" y1="150" x2="260" y2="150"/>
+    <line x1="52" y1="176" x2="260" y2="176"/>
+    <line x1="52" y1="202" x2="260" y2="202"/>
+    <line x1="52" y1="228" x2="260" y2="228"/>
+    <line x1="52" y1="254" x2="260" y2="254"/>
+  </g>
+  <g fill="#1919ff" fill-opacity="0.07" stroke="#1919ff" stroke-width="2.6">
+    <rect x="52" y="150" width="208" height="104"/>
+  </g>
+  <g fill="#1919ff">
+    <circle cx="65" cy="163" r="3.4"/>
+  </g>
+  <text class="mono ray" x="156" y="278" text-anchor="middle">1 ray-tracing pass</text>
+  <rect class="panel" x="298.5" y="76.5" width="263" height="224" rx="6"/>
+  <text class="code ink" x="430" y="102" text-anchor="middle">level="pulse"</text>
+  <text class="lbl" x="430" y="121" text-anchor="middle">one pass per pulse</text>
+  <g stroke="#c9cfd8" stroke-width="0.8">
+    <line x1="326" y1="150" x2="326" y2="254"/>
+    <line x1="352" y1="150" x2="352" y2="254"/>
+    <line x1="378" y1="150" x2="378" y2="254"/>
+    <line x1="404" y1="150" x2="404" y2="254"/>
+    <line x1="430" y1="150" x2="430" y2="254"/>
+    <line x1="456" y1="150" x2="456" y2="254"/>
+    <line x1="482" y1="150" x2="482" y2="254"/>
+    <line x1="508" y1="150" x2="508" y2="254"/>
+    <line x1="534" y1="150" x2="534" y2="254"/>
+    <line x1="326" y1="150" x2="534" y2="150"/>
+    <line x1="326" y1="176" x2="534" y2="176"/>
+    <line x1="326" y1="202" x2="534" y2="202"/>
+    <line x1="326" y1="228" x2="534" y2="228"/>
+    <line x1="326" y1="254" x2="534" y2="254"/>
+  </g>
+  <g fill="#1919ff" fill-opacity="0.07" stroke="#1919ff" stroke-width="2.2">
+    <rect x="326" y="150" width="208" height="26"/>
+    <rect x="326" y="176" width="208" height="26"/>
+    <rect x="326" y="202" width="208" height="26"/>
+    <rect x="326" y="228" width="208" height="26"/>
+  </g>
+  <g fill="#1919ff">
+    <circle cx="339" cy="163" r="3.4"/>
+    <circle cx="339" cy="189" r="3.4"/>
+    <circle cx="339" cy="215" r="3.4"/>
+    <circle cx="339" cy="241" r="3.4"/>
+  </g>
+  <text class="mono ray" x="430" y="278" text-anchor="middle">4 passes, one per pulse</text>
+  <rect class="panel" x="572.5" y="76.5" width="263" height="224" rx="6"/>
+  <text class="code env" x="704" y="102" text-anchor="middle">level="sample"</text>
+  <text class="lbl" x="704" y="121" text-anchor="middle">one pass per sample</text>
+  <g stroke="#c9cfd8" stroke-width="0.8">
+    <line x1="600" y1="150" x2="600" y2="254"/>
+    <line x1="626" y1="150" x2="626" y2="254"/>
+    <line x1="652" y1="150" x2="652" y2="254"/>
+    <line x1="678" y1="150" x2="678" y2="254"/>
+    <line x1="704" y1="150" x2="704" y2="254"/>
+    <line x1="730" y1="150" x2="730" y2="254"/>
+    <line x1="756" y1="150" x2="756" y2="254"/>
+    <line x1="782" y1="150" x2="782" y2="254"/>
+    <line x1="808" y1="150" x2="808" y2="254"/>
+    <line x1="600" y1="150" x2="808" y2="150"/>
+    <line x1="600" y1="176" x2="808" y2="176"/>
+    <line x1="600" y1="202" x2="808" y2="202"/>
+    <line x1="600" y1="228" x2="808" y2="228"/>
+    <line x1="600" y1="254" x2="808" y2="254"/>
+  </g>
+  <g fill="#1919ff" fill-opacity="0.07" stroke="#1919ff" stroke-width="1.3">
+    <rect x="600" y="150" width="26" height="26"/>
+    <rect x="626" y="150" width="26" height="26"/>
+    <rect x="652" y="150" width="26" height="26"/>
+    <rect x="678" y="150" width="26" height="26"/>
+    <rect x="704" y="150" width="26" height="26"/>
+    <rect x="730" y="150" width="26" height="26"/>
+    <rect x="756" y="150" width="26" height="26"/>
+    <rect x="782" y="150" width="26" height="26"/>
+    <rect x="600" y="176" width="26" height="26"/>
+    <rect x="626" y="176" width="26" height="26"/>
+    <rect x="652" y="176" width="26" height="26"/>
+    <rect x="678" y="176" width="26" height="26"/>
+    <rect x="704" y="176" width="26" height="26"/>
+    <rect x="730" y="176" width="26" height="26"/>
+    <rect x="756" y="176" width="26" height="26"/>
+    <rect x="782" y="176" width="26" height="26"/>
+    <rect x="600" y="202" width="26" height="26"/>
+    <rect x="626" y="202" width="26" height="26"/>
+    <rect x="652" y="202" width="26" height="26"/>
+    <rect x="678" y="202" width="26" height="26"/>
+    <rect x="704" y="202" width="26" height="26"/>
+    <rect x="730" y="202" width="26" height="26"/>
+    <rect x="756" y="202" width="26" height="26"/>
+    <rect x="782" y="202" width="26" height="26"/>
+    <rect x="600" y="228" width="26" height="26"/>
+    <rect x="626" y="228" width="26" height="26"/>
+    <rect x="652" y="228" width="26" height="26"/>
+    <rect x="678" y="228" width="26" height="26"/>
+    <rect x="704" y="228" width="26" height="26"/>
+    <rect x="730" y="228" width="26" height="26"/>
+    <rect x="756" y="228" width="26" height="26"/>
+    <rect x="782" y="228" width="26" height="26"/>
+  </g>
+  <g fill="#1919ff">
+    <circle cx="613" cy="163" r="2.2"/>
+    <circle cx="639" cy="163" r="2.2"/>
+    <circle cx="665" cy="163" r="2.2"/>
+    <circle cx="691" cy="163" r="2.2"/>
+    <circle cx="717" cy="163" r="2.2"/>
+    <circle cx="743" cy="163" r="2.2"/>
+    <circle cx="769" cy="163" r="2.2"/>
+    <circle cx="795" cy="163" r="2.2"/>
+    <circle cx="613" cy="189" r="2.2"/>
+    <circle cx="639" cy="189" r="2.2"/>
+    <circle cx="665" cy="189" r="2.2"/>
+    <circle cx="691" cy="189" r="2.2"/>
+    <circle cx="717" cy="189" r="2.2"/>
+    <circle cx="743" cy="189" r="2.2"/>
+    <circle cx="769" cy="189" r="2.2"/>
+    <circle cx="795" cy="189" r="2.2"/>
+    <circle cx="613" cy="215" r="2.2"/>
+    <circle cx="639" cy="215" r="2.2"/>
+    <circle cx="665" cy="215" r="2.2"/>
+    <circle cx="691" cy="215" r="2.2"/>
+    <circle cx="717" cy="215" r="2.2"/>
+    <circle cx="743" cy="215" r="2.2"/>
+    <circle cx="769" cy="215" r="2.2"/>
+    <circle cx="795" cy="215" r="2.2"/>
+    <circle cx="613" cy="241" r="2.2"/>
+    <circle cx="639" cy="241" r="2.2"/>
+    <circle cx="665" cy="241" r="2.2"/>
+    <circle cx="691" cy="241" r="2.2"/>
+    <circle cx="717" cy="241" r="2.2"/>
+    <circle cx="743" cy="241" r="2.2"/>
+    <circle cx="769" cy="241" r="2.2"/>
+    <circle cx="795" cy="241" r="2.2"/>
+  </g>
+  <text class="mono ray" x="704" y="278" text-anchor="middle">32 passes, one per sample</text>
+  <text class="lbl" x="24" y="326">Each grid is one radar frame of a single transmit channel: rows are pulses, columns are ADC samples.</text>
+  <text class="cap" x="24" y="350">Per frame and per transmit channel the simulator runs 1 pass, P passes, or P &#215; S passes, for P pulses of S samples. That count is what the run time follows.</text>
+</svg>
