@@ -135,6 +135,15 @@ cdef inline raise_err(RadarSimErrorCode err):
             "1. Reduce the `grid` dimensions for the Transmitter (Tx) Channel.\n"
             "2. Decrease the `density` parameter value in your `sim_radar()` function call."
         )
+    if err == RadarSimErrorCode.RADARSIMCPP_ERROR_PO_LUT_OVERFLOW:
+        raise RuntimeError(
+            "[ERROR_PO_LUT_OVERFLOW] The scene produced more scattering points than the "
+            "physical-optics lookup table can hold, so some would have been discarded. "
+            "Rather than return a quietly incomplete result, the simulation stops.\n"
+            "1. Decrease the `density` parameter value in your `sim_radar()` function call.\n"
+            "2. Narrow `ray_filter`, which also caps how deep rays are traced.\n"
+            "3. Mark large surrounding surfaces with `skip_diffusion=True`."
+        )
     else:
         raise RuntimeError(f"Simulation error occurred with code: {err}")
 
