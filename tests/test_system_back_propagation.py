@@ -244,11 +244,6 @@ def test_reflection_filter_edges(make_radar, model_path, mesh_module):
     assert np.all(inverted["baseband"] == 0.0)
 
 
-@pytest.mark.xfail(
-    reason="a back-traced entry is filtered on its incident bounce index, not "
-    "on the true length of the path it stands for",
-    strict=False,
-)
 def test_reflection_filter_counts_a_back_propagated_path_in_full(
     make_radar, model_path, mesh_module
 ):
@@ -256,10 +251,11 @@ def test_reflection_filter_counts_a_back_propagated_path_in_full(
 
     A back-propagated return traverses the chain on the way out as well as the
     way in, so it has more bounces than the hit it scattered at. Filtering to a
-    band that excludes the true count must therefore drop it. Today the entry is
-    filtered on the incident index alone, so it survives a band it does not
-    belong to, and enabling back propagation changes a run that asked only for
-    short paths.
+    band that excludes the true count must therefore drop it.
+
+    This was the specification for the redesign: the entry used to be filtered
+    on its incident index alone, so it survived a band it did not belong to and
+    enabling back propagation changed a run that had asked only for short paths.
     """
     del mesh_module  # fixture is a skip guard
 
