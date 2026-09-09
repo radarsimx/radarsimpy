@@ -26,6 +26,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- `sim_radar(..., back_propagating=True)` no longer reports multi-bounce returns at too short a range. Back propagation follows a ray out, scatters at a hit point and sends the field back down the same chain, so the round trip includes that chain twice; the return leg was being measured from the ray's first hit instead, which dropped the stretch between there and the scattering point. On two plates 30 m and 20 m from the radar and 20 m apart, the back-propagated return appeared at 40 m rather than its true 50 m. Only affects `back_propagating=True`; everything else is bit-identical
 - `radarsimpy.mesh_kit.import_mesh_module` docstring listed the backend search order as pyvista first; the code has always tried trimesh first
 
 ### Changed
