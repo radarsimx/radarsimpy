@@ -33,28 +33,28 @@
   <text class="lbl"      x="225" y="117" text-anchor="middle">the ground scatters like any other surface</text>
 
   <line x1="44" y1="290" x2="412" y2="290" stroke="#1a7f37" stroke-width="2.2"/>
-  <path d="M296,290 L296,270 L308,270 L318,250 L352,250 L362,270 L368,270 L368,290 Z"
+  <path d="M296,283 L296,263 L308,263 L318,243 L352,243 L362,263 L368,263 L368,283 Z"
         fill="#cf4640" fill-opacity="0.10" stroke="#cf4640" stroke-width="1.8" stroke-linejoin="round"/>
-  <circle cx="309" cy="289" r="7" fill="#ffffff" stroke="#cf4640" stroke-width="1.6"/>
-  <circle cx="355" cy="289" r="7" fill="#ffffff" stroke="#cf4640" stroke-width="1.6"/>
+  <circle cx="309" cy="282" r="7" fill="#ffffff" stroke="#cf4640" stroke-width="1.6"/>
+  <circle cx="355" cy="282" r="7" fill="#ffffff" stroke="#cf4640" stroke-width="1.6"/>
 
   <rect x="48" y="160" width="40" height="24" rx="3" fill="#1e73be" fill-opacity="0.12" stroke="#1e73be" stroke-width="1.8"/>
   <text class="mono ray" x="68" y="176" text-anchor="middle">Tx</text>
 
   <g fill="none" stroke="#1e73be" stroke-width="1.6" opacity="0.6">
     <polyline points="88,172 150,290 211,174" marker-end="url(#sArr)"/>
-    <line x1="88" y1="172" x2="328" y2="249"/>
-    <polyline points="88,172 268,290 295,272"/>
+    <line x1="88" y1="172" x2="328" y2="242"/>
+    <polyline points="88,172 268,290 295,265"/>
   </g>
   <g fill="none" stroke="#cf4640" stroke-width="1.6" stroke-dasharray="5 3">
     <line x1="150" y1="290" x2="134" y2="260" marker-end="url(#sRet)"/>
     <line x1="268" y1="290" x2="240" y2="271" marker-end="url(#sRet)"/>
-    <line x1="296" y1="272" x2="265" y2="257" marker-end="url(#sRet)"/>
-    <line x1="330" y1="250" x2="298" y2="240" marker-end="url(#sRet)"/>
+    <line x1="296" y1="265" x2="265" y2="250" marker-end="url(#sRet)"/>
+    <line x1="330" y1="243" x2="298" y2="233" marker-end="url(#sRet)"/>
   </g>
   <g fill="#cf4640">
-    <circle cx="150" cy="290" r="5"/><circle cx="330" cy="250" r="5"/>
-    <circle cx="268" cy="290" r="5"/><circle cx="296" cy="272" r="5"/>
+    <circle cx="150" cy="290" r="5"/><circle cx="330" cy="243" r="5"/>
+    <circle cx="268" cy="290" r="5"/><circle cx="296" cy="265" r="5"/>
   </g>
 
   <text class="lbl tgt" x="44" y="318">every bounce adds a return, the ground included</text>
@@ -66,28 +66,28 @@
   <text class="lbl"      x="635" y="117" text-anchor="middle">the ground behaves as a mirror and nothing more</text>
 
   <line x1="454" y1="290" x2="822" y2="290" stroke="#1a7f37" stroke-width="2.2"/>
-  <path d="M706,290 L706,270 L718,270 L728,250 L762,250 L772,270 L778,270 L778,290 Z"
+  <path d="M706,283 L706,263 L718,263 L728,243 L762,243 L772,263 L778,263 L778,283 Z"
         fill="#cf4640" fill-opacity="0.10" stroke="#cf4640" stroke-width="1.8" stroke-linejoin="round"/>
-  <circle cx="719" cy="289" r="7" fill="#ffffff" stroke="#cf4640" stroke-width="1.6"/>
-  <circle cx="765" cy="289" r="7" fill="#ffffff" stroke="#cf4640" stroke-width="1.6"/>
+  <circle cx="719" cy="282" r="7" fill="#ffffff" stroke="#cf4640" stroke-width="1.6"/>
+  <circle cx="765" cy="282" r="7" fill="#ffffff" stroke="#cf4640" stroke-width="1.6"/>
 
   <rect x="458" y="160" width="40" height="24" rx="3" fill="#1e73be" fill-opacity="0.12" stroke="#1e73be" stroke-width="1.8"/>
   <text class="mono ray" x="478" y="176" text-anchor="middle">Tx</text>
 
   <g fill="none" stroke="#1e73be" stroke-width="1.6" opacity="0.6">
     <polyline points="498,172 560,290 621,174" marker-end="url(#sArr)"/>
-    <line x1="498" y1="172" x2="738" y2="249"/>
-    <polyline points="498,172 678,290 705,272"/>
+    <line x1="498" y1="172" x2="738" y2="242"/>
+    <polyline points="498,172 678,290 705,265"/>
   </g>
   <g fill="none" stroke="#cf4640" stroke-width="1.6" stroke-dasharray="5 3">
-    <line x1="706" y1="272" x2="675" y2="257" marker-end="url(#sRet)"/>
-    <line x1="740" y1="250" x2="708" y2="240" marker-end="url(#sRet)"/>
+    <line x1="706" y1="265" x2="675" y2="250" marker-end="url(#sRet)"/>
+    <line x1="740" y1="243" x2="708" y2="233" marker-end="url(#sRet)"/>
   </g>
   <g fill="#ffffff" stroke="#848d97" stroke-width="1.8">
     <circle cx="560" cy="290" r="5"/><circle cx="678" cy="290" r="5"/>
   </g>
   <g fill="#cf4640">
-    <circle cx="740" cy="250" r="5"/><circle cx="706" cy="272" r="5"/>
+    <circle cx="740" cy="243" r="5"/><circle cx="706" cy="265" r="5"/>
   </g>
 
   <text class="lbl env" x="454" y="318">a bounce on the ground only redirects the ray</text>

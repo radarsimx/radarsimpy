@@ -30,18 +30,18 @@
   <text class="lbl"      x="225" y="117" text-anchor="middle">the ground is sampled like a target of interest</text>
 
   <line x1="44" y1="286" x2="412" y2="286" stroke="#1a7f37" stroke-width="2.2"/>
-  <path d="M290,286 L290,266 L302,266 L312,246 L346,246 L356,266 L362,266 L362,286 Z"
+  <path d="M290,279 L290,259 L302,259 L312,239 L346,239 L356,259 L362,259 L362,279 Z"
         fill="#cf4640" fill-opacity="0.10" stroke="#cf4640" stroke-width="1.8" stroke-linejoin="round"/>
-  <circle cx="303" cy="285" r="7" fill="#ffffff" stroke="#cf4640" stroke-width="1.6"/>
-  <circle cx="349" cy="285" r="7" fill="#ffffff" stroke="#cf4640" stroke-width="1.6"/>
+  <circle cx="303" cy="278" r="7" fill="#ffffff" stroke="#cf4640" stroke-width="1.6"/>
+  <circle cx="349" cy="278" r="7" fill="#ffffff" stroke="#cf4640" stroke-width="1.6"/>
 
   <rect x="48" y="168" width="40" height="24" rx="3" fill="#1e73be" fill-opacity="0.12" stroke="#1e73be" stroke-width="1.8"/>
   <text class="mono ray" x="68" y="184" text-anchor="middle">Tx</text>
   <g stroke="#1e73be" stroke-width="1.3" opacity="0.5">
     <line x1="88" y1="180" x2="143" y2="284" marker-end="url(#rArr)"/>
     <line x1="88" y1="180" x2="233" y2="284" marker-end="url(#rArr)"/>
-    <line x1="88" y1="180" x2="288" y2="279" marker-end="url(#rArr)"/>
-    <line x1="88" y1="180" x2="328" y2="245" marker-end="url(#rArr)"/>
+    <line x1="88" y1="180" x2="288" y2="272" marker-end="url(#rArr)"/>
+    <line x1="88" y1="180" x2="328" y2="238" marker-end="url(#rArr)"/>
   </g>
 
   <!-- ray landings: dense on the ground, sparse on the vehicle -->
@@ -57,9 +57,9 @@
     <circle cx="244" cy="286" r="2.7"/><circle cx="253" cy="286" r="2.7"/>
     <circle cx="262" cy="286" r="2.7"/><circle cx="271" cy="286" r="2.7"/>
     <circle cx="280" cy="286" r="2.7"/>
-    <circle cx="290" cy="280" r="2.7"/><circle cx="297" cy="266" r="2.7"/>
-    <circle cx="308" cy="254" r="2.7"/><circle cx="330" cy="246" r="2.7"/>
-    <circle cx="344" cy="246" r="2.7"/>
+    <circle cx="290" cy="273" r="2.7"/><circle cx="297" cy="259" r="2.7"/>
+    <circle cx="308" cy="247" r="2.7"/><circle cx="330" cy="239" r="2.7"/>
+    <circle cx="344" cy="239" r="2.7"/>
   </g>
 
   <text class="lbl env" x="44" y="316">most of the budget lands on the ground</text>
@@ -71,18 +71,18 @@
   <text class="lbl"      x="635" y="117" text-anchor="middle">the ground is sampled as scenery, not as a target</text>
 
   <line x1="454" y1="286" x2="822" y2="286" stroke="#1a7f37" stroke-width="2.2"/>
-  <path d="M700,286 L700,266 L712,266 L722,246 L756,246 L766,266 L772,266 L772,286 Z"
+  <path d="M700,279 L700,259 L712,259 L722,239 L756,239 L766,259 L772,259 L772,279 Z"
         fill="#cf4640" fill-opacity="0.10" stroke="#cf4640" stroke-width="1.8" stroke-linejoin="round"/>
-  <circle cx="713" cy="285" r="7" fill="#ffffff" stroke="#cf4640" stroke-width="1.6"/>
-  <circle cx="759" cy="285" r="7" fill="#ffffff" stroke="#cf4640" stroke-width="1.6"/>
+  <circle cx="713" cy="278" r="7" fill="#ffffff" stroke="#cf4640" stroke-width="1.6"/>
+  <circle cx="759" cy="278" r="7" fill="#ffffff" stroke="#cf4640" stroke-width="1.6"/>
 
   <rect x="458" y="168" width="40" height="24" rx="3" fill="#1e73be" fill-opacity="0.12" stroke="#1e73be" stroke-width="1.8"/>
   <text class="mono ray" x="478" y="184" text-anchor="middle">Tx</text>
   <g stroke="#1e73be" stroke-width="1.3" opacity="0.5">
     <line x1="498" y1="180" x2="572" y2="284" marker-end="url(#rArr)"/>
     <line x1="498" y1="180" x2="662" y2="284" marker-end="url(#rArr)"/>
-    <line x1="498" y1="180" x2="698" y2="279" marker-end="url(#rArr)"/>
-    <line x1="498" y1="180" x2="736" y2="245" marker-end="url(#rArr)"/>
+    <line x1="498" y1="180" x2="698" y2="272" marker-end="url(#rArr)"/>
+    <line x1="498" y1="180" x2="736" y2="238" marker-end="url(#rArr)"/>
   </g>
 
   <!-- ray landings: sparse on the ground, dense on the vehicle -->
@@ -91,14 +91,14 @@
     <circle cx="574" cy="286" r="2.7"/><circle cx="604" cy="286" r="2.7"/>
     <circle cx="634" cy="286" r="2.7"/><circle cx="664" cy="286" r="2.7"/>
     <circle cx="694" cy="286" r="2.7"/>
-    <circle cx="700" cy="270" r="2.7"/><circle cx="700" cy="276" r="2.7"/>
-    <circle cx="700" cy="282" r="2.7"/>
-    <circle cx="704" cy="266" r="2.7"/><circle cx="709" cy="266" r="2.7"/>
-    <circle cx="714" cy="262" r="2.7"/><circle cx="717" cy="256" r="2.7"/>
-    <circle cx="720" cy="250" r="2.7"/>
-    <circle cx="724" cy="246" r="2.7"/><circle cx="730" cy="246" r="2.7"/>
-    <circle cx="736" cy="246" r="2.7"/><circle cx="742" cy="246" r="2.7"/>
-    <circle cx="748" cy="246" r="2.7"/><circle cx="754" cy="246" r="2.7"/>
+    <circle cx="700" cy="263" r="2.7"/><circle cx="700" cy="269" r="2.7"/>
+    <circle cx="700" cy="275" r="2.7"/>
+    <circle cx="704" cy="259" r="2.7"/><circle cx="709" cy="259" r="2.7"/>
+    <circle cx="714" cy="255" r="2.7"/><circle cx="717" cy="249" r="2.7"/>
+    <circle cx="720" cy="243" r="2.7"/>
+    <circle cx="724" cy="239" r="2.7"/><circle cx="730" cy="239" r="2.7"/>
+    <circle cx="736" cy="239" r="2.7"/><circle cx="742" cy="239" r="2.7"/>
+    <circle cx="748" cy="239" r="2.7"/><circle cx="754" cy="239" r="2.7"/>
   </g>
 
   <text class="lbl env" x="454" y="316">the ground gets a coarse share, enough for a big flat reflector</text>

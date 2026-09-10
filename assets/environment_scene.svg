@@ -37,10 +37,10 @@
   <text class="code ray" x="90" y="238" text-anchor="middle">radar</text>
 
   <!-- vehicle of interest -->
-  <path d="M300,250 L300,222 L318,222 L331,201 L392,201 L405,222 L424,222 L424,250 Z"
+  <path d="M300,243 L300,215 L318,215 L331,194 L392,194 L405,215 L424,215 L424,243 Z"
         fill="#cf4640" fill-opacity="0.12" stroke="#cf4640" stroke-width="2" stroke-linejoin="round"/>
-  <circle cx="326" cy="248" r="8" fill="#ffffff" stroke="#cf4640" stroke-width="2"/>
-  <circle cx="398" cy="248" r="8" fill="#ffffff" stroke="#cf4640" stroke-width="2"/>
+  <circle cx="326" cy="241" r="8" fill="#ffffff" stroke="#cf4640" stroke-width="2"/>
+  <circle cx="398" cy="241" r="8" fill="#ffffff" stroke="#cf4640" stroke-width="2"/>
 
   <!-- direct path -->
   <line x1="118" y1="215" x2="294" y2="213" stroke="#1e73be" stroke-width="2" marker-end="url(#arrB)"/>
@@ -54,9 +54,9 @@
   <text class="lbl ray" x="212" y="283" text-anchor="middle">multi-bounce via the ground</text>
 
   <!-- vehicle labels -->
-  <text class="code tgt" x="362" y="167" text-anchor="middle">"environment": False</text>
-  <text class="lbl" x="362" y="185" text-anchor="middle">vehicle of interest &#8212; the radar target</text>
-  <line class="leader" x1="362" y1="191" x2="362" y2="199"/>
+  <text class="code tgt" x="362" y="160" text-anchor="middle">"environment": False</text>
+  <text class="lbl" x="362" y="178" text-anchor="middle">vehicle of interest &#8212; the radar target</text>
+  <line class="leader" x1="362" y1="184" x2="362" y2="192"/>
 
   <!-- wall labels -->
   <text class="code env" x="651" y="91" text-anchor="middle">"environment": True</text>
