@@ -29,6 +29,7 @@ MODELS = {
     "plate5x5": "models/plate5x5.stl",
     "ball_1m": "models/ball_1m.stl",
     "half_ring": "models/half_ring.stl",
+    "surface_60x60": "models/surface_60x60.stl",
     "turbine": "models/turbine.stl",
 }
 
@@ -80,12 +81,30 @@ def make_radar(pulses=1, samples=20, tx_channels=1, rx_channels=1, frames=1):
     return Radar(transmitter=tx, receiver=rx, frame_time=frame_time)
 
 
-def make_targets(model="ball_1m", distance=20.0, speed=(0, 0, 0)):
-    """Single mesh target on boresight at ``distance`` metres."""
-    return [
+def make_targets(model="ball_1m", distance=20.0, speed=(0, 0, 0), extra=None):
+    """One mesh target on boresight at ``distance`` metres, plus any extras.
+
+    ``extra`` is a list of dicts merged over the same defaults, so a scene can
+    add a ground plane or a second body without repeating the boilerplate. Each
+    entry may set ``model`` (a key of :data:`MODELS`), ``location``, ``speed``
+    and any target flag such as ``skip_diffusion``. Multi-target scenes are what
+    make multi-bounce and back-propagation paths reachable at all -- a single
+    convex body rarely produces a second bounce.
+    """
+    targets = [
         {
             "model": model_path(model),
             "location": (distance, 0, 0),
             "speed": speed,
         }
     ]
+    for spec in extra or []:
+        spec = dict(spec)
+        target = {
+            "model": model_path(spec.pop("model")),
+            "location": spec.pop("location", (distance, 0, 0)),
+            "speed": spec.pop("speed", (0, 0, 0)),
+        }
+        target.update(spec)
+        targets.append(target)
+    return targets

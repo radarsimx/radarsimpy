@@ -138,29 +138,45 @@ This is useful for isolating specific scattering mechanisms. For example:
 - ``ray_filter=[1, 1]`` — Include only single-bounce (direct) reflections.
 - ``ray_filter=[2, 3]`` — Include only double- and triple-bounce reflections.
 
+The count is the path's own, end to end. With ``back_propagating`` enabled a
+return may reflect on its way out as well as on its way in, and those
+reflections count too — a path that reaches a target over three bounces and
+leaves over one more is four, not three.
+
+``ray_filter[1]`` also caps how deep rays are traced, since a bounce past it
+could not contribute anyway. That makes it a little more than a filter: a ray
+stopped by the cap is treated as still travelling, so it contributes no
+outgoing reflections (see ``back_propagating`` below).
+
 ``back_propagating``
 ~~~~~~~~~~~~~~~~~~~~
 
 :Type: ``bool``
 :Default: ``False``
 
-Enables **backward ray propagation** analysis. When set to ``True``, the
-simulator performs an additional backtracing pass after the forward
-ray-tracing stage.
+Lets a scattering point send energy back to the receiver **by reflecting off
+the surfaces the ray arrived over**, rather than only in a straight line.
 
-In the forward pass, rays are traced from the transmitter to targets. In the
-backtracing pass, rays at their final hit points are traced back towards the
-radar to check for additional multi-bounce paths that scatter energy back to
-the receiver through intermediate reflections.
+Rays are traced away from the radar, and a scattering point normally radiates
+straight back to the receiver. That misses the returns that leave a target,
+bounce off something, and only then arrive — the paths that matter inside a
+tunnel, where energy reaches the radar off the walls, ceiling and floor rather
+than directly.
 
-This is important for capturing indirect scattering paths in scenes with
-multiple reflections, such as inside a tunnel where rays bounce between
-walls, ceiling, and floor before returning to the radar.
+With this enabled, a ray that leaves the scene also contributes returns that
+reflect their way back out over the surfaces it came in over. Each one is
+checked before it counts: the reflection has to land on the surface rather than
+past its edge, and nothing may stand in the way. Chains are only built for a ray
+that genuinely escaped, never one the trace depth stopped — that ray may well
+have carried on in reality, and the bounce it would have taken next is the
+ordinary forward path's to describe.
 
 .. note::
 
-   Enabling back-propagation increases computation time since an additional
-   ray-tracing pass and baseband calculation are performed for each snapshot.
+   Enabling back propagation costs more scattering evaluations per snapshot,
+   which are the dominant cost of a mesh simulation. It adds nothing at all to a
+   scene where rays do not bounce: a single convex target returns exactly the
+   same baseband either way.
 
 
 Target Flags

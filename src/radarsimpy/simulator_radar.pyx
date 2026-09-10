@@ -135,6 +135,15 @@ cdef inline raise_err(RadarSimErrorCode err):
             "1. Reduce the `grid` dimensions for the Transmitter (Tx) Channel.\n"
             "2. Decrease the `density` parameter value in your `sim_radar()` function call."
         )
+    if err == RadarSimErrorCode.RADARSIMCPP_ERROR_PO_LUT_OVERFLOW:
+        raise RuntimeError(
+            "[ERROR_PO_LUT_OVERFLOW] The scene produced more scattering points than the "
+            "physical-optics lookup table can hold, so some would have been discarded. "
+            "Rather than return a quietly incomplete result, the simulation stops.\n"
+            "1. Decrease the `density` parameter value in your `sim_radar()` function call.\n"
+            "2. Narrow `ray_filter`, which also caps how deep rays are traced.\n"
+            "3. Mark large surrounding surfaces with `skip_diffusion=True`."
+        )
     else:
         raise RuntimeError(f"Simulation error occurred with code: {err}")
 
@@ -195,13 +204,18 @@ cpdef sim_radar(radar, targets, density=1, level=None, interf=None,
     :param Radar or None interf:
         Interference radar object. Default: ``None``.
     :param list or None ray_filter:
-        Filters rays based on the number of reflections.
-        Only rays with the number of reflections between ``ray_filter[0]``
-        and ``ray_filter[1]`` are included in the calculations.
+        Filters paths by their number of reflections, counted end to end.
+        Only paths whose count falls between ``ray_filter[0]`` and
+        ``ray_filter[1]`` are included. With ``back_propagating`` enabled the
+        reflections a return takes on its way out are counted too.
+        ``ray_filter[1]`` also caps how deep rays are traced.
         Default: ``None`` (no filtering).
     :param bool back_propagating:
-        Whether to enable back propagation in the simulation. When enabled, the simulation will consider
-        rays that propagate back towards the radar after reflecting off targets. Default: ``False``.
+        Whether a scattering point may send energy back to the receiver by
+        reflecting off the surfaces its ray arrived over, rather than only in a
+        straight line. Captures returns that leave a target, bounce off
+        something and only then arrive -- the paths that matter inside a tunnel.
+        Adds nothing to a scene where rays do not bounce. Default: ``False``.
     :param str device:
         Execution device for the simulation. Default: ``"auto"``.
 

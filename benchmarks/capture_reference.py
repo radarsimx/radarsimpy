@@ -67,10 +67,41 @@ CASES = {
         "targets": {"model": "turbine", "distance": 15.0, "speed": (-5, 0, 0)},
         "sim": {"density": 0.5, "level": "pulse"},
     },
+    # A convex sphere rarely produces a second bounce, so this case emits few or
+    # no back-tracing entries -- it was bit-identical straight through the last
+    # real back-propagation bug fix. Kept deliberately as a NEGATIVE CONTROL: a
+    # redesign of the pass must leave it untouched.
     "sphere_backprop": {
         "radar": {"pulses": 2, "samples": 20},
         "targets": {"model": "ball_1m", "distance": 20.0},
         "sim": {"density": 0.5, "back_propagating": True},
+    },
+    # The two cases below do exercise it -- measured, not assumed: toggling
+    # `back_propagating` moves them by 1.2e-3 and 5.8e-3 relative, where the
+    # sphere above does not move at all. A trihedral guarantees three bounces,
+    # and a body over a skipped ground plane is the multipath geometry the flag
+    # is documented for. (`models/dihedral.stl` was tried and rejected: it
+    # returns no 2+ bounce energy at any orientation, so it is a third control,
+    # not coverage.)
+    "corner_backprop": {
+        "radar": {"pulses": 2, "samples": 20},
+        "targets": {"model": "cr", "distance": 10.0},
+        "sim": {"density": 1.0, "back_propagating": True},
+    },
+    "ground_multipath_backprop": {
+        "radar": {"pulses": 2, "samples": 20},
+        "targets": {
+            "model": "cr",
+            "distance": 15.0,
+            "extra": [
+                {
+                    "model": "surface_60x60",
+                    "location": (0, 0, -1.0),
+                    "skip_diffusion": True,
+                }
+            ],
+        },
+        "sim": {"density": 0.6, "back_propagating": True},
     },
 }
 

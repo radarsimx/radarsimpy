@@ -108,6 +108,7 @@ cdef extern from "core/enums.hpp":
         RADARSIMCPP_ERROR_EXCEPTION           # General exception occurred
         RADARSIMCPP_ERROR_TOO_MANY_RAYS_PER_GRID  # Ray density exceeds grid capacity
         RADARSIMCPP_ERROR_CUDA_DEVICE_QUERY   # Failed to query CUDA device memory info
+        RADARSIMCPP_ERROR_PO_LUT_OVERFLOW     # Scattering points exceeded the PO lookup table
         # PointSimulator CUDA errors (100-103)
         RADARSIMCPP_ERROR_POINT_SIM_CUDA_SYNC          # cudaDeviceSynchronize failed in PointSimulator (standard path)
         RADARSIMCPP_ERROR_POINT_SIM_CUDA_KERNEL        # CUDA kernel launch failed in PointSimulator (standard path)
