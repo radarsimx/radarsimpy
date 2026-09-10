@@ -46,11 +46,14 @@ RadarSimPy is a powerful and versatile Python-based Radar Simulator that models 
 - Python >= 3.10
 - NumPy >= 2.0
 - SciPy
-- PyMeshLab, PyVista, trimesh, or meshio
+- One of PyMeshLab, PyVista, trimesh or meshio, for 3D model support (`trimesh` is installed by default)
+- pygltflib, only for keyframed glTF 2.0 / GLB targets (`radarsimpy.animation_kit`)
 
 ```bash
 pip install -r requirements.txt
 ```
+
+Full detail, including platform and hardware requirements, is on the [Dependencies page](https://radarsimx.github.io/radarsimpy/user_guide/dependencies.html).
 
 **Platform-specific requirements:**
 
@@ -116,27 +119,37 @@ This module supports CPU/GPU parallelization:
 
 ## Coordinate Systems
 
-### Global Coordinate
+Everything lives in a single right-handed, z-up frame. Angles are in degrees, distances in metres.
 
-- **axis** (m): `[x, y, z]`
-- **phi** (deg): angle on the x-y plane. 0 deg is the positive x-axis, 90 deg is the positive y-axis
-- **theta** (deg): angle on the z-x plane. 0 deg is the positive z-axis, 90 deg is the x-y plane
+### Global frame
 
-<img src="./assets/phi_theta.svg" alt="phi_theta" width="400"/>
+- **axis** (m): `[x, y, z]` — x forward, y to the left, z up
+- **phi** (deg): azimuthal angle in the x-y plane. 0° at +x, 90° at +y
+- **theta** (deg): polar angle from +z. 0° at zenith, 90° at the horizon, 180° at nadir
 
-### Local Coordinate
+<img src="https://github.com/radarsimx/radarsimpy/raw/master/assets/phi_theta.svg" alt="phi and theta" width="700"/>
 
-- **yaw** (deg): rotation along the z-axis. Positive yaw rotates the object from the positive x-axis to the positive y-axis
-- **pitch** (deg): rotation along the y-axis. Positive pitch rotates the object from the positive x-axis to the positive z-axis
-- **roll** (deg): rotation along the x-axis. Positive roll rotates the object from the positive y-axis to the positive z-axis
-- **origin** (m): `[x, y, z]`, the motion (rotation and translation) centor of the object. Radar's origin is always at `[0, 0, 0]`
+### Radar-centric angles
 
-<img src="./assets/yaw_pitch_roll.svg" alt="yaw_pitch_roll" width="400"/>
+- **azimuth** (deg): the same angle as phi. 0° at boresight (+x), positive toward +y
+- **elevation** (deg): angle above the x-y plane, `elevation = 90° - theta`
 
-- **azimuth** (deg): azimuth -90 ~ 90 deg equal to phi -90 ~ 90 deg
-- **elevation** (deg): elevation -90 ~ 90 deg equal to theta 180 ~ 0 deg
+<img src="https://github.com/radarsimx/radarsimpy/raw/master/assets/azimuth_elevation.svg" alt="azimuth and elevation" width="700"/>
 
-<img src="./assets/azimuth_elevation.svg" alt="azimuth_elevation" width="400"/>
+### Orientation
+
+Objects are oriented with `[yaw, pitch, roll]`, applied in that order:
+
+- **yaw** (deg): about +z. Turns +x toward +y
+- **pitch** (deg): about **-y**. Turns +x toward +z
+- **roll** (deg): about +x. Turns +y toward +z
+- **origin** (m): `[x, y, z]`, the centre that rotation and translation act about. A radar's origin is always `[0, 0, 0]`
+
+<img src="https://github.com/radarsimx/radarsimpy/raw/master/assets/yaw_pitch_roll.svg" alt="yaw, pitch and roll" width="700"/>
+
+> **Note** — pitch is not a right-handed rotation about +y; a right-handed one would turn +x toward *-z*. The composed rotation is `Rz(yaw) · Ry(-pitch) · Rx(roll)`, the aerospace "nose up is positive" convention. Expect a sign flip when importing orientations from a toolchain that uses the strict right-handed sense.
+
+Conversions, the rotation order in full, and the boresight shortcut `rotation = [azimuth, elevation, roll]` are covered in the [Coordinate Systems guide](https://radarsimx.github.io/radarsimpy/user_guide/coordinate_systems.html).
 
 ---
 
@@ -199,9 +212,31 @@ Check [Build Instructions](./build_instructions.md)
 
 ---
 
-## API Reference
+## Documentation
 
-See the [Documentation](https://radarsimx.github.io/radarsimpy/)
+Full documentation lives at [radarsimx.github.io/radarsimpy](https://radarsimx.github.io/radarsimpy/).
+
+**Getting started**
+
+- [Overview](https://radarsimx.github.io/radarsimpy/user_guide/overview.html) — what RadarSimPy can model, simulate and process
+- [Dependencies](https://radarsimx.github.io/radarsimpy/user_guide/dependencies.html) and [Installation](https://radarsimx.github.io/radarsimpy/user_guide/installation.html)
+
+**Concepts and conventions**
+
+- [System model](https://radarsimx.github.io/radarsimpy/user_guide/system_model.html) — how `Transmitter`, `Receiver` and `Radar` fit together, the virtual array, and the shape of the simulated output
+- [Coordinate systems](https://radarsimx.github.io/radarsimpy/user_guide/coordinate_systems.html) — frames, angles and orientation
+- [Doppler convention](https://radarsimx.github.io/radarsimpy/user_guide/doppler_convention.html) — the sign of the Doppler frequency
+
+**Configuring a simulation**
+
+- [Transmitter and waveform](https://radarsimx.github.io/radarsimpy/user_guide/transmitter.html) — waveform, pulse train, modulation and the transmit array
+- [Receiver and baseband](https://radarsimx.github.io/radarsimpy/user_guide/receiver.html) — sampling, baseband type, the noise budget and the range gate
+- [Noise](https://radarsimx.github.io/radarsimpy/user_guide/noise.html) — receiver thermal noise and transmitter phase noise
+- [Ray-tracing simulation](https://radarsimx.github.io/radarsimpy/user_guide/ray_tracing_simulation.html) — ray density, fidelity level and target flags for 3D meshes
+- [Animated targets](https://radarsimx.github.io/radarsimpy/user_guide/animated_targets.html) — driving targets from keyframed glTF motion
+- [Long-range stretch processing](https://radarsimx.github.io/radarsimpy/user_guide/stretch_processing.html) — range gating for long-range FMCW
+
+**[API reference](https://radarsimx.github.io/radarsimpy/api/index.html)** — complete class and function documentation
 
 ---
 
