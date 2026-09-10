@@ -232,6 +232,7 @@ Full documentation lives at [radarsimx.github.io/radarsimpy](https://radarsimx.g
 - [Transmitter and waveform](https://radarsimx.github.io/radarsimpy/user_guide/transmitter.html) — waveform, pulse train, modulation and the transmit array
 - [Receiver and baseband](https://radarsimx.github.io/radarsimpy/user_guide/receiver.html) — sampling, baseband type, the noise budget and the range gate
 - [Noise](https://radarsimx.github.io/radarsimpy/user_guide/noise.html) — receiver thermal noise and transmitter phase noise
+- [Interference](https://radarsimx.github.io/radarsimpy/user_guide/interference.html) — mutual interference from another radar sharing the band
 - [Ray-tracing simulation](https://radarsimx.github.io/radarsimpy/user_guide/ray_tracing_simulation.html) — ray density, fidelity level and target flags for 3D meshes
 - [Animated targets](https://radarsimx.github.io/radarsimpy/user_guide/animated_targets.html) — driving targets from keyframed glTF motion
 - [Long-range stretch processing](https://radarsimx.github.io/radarsimpy/user_guide/stretch_processing.html) — range gating for long-range FMCW

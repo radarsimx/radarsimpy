@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 400" width="860" height="400"
+     role="img" aria-label="An interfering chirp only reaches the baseband where it crosses the victim receiver's passband">
+  <title>An interfering chirp only reaches the baseband where it crosses the victim receiver's passband</title>
+  <style>
+    .bg    { fill:#ffffff; stroke:#d0d7de; stroke-width:1 }
+    .lbl   { font:11.5px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#6b7280 }
+    .rowlb { font:600 12px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif }
+    .mono  { font:11px 'IBM Plex Mono',Consolas,'Courier New',monospace }
+    .code  { font:12.5px 'IBM Plex Mono',Consolas,'Courier New',monospace }
+    .vic   { fill:#1e73be }
+    .itf   { fill:#cf4640 }
+    .ink   { fill:#0d1117 }
+    .axis  { stroke:#848d97; stroke-width:1.2 }
+    .guide { stroke:#0d1117; stroke-width:1; stroke-dasharray:4 3; opacity:0.45 }
+  </style>
+  <defs>
+    <marker id="iAx" markerWidth="9" markerHeight="8" refX="7.6" refY="3.2" orient="auto">
+      <path d="M0,0 L8,3.2 L0,6.4 z" fill="#848d97"/></marker>
+  </defs>
+
+  <rect class="bg" x="0.5" y="0.5" width="859" height="399" rx="8"/>
+
+  <!-- ===== frequency vs time ===== -->
+  <line class="axis" x1="110" y1="240" x2="826" y2="240" marker-end="url(#iAx)"/>
+  <line class="axis" x1="110" y1="240" x2="110" y2="48"  marker-end="url(#iAx)"/>
+  <text class="lbl ink" x="118" y="46">frequency</text>
+  <text class="lbl ink" x="826" y="258" text-anchor="end">time within one sweep</text>
+
+  <!-- receiver passband around the victim's own chirp -->
+  <polygon points="110,206 800,66 800,94 110,234" fill="#1e73be" fill-opacity="0.12"/>
+  <text class="mono vic" x="470" y="176">&#177; fs</text>
+
+  <!-- victim chirp = the LO reference -->
+  <line x1="110" y1="220" x2="800" y2="80" stroke="#1e73be" stroke-width="2.6"/>
+  <text class="rowlb vic" x="806" y="60" text-anchor="end">victim chirp &#8212; the deramp reference</text>
+
+  <!-- interfering chirps, steeper and repeating -->
+  <g stroke="#cf4640" stroke-width="2.4" fill="none">
+    <line x1="150" y1="231.7" x2="410" y2="80"/>
+    <line x1="430" y1="220" x2="670" y2="80"/>
+    <line x1="690" y1="220" x2="810" y2="150"/>
+  </g>
+  <text class="rowlb itf" x="330" y="70">interferer</text>
+  <text class="lbl itf"   x="330" y="86">a different slope and period</text>
+
+  <!-- time spent inside the passband -->
+  <rect x="165.4" y="52" width="73.6" height="302" fill="#cf4640" fill-opacity="0.06"/>
+  <rect x="563.9" y="52" width="73.6" height="302" fill="#cf4640" fill-opacity="0.06"/>
+  <g stroke="#cf4640" stroke-width="6" stroke-linecap="round" opacity="0.35">
+    <line x1="165.4" y1="222.7" x2="239.0" y2="179.7"/>
+    <line x1="563.9" y1="141.9" x2="637.5" y2="99.0"/>
+  </g>
+
+  <!-- crossings -->
+  <circle cx="202" cy="201" r="6" fill="#ffffff" stroke="#cf4640" stroke-width="2.4"/>
+  <circle cx="601" cy="120" r="6" fill="#ffffff" stroke="#cf4640" stroke-width="2.4"/>
+  <line class="guide" x1="202" y1="207" x2="202" y2="302"/>
+  <line class="guide" x1="601" y1="126" x2="601" y2="302"/>
+  <text class="code ink" x="212" y="230">|f_lo &#8722; f_interf| &lt; fs</text>
+
+  <!-- ===== resulting baseband (real part) ===== -->
+  <text class="rowlb ink" x="100" y="322" text-anchor="end">baseband</text>
+  <text class="lbl" x="100" y="337" text-anchor="end">real part</text>
+  <line class="axis" x1="110" y1="326" x2="826" y2="326"/>
+  <g stroke="#cf4640" stroke-width="1" stroke-dasharray="3 3" opacity="0.6">
+    <line x1="165.4" y1="305" x2="239.0" y2="305"/><line x1="165.4" y1="347" x2="239.0" y2="347"/>
+    <line x1="563.9" y1="305" x2="637.5" y2="305"/><line x1="563.9" y1="347" x2="637.5" y2="347"/>
+  </g>
+  <g stroke="#cf4640" stroke-width="1.6" fill="none" stroke-linejoin="round">
+    <path d="M165.4,326.0 L165.4,345.3 L165.9,346.6 L166.4,340.7 L166.9,329.9 L167.4,318.0 L167.9,308.8 L168.4,305.0 L168.9,307.7 L169.4,315.7 L169.9,326.5 L170.4,337.1 L170.9,344.5 L171.4,347.0 L171.9,344.2 L172.4,337.0 L172.9,327.3 L173.4,317.4 L173.9,309.7 L174.4,305.5 L174.9,305.6 L175.4,309.8 L175.9,317.0 L176.4,325.7 L176.9,334.4 L177.4,341.4 L177.9,345.8 L178.4,347.0 L178.9,344.9 L179.4,340.2 L179.9,333.6 L180.4,326.1 L180.9,318.8 L181.4,312.5 L181.9,307.9 L182.4,305.4 L182.9,305.2 L183.4,307.0 L183.9,310.5 L184.4,315.4 L184.9,321.0 L185.4,326.9 L185.9,332.6 L186.4,337.6 L186.9,341.6 L187.4,344.6 L187.9,346.4 L188.4,347.0 L188.9,346.5 L189.4,345.1 L189.9,342.9 L190.4,340.0 L190.9,336.8 L191.4,333.4 L191.9,329.9 L192.4,326.4 L192.9,323.1 L193.4,320.0 L193.9,317.2 L194.4,314.8 L194.9,312.7 L195.4,310.9 L195.9,309.4 L196.4,308.2 L196.9,307.2 L197.4,306.5 L197.9,306.0 L198.4,305.6 L198.9,305.3 L199.4,305.2 L199.9,305.1 L200.4,305.0 L200.9,305.0 L201.4,305.0 L201.9,305.0 L202.4,305.0 L202.9,305.0 L203.4,305.0 L203.9,305.0 L204.4,305.1 L204.9,305.2 L205.4,305.3 L205.9,305.5 L206.4,305.9 L206.9,306.4 L207.4,307.1 L207.9,308.0 L208.4,309.1 L208.9,310.5 L209.4,312.2 L209.9,314.3 L210.4,316.7 L210.9,319.4 L211.4,322.4 L211.9,325.7 L212.4,329.1 L212.9,332.6 L213.4,336.1 L213.9,339.4 L214.4,342.3 L214.9,344.7 L215.4,346.3 L215.9,347.0 L216.4,346.6 L216.9,345.1 L217.4,342.4 L217.9,338.5 L218.4,333.7 L218.9,328.2 L219.4,322.3 L219.9,316.6 L220.4,311.5 L220.9,307.6 L221.4,305.4 L221.9,305.2 L222.4,307.2 L222.9,311.4 L223.4,317.3 L223.9,324.5 L224.4,332.1 L224.9,338.9 L225.4,344.1 L225.9,346.8 L226.4,346.3 L226.9,342.6 L227.4,336.0 L227.9,327.6 L228.4,318.8 L228.9,311.1 L229.4,306.2 L229.9,305.1 L230.4,308.4 L230.9,315.5 L231.4,325.1 L231.9,335.0 L232.4,343.0 L232.9,346.8 L233.4,345.5 L233.9,339.0 L234.4,328.9 L234.9,317.9 L235.4,309.0 L235.9,305.1 L236.4,307.4 L236.9,315.7 L237.4,327.3 L237.9,338.7 L238.4,345.9 L238.9,346.2 L238.9,326.0"/>
+    <path d="M563.9,326.0 L563.9,345.3 L564.4,346.6 L564.9,340.7 L565.4,329.9 L565.9,318.0 L566.4,308.8 L566.9,305.0 L567.4,307.7 L567.9,315.7 L568.4,326.5 L568.9,337.1 L569.4,344.5 L569.9,347.0 L570.4,344.2 L570.9,337.0 L571.4,327.3 L571.9,317.4 L572.4,309.7 L572.9,305.5 L573.4,305.6 L573.9,309.8 L574.4,317.0 L574.9,325.7 L575.4,334.4 L575.9,341.4 L576.4,345.8 L576.9,347.0 L577.4,344.9 L577.9,340.2 L578.4,333.6 L578.9,326.1 L579.4,318.8 L579.9,312.5 L580.4,307.9 L580.9,305.4 L581.4,305.2 L581.9,307.0 L582.4,310.5 L582.9,315.4 L583.4,321.0 L583.9,326.9 L584.4,332.6 L584.9,337.6 L585.4,341.6 L585.9,344.6 L586.4,346.4 L586.9,347.0 L587.4,346.5 L587.9,345.1 L588.4,342.9 L588.9,340.0 L589.4,336.8 L589.9,333.4 L590.4,329.9 L590.9,326.4 L591.4,323.1 L591.9,320.0 L592.4,317.2 L592.9,314.8 L593.4,312.7 L593.9,310.9 L594.4,309.4 L594.9,308.2 L595.4,307.2 L595.9,306.5 L596.4,306.0 L596.9,305.6 L597.4,305.3 L597.9,305.2 L598.4,305.1 L598.9,305.0 L599.4,305.0 L599.9,305.0 L600.4,305.0 L600.9,305.0 L601.4,305.0 L601.9,305.0 L602.4,305.0 L602.9,305.1 L603.4,305.2 L603.9,305.3 L604.4,305.5 L604.9,305.9 L605.4,306.4 L605.9,307.1 L606.4,308.0 L606.9,309.1 L607.4,310.5 L607.9,312.2 L608.4,314.3 L608.9,316.7 L609.4,319.4 L609.9,322.4 L610.4,325.7 L610.9,329.1 L611.4,332.6 L611.9,336.1 L612.4,339.4 L612.9,342.3 L613.4,344.7 L613.9,346.3 L614.4,347.0 L614.9,346.6 L615.4,345.1 L615.9,342.4 L616.4,338.5 L616.9,333.7 L617.4,328.2 L617.9,322.3 L618.4,316.6 L618.9,311.5 L619.4,307.6 L619.9,305.4 L620.4,305.2 L620.9,307.2 L621.4,311.4 L621.9,317.3 L622.4,324.5 L622.9,332.1 L623.4,338.9 L623.9,344.1 L624.4,346.8 L624.9,346.3 L625.4,342.6 L625.9,336.0 L626.4,327.6 L626.9,318.8 L627.4,311.1 L627.9,306.2 L628.4,305.1 L628.9,308.4 L629.4,315.5 L629.9,325.1 L630.4,335.0 L630.9,343.0 L631.4,346.8 L631.9,345.5 L632.4,339.0 L632.9,328.9 L633.4,317.9 L633.9,309.0 L634.4,305.1 L634.9,307.4 L635.4,315.7 L635.9,327.3 L636.4,338.7 L636.9,345.9 L637.4,346.2 L637.4,326.0"/>
+  </g>
+  <text class="lbl itf" x="647.5" y="310">constant amplitude</text>
+  <text class="lbl itf" x="647.5" y="325">beat sweeps through zero</text>
+  <text class="lbl itf" x="647.5" y="340">at the crossing</text>
+  <text class="lbl" x="110" y="382">Everywhere else the interferer is outside the passband and contributes nothing at all.</text>
+</svg>

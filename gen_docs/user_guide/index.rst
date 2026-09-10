@@ -27,6 +27,7 @@ configuring the simulator for your scenario.
    transmitter
    receiver
    noise
+   interference
    ray_tracing_simulation
    animated_targets
    stretch_processing

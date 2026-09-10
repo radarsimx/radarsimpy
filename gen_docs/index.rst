@@ -42,6 +42,7 @@ Step-by-step guides to help you get started with RadarSimPy and understand key c
 * :doc:`user_guide/transmitter` - Waveform, pulse train, modulation and the transmit array
 * :doc:`user_guide/receiver` - Sampling, baseband type, noise budget, range gate and the receive array
 * :doc:`user_guide/noise` - Receiver thermal noise and transmitter phase noise
+* :doc:`user_guide/interference` - Mutual interference from another radar sharing the band
 * :doc:`user_guide/ray_tracing_simulation` - Ray density, fidelity level and target flags for 3D meshes
 * :doc:`user_guide/animated_targets` - Driving targets from keyframed glTF 2.0 / GLB motion
 * :doc:`user_guide/stretch_processing` - Range gating for long-range FMCW and stretch radars
