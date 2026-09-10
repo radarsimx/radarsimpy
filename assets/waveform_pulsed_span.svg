@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 262" width="860" height="262"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 236" width="860" height="236"
      role="img" aria-label="How far mod_t spans decides whether a target beyond the unambiguous range folds back or vanishes">
   <title>How far mod_t spans decides whether a target beyond the unambiguous range folds back or vanishes</title>
   <style>
@@ -15,7 +15,7 @@
       <path d="M0,0 L8,3.2 L0,6.4 z" fill="#cf4640"/></marker>
   </defs>
 
-  <rect class="bg" x="0.5" y="0.5" width="859" height="261" rx="8"/>
+  <rect class="bg" x="0.5" y="0.5" width="859" height="235" rx="8"/>
 
   <!-- echo guide -->
   <text class="lbl ec" x="420" y="26" text-anchor="middle">echo from pulse 0, round trip longer than one PRI</text>
@@ -54,8 +54,4 @@
         fill="#1e73be" fill-opacity="0.16" stroke="#1e73be" stroke-width="1.5"/>
   <text class="mono tx" x="455" y="192" text-anchor="middle">one table across every pulse &#8212; no wrap</text>
   <text class="lbl" x="110" y="214">The echo reads a part of the table where <tspan class="mono tx">amp</tspan> is zero, so it <tspan class="ec">produces no return</tspan> at all.</text>
-
-  <!-- caution -->
-  <line x1="110" y1="228" x2="800" y2="228" stroke="#d0d7de" stroke-width="1"/>
-  <text class="lbl" x="110" y="248">A round trip longer than the span of <tspan class="mono tx">mod_t</tspan> also indexes before the start of the table, adding a <tspan class="ec">spurious return</tspan> whose level is undefined.</text>
 </svg>

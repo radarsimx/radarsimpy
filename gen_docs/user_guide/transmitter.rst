@@ -426,16 +426,6 @@ With the 80 µs interval above and a target at 14 km, a one-interval table
 places the folded echo at samples 79–81, which is 2 km — where a real radar
 would report it. A frame-long table returns nothing for that target at all.
 
-.. note::
-
-   In builds before this was fixed, a round trip longer than the span of
-   ``mod_t`` also produced a spurious ghost at a lower sample: the table index
-   was biased by the table length only once before the remainder was taken, so
-   it could stay negative and read outside the array. The lookup now wraps
-   properly and a one-interval table reports the fold and nothing else. On an
-   older build, prefer a frame-long ``mod_t``, which never reaches outside the
-   table for a delay inside the frame.
-
 A chirped pulse
 ~~~~~~~~~~~~~~~
 
