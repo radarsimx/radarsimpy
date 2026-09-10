@@ -166,14 +166,12 @@ so channel ``n`` corresponds to ``Tx[n // N]`` and ``Rx[n % N]``. The element
 positions are available as ``radar.virtual_array_locations``, an ``[M*N, 3]``
 array.
 
-.. warning::
+.. note::
 
-   A virtual array is only a valid stand-in for a real one when the transmit
-   channels are separable — by time, frequency or code. Placing several
-   transmitters at different locations and firing them simultaneously with
-   identical waveforms produces a superposition, not :math:`M \times N`
-   independent measurements. :doc:`transmitter` describes the modulation
-   controls that make the channels separable.
+   The simulator returns these :math:`M \times N` channels already separated,
+   whatever the transmit channels happen to be doing at the time — see
+   `Simultaneous Transmit Channels`_. Real hardware has to earn that separation
+   with TDM, CDM or DDM; :doc:`transmitter` covers the controls that do it.
 
 The timestamp
 ~~~~~~~~~~~~~
@@ -222,6 +220,90 @@ frame index varying slowest:
 Each frame gets an independent thermal-noise realization. Within a frame, all
 virtual channels that share a physical receiver and a timestamp get *identical*
 noise; :doc:`noise` covers what that means for covariance estimation.
+
+
+Simultaneous Transmit Channels
+------------------------------
+
+``sim_radar`` computes every transmit–receive path **in isolation**. Channel
+``n`` of the returned array holds only the energy that ``Tx[n // N]`` radiated
+and ``Rx[n % N]`` collected, regardless of what the other transmitters were
+doing at that instant. Adding a second transmitter does not disturb the first
+one's channel:
+
+.. code-block:: python
+
+   two = sim_radar(radar_2tx, targets)["baseband"]   # 2 Tx × 1 Rx → 2 channels
+   one = sim_radar(radar_1tx, targets)["baseband"]   # the same scene, Tx0 only
+
+   np.allclose(two[0], one[0])   # True — bit for bit
+
+Real hardware does not behave that way. A physical receiver collects the sum of
+everything radiating while its window is open, and the whole job of a MIMO
+modulation scheme is to make that sum separable again after digitising. The
+simulator hands you the *result* of a perfect separation and skips the sum, so
+when you want the superposition you have to build it yourself.
+
+Building the physical receive signal
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sum the transmit channels that share a receiver. The first axis runs frame,
+then Tx, then Rx, so a reshape does it:
+
+.. code-block:: python
+
+   import numpy as np
+
+   M = radar.transmitter.num_channels
+   N = radar.receiver.num_channels
+   P = radar.transmitter.num_pulses
+   S = radar.samples_per_pulse
+   K = np.size(radar.time_prop["frame_start_time"])
+
+   result = sim_radar(radar, targets)
+
+   signal = result["baseband"].reshape(K, M, N, P, S).sum(axis=1)
+   noise = result["noise"].reshape(K, M, N, P, S)[:, 0]
+
+   physical = signal + noise      # [frames, Rx, pulses, samples]
+
+.. important::
+
+   Sum the signal, but take the noise **once**. Every virtual channel sharing a
+   physical receiver and a timestamp carries an *identical* noise realization,
+   so summing ``result["noise"]`` alongside the baseband multiplies the noise
+   amplitude by :math:`M` — those are :math:`M` copies of one draw, not
+   :math:`M` independent ones. A real receiver has one front end and one noise
+   process, which is what the ``[:, 0]`` above keeps.
+
+When it matters
+~~~~~~~~~~~~~~~
+
+**TDM** — a per-channel ``delay`` puts each transmitter in its own time slot,
+so the channels never overlap to begin with. The simulator's per-path output
+already matches what the hardware yields once the slots are de-interleaved.
+Nothing to do.
+
+**CDM and DDM** — the transmitters radiate together and are pulled apart
+afterwards, by code or by Doppler. Superimposing is what lets you see what the
+demodulator actually faces: residual cross-talk between codes, the way a
+target's own Doppler mixes with a DDM phase ramp, and the dynamic range the ADC
+needs to hold :math:`M` overlapping returns at once.
+
+**No modulation at all** — several transmitters at different locations sending
+identical waveforms simultaneously are not separable by anything. The simulator
+still returns :math:`M \times N` tidy channels; the hardware would return
+:math:`N` channels of superimposed echoes with no way back to the individual
+paths. Building a virtual array from the simulator output here describes an
+array that could not be built.
+
+.. note::
+
+   None of this forbids using the :math:`M \times N` channels directly. Ideal
+   separation is the right model for plenty of work — array geometry, angle
+   estimation, beampattern studies — and it is both faster and cleaner than
+   simulating a scheme only to undo it. The point is to choose deliberately
+   rather than by default.
 
 
 See Also
