@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 252" width="860" height="252"
+     role="img" aria-label="How f and t define a single-tone, linear-FM or arbitrary waveform">
+  <title>How f and t define a single-tone, linear-FM or arbitrary waveform</title>
+  <style>
+    .bg    { fill:#ffffff; stroke:#d0d7de; stroke-width:1 }
+    .panel { fill:#f6f8fa; stroke:#d8dee4; stroke-width:1 }
+    .lbl   { font:11.5px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#6b7280 }
+    .code  { font:12.5px 'IBM Plex Mono',Consolas,'Courier New',monospace }
+    .mono  { font:11.5px 'IBM Plex Mono',Consolas,'Courier New',monospace }
+    .ray   { fill:#1e73be }
+    .ink   { fill:#0d1117 }
+    .axis  { stroke:#848d97; stroke-width:1.1 }
+    .trace { stroke:#1e73be; stroke-width:2.6; fill:none }
+  </style>
+
+  <rect class="bg" x="0.5" y="0.5" width="859" height="251" rx="8"/>
+  <g id="fig" transform="translate(0,-62.5)">
+
+  <!-- ============ single tone ============ -->
+  <rect class="panel" x="24.5" y="76.5" width="263" height="224" rx="6"/>
+  <text class="code ink" x="156" y="102" text-anchor="middle">f = 24.125e9</text>
+  <text class="lbl"     x="156" y="121" text-anchor="middle">a scalar &#8594; single tone (CW)</text>
+  <line class="axis" x1="60" y1="248" x2="256" y2="248"/>
+  <line class="axis" x1="60" y1="150" x2="60"  y2="248"/>
+  <path class="trace" d="M70,197 L245,197"/>
+  <circle cx="70" cy="197" r="3.2" class="ray"/>
+  <circle cx="245" cy="197" r="3.2" class="ray"/>
+  <text class="mono ray" x="156" y="188" text-anchor="middle">f(t) = f</text>
+  <text class="lbl" x="156" y="268" text-anchor="middle">bandwidth = 0</text>
+  <text class="lbl ink" x="52" y="146" text-anchor="middle">f</text>
+  <text class="lbl ink" x="256" y="264" text-anchor="end">t</text>
+
+  <!-- ============ linear FM ============ -->
+  <rect class="panel" x="298.5" y="76.5" width="263" height="224" rx="6"/>
+  <text class="code ink" x="430" y="102" text-anchor="middle">f = [77e9, 81e9]</text>
+  <text class="lbl"     x="430" y="121" text-anchor="middle">two values &#8594; linear FM chirp</text>
+  <line class="axis" x1="334" y1="248" x2="530" y2="248"/>
+  <line class="axis" x1="334" y1="150" x2="334" y2="248"/>
+  <path class="trace" d="M344,238 L519,158"/>
+  <circle cx="344" cy="238" r="3.2" class="ray"/>
+  <circle cx="519" cy="158" r="3.2" class="ray"/>
+  <text class="mono ray" x="452" y="212">slope k = B / T</text>
+  <text class="lbl" x="430" y="268" text-anchor="middle">bandwidth = max(f) &#8722; min(f)</text>
+  <text class="lbl ink" x="326" y="146" text-anchor="middle">f</text>
+  <text class="lbl ink" x="530" y="264" text-anchor="end">t</text>
+
+  <!-- ============ arbitrary ============ -->
+  <rect class="panel" x="572.5" y="76.5" width="263" height="224" rx="6"/>
+  <text class="code ink" x="704" y="102" text-anchor="middle">f = f_arr, t = t_arr</text>
+  <text class="lbl"     x="704" y="121" text-anchor="middle">paired 1-D arrays &#8594; arbitrary f(t)</text>
+  <line class="axis" x1="608" y1="248" x2="804" y2="248"/>
+  <line class="axis" x1="608" y1="150" x2="608" y2="248"/>
+  <path class="trace" d="M608,240 L632,237.4 L656,231.7 L680,223.4 L704,212.9 L728,200.4 L752,186 L776,169.8 L800,152"/>
+  <g class="ray">
+    <circle cx="608" cy="240" r="3.2"/><circle cx="632" cy="237.4" r="3.2"/>
+    <circle cx="656" cy="231.7" r="3.2"/><circle cx="680" cy="223.4" r="3.2"/>
+    <circle cx="704" cy="212.9" r="3.2"/><circle cx="728" cy="200.4" r="3.2"/>
+    <circle cx="752" cy="186" r="3.2"/><circle cx="776" cy="169.8" r="3.2"/>
+    <circle cx="800" cy="152" r="3.2"/>
+  </g>
+  <text class="lbl" x="704" y="268" text-anchor="middle">one f per t; linear between the pairs</text>
+  <text class="lbl ink" x="600" y="146" text-anchor="middle">f</text>
+  <text class="lbl ink" x="804" y="264" text-anchor="end">t</text>
+
+  </g>
+</svg>

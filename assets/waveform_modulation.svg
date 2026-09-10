@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 264" width="860" height="264"
+     role="img" aria-label="Pulse modulation in slow time versus waveform modulation in fast time">
+  <title>Pulse modulation in slow time versus waveform modulation in fast time</title>
+  <style>
+    .bg    { fill:#ffffff; stroke:#d0d7de; stroke-width:1 }
+    .panel { fill:#f6f8fa; stroke:#d8dee4; stroke-width:1 }
+    .lbl   { font:11.5px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#6b7280 }
+    .code  { font:12.5px 'IBM Plex Mono',Consolas,'Courier New',monospace }
+    .mono  { font:11px 'IBM Plex Mono',Consolas,'Courier New',monospace }
+    .ray   { fill:#1e73be }
+    .env   { fill:#1a7f37 }
+    .ink   { fill:#0d1117 }
+    .axis  { stroke:#848d97; stroke-width:1.1 }
+    .tick  { stroke:#d0d7de; stroke-width:1 }
+  </style>
+
+  <rect class="bg" x="0.5" y="0.5" width="859" height="263" rx="8"/>
+
+  <!-- ================= slow time ================= -->
+  <rect class="panel" x="14.5" y="14.5" width="410" height="235" rx="6"/>
+  <text class="code ink" x="219" y="40" text-anchor="middle">pulse_amp[n] / pulse_phs[n]</text>
+  <text class="lbl"     x="219" y="59" text-anchor="middle">slow time &#8212; one value per pulse</text>
+
+  <line class="axis" x1="36" y1="200" x2="406" y2="200"/>
+  <g fill="#1e73be" fill-opacity="0.16" stroke="#1e73be" stroke-width="2">
+    <rect x="46"  y="130" width="50" height="70"/>
+    <rect x="136" y="158" width="50" height="42"/>
+    <rect x="226" y="130" width="50" height="70"/>
+    <rect x="316" y="172" width="50" height="28"/>
+  </g>
+  <g class="mono env" text-anchor="middle">
+    <text x="71"  y="122">0&#176;</text>
+    <text x="161" y="150">180&#176;</text>
+    <text x="251" y="122">90&#176;</text>
+    <text x="341" y="164">180&#176;</text>
+  </g>
+  <g class="mono ray" text-anchor="middle">
+    <text x="71"  y="216">n=0</text>
+    <text x="161" y="216">n=1</text>
+    <text x="251" y="216">n=2</text>
+    <text x="341" y="216">n=3</text>
+  </g>
+  <text class="lbl" x="219" y="238" text-anchor="middle">bar height = <tspan class="mono ray">pulse_amp</tspan> &#160;&#183;&#160; angle = <tspan class="mono env">pulse_phs</tspan></text>
+
+  <!-- ================= fast time ================= -->
+  <rect class="panel" x="435.5" y="14.5" width="410" height="235" rx="6"/>
+  <text class="code ink" x="640" y="40" text-anchor="middle">mod_t / amp / phs</text>
+  <text class="lbl"     x="640" y="59" text-anchor="middle">fast time &#8212; a profile inside every pulse</text>
+
+  <line class="axis" x1="457" y1="200" x2="827" y2="200"/>
+  <path d="M480,200 L480,175.5 L544,175.5 L544,144 L608,144 L608,130 L672,130 L672,144
+           L736,144 L736,175.5 L800,175.5 L800,200 Z"
+        fill="#1e73be" fill-opacity="0.16" stroke="#1e73be" stroke-width="2" stroke-linejoin="round"/>
+  <g class="ray">
+    <circle cx="480" cy="175.5" r="3"/><circle cx="544" cy="175.5" r="3"/>
+    <circle cx="544" cy="144" r="3"/><circle cx="608" cy="144" r="3"/>
+    <circle cx="608" cy="130" r="3"/><circle cx="672" cy="130" r="3"/>
+    <circle cx="672" cy="144" r="3"/><circle cx="736" cy="144" r="3"/>
+    <circle cx="736" cy="175.5" r="3"/><circle cx="800" cy="175.5" r="3"/>
+  </g>
+  <g class="mono env" text-anchor="middle">
+    <text x="512" y="192">0&#176;</text><text x="576" y="192">0&#176;</text>
+    <text x="640" y="192">180&#176;</text><text x="704" y="192">180&#176;</text>
+    <text x="768" y="192">0&#176;</text>
+  </g>
+  <g class="tick">
+    <line x1="480" y1="200" x2="480" y2="207"/><line x1="544" y1="200" x2="544" y2="207"/>
+    <line x1="608" y1="200" x2="608" y2="207"/><line x1="672" y1="200" x2="672" y2="207"/>
+    <line x1="736" y1="200" x2="736" y2="207"/><line x1="800" y1="200" x2="800" y2="207"/>
+  </g>
+  <g class="mono ray" text-anchor="middle">
+    <text x="480" y="219">[0]</text><text x="544" y="219">[1]</text><text x="608" y="219">[2]</text>
+    <text x="672" y="219">[3]</text><text x="736" y="219">[4]</text><text x="800" y="219">[5]</text>
+  </g>
+  <text class="lbl" x="640" y="238" text-anchor="middle">step height = <tspan class="mono ray">amp</tspan> &#160;&#183;&#160; angle = <tspan class="mono env">phs</tspan> &#160;&#183;&#160; breakpoints = <tspan class="mono ray">mod_t</tspan></text>
+</svg>

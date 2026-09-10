@@ -25,6 +25,17 @@ including phase noise and noise amplitudes.
     ██║  ██║██║  ██║██████╔╝██║  ██║██║  ██║███████║██║██║ ╚═╝ ██║██╔╝ ██╗
     ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝╚═╝     ╚═╝╚═╝  ╚═╝
 
+.. seealso::
+
+   The User Guide covers this module in narrative form, with diagrams:
+
+   * :doc:`../user_guide/system_model` - how ``Transmitter``, ``Receiver`` and
+     ``Radar`` fit together, and the shape of the simulated output
+   * :doc:`../user_guide/transmitter` - waveform, pulse train, modulation and
+     the transmit array
+   * :doc:`../user_guide/receiver` - sampling, baseband type, the noise budget,
+     the range gate and the receive array
+
 radarsimpy.Transmitter
 -----------------------
 

@@ -2,17 +2,17 @@
      role="img" aria-label="How the environment flag changes physical-optics surface sampling">
   <title>How the environment flag changes physical-optics surface sampling</title>
   <style>
-    .bg    { fill:#ffffff; stroke:#d5d9e0; stroke-width:1 }
-    .panel { fill:#fafbfc; stroke:#dde1e7; stroke-width:1 }
-    .ttl   { font:600 17px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#14181f }
-    .sub   { font:13px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#5b6472 }
-    .lbl   { font:11.5px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#5b6472 }
-    .cap   { font:12px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#5b6472 }
+    .bg    { fill:#ffffff; stroke:#d0d7de; stroke-width:1 }
+    .panel { fill:#f6f8fa; stroke:#d8dee4; stroke-width:1 }
+    .ttl   { font:600 17px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#0d1117 }
+    .sub   { font:13px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#6b7280 }
+    .lbl   { font:11.5px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#6b7280 }
+    .cap   { font:12px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#6b7280 }
     .code  { font:13px 'IBM Plex Mono',Consolas,'Courier New',monospace }
     .mono  { font:12px 'IBM Plex Mono',Consolas,'Courier New',monospace }
-    .env   { fill:#0f8a7e }
-    .ray   { fill:#1919ff }
-    .ink   { fill:#14181f }
+    .env   { fill:#1a7f37 }
+    .ray   { fill:#1e73be }
+    .ink   { fill:#0d1117 }
   </style>
 
   <rect class="bg" x="0.5" y="0.5" width="859" height="255" rx="8"/>
@@ -22,8 +22,8 @@
   <text class="code ink" x="225" y="98"  text-anchor="middle">"environment": False</text>
   <text class="lbl"      x="225" y="117" text-anchor="middle">a surface whose scattering you are measuring</text>
   <g transform="translate(225,200) skewX(-24)">
-    <rect x="-110" y="-38" width="220" height="76" fill="#1919ff" fill-opacity="0.05" stroke="#1919ff" stroke-width="1.6"/>
-    <g stroke="#1919ff" stroke-width="0.9" opacity="0.6">
+    <rect x="-110" y="-38" width="220" height="76" fill="#1e73be" fill-opacity="0.05" stroke="#1e73be" stroke-width="1.6"/>
+    <g stroke="#1e73be" stroke-width="0.9" opacity="0.6">
       <line x1="-90.0" y1="-38" x2="-90.0" y2="38"/>
       <line x1="-70.0" y1="-38" x2="-70.0" y2="38"/>
       <line x1="-50.0" y1="-38" x2="-50.0" y2="38"/>
@@ -38,7 +38,7 @@
       <line x1="-110" y1="0.0" x2="110" y2="0.0"/>
       <line x1="-110" y1="19.0" x2="110" y2="19.0"/>
     </g>
-    <g fill="#1919ff">
+    <g fill="#1e73be">
       <circle cx="-100.0" cy="-28.5" r="2.4"/>
       <circle cx="-80.0" cy="-28.5" r="2.4"/>
       <circle cx="-60.0" cy="-28.5" r="2.4"/>
@@ -92,14 +92,14 @@
   <text class="code env" x="635" y="98"  text-anchor="middle">"environment": True</text>
   <text class="lbl"      x="635" y="117" text-anchor="middle">a large, mostly flat surrounding surface</text>
   <g transform="translate(635,200) skewX(-24)">
-    <rect x="-110" y="-38" width="220" height="76" fill="#1919ff" fill-opacity="0.05" stroke="#1919ff" stroke-width="1.6"/>
-    <g stroke="#1919ff" stroke-width="0.9" opacity="0.6">
+    <rect x="-110" y="-38" width="220" height="76" fill="#1e73be" fill-opacity="0.05" stroke="#1e73be" stroke-width="1.6"/>
+    <g stroke="#1e73be" stroke-width="0.9" opacity="0.6">
       <line x1="-55.0" y1="-38" x2="-55.0" y2="38"/>
       <line x1="0.0" y1="-38" x2="0.0" y2="38"/>
       <line x1="55.0" y1="-38" x2="55.0" y2="38"/>
       <line x1="-110" y1="0.0" x2="110" y2="0.0"/>
     </g>
-    <g fill="#1919ff">
+    <g fill="#1e73be">
       <circle cx="-82.5" cy="-19.0" r="2.4"/>
       <circle cx="-27.5" cy="-19.0" r="2.4"/>
       <circle cx="27.5" cy="-19.0" r="2.4"/>

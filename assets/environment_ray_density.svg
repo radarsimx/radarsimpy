@@ -2,22 +2,22 @@
      role="img" aria-label="Where the ray budget goes with and without the environment flag">
   <title>Where the ray budget goes with and without the environment flag</title>
   <style>
-    .bg    { fill:#ffffff; stroke:#d5d9e0; stroke-width:1 }
-    .panel { fill:#fafbfc; stroke:#dde1e7; stroke-width:1 }
-    .ttl   { font:600 17px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#14181f }
-    .sub   { font:13px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#5b6472 }
-    .lbl   { font:11.5px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#5b6472 }
-    .cap   { font:12px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#5b6472 }
+    .bg    { fill:#ffffff; stroke:#d0d7de; stroke-width:1 }
+    .panel { fill:#f6f8fa; stroke:#d8dee4; stroke-width:1 }
+    .ttl   { font:600 17px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#0d1117 }
+    .sub   { font:13px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#6b7280 }
+    .lbl   { font:11.5px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#6b7280 }
+    .cap   { font:12px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#6b7280 }
     .code  { font:13px 'IBM Plex Mono',Consolas,'Courier New',monospace }
     .mono  { font:11.5px 'IBM Plex Mono',Consolas,'Courier New',monospace }
-    .env   { fill:#0f8a7e }
-    .ray   { fill:#1919ff }
-    .tgt   { fill:#d61f1f }
-    .ink   { fill:#14181f }
+    .env   { fill:#1a7f37 }
+    .ray   { fill:#1e73be }
+    .tgt   { fill:#cf4640 }
+    .ink   { fill:#0d1117 }
   </style>
   <defs>
     <marker id="rArr" markerWidth="8" markerHeight="7" refX="6.6" refY="2.8" orient="auto">
-      <path d="M0,0 L7,2.8 L0,5.6 z" fill="#1919ff"/>
+      <path d="M0,0 L7,2.8 L0,5.6 z" fill="#1e73be"/>
     </marker>
   </defs>
 
@@ -29,15 +29,15 @@
   <text class="code ink" x="225" y="98"  text-anchor="middle">"environment": False</text>
   <text class="lbl"      x="225" y="117" text-anchor="middle">the ground is sampled like a target of interest</text>
 
-  <line x1="44" y1="286" x2="412" y2="286" stroke="#0f8a7e" stroke-width="2.2"/>
+  <line x1="44" y1="286" x2="412" y2="286" stroke="#1a7f37" stroke-width="2.2"/>
   <path d="M290,286 L290,266 L302,266 L312,246 L346,246 L356,266 L362,266 L362,286 Z"
-        fill="#d61f1f" fill-opacity="0.10" stroke="#d61f1f" stroke-width="1.8" stroke-linejoin="round"/>
-  <circle cx="303" cy="285" r="7" fill="#ffffff" stroke="#d61f1f" stroke-width="1.6"/>
-  <circle cx="349" cy="285" r="7" fill="#ffffff" stroke="#d61f1f" stroke-width="1.6"/>
+        fill="#cf4640" fill-opacity="0.10" stroke="#cf4640" stroke-width="1.8" stroke-linejoin="round"/>
+  <circle cx="303" cy="285" r="7" fill="#ffffff" stroke="#cf4640" stroke-width="1.6"/>
+  <circle cx="349" cy="285" r="7" fill="#ffffff" stroke="#cf4640" stroke-width="1.6"/>
 
-  <rect x="48" y="168" width="40" height="24" rx="3" fill="#1919ff" fill-opacity="0.12" stroke="#1919ff" stroke-width="1.8"/>
+  <rect x="48" y="168" width="40" height="24" rx="3" fill="#1e73be" fill-opacity="0.12" stroke="#1e73be" stroke-width="1.8"/>
   <text class="mono ray" x="68" y="184" text-anchor="middle">Tx</text>
-  <g stroke="#1919ff" stroke-width="1.3" opacity="0.5">
+  <g stroke="#1e73be" stroke-width="1.3" opacity="0.5">
     <line x1="88" y1="180" x2="143" y2="284" marker-end="url(#rArr)"/>
     <line x1="88" y1="180" x2="233" y2="284" marker-end="url(#rArr)"/>
     <line x1="88" y1="180" x2="288" y2="279" marker-end="url(#rArr)"/>
@@ -45,7 +45,7 @@
   </g>
 
   <!-- ray landings: dense on the ground, sparse on the vehicle -->
-  <g fill="#1919ff">
+  <g fill="#1e73be">
     <circle cx="100" cy="286" r="2.7"/><circle cx="109" cy="286" r="2.7"/>
     <circle cx="118" cy="286" r="2.7"/><circle cx="127" cy="286" r="2.7"/>
     <circle cx="136" cy="286" r="2.7"/><circle cx="145" cy="286" r="2.7"/>
@@ -70,15 +70,15 @@
   <text class="code env" x="635" y="98"  text-anchor="middle">"environment": True</text>
   <text class="lbl"      x="635" y="117" text-anchor="middle">the ground is sampled as scenery, not as a target</text>
 
-  <line x1="454" y1="286" x2="822" y2="286" stroke="#0f8a7e" stroke-width="2.2"/>
+  <line x1="454" y1="286" x2="822" y2="286" stroke="#1a7f37" stroke-width="2.2"/>
   <path d="M700,286 L700,266 L712,266 L722,246 L756,246 L766,266 L772,266 L772,286 Z"
-        fill="#d61f1f" fill-opacity="0.10" stroke="#d61f1f" stroke-width="1.8" stroke-linejoin="round"/>
-  <circle cx="713" cy="285" r="7" fill="#ffffff" stroke="#d61f1f" stroke-width="1.6"/>
-  <circle cx="759" cy="285" r="7" fill="#ffffff" stroke="#d61f1f" stroke-width="1.6"/>
+        fill="#cf4640" fill-opacity="0.10" stroke="#cf4640" stroke-width="1.8" stroke-linejoin="round"/>
+  <circle cx="713" cy="285" r="7" fill="#ffffff" stroke="#cf4640" stroke-width="1.6"/>
+  <circle cx="759" cy="285" r="7" fill="#ffffff" stroke="#cf4640" stroke-width="1.6"/>
 
-  <rect x="458" y="168" width="40" height="24" rx="3" fill="#1919ff" fill-opacity="0.12" stroke="#1919ff" stroke-width="1.8"/>
+  <rect x="458" y="168" width="40" height="24" rx="3" fill="#1e73be" fill-opacity="0.12" stroke="#1e73be" stroke-width="1.8"/>
   <text class="mono ray" x="478" y="184" text-anchor="middle">Tx</text>
-  <g stroke="#1919ff" stroke-width="1.3" opacity="0.5">
+  <g stroke="#1e73be" stroke-width="1.3" opacity="0.5">
     <line x1="498" y1="180" x2="572" y2="284" marker-end="url(#rArr)"/>
     <line x1="498" y1="180" x2="662" y2="284" marker-end="url(#rArr)"/>
     <line x1="498" y1="180" x2="698" y2="279" marker-end="url(#rArr)"/>
@@ -86,7 +86,7 @@
   </g>
 
   <!-- ray landings: sparse on the ground, dense on the vehicle -->
-  <g fill="#1919ff">
+  <g fill="#1e73be">
     <circle cx="514" cy="286" r="2.7"/><circle cx="544" cy="286" r="2.7"/>
     <circle cx="574" cy="286" r="2.7"/><circle cx="604" cy="286" r="2.7"/>
     <circle cx="634" cy="286" r="2.7"/><circle cx="664" cy="286" r="2.7"/>
@@ -105,9 +105,9 @@
   <text class="lbl tgt" x="454" y="334">the vehicle keeps the fine sampling</text>
 
   <!-- legend + captions -->
-  <circle cx="30" cy="376" r="2.7" fill="#1919ff"/>
+  <circle cx="30" cy="376" r="2.7" fill="#1e73be"/>
   <text class="lbl" x="40" y="380">one dot = one ray landing on a surface</text>
-  <line x1="264" y1="376" x2="288" y2="376" stroke="#1919ff" stroke-width="1.3" opacity="0.5" marker-end="url(#rArr)"/>
+  <line x1="264" y1="376" x2="288" y2="376" stroke="#1e73be" stroke-width="1.3" opacity="0.5" marker-end="url(#rArr)"/>
   <text class="lbl" x="296" y="380">a few of those rays, drawn in full</text>
 
   </g>
