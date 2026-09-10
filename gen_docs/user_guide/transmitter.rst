@@ -291,6 +291,210 @@ in the received signal (see :doc:`system_model`). The mechanisms available are:
        each pulse. The ramp resolution is limited by the ``mod_t`` step.
 
 
+Pulsed Waveforms
+----------------
+
+A pulsed radar transmits briefly and then listens for a long time, and that
+does not map onto ``t`` the way a chirp does. The rule to internalise:
+
+.. important::
+
+   ``t`` is the **receive window**, not the transmit duration.
+
+For CW and FMCW the two coincide — the transmitter is on for the whole sweep,
+so one number describes both. For a pulsed radar they differ by orders of
+magnitude, and the split is expressed with the fast-time amplitude gate:
+
+* ``t`` spans the entire pulse repetition interval. That is what sets
+  ``pulse_length``, ``samples_per_pulse`` and, by default, ``prp``.
+* ``amp`` and ``mod_t`` switch the transmitter on for the first :math:`\tau`
+  seconds of that interval and off for the rest.
+
+.. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/waveform_pulsed.svg
+    :width: 100%
+    :alt: Pulsed radar timing, with t spanning the listening window and amp gating the transmitter
+
+    The blue pulse is the transmitter being gated on; the green band is the
+    receive window, which stays open for the whole period. Both are described
+    by the same ``t`` — the narrow one through ``amp``, the wide one directly.
+
+A rectangular pulse
+~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: python
+
+   import numpy as np
+   from scipy import constants
+   from radarsimpy import Radar, Transmitter, Receiver
+
+   c = constants.c
+   fc = 10e9            # carrier
+   prf = 20e3           # pulse repetition frequency
+   fs = 20e6            # ADC rate
+   pulse_width = 0.5e-6 # tau
+
+   prp = 1 / prf                          # 50 us listening window
+   n = int(round(prp * fs))               # samples in that window
+
+   mod_t = np.arange(n) / fs
+   amp = np.zeros(n)
+   amp[mod_t < pulse_width] = 1.0         # transmitter on for the first tau
+
+   tx = Transmitter(
+       f=fc,                              # single tone: an unmodulated pulse
+       t=prp,                             # the whole interval, not the pulse
+       tx_power=40,
+       pulses=256,
+       channels=[{"location": (0, 0, 0), "mod_t": mod_t, "amp": amp}],
+   )
+
+   rx = Receiver(fs=fs, noise_figure=5, rf_gain=20, baseband_gain=30,
+                 channels=[{"location": (0, 0, 0)}])
+
+   radar = Radar(transmitter=tx, receiver=rx)
+
+``prp`` is not passed: it defaults to ``pulse_length``, which is already the
+full interval. Passing ``prp=1/prf`` explicitly is equivalent.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 42 22 36
+
+   * - Quantity
+     - Expression
+     - This example
+   * - Samples per pulse
+     - ``prp * fs``
+     - 1000
+   * - Transmit-on samples
+     - ``tau * fs``
+     - 10
+   * - Duty cycle
+     - ``tau / prp``
+     - 1 %
+   * - Max unambiguous range
+     - ``c * prp / 2``
+     - 7.49 km
+   * - Range resolution
+     - ``c * tau / 2``
+     - 75 m
+   * - Range per sample
+     - ``c / (2 * fs)``
+     - 7.5 m
+
+A target at range :math:`R` puts its echo at roughly sample
+:math:`2R f_s / c`, spread over the :math:`\tau f_s` samples the pulse
+occupies. A point target at 1500 m in the configuration above lands within one
+sample of index 200, which back-converts to 1491 m — inside a single 7.5 m
+range bin.
+
+How far ``mod_t`` should span
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The snippet above builds ``mod_t`` across one interval. Spanning the whole
+frame instead — ``np.arange(int(prp * pulses * fs)) / fs`` — is equally valid,
+and the choice decides what happens to a target beyond the unambiguous range
+:math:`c \cdot \text{prp} / 2`:
+
+.. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/waveform_pulsed_span.svg
+    :width: 100%
+    :alt: A one-period modulation table wraps and folds late echoes; a frame-long table does not
+
+    The modulation table is indexed by time within a pulse, so a one-period
+    table repeats every period while a frame-long table does not. A late echo
+    therefore reads a gated-on sample in the first case and a gated-off sample
+    in the second.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 39 39
+
+   * - ``mod_t`` spans
+     - One interval
+     - The whole frame
+   * - Length
+     - ``int(prp * fs)``
+     - ``int(prp * pulses * fs)``
+   * - Target beyond :math:`R_\text{max}`
+     - Folds back to :math:`R - c\,\text{prp}/2`, as real hardware does
+     - Returns exactly zero — never seen
+   * - Use when
+     - Range ambiguity is part of what you are studying
+     - You want only unambiguous returns, which is usually simpler
+
+With the 80 µs interval above and a target at 14 km, a one-interval table
+places the folded echo at samples 79–81, which is 2 km — where a real radar
+would report it. A frame-long table returns nothing for that target at all.
+
+.. note::
+
+   In builds before this was fixed, a round trip longer than the span of
+   ``mod_t`` also produced a spurious ghost at a lower sample: the table index
+   was biased by the table length only once before the remainder was taken, so
+   it could stay negative and read outside the array. The lookup now wraps
+   properly and a one-interval table reports the fold and nothing else. On an
+   older build, prefer a frame-long ``mod_t``, which never reaches outside the
+   table for a delay inside the frame.
+
+A chirped pulse
+~~~~~~~~~~~~~~~
+
+An unmodulated pulse trades range resolution against energy on target: making
+:math:`\tau` shorter sharpens the range profile but transmits less. Pulse
+compression breaks that trade by sweeping the frequency *within* the pulse.
+
+Since ``f`` and ``t`` are matched arrays, the sweep can be confined to the
+first :math:`\tau` and held flat for the remainder, which is exactly where
+``amp`` has already switched the transmitter off:
+
+.. code-block:: python
+
+   bandwidth = 10e6
+
+   tx = Transmitter(
+       f=[fc - bandwidth / 2, fc + bandwidth / 2, fc + bandwidth / 2],
+       t=[0, pulse_width, prp],
+       tx_power=40,
+       pulses=256,
+       channels=[{"location": (0, 0, 0), "mod_t": mod_t, "amp": amp}],
+   )
+
+The three points sweep across the pulse and then hold. ``bandwidth`` reports
+10 MHz and ``pulse_length`` is still the full 50 µs interval, so
+``samples_per_pulse`` is unchanged. Range resolution after matched filtering
+becomes :math:`c / 2B` — 15 m here, against 75 m for the rectangular pulse of
+the same duration.
+
+.. note::
+
+   The simulator returns the received echo, not a compressed range profile.
+   Matched filtering is a post-processing step you apply to
+   ``result["baseband"]`` — correlate each pulse against the transmitted
+   waveform, then continue with Doppler processing as usual.
+
+Practical notes
+~~~~~~~~~~~~~~~
+
+* **Eclipsing.** A target close enough that its echo returns while the
+  transmitter is still on falls inside the first :math:`\tau f_s` samples.
+  Real hardware is deaf there; the simulator is not, so those samples need
+  discarding by hand if you are modelling a system with a real duplexer.
+* **Duty cycle.** Realistic values are small — the SAR example on
+  `radarsimx.com <https://radarsimx.com/2026/06/30/pulse-radar-sar-imaging/>`_
+  gates 3 samples out of 120 000. Long windows at a high ``fs`` make
+  ``samples_per_pulse`` large, and memory scales with it.
+* **Range gating.** For long-range work, opening the window at the interval of
+  interest rather than at zero delay avoids sampling empty space; see
+  :doc:`stretch_processing`.
+* **Staggered PRF.** ``prp`` accepts an array, so the interval can vary pulse
+  to pulse to break Doppler ambiguity. Because ``t`` also sets the window
+  length, and ``prp >= pulse_length`` is enforced, the stagger can only extend
+  intervals beyond ``t[-1]``, never shorten them: set ``t`` to the *shortest*
+  interval you want and stagger upward from there. Every receive window keeps
+  the same length regardless, so a longer interval simply adds dead time after
+  the window closes.
+
+
 Transmit Channels
 -----------------
 

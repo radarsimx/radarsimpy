@@ -406,3 +406,116 @@ def test_pulsed_radar_with_doppler():
         ),
         1e-6,
     )
+
+
+def test_pulsed_radar_ambiguous_range_no_ghost():
+    """
+    A target beyond the unambiguous range must fold to the range a real radar
+    would report, and must not leave anything anywhere else.
+
+    The modulation LUT is indexed by the instant the arriving energy left the
+    transmitter, which is negative once the round trip outruns the sample
+    offset. Biasing that index by the table length before taking the remainder
+    left it negative whenever the round trip also outran the table itself, so
+    the lookup read before the start of the array and painted a ghost at a
+    lower sample. The ghost's level was whatever sat in memory -- once the same
+    magnitude as the real return, once 1e32 -- so this guards the amplitude as
+    well as the position.
+    """
+    light_speed = constants.c
+
+    fc = 10e9
+    fs = 6e6
+    prp = 80e-6  # unambiguous range 11.99 km
+    pulse_width = 334e-9
+
+    n_mod = int(prp * fs)
+    mod_t = np.arange(n_mod) / fs
+    amp = np.zeros_like(mod_t)
+    amp[mod_t <= pulse_width] = 1
+
+    tx = Transmitter(
+        f=fc,
+        t=prp,
+        tx_power=67,
+        pulses=4,
+        channels=[{"location": (0, 0, 0), "mod_t": mod_t, "amp": amp}],
+    )
+    rx = Receiver(
+        fs=fs,
+        noise_figure=12,
+        rf_gain=20,
+        load_resistor=500,
+        baseband_gain=30,
+        channels=[{"location": (0, 0, 0)}],
+    )
+    radar = Radar(transmitter=tx, receiver=rx)
+
+    target_range = 14000.0  # beyond c * prp / 2
+    result = sim_radar(radar, [{"location": (target_range, 0, 0), "rcs": 10}])
+    mag = np.abs(result["baseband"][0, 2])
+
+    # the fold a real radar reports
+    delay = 2 * target_range / light_speed
+    assert delay > prp, "target should be ambiguous for this test to mean anything"
+    fold_sample = (delay - prp) * fs
+
+    # the echo spans tau * fs samples, so allow the peak anywhere across it
+    peak = int(np.argmax(mag))
+    assert abs(peak - fold_sample) <= 3, (
+        f"folded echo peaks at sample {peak}, expected near {fold_sample:.0f}"
+    )
+
+    # nothing below the folded echo: the ghost sat at a lower sample index
+    carrying = np.flatnonzero(mag > mag.max() * 1e-3)
+    assert carrying.min() >= fold_sample - 3, (
+        f"energy at samples {carrying.tolist()} but the folded echo starts near "
+        f"{fold_sample:.0f}; an out-of-range LUT lookup is painting a ghost"
+    )
+
+    # and the level is physical, not whatever happened to be in memory
+    assert mag.max() < 1e-3, f"peak {mag.max():.3e} is not a physical return level"
+
+
+def test_pulsed_radar_frame_long_mod_t_drops_ambiguous_target():
+    """
+    Spanning ``mod_t`` across the whole frame instead of one interval stops the
+    table repeating, so a target beyond the unambiguous range is never gated on
+    and returns nothing at all. This is the other documented behaviour and must
+    stay distinct from the folding one above.
+    """
+    fc = 10e9
+    fs = 6e6
+    prp = 80e-6
+    pulse_width = 334e-9
+    pulses = 4
+
+    n_mod = int(prp * pulses * fs)  # the whole frame
+    mod_t = np.arange(n_mod) / fs
+    amp = np.zeros_like(mod_t)
+    amp[mod_t <= pulse_width] = 1
+
+    tx = Transmitter(
+        f=fc,
+        t=prp,
+        tx_power=67,
+        pulses=pulses,
+        channels=[{"location": (0, 0, 0), "mod_t": mod_t, "amp": amp}],
+    )
+    rx = Receiver(
+        fs=fs,
+        noise_figure=12,
+        rf_gain=20,
+        load_resistor=500,
+        baseband_gain=30,
+        channels=[{"location": (0, 0, 0)}],
+    )
+    radar = Radar(transmitter=tx, receiver=rx)
+
+    result = sim_radar(radar, [{"location": (14000.0, 0, 0), "rcs": 10}])
+    npt.assert_allclose(np.abs(result["baseband"][0, 2]), 0.0, atol=1e-30)
+
+    # a target inside the unambiguous range still comes through normally
+    result = sim_radar(radar, [{"location": (8000.0, 0, 0), "rcs": 10}])
+    mag = np.abs(result["baseband"][0, 2])
+    npt.assert_allclose(int(np.argmax(mag)), 2 * 8000.0 / constants.c * fs, atol=2)

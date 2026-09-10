@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 356" width="860" height="356"
+     role="img" aria-label="Pulsed radar timing: t spans the whole listening window while amp and mod_t gate the transmitter">
+  <title>Pulsed radar timing: t spans the whole listening window while amp and mod_t gate the transmitter</title>
+  <style>
+    .bg    { fill:#ffffff; stroke:#d0d7de; stroke-width:1 }
+    .lbl   { font:11.5px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#6b7280 }
+    .rowlb { font:600 12px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif }
+    .mono  { font:11px 'IBM Plex Mono',Consolas,'Courier New',monospace }
+    .code  { font:12.5px 'IBM Plex Mono',Consolas,'Courier New',monospace }
+    .tx    { fill:#1e73be }
+    .rx    { fill:#1a7f37 }
+    .ec    { fill:#cf4640 }
+    .ink   { fill:#0d1117 }
+    .axis  { stroke:#848d97; stroke-width:1.2 }
+    .brk   { stroke:#0d1117; stroke-width:1.1; fill:none }
+    .tick  { stroke:#1a7f37; stroke-width:1; opacity:0.5 }
+  </style>
+  <defs>
+    <marker id="pAx" markerWidth="9" markerHeight="8" refX="7.6" refY="3.2" orient="auto">
+      <path d="M0,0 L8,3.2 L0,6.4 z" fill="#848d97"/></marker>
+    <marker id="pEc" markerWidth="9" markerHeight="8" refX="7.6" refY="3.2" orient="auto">
+      <path d="M0,0 L8,3.2 L0,6.4 z" fill="#cf4640"/></marker>
+  </defs>
+
+  <rect class="bg" x="0.5" y="0.5" width="859" height="355" rx="8"/>
+
+  <!-- prp bracket -->
+  <path class="brk" d="M110,66 L110,56 L440,56 L440,66"/>
+  <rect x="228" y="46" width="94" height="18" fill="#ffffff"/>
+  <text class="code ink" x="275" y="60" text-anchor="middle">prp = t[-1]</text>
+
+  <!-- ===================== transmit lane ===================== -->
+  <text class="rowlb tx" x="96" y="132" text-anchor="end">transmit</text>
+  <line class="axis" x1="104" y1="150" x2="820" y2="150" marker-end="url(#pAx)"/>
+
+  <g fill="#1e73be" fill-opacity="0.18" stroke="#1e73be" stroke-width="1.8">
+    <rect x="110" y="104" width="20" height="46"/>
+    <rect x="440" y="104" width="20" height="46"/>
+  </g>
+  <g fill="#1e73be" fill-opacity="0.09" stroke="#1e73be" stroke-width="1.8" opacity="0.45">
+    <rect x="770" y="104" width="20" height="46"/>
+  </g>
+  <text class="mono tx" x="150" y="118">amp / mod_t gate the transmitter on</text>
+
+  <!-- tau bracket -->
+  <path class="brk" d="M110,158 L110,167 L130,167 L130,158"/>
+  <text class="code ink" x="120" y="186" text-anchor="middle">&#964;</text>
+  <text class="lbl" x="140" y="186">pulse width, set by <tspan class="mono tx">amp</tspan></text>
+
+  <!-- ===================== echoes ===================== -->
+  <g stroke="#cf4640" stroke-width="1.6" fill="none" stroke-dasharray="5 3" marker-end="url(#pEc)">
+    <line x1="458" y1="152" x2="536" y2="206"/>
+    <line x1="458" y1="152" x2="686" y2="206"/>
+  </g>
+  <text class="lbl ec" x="568" y="178">echoes arrive at 2R/c</text>
+
+  <!-- ===================== receive lane ===================== -->
+  <text class="rowlb rx" x="96" y="238" text-anchor="end">receive</text>
+
+  <rect x="110" y="212" width="330" height="46" rx="3"
+        fill="#1a7f37" fill-opacity="0.10" stroke="#1a7f37" stroke-width="1.8"/>
+  <rect x="440" y="212" width="330" height="46" rx="3"
+        fill="#1a7f37" fill-opacity="0.10" stroke="#1a7f37" stroke-width="1.8"/>
+  <rect x="770" y="212" width="42" height="46" rx="3"
+        fill="#1a7f37" fill-opacity="0.06" stroke="#1a7f37" stroke-width="1.8" opacity="0.45"/>
+
+  <text class="code ink" x="275" y="233" text-anchor="middle">pulse_length = t[-1]</text>
+  <text class="lbl"      x="275" y="249" text-anchor="middle">the window stays open for the whole period</text>
+
+  <!-- sample ticks -->
+  <g class="tick">
+    <line x1="134" y1="258" x2="134" y2="265"/><line x1="158" y1="258" x2="158" y2="265"/>
+    <line x1="182" y1="258" x2="182" y2="265"/><line x1="206" y1="258" x2="206" y2="265"/>
+    <line x1="230" y1="258" x2="230" y2="265"/><line x1="254" y1="258" x2="254" y2="265"/>
+    <line x1="278" y1="258" x2="278" y2="265"/><line x1="302" y1="258" x2="302" y2="265"/>
+    <line x1="326" y1="258" x2="326" y2="265"/><line x1="350" y1="258" x2="350" y2="265"/>
+    <line x1="374" y1="258" x2="374" y2="265"/><line x1="398" y1="258" x2="398" y2="265"/>
+    <line x1="422" y1="258" x2="422" y2="265"/>
+  </g>
+  <text class="code rx" x="275" y="284" text-anchor="middle">samples_per_pulse = t[-1] &#215; fs</text>
+
+  <text class="lbl" x="828" y="238" text-anchor="end">&#183; &#183; &#183;</text>
+
+  <!-- footnote -->
+  <text class="lbl" x="110" y="322">&#964; is drawn far wider than a real duty cycle &#8212; a 33 ns pulse in a 2 ms period is 3 samples out of 120&#8239;000.</text>
+</svg>
