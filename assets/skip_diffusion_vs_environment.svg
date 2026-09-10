@@ -2,23 +2,23 @@
      role="img" aria-label="How skip_diffusion and environment differ">
   <title>How skip_diffusion and environment differ</title>
   <style>
-    .bg    { fill:#ffffff; stroke:#d5d9e0; stroke-width:1 }
-    .panel { fill:#fafbfc; stroke:#dde1e7; stroke-width:1 }
-    .ttl   { font:600 17px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#14181f }
-    .sub   { font:13px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#5b6472 }
-    .lbl   { font:11.5px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#5b6472 }
-    .big   { font:600 12.5px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#14181f }
-    .cap   { font:12px 'Segoe UI',Helvetica,Arial,sans-serif; fill:#5b6472 }
+    .bg    { fill:#ffffff; stroke:#d0d7de; stroke-width:1 }
+    .panel { fill:#f6f8fa; stroke:#d8dee4; stroke-width:1 }
+    .ttl   { font:600 17px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#0d1117 }
+    .sub   { font:13px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#6b7280 }
+    .lbl   { font:11.5px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#6b7280 }
+    .big   { font:600 12.5px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#0d1117 }
+    .cap   { font:12px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#6b7280 }
     .code  { font:13px 'IBM Plex Mono',Consolas,'Courier New',monospace }
-    .mono  { font:12.5px 'IBM Plex Mono',Consolas,'Courier New',monospace; fill:#14181f }
-    .env   { fill:#0f8a7e }
-    .ray   { fill:#1919ff }
-    .tgt   { fill:#d61f1f }
-    .ink   { fill:#14181f }
+    .mono  { font:12.5px 'IBM Plex Mono',Consolas,'Courier New',monospace; fill:#0d1117 }
+    .env   { fill:#1a7f37 }
+    .ray   { fill:#1e73be }
+    .tgt   { fill:#cf4640 }
+    .ink   { fill:#0d1117 }
   </style>
   <defs>
     <marker id="cArr" markerWidth="8" markerHeight="7" refX="6.6" refY="2.8" orient="auto">
-      <path d="M0,0 L7,2.8 L0,5.6 z" fill="#1919ff"/>
+      <path d="M0,0 L7,2.8 L0,5.6 z" fill="#1e73be"/>
     </marker>
   </defs>
 
@@ -30,15 +30,15 @@
   <text class="code ink" x="225" y="98"  text-anchor="middle">"skip_diffusion": True</text>
   <text class="big"      x="225" y="120" text-anchor="middle">changes what the surface returns</text>
 
-  <line x1="120" y1="205" x2="330" y2="205" stroke="#0f8a7e" stroke-width="2.2"/>
-  <line x1="152" y1="152" x2="212" y2="201" stroke="#1919ff" stroke-width="1.7" opacity="0.75" marker-end="url(#cArr)"/>
-  <line x1="218" y1="201" x2="278" y2="152" stroke="#1919ff" stroke-width="1.7" opacity="0.75" marker-end="url(#cArr)"/>
-  <circle cx="215" cy="205" r="5.5" fill="#ffffff" stroke="#9aa2ae" stroke-width="1.8"/>
+  <line x1="120" y1="205" x2="330" y2="205" stroke="#1a7f37" stroke-width="2.2"/>
+  <line x1="152" y1="152" x2="212" y2="201" stroke="#1e73be" stroke-width="1.7" opacity="0.75" marker-end="url(#cArr)"/>
+  <line x1="218" y1="201" x2="278" y2="152" stroke="#1e73be" stroke-width="1.7" opacity="0.75" marker-end="url(#cArr)"/>
+  <circle cx="215" cy="205" r="5.5" fill="#ffffff" stroke="#848d97" stroke-width="1.8"/>
   <text class="lbl" x="225" y="230" text-anchor="middle">the ray is redirected, no return of its own is added</text>
 
-  <circle cx="50" cy="257" r="2.4" fill="#5b6472"/>
+  <circle cx="50" cy="257" r="2.4" fill="#6b7280"/>
   <text class="lbl" x="60" y="261">multi-bounce paths through the surface are preserved</text>
-  <circle cx="50" cy="278" r="2.4" fill="#5b6472"/>
+  <circle cx="50" cy="278" r="2.4" fill="#6b7280"/>
   <text class="lbl" x="60" y="282">for large flat reflectors, whose own return is negligible</text>
 
   <!-- ================= CARD 2 ================= -->
@@ -47,8 +47,8 @@
   <text class="big"      x="635" y="120" text-anchor="middle">changes how finely the surface is sampled</text>
 
   <text class="lbl tgt" x="562" y="177" text-anchor="end">target</text>
-  <line x1="574" y1="173" x2="800" y2="173" stroke="#d61f1f" stroke-width="2"/>
-  <g fill="#1919ff">
+  <line x1="574" y1="173" x2="800" y2="173" stroke="#cf4640" stroke-width="2"/>
+  <g fill="#1e73be">
     <circle cx="582" cy="173" r="2.6"/><circle cx="596" cy="173" r="2.6"/>
     <circle cx="610" cy="173" r="2.6"/><circle cx="624" cy="173" r="2.6"/>
     <circle cx="638" cy="173" r="2.6"/><circle cx="652" cy="173" r="2.6"/>
@@ -60,17 +60,17 @@
   </g>
 
   <text class="lbl env" x="562" y="215" text-anchor="end">environment</text>
-  <line x1="574" y1="211" x2="800" y2="211" stroke="#0f8a7e" stroke-width="2.2"/>
-  <g fill="#1919ff">
+  <line x1="574" y1="211" x2="800" y2="211" stroke="#1a7f37" stroke-width="2.2"/>
+  <g fill="#1e73be">
     <circle cx="588" cy="211" r="2.6"/><circle cx="638" cy="211" r="2.6"/>
     <circle cx="688" cy="211" r="2.6"/><circle cx="738" cy="211" r="2.6"/>
     <circle cx="788" cy="211" r="2.6"/>
   </g>
   <text class="lbl" x="687" y="236" text-anchor="middle">the same area, far fewer rays spent on it</text>
 
-  <circle cx="460" cy="257" r="2.4" fill="#5b6472"/>
+  <circle cx="460" cy="257" r="2.4" fill="#6b7280"/>
   <text class="lbl" x="470" y="261">what the surface sends back is unchanged, only coarser</text>
-  <circle cx="460" cy="278" r="2.4" fill="#5b6472"/>
+  <circle cx="460" cy="278" r="2.4" fill="#6b7280"/>
   <text class="lbl" x="470" y="282">for large surroundings that fill much of the field of view</text>
 
   <!-- ================= COMBINED ================= -->

@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 322" width="860" height="322"
+     role="img" aria-label="Receiver signal chain and the thermal-noise budget carried along it">
+  <title>Receiver signal chain and the thermal-noise budget carried along it</title>
+  <style>
+    .bg    { fill:#ffffff; stroke:#d0d7de; stroke-width:1 }
+    .panel { fill:#f6f8fa; stroke:#d8dee4; stroke-width:1 }
+    .blk   { fill:#1e73be; fill-opacity:0.07; stroke:#1e73be; stroke-width:2 }
+    .lo    { fill:#1a7f37; fill-opacity:0.08; stroke:#1a7f37; stroke-width:2 }
+    .lbl   { font:11.5px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#6b7280 }
+    .nm    { font:600 13px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#0d1117 }
+    .mono  { font:11px 'IBM Plex Mono',Consolas,'Courier New',monospace }
+    .eq    { font:12.5px 'IBM Plex Mono',Consolas,'Courier New',monospace; fill:#0d1117 }
+    .ray   { fill:#1e73be }
+    .env   { fill:#1a7f37 }
+    .wire  { stroke:#848d97; stroke-width:1.6; fill:none }
+  </style>
+  <defs>
+    <marker id="aw" markerWidth="9" markerHeight="8" refX="7.6" refY="3.2" orient="auto">
+      <path d="M0,0 L8,3.2 L0,6.4 z" fill="#848d97"/>
+    </marker>
+    <marker id="ag" markerWidth="9" markerHeight="8" refX="7.6" refY="3.2" orient="auto">
+      <path d="M0,0 L8,3.2 L0,6.4 z" fill="#1a7f37"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0.5" y="0.5" width="859" height="321" rx="8"/>
+
+  <!-- LO tap from the transmitter -->
+  <rect class="lo" x="328" y="14" width="148" height="30" rx="5"/>
+  <text class="nm" x="402" y="34" text-anchor="middle" fill="#1a7f37">Transmitter LO</text>
+  <line class="wire" x1="402" y1="44" x2="402" y2="68" stroke="#1a7f37" marker-end="url(#ag)"/>
+
+  <!-- blocks -->
+  <g>
+    <rect class="blk" x="36"  y="70" width="116" height="56" rx="5"/>
+    <rect class="blk" x="190" y="70" width="116" height="56" rx="5"/>
+    <rect class="blk" x="344" y="70" width="116" height="56" rx="5"/>
+    <rect class="blk" x="498" y="70" width="116" height="56" rx="5"/>
+    <rect class="blk" x="652" y="70" width="116" height="56" rx="5"/>
+  </g>
+  <g class="nm" text-anchor="middle">
+    <text x="94"  y="103">Rx antenna</text>
+    <text x="248" y="103">RF amp</text>
+    <text x="402" y="103">Mixer</text>
+    <text x="556" y="103">Baseband amp</text>
+    <text x="710" y="103">ADC</text>
+  </g>
+
+  <!-- wires -->
+  <g class="wire" marker-end="url(#aw)">
+    <line x1="152" y1="98" x2="186" y2="98"/>
+    <line x1="306" y1="98" x2="340" y2="98"/>
+    <line x1="460" y1="98" x2="494" y2="98"/>
+    <line x1="614" y1="98" x2="648" y2="98"/>
+    <line x1="768" y1="98" x2="806" y2="98"/>
+  </g>
+  <text class="mono ray" x="812" y="102">bb</text>
+
+  <!-- node markers -->
+  <g>
+    <circle cx="169" cy="76" r="9" fill="#ffffff" stroke="#1e73be" stroke-width="1.6"/>
+    <text class="mono ray" x="169" y="80" text-anchor="middle">1</text>
+    <circle cx="323" cy="76" r="9" fill="#ffffff" stroke="#1e73be" stroke-width="1.6"/>
+    <text class="mono ray" x="323" y="80" text-anchor="middle">2</text>
+    <circle cx="631" cy="76" r="9" fill="#ffffff" stroke="#1e73be" stroke-width="1.6"/>
+    <text class="mono ray" x="631" y="80" text-anchor="middle">3</text>
+    <circle cx="787" cy="76" r="9" fill="#ffffff" stroke="#1e73be" stroke-width="1.6"/>
+    <text class="mono ray" x="787" y="80" text-anchor="middle">4</text>
+  </g>
+
+  <!-- parameters under each block -->
+  <g class="mono ray" text-anchor="middle">
+    <text x="94"  y="145">channels[]: location,</text>
+    <text x="94"  y="159">polarization, patterns</text>
+    <text x="248" y="145">noise_figure</text>
+    <text x="248" y="159">rf_gain</text>
+    <text x="402" y="145">gate_delay</text>
+    <text x="556" y="145">baseband_gain</text>
+    <text x="556" y="159">load_resistor</text>
+    <text x="710" y="145">fs</text>
+    <text x="710" y="159">bb_type</text>
+  </g>
+  <text class="lbl" x="402" y="160" text-anchor="middle">deramp against the Tx chirp</text>
+
+  <!-- noise ledger -->
+  <rect class="panel" x="36" y="182" width="784" height="118" rx="6"/>
+  <g>
+    <circle cx="58" cy="203" r="8" fill="#ffffff" stroke="#1e73be" stroke-width="1.4"/>
+    <text class="mono ray" x="58" y="207" text-anchor="middle">1</text>
+    <circle cx="58" cy="226" r="8" fill="#ffffff" stroke="#1e73be" stroke-width="1.4"/>
+    <text class="mono ray" x="58" y="230" text-anchor="middle">2</text>
+    <circle cx="58" cy="249" r="8" fill="#ffffff" stroke="#1e73be" stroke-width="1.4"/>
+    <text class="mono ray" x="58" y="253" text-anchor="middle">3</text>
+    <circle cx="58" cy="272" r="8" fill="#ffffff" stroke="#1e73be" stroke-width="1.4"/>
+    <text class="mono ray" x="58" y="276" text-anchor="middle">4</text>
+  </g>
+  <g class="eq">
+    <text x="78" y="207">n1 = 10*log10(k_B * 290 * 1000) + 10*log10(noise_bandwidth)</text>
+    <text x="78" y="230">n2 = n1 + noise_figure + rf_gain</text>
+    <text x="78" y="253">n3 = n2 + baseband_gain</text>
+    <text x="78" y="276">sigma = sqrt(1e-3 * 10^(n3/10) * load_resistor)</text>
+  </g>
+  <g class="lbl" text-anchor="end">
+    <text x="806" y="207">dBm</text>
+    <text x="806" y="230">dBm</text>
+    <text x="806" y="253">dBm</text>
+    <text x="806" y="276">V &#8212; radar.sample_prop["noise"]</text>
+  </g>
+  <text class="lbl" x="78" y="294"><tspan class="mono ray">noise_bandwidth</tspan> = <tspan class="mono ray">fs</tspan> for complex baseband, <tspan class="mono ray">fs/2</tspan> for real</text>
+</svg>

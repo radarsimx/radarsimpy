@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 356" width="860" height="356"
+     role="img" aria-label="From Transmitter and Receiver, through Radar and sim_radar, to the baseband cube">
+  <title>From Transmitter and Receiver, through Radar and sim_radar, to the baseband cube</title>
+  <style>
+    .bg    { fill:#ffffff; stroke:#d0d7de; stroke-width:1 }
+    .boxT  { fill:#1e73be; fill-opacity:0.06; stroke:#1e73be; stroke-width:2 }
+    .boxR  { fill:#1a7f37; fill-opacity:0.06; stroke:#1a7f37; stroke-width:2 }
+    .boxC  { fill:#f6f8fa; stroke:#848d97; stroke-width:2 }
+    .boxO  { fill:#cf4640; fill-opacity:0.06; stroke:#cf4640; stroke-width:2 }
+    .hd    { font:600 13.5px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#0d1117 }
+    .grp   { font:11px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#848d97 }
+    .lbl   { font:11.5px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#6b7280 }
+    .mono  { font:11.5px 'IBM Plex Mono',Consolas,'Courier New',monospace; fill:#0d1117 }
+    .ray   { fill:#1e73be }
+    .env   { fill:#1a7f37 }
+    .tgt   { fill:#cf4640 }
+    .wire  { stroke:#848d97; stroke-width:1.8; fill:none }
+    .div   { stroke:#d0d7de; stroke-width:1 }
+  </style>
+  <defs>
+    <marker id="a1" markerWidth="10" markerHeight="9" refX="8.4" refY="3.6" orient="auto">
+      <path d="M0,0 L9,3.6 L0,7.2 z" fill="#848d97"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0.5" y="0.5" width="859" height="355" rx="8"/>
+
+  <!-- ============ Transmitter ============ -->
+  <rect class="boxT" x="20" y="22" width="214" height="146" rx="6"/>
+  <text class="hd ray" x="34" y="44">Transmitter</text>
+  <text class="grp" x="34" y="66">waveform</text>
+  <text class="mono" x="34" y="82">f, t, pulses, prp,</text>
+  <text class="mono" x="34" y="97">f_offset</text>
+  <text class="grp" x="34" y="118">RF</text>
+  <text class="mono" x="34" y="134">tx_power, pn_f, pn_power</text>
+  <text class="grp" x="34" y="152">array</text>
+  <text class="mono" x="80" y="152">channels[]  &#215; M</text>
+
+  <!-- ============ Receiver ============ -->
+  <rect class="boxR" x="20" y="188" width="214" height="146" rx="6"/>
+  <text class="hd env" x="34" y="210">Receiver</text>
+  <text class="grp" x="34" y="232">baseband</text>
+  <text class="mono" x="34" y="248">fs, bb_type, gate_delay</text>
+  <text class="grp" x="34" y="270">gain &amp; noise</text>
+  <text class="mono" x="34" y="286">noise_figure, rf_gain,</text>
+  <text class="mono" x="34" y="301" style="font-size:11px">baseband_gain, load_resistor</text>
+  <text class="grp" x="34" y="322">array</text>
+  <text class="mono" x="80" y="322">channels[]  &#215; N</text>
+
+  <!-- ============ Radar ============ -->
+  <line class="wire" x1="234" y1="95"  x2="268" y2="150" marker-end="url(#a1)"/>
+  <line class="wire" x1="234" y1="261" x2="268" y2="206" marker-end="url(#a1)"/>
+
+  <rect class="boxC" x="272" y="60" width="228" height="236" rx="6"/>
+  <text class="hd" x="286" y="82">Radar</text>
+  <text class="grp" x="286" y="104">platform &amp; timing</text>
+  <text class="mono" x="286" y="120">frame_time, seed</text>
+  <text class="mono" x="286" y="135">location, speed</text>
+  <text class="mono" x="286" y="150">rotation, rotation_rate</text>
+  <line class="div" x1="286" y1="166" x2="486" y2="166"/>
+  <text class="grp" x="286" y="184">derived</text>
+  <text class="mono" x="286" y="200">samples_per_pulse</text>
+  <text class="lbl" x="286" y="215">= pulse_length &#215; fs</text>
+  <text class="mono" x="286" y="235">virtual_array</text>
+  <text class="lbl" x="286" y="250">M &#215; N elements</text>
+  <text class="mono" x="286" y="270">timestamp</text>
+  <text class="lbl" x="286" y="285">[channels, pulses, samples]</text>
+
+  <!-- ============ sim_radar ============ -->
+  <line class="wire" x1="500" y1="178" x2="534" y2="178" marker-end="url(#a1)"/>
+
+  <rect class="boxC" x="538" y="94" width="160" height="168" rx="6"/>
+  <text class="hd" x="552" y="116">sim_radar()</text>
+  <text class="grp" x="552" y="138">scene</text>
+  <text class="mono" x="552" y="154">targets</text>
+  <text class="grp" x="552" y="176">ray tracing</text>
+  <text class="mono" x="552" y="192">density, level</text>
+  <text class="mono" x="552" y="207">ray_filter</text>
+  <text class="grp" x="552" y="229">run</text>
+  <text class="mono" x="552" y="245">device, interf</text>
+
+  <!-- ============ output ============ -->
+  <line class="wire" x1="698" y1="178" x2="726" y2="178" marker-end="url(#a1)"/>
+
+  <rect class="boxO" x="730" y="94" width="110" height="168" rx="6"/>
+  <text class="hd tgt" x="744" y="116">result</text>
+  <text class="mono" x="744" y="146">baseband</text>
+  <text class="mono" x="744" y="176">noise</text>
+  <text class="mono" x="744" y="206" style="font-size:10.5px">interference</text>
+  <text class="mono" x="744" y="236">timestamp</text>
+</svg>

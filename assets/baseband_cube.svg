@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 280" width="860" height="280"
+     role="img" aria-label="MIMO virtual array and the shape of the returned baseband array">
+  <title>MIMO virtual array and the shape of the returned baseband array</title>
+  <style>
+    .bg    { fill:#ffffff; stroke:#d0d7de; stroke-width:1 }
+    .panel { fill:#f6f8fa; stroke:#d8dee4; stroke-width:1 }
+    .lbl   { font:11.5px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#6b7280 }
+    .code  { font:12.5px 'IBM Plex Mono',Consolas,'Courier New',monospace }
+    .mono  { font:11px 'IBM Plex Mono',Consolas,'Courier New',monospace }
+    .ray   { fill:#1e73be }
+    .env   { fill:#1a7f37 }
+    .ink   { fill:#0d1117 }
+    .axis  { stroke:#848d97; stroke-width:1.2 }
+  </style>
+  <defs>
+    <marker id="ac" markerWidth="9" markerHeight="8" refX="7.6" refY="3.2" orient="auto">
+      <path d="M0,0 L8,3.2 L0,6.4 z" fill="#848d97"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0.5" y="0.5" width="859" height="279" rx="8"/>
+
+  <!-- ================= virtual array ================= -->
+  <rect class="panel" x="14.5" y="14.5" width="410" height="250" rx="6"/>
+  <text class="code ink" x="219" y="40" text-anchor="middle">radar.array_prop["virtual_array"]</text>
+  <text class="lbl"     x="219" y="59" text-anchor="middle">M transmit &#215; N receive &#8594; M&#183;N virtual elements</text>
+
+  <text class="mono ray" x="34" y="96">Tx &#215; 2</text>
+  <g fill="#1e73be" fill-opacity="0.18" stroke="#1e73be" stroke-width="1.8">
+    <rect x="117" y="85" width="14" height="14"/>
+    <rect x="277" y="85" width="14" height="14"/>
+  </g>
+
+  <text class="mono env" x="34" y="144">Rx &#215; 4</text>
+  <g fill="#1a7f37" fill-opacity="0.18" stroke="#1a7f37" stroke-width="1.8">
+    <circle cx="124" cy="140" r="7"/><circle cx="164" cy="140" r="7"/>
+    <circle cx="204" cy="140" r="7"/><circle cx="244" cy="140" r="7"/>
+  </g>
+
+  <text class="lbl" x="219" y="176" text-anchor="middle">every Tx location + every Rx location</text>
+  <line class="axis" x1="219" y1="182" x2="219" y2="194" marker-end="url(#ac)"/>
+
+  <text class="mono ink" x="34" y="216">virtual &#215; 8</text>
+  <g fill="#0d1117" fill-opacity="0.12" stroke="#0d1117" stroke-width="1.6">
+    <path d="M124,205 l8,8 l-8,8 l-8,-8 z"/><path d="M164,205 l8,8 l-8,8 l-8,-8 z"/>
+    <path d="M204,205 l8,8 l-8,8 l-8,-8 z"/><path d="M244,205 l8,8 l-8,8 l-8,-8 z"/>
+    <path d="M284,205 l8,8 l-8,8 l-8,-8 z"/><path d="M324,205 l8,8 l-8,8 l-8,-8 z"/>
+    <path d="M364,205 l8,8 l-8,8 l-8,-8 z"/><path d="M404,205 l8,8 l-8,8 l-8,-8 z"/>
+  </g>
+  <g class="mono ink" text-anchor="middle" opacity="0.75">
+    <text x="124" y="236">0</text><text x="164" y="236">1</text><text x="204" y="236">2</text>
+    <text x="244" y="236">3</text><text x="284" y="236">4</text><text x="324" y="236">5</text>
+    <text x="364" y="236">6</text><text x="404" y="236">7</text>
+  </g>
+  <text class="lbl" x="219" y="256" text-anchor="middle">channel <tspan class="mono ink">n</tspan> = <tspan class="mono ray">Tx[n // N]</tspan> &#8594; <tspan class="mono env">Rx[n % N]</tspan></text>
+
+  <!-- ================= baseband cube ================= -->
+  <rect class="panel" x="435.5" y="14.5" width="410" height="250" rx="6"/>
+  <text class="code ink" x="640" y="40" text-anchor="middle">result["baseband"]</text>
+  <text class="lbl"     x="640" y="59" text-anchor="middle">one array of shape [channels, pulses, samples]</text>
+
+  <!-- cube -->
+  <polygon points="500,126 534,96 764,96 730,126" fill="#1e73be" fill-opacity="0.10" stroke="#1e73be" stroke-width="1.8"/>
+  <polygon points="730,126 764,96 764,196 730,226" fill="#1e73be" fill-opacity="0.16" stroke="#1e73be" stroke-width="1.8"/>
+  <rect x="500" y="126" width="230" height="100" fill="#1e73be" fill-opacity="0.05" stroke="#1e73be" stroke-width="1.8"/>
+  <g stroke="#1e73be" stroke-width="0.7" opacity="0.45">
+    <line x1="538" y1="126" x2="538" y2="226"/><line x1="576" y1="126" x2="576" y2="226"/>
+    <line x1="614" y1="126" x2="614" y2="226"/><line x1="652" y1="126" x2="652" y2="226"/>
+    <line x1="691" y1="126" x2="691" y2="226"/>
+    <line x1="500" y1="151" x2="730" y2="151"/><line x1="500" y1="176" x2="730" y2="176"/>
+    <line x1="500" y1="201" x2="730" y2="201"/>
+  </g>
+
+  <!-- axis labels -->
+  <line class="axis" x1="500" y1="240" x2="730" y2="240" marker-end="url(#ac)"/>
+  <text class="mono ray" x="615" y="257" text-anchor="middle">samples</text>
+  <line class="axis" x1="488" y1="126" x2="488" y2="226" marker-end="url(#ac)"/>
+  <text class="mono ray" x="482" y="176" text-anchor="middle" transform="rotate(-90 482 176)">pulses</text>
+  <line class="axis" x1="742" y1="118" x2="778" y2="86" marker-end="url(#ac)"/>
+  <text class="mono ray" x="830" y="82" text-anchor="end">channels &#215; frames</text>
+
+  <text class="lbl" x="640" y="257" text-anchor="middle" opacity="0"> </text>
+</svg>

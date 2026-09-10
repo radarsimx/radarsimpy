@@ -16,6 +16,7 @@ configuring the simulator for your scenario.
    :maxdepth: 2
    :caption: Concepts & Conventions
 
+   system_model
    coordinate_systems
    doppler_convention
 
@@ -23,6 +24,8 @@ configuring the simulator for your scenario.
    :maxdepth: 2
    :caption: Simulation Guides
 
+   transmitter
+   receiver
    noise
    ray_tracing_simulation
    animated_targets

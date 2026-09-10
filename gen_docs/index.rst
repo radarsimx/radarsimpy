@@ -33,11 +33,14 @@ Step-by-step guides to help you get started with RadarSimPy and understand key c
 
 **Concepts & Conventions**
 
+* :doc:`user_guide/system_model` - Transmitter, Receiver and Radar, and the shape of the output
 * :doc:`user_guide/coordinate_systems` - Global and local frames, Euler angles, azimuth and elevation
 * :doc:`user_guide/doppler_convention` - The sign of the Doppler frequency, and how to convert it
 
 **Simulation Guides**
 
+* :doc:`user_guide/transmitter` - Waveform, pulse train, modulation and the transmit array
+* :doc:`user_guide/receiver` - Sampling, baseband type, noise budget, range gate and the receive array
 * :doc:`user_guide/noise` - Receiver thermal noise and transmitter phase noise
 * :doc:`user_guide/ray_tracing_simulation` - Ray density, fidelity level and target flags for 3D meshes
 * :doc:`user_guide/animated_targets` - Driving targets from keyframed glTF 2.0 / GLB motion
