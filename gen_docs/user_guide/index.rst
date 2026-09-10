@@ -5,7 +5,7 @@ Guides for installing RadarSimPy, understanding the conventions it follows, and
 configuring the simulator for your scenario.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Getting Started
 
    overview
@@ -13,7 +13,7 @@ configuring the simulator for your scenario.
    installation
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Concepts & Conventions
 
    system_model
@@ -21,7 +21,7 @@ configuring the simulator for your scenario.
    doppler_convention
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Simulation Guides
 
    transmitter
@@ -32,7 +32,7 @@ configuring the simulator for your scenario.
    stretch_processing
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Resources & Development
 
    examples
