@@ -9,6 +9,22 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - `tests/test_system_back_propagation.py`, which states back propagation and the reflection filter as properties rather than stored numbers: the flag is inert without multipath, what it adds lands at the path length it stands for, a scene of only skipped surfaces is silent, and every reflection band summed reconstructs the unfiltered run. `benchmarks/scenes.py` gained multi-target scenes to go with them, and the reference capture two cases that are sensitive to back propagation by measurement -- the pre-existing `sphere_backprop` moves by exactly zero and is the negative control
+
+### Fixed
+
+- `sim_radar(..., back_propagating=True)` no longer reports multi-bounce returns at too short a range. Back propagation follows a ray out, scatters at a hit point and sends the field back down the same chain, so the round trip includes that chain twice; the return leg was being measured from the ray's first hit instead, which dropped the stretch between there and the scattering point. On two plates 30 m and 20 m from the radar and 20 m apart, the back-propagated return appeared at 40 m rather than its true 50 m. Only affects `back_propagating=True`; everything else is bit-identical
+
+### Changed
+
+- `sim_radar(..., back_propagating=True)` is redesigned. It used to run a second ray-tracing and baseband pass that rewrote the traced rays in place; a return path is now described by the scattering point it belongs to, so both kinds of return are computed together. Three things change for a user: a return that reflects on its way out is checked against the surfaces it claims to reflect off, instead of being assumed to close; `ray_filter` counts such a path at its true length, where a seven-bounce return was previously filtered as if it were four; and returns are only built for rays that left the scene, not for rays the trace depth stopped. Scenes that leave the flag off are bit-identical, and so is any scene where rays do not bounce -- a single convex target returns exactly what it did before
+- `ray_filter` counts reflections end to end, including those a back-propagated return takes on its way out. `ray_filter[1]` continues to cap trace depth
+
+---
+
+## [15.4.0] - 2026-09-09
+
+### Added
+
 - `radarsimpy.animation_kit`, which turns a keyframe-animated glTF 2.0 / GLB model into ordinary target dictionaries. Each animated node becomes its own target whose `location`, `speed`, `rotation` and `rotation_rate` are sampled at `radar.time_prop["timestamp"]`, so a spinning rotor, a turning wheel or a keyframed flight path is simulated from the motion authored in the file instead of being re-derived by hand. Velocity and angular rate come from the analytic derivative of the keyframe interpolation, not from differencing the sample grid, because the timestamp restarts at every channel and frame. `STEP`, `LINEAR` and `CUBICSPLINE` samplers, nested node hierarchies and the glTF Y-up to RadarSimPy Z-up conversion are handled; skinning, morph targets and animated scale raise a descriptive `NotImplementedError`, since the ray tracer transforms each target rigidly. Requires the optional `pygltflib` package, discovered at runtime the same way the mesh backends are
 - `radarsimpy.mesh_kit.load_mesh` accepts an in-memory `{"points": ..., "cells": ...}` dictionary in place of a file path, so generated geometry can be simulated without a temporary file. This is how `animation_kit` hands over the parts it extracts from an animated model
 - `gltf` pytest marker, which skips the animated-model tests when `pygltflib` is not installed
@@ -27,13 +43,10 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
-- `sim_radar(..., back_propagating=True)` no longer reports multi-bounce returns at too short a range. Back propagation follows a ray out, scatters at a hit point and sends the field back down the same chain, so the round trip includes that chain twice; the return leg was being measured from the ray's first hit instead, which dropped the stretch between there and the scattering point. On two plates 30 m and 20 m from the radar and 20 m apart, the back-propagated return appeared at 40 m rather than its true 50 m. Only affects `back_propagating=True`; everything else is bit-identical
 - `radarsimpy.mesh_kit.import_mesh_module` docstring listed the backend search order as pyvista first; the code has always tried trimesh first
 
 ### Changed
 
-- `sim_radar(..., back_propagating=True)` is redesigned. It used to run a second ray-tracing and baseband pass that rewrote the traced rays in place; a return path is now described by the scattering point it belongs to, so both kinds of return are computed together. Three things change for a user: a return that reflects on its way out is checked against the surfaces it claims to reflect off, instead of being assumed to close; `ray_filter` counts such a path at its true length, where a seven-bounce return was previously filtered as if it were four; and returns are only built for rays that left the scene, not for rays the trace depth stopped. Scenes that leave the flag off are bit-identical, and so is any scene where rays do not bounce -- a single convex target returns exactly what it did before
-- `ray_filter` counts reflections end to end, including those a back-propagated return takes on its way out. `ray_filter[1]` continues to cap trace depth
 - Substantially faster mesh (SBR) radar simulation, with baseband output unchanged. Measured against the previous release on the benchmark sweep: **GPU 1.1x-8.2x** (RTX 3050, CUDA 13.3) and **CPU 2.9x-6.3x** (16 logical cores), with `sim_radar(..., level="sample")` dropping from 10.7 s to 1.7 s on the CPU path. The CPU path's output is bit-identical to before and reproducible from run to run; the GPU path moves by ~1e-15 relative, which is atomicAdd ordering. See the `radarsimcpp` changelog for the individual changes
 - A GPU-enabled build now has OpenMP for its host code paths, so `sim_radar(..., device="cpu")` on such a build is no longer single-threaded. It was 64.9 s on a scene a CPU-only build ran in 3.1 s; it is now 0.64 s. The `device` docstring no longer carries the performance caveat, and the no-CUDA-device `RuntimeWarning` no longer mentions it
 - `sim_rcs` is substantially faster on scenes large enough to exceed the ray-pool budget. The per-tile ray count was capped by a constant that did not account for the size of a ray, so a 5x5 m plate at 77 GHz with density 1 asked for a single 4.97 GB tile; on a 4 GB card that oversubscribes and pages over PCIe rather than failing. 2.69 s to 0.23 s on an RTX 3050, 2.16 s to 1.00 s on the host. Host RCS is also 1.2x-1.5x faster from parallelizing its ray pool, and stays bit-reproducible run to run
