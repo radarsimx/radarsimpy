@@ -244,6 +244,59 @@ modulation scheme is to make that sum separable again after digitising. The
 simulator hands you the *result* of a perfect separation and skips the sum, so
 when you want the superposition you have to build it yourself.
 
+Why it works this way
+~~~~~~~~~~~~~~~~~~~~~
+
+There is no MIMO mode switch in the API. TDM, CDM, DDM and intra-pulse coding
+are not options you select — they are what emerges from combining a per-channel
+``delay``, a ``pulse_phs`` sequence, a ``mod_t`` / ``phs`` table and
+``f_offset`` (:doc:`transmitter`). That is the point of building the
+transmitter out of primitives: it lets you model a scheme the library has never
+heard of. But it also means the simulator has no way to infer which scheme you
+had in mind. It cannot know which transmitters are meant to overlap, nor how
+you intend to pull them apart again, so it does not guess.
+
+The same choice is what puts unusual waveforms within reach. ``f`` and ``t``
+describe an arbitrary frequency-versus-time law instead of selecting from a
+list, and ``mod_t`` / ``amp`` / ``phs`` carry an arbitrary complex envelope
+through the pulse. Between them they *describe* a waveform rather than name
+one: non-linear FM, stepped frequency, phase-coded PMCW, an OFDM symbol built
+by loading subcarriers and taking an IFFT — and, on the same terms, schemes
+that do not exist yet. The simulator never needs to have heard of a waveform
+for it to be simulated; the waveform only has to be expressible as
+:math:`f(t)` and a complex envelope.
+
+.. note::
+
+   One boundary is worth knowing about. The fast-time table is indexed by time
+   *within* a pulse, so it repeats identically from pulse to pulse. A single
+   symbol — one OFDM symbol, one phase code — is direct. A frame that carries
+   *different* data in every symbol, as a full OFDM data frame or an OTFS grid
+   does, is not expressible in a single call: build it from several and
+   assemble the frame yourself. That this works at all is the same property
+   again — nothing comes back pre-mixed.
+
+The asymmetry settles the question. Superimposing channels is a one-line sum.
+Recovering the individual paths from a sum is, in general, impossible — and no
+more possible for the simulator than for you. So ``sim_radar`` returns the
+finest decomposition it computed and leaves composition to the caller, where
+the knowledge of the scheme actually lives.
+
+The same rule shapes the rest of the return value. ``baseband`` holds the
+target response with no thermal noise in it at all, while ``noise`` and
+``interference`` come back as separate arrays of the same shape. Nothing is
+pre-mixed. You add the components you want and omit the ones you do not, which
+is what makes it straightforward to compute a noise-free reference, isolate an
+interference contribution, or take a single transmit–receive path on its own to
+check a geometry.
+
+Keeping the paths apart costs nothing, either. Every Tx–Rx pair already has its
+own delay, Doppler, antenna-pattern weighting and polarization, so the engine
+evaluates it separately whether or not the result is summed afterwards. And
+because ``timestamp`` carries the same ``[channel, pulse, sample]`` layout, the
+per-channel outputs stay aligned with per-channel time bases — which genuinely
+differ the moment a transmitter is given a ``delay``.
+
 Building the physical receive signal
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

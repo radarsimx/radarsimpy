@@ -222,6 +222,13 @@ those instants. The profile is sampled with a zero-order hold — the value in
 force at a given instant is the one from the nearest preceding breakpoint, not
 an interpolation — and it repeats identically in every pulse.
 
+Together these three are an arbitrary complex envelope, which is what makes
+waveforms outside the FM family reachable: a phase code, a shaped pulse, or an
+OFDM symbol obtained by loading subcarriers and taking an IFFT all reduce to
+``amp`` and ``phs`` sampled on the ``mod_t`` grid. Because the table repeats
+per pulse, one symbol is direct while a frame carrying different data in each
+symbol takes more than one call — see :doc:`system_model`.
+
 .. important::
 
    ``mod_t`` must be **equally spaced and increasing**. The simulator derives
