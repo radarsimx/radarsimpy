@@ -1,25 +1,26 @@
 """
-Accuracy and speed A/B of the GPU baseband kernel's precision modes.
+Accuracy and speed of the mesh baseband kernel across precision builds.
 
-The mesh simulator's GPU baseband kernel can be switched at run time with the
-``RADARSIMX_BB_PRECISION`` environment variable:
+Which quantities the mesh baseband kernel evaluates in double follows the
+simulator's template types: the precision-critical ones (absolute range, delay,
+gate and the waveform phase difference) use ``H``, everything else ``L``. On the
+Python side ``L`` is ``float_t`` in ``src/radarsimpy/includes/type_def.pxd``:
 
-- ``double``      the all-FP64 reference kernel (the default)
-- ``mixed``       FP64 only for the absolute range/delay and the waveform phase
-                  difference; everything else in float
-- ``float_naive`` a control with range, delay and phase forced to float, to
-                  show what the split in ``mixed`` protects against
+- ``ctypedef float float_t``   -> mixed precision (the default build)
+- ``ctypedef double float_t``  -> all-FP64, the reference
 
-Every simulation runs in its own subprocess with the variable set there, so a
-mode can never leak into the next run and all modes are timed from one binary.
-Timing rounds interleave the modes and alternate their order, because absolute
-GPU wall times on a laptop drift by a few percent across minutes; only paired,
-same-round differences are reported.
+So a comparison is between two builds. Capture each, then compare::
 
-Usage::
+    # build with float_t = double
+    python benchmarks/precision_ab.py capture --out fp64.npz
+    # build with float_t = float
+    python benchmarks/precision_ab.py capture --out mixed.npz
+    python benchmarks/precision_ab.py compare fp64.npz mixed.npz
 
-    python benchmarks/precision_ab.py accuracy --out-dir precision_out
-    python benchmarks/precision_ab.py speed --rounds 4 --out-dir precision_out
+``capture`` runs every accuracy scene once and each speed scene ``--rounds``
+times in one process, after a warm-up that pays for CUDA context creation.
+Absolute GPU wall times on a laptop drift by a few percent between builds, so
+only speed differences well outside that are meaningful here.
 
 ---
 
@@ -32,7 +33,6 @@ Usage::
 import argparse
 import json
 import os
-import subprocess
 import sys
 import time
 
@@ -47,9 +47,6 @@ import scenes  # noqa: E402  (needs the path insert above)
 from capture_reference import CASES as REFERENCE_CASES  # noqa: E402
 
 from radarsimpy import Radar, Receiver, Transmitter  # noqa: E402
-
-MODES = ["double", "mixed", "float_naive"]
-
 
 # --------------------------------------------------------------------------
 # Scenes
@@ -271,43 +268,6 @@ SPEED_SCENES = ["timing_ball", "timing_turbine"]
 
 
 # --------------------------------------------------------------------------
-# Worker: one simulation, in its own process
-# --------------------------------------------------------------------------
-
-
-def worker(scene, out_path):
-    """Run one scene on the GPU and report its wall time as a JSON line."""
-    # pylint: disable=import-outside-toplevel
-    from radarsimpy.simulator import sim_radar  # pylint: disable=no-name-in-module
-
-    # Pay CUDA context creation outside the timed region.
-    warm_radar, warm_targets, _ = build_scene("ref:plate_normal")
-    sim_radar(warm_radar, warm_targets, density=0.1, device="gpu")
-
-    radar, targets, sim_kw = build_scene(scene)
-    start = time.perf_counter()
-    result = sim_radar(radar, targets, device="gpu", **sim_kw)
-    elapsed = time.perf_counter() - start
-
-    if out_path:
-        np.save(out_path, np.asarray(result["baseband"]))
-    print(json.dumps({"scene": scene, "time": elapsed}))
-
-
-def run_worker(mode, scene, out_path=None):
-    """Launch a worker with ``RADARSIMX_BB_PRECISION=mode``; returns seconds."""
-    env = dict(os.environ, RADARSIMX_BB_PRECISION=mode)
-    cmd = [sys.executable, os.path.abspath(__file__), "worker", scene]
-    if out_path:
-        cmd += ["--npy", out_path]
-    proc = subprocess.run(cmd, env=env, capture_output=True, text=True, check=False)
-    if proc.returncode != 0:
-        raise RuntimeError(f"{mode}/{scene} failed:\n{proc.stdout}\n{proc.stderr}")
-    line = [ln for ln in proc.stdout.splitlines() if ln.startswith("{")][-1]
-    return json.loads(line)["time"]
-
-
-# --------------------------------------------------------------------------
 # Metrics
 # --------------------------------------------------------------------------
 
@@ -390,89 +350,79 @@ def phase_smoothness(bb):
 # --------------------------------------------------------------------------
 
 
-def accuracy(out_dir, scenes_to_run, modes):
-    os.makedirs(out_dir, exist_ok=True)
+def capture(out_path, device, rounds):
+    """Run every scene on the installed build and save basebands and times."""
+    # pylint: disable=import-outside-toplevel
+    from radarsimpy.simulator import sim_radar  # pylint: disable=no-name-in-module
+
+    # Pay CUDA context creation outside every timed region.
+    warm_radar, warm_targets, _ = build_scene("ref:plate_normal")
+    sim_radar(warm_radar, warm_targets, density=0.1, device=device)
+
+    saved = {}
+    for scene in dict.fromkeys(ACCURACY_SCENES + SPEED_SCENES):
+        runs = rounds if scene in SPEED_SCENES else 1
+        times = []
+        for _ in range(runs):
+            radar, targets, sim_kw = build_scene(scene)
+            start = time.perf_counter()
+            result = sim_radar(radar, targets, device=device, **sim_kw)
+            times.append(time.perf_counter() - start)
+        saved[f"bb:{scene}"] = np.asarray(result["baseband"])
+        saved[f"t:{scene}"] = np.asarray(times)
+        print(f"  {scene:30} {np.median(times):8.3f} s", flush=True)
+
+    np.savez(out_path, **saved)
+    print(f"wrote {out_path}")
+
+
+def compare(ref_path, test_path, json_out=None):
+    """Accuracy and speed of ``test_path`` against the ``ref_path`` capture."""
+    ref = np.load(ref_path)
+    test = np.load(test_path)
     table = {}
-    for scene in scenes_to_run:
-        safe = scene.replace(":", "_")
-        arrays = {}
-        for mode in modes:
-            path = os.path.join(out_dir, f"{safe}__{mode}.npy")
-            run_worker(mode, scene, path)
-            arrays[mode] = np.load(path)
-        row = {"shape": list(arrays["double"].shape)}
-        row["double"] = phase_smoothness(arrays["double"])
-        for mode in modes:
-            if mode == "double":
-                continue
-            row[mode] = metrics(arrays["double"], arrays[mode])
-            row[mode].update(phase_smoothness(arrays[mode]))
+    print(f"{'scene':30} {'rel L2':>9} {'RD dBc':>8} {'phase RMS deg':>14} "
+          f"{'time ref':>9} {'time test':>9} {'x':>6}")
+    for key in ref.files:
+        if not key.startswith("bb:") or key not in test.files:
+            continue
+        scene = key[3:]
+        row = metrics(ref[key], test[key])
+        row.update({f"test_{k}": v for k, v in phase_smoothness(test[key]).items()})
+        row.update({f"ref_{k}": v for k, v in phase_smoothness(ref[key]).items()})
+        t_ref = float(np.median(ref[f"t:{scene}"]))
+        t_test = float(np.median(test[f"t:{scene}"]))
+        row.update({"time_ref_s": t_ref, "time_test_s": t_test,
+                    "shape": list(ref[key].shape)})
         table[scene] = row
-        print(f"{scene}: {json.dumps(row)}", flush=True)
-
-    with open(os.path.join(out_dir, "accuracy.json"), "w", encoding="utf-8") as f:
-        json.dump(table, f, indent=2)
-
-
-def speed(out_dir, scenes_to_run, modes, rounds):
-    os.makedirs(out_dir, exist_ok=True)
-    results = {scene: {mode: [] for mode in modes} for scene in scenes_to_run}
-    for rnd in range(rounds):
-        order = modes if rnd % 2 == 0 else list(reversed(modes))
-        for scene in scenes_to_run:
-            for mode in order:
-                elapsed = run_worker(mode, scene)
-                results[scene][mode].append(elapsed)
-                print(f"round {rnd} {scene:16} {mode:12} {elapsed:8.3f} s", flush=True)
-
-    summary = {}
-    for scene, per_mode in results.items():
-        base = np.array(per_mode["double"])
-        summary[scene] = {"times": per_mode}
-        for mode in modes:
-            t = np.array(per_mode[mode])
-            summary[scene][mode] = {
-                "median_s": float(np.median(t)),
-                "speedup_paired": [float(b / x) for b, x in zip(base, t)],
-            }
-        print(f"{scene}: " + ", ".join(
-            f"{m} median {summary[scene][m]['median_s']:.3f} s "
-            f"(x{np.median(summary[scene][m]['speedup_paired']):.2f})"
-            for m in modes
-        ))
-
-    with open(os.path.join(out_dir, "speed.json"), "w", encoding="utf-8") as f:
-        json.dump(summary, f, indent=2)
+        print(f"{scene:30} {row['rel_l2']:9.2e} {row['rd_diff_dbc']:8.1f} "
+              f"{row.get('phase_err_rms_deg', 0.0):14.2e} "
+              f"{t_ref:9.3f} {t_test:9.3f} {t_ref / t_test:6.2f}")
+    if json_out:
+        with open(json_out, "w", encoding="utf-8") as f:
+            json.dump(table, f, indent=2)
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     sub = parser.add_subparsers(dest="cmd", required=True)
 
-    w = sub.add_parser("worker")
-    w.add_argument("scene")
-    w.add_argument("--npy")
+    c = sub.add_parser("capture", help="run all scenes on the installed build")
+    c.add_argument("--out", required=True, help=".npz file to write")
+    c.add_argument("--device", default="gpu", choices=["cpu", "gpu"])
+    c.add_argument("--rounds", type=int, default=4,
+                   help="timed repeats of each speed scene")
 
-    a = sub.add_parser("accuracy")
-    a.add_argument("--out-dir", default="precision_out")
-    a.add_argument("--scene", nargs="+", default=ACCURACY_SCENES)
-    a.add_argument("--mode", nargs="+", default=MODES)
-
-    s = sub.add_parser("speed")
-    s.add_argument("--out-dir", default="precision_out")
-    s.add_argument("--scene", nargs="+", default=SPEED_SCENES)
-    s.add_argument("--mode", nargs="+", default=MODES)
-    s.add_argument("--rounds", type=int, default=4)
+    d = sub.add_parser("compare", help="diff a capture against a reference")
+    d.add_argument("ref", help="capture from the float_t = double build")
+    d.add_argument("test", help="capture to evaluate")
+    d.add_argument("--json", help="also write the table as JSON")
 
     args = parser.parse_args()
-    if args.cmd == "worker":
-        worker(args.scene, args.npy)
-    elif args.cmd == "accuracy":
-        if "double" not in args.mode:
-            parser.error("accuracy needs the double mode as its reference")
-        accuracy(args.out_dir, args.scene, args.mode)
+    if args.cmd == "capture":
+        capture(args.out, args.device, args.rounds)
     else:
-        speed(args.out_dir, args.scene, args.mode, args.rounds)
+        compare(args.ref, args.test, args.json)
 
 
 if __name__ == "__main__":

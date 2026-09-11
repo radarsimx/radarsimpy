@@ -37,7 +37,9 @@ from radarsimpy.includes.type_def cimport float_t, int_t, vector
 from radarsimpy.mesh_kit import import_mesh_module, load_mesh
 
 np.import_array()
-np_float = np.float32
+# Numpy dtype matching float_t in type_def.pxd, so the typed memoryviews
+# below accept these arrays whichever precision the package is built for.
+np_float = np.float32 if sizeof(float_t) == 4 else np.float64
 
 
 @cython.cdivision(True)
@@ -125,7 +127,7 @@ cpdef sim_lidar(lidar, targets, frame_time=0, device="auto"):
     cdef LidarSimulator[float_t, cpu_policy] lidar_sim_cpu
     cdef LidarSimulator[float_t, gpu_policy] lidar_sim_gpu
     cdef bint use_gpu = resolve_device(device) == "gpu"
-    cdef vector[Ray[float_t]] *cloud
+    cdef vector[Ray[float_t, float_t]] *cloud
 
     cdef shared_ptr[TargetsManager[float_t]] targets_manager = make_shared[TargetsManager[float_t]]()
 

@@ -68,7 +68,10 @@ Performance Notes:
 
 # Import the compiled Cython module if available
 try:
-    from .cp_radarsimc import cp_GetTargetMesh, cp_GetSceneStateChannels
+    # np_float is the numpy dtype matching float_t in type_def.pxd, so callers
+    # can build arrays the typed memoryviews accept whichever precision this
+    # package was built for.
+    from .cp_radarsimc import cp_GetTargetMesh, cp_GetSceneStateChannels, np_float
 
     _lib_available = True
     _import_error = None
@@ -85,6 +88,7 @@ __all__ = (
     [
         "cp_GetTargetMesh",
         "cp_GetSceneStateChannels",
+        "np_float",
         "is_available",
         "get_lib_info",
     ]
