@@ -48,7 +48,17 @@ Performance Optimizations:
 ctypedef int int_t              # Signed integer for general indexing
 ctypedef unsigned int uint_t    # Unsigned integer for sizes and counts
 
-# Floating-point types for numerical precision control  
+# Floating-point types for numerical precision control
+#
+# This is the simulators' low-precision type L. The mesh baseband kernel keeps
+# the quantities that need it in H (double) -- the absolute range, the delay,
+# the range gate and the waveform phase difference -- and evaluates everything
+# else in L, so this line also chooses that kernel's precision:
+#
+#   float   mixed precision: ~4x faster baseband on a consumer GPU, and within
+#           -113 dBc of the all-FP64 result on the range-Doppler map
+#   double  all-FP64, the reference. Slower and heavier on memory everywhere,
+#           since L is also the geometry and BVH type.
 ctypedef float float_t          # Single precision (32-bit) for memory efficiency
 
 

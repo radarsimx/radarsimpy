@@ -354,7 +354,7 @@ cdef extern from "targets_manager.hpp":
 # Ray representation for LiDAR and ray tracing operations
 #------------------------------------------------------------------------------
 cdef extern from "ray.hpp":
-    cdef cppclass Ray[T]:
+    cdef cppclass Ray[T, L]:
         Ray() except +
         Vec3[T] * direction_      # Ray direction vector
         Vec3[T] * location_       # Ray origin/intersection point
@@ -395,10 +395,10 @@ cdef extern from "simulator_mesh.hpp":
 # --- Radar Cross Section (RCS) Calculation ---
 # RCS calculation using physical optics and scattering theory.
 cdef extern from "simulator_rcs.hpp":
-    cdef cppclass RcsSimulator[T, ExecutionPolicy]:
+    cdef cppclass RcsSimulator[T, ExecutionPolicy, L]:
         RcsSimulator() except +
 
-        RadarSimErrorCode Run(const shared_ptr[TargetsManager[float]] & targets_manager,  # Targets manager
+        RadarSimErrorCode Run(const shared_ptr[TargetsManager[L]] & targets_manager,  # Targets manager
                               vector[Vec3[T]] inc_dir_array,         # Incident wave directions
                               vector[Vec3[T]] obs_dir_array,         # Observation directions
                               Vec3[cpp_complex[T]] inc_polarization,  # Incident polarization
@@ -419,7 +419,7 @@ cdef extern from "simulator_lidar.hpp":
                               const vector[T] & theta,             # Elevation angles (radians)
                               const Vec3[T] & position)            # LiDAR sensor position
 
-        vector[Ray[T]] cloud_                                       # Generated point cloud rays
+        vector[Ray[T, T]] cloud_                                    # Generated point cloud rays
 
 # --- Radar Interference Simulation ---
 # Radar-to-radar interference simulation for EMC analysis.

@@ -42,7 +42,9 @@ from radarsimpy.includes.type_def cimport int_t, float_t, vector
 
 
 np.import_array()
-np_float = np.float32
+# Numpy dtype matching float_t in type_def.pxd, so the typed memoryviews
+# below accept these arrays whichever precision the package is built for.
+np_float = np.float32 if sizeof(float_t) == 4 else np.float64
 
 
 # ============================================================================

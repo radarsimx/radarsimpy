@@ -358,9 +358,11 @@ def cp_GetSceneStateChannels(
     cdef int_t N_rx = <int_t>rx_local_locs.shape[0]
 
     # Allocating outputs
-    tx_global_locs = np.zeros((K, M, 3), dtype=np.float32)
-    rx_global_locs = np.zeros((K, N_rx, 3), dtype=np.float32)
-    radar_boresights = np.zeros((K, 3), dtype=np.float32)
+    # dtype follows float_t so the float_t memoryviews below bind to these.
+    np_float = np.float32 if sizeof(float_t) == 4 else np.float64
+    tx_global_locs = np.zeros((K, M, 3), dtype=np_float)
+    rx_global_locs = np.zeros((K, N_rx, 3), dtype=np_float)
+    radar_boresights = np.zeros((K, 3), dtype=np_float)
 
     cdef float_t[:, :, :] tx_global_mv = tx_global_locs
     cdef float_t[:, :, :] rx_global_mv = rx_global_locs

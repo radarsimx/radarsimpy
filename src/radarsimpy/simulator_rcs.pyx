@@ -32,7 +32,7 @@ cimport numpy as np
 
 # Local imports
 from radarsimpy.includes.rsvector cimport Vec3
-from radarsimpy.includes.type_def cimport vector
+from radarsimpy.includes.type_def cimport float_t, vector
 from radarsimpy.includes.radarsimc cimport (
     RcsSimulator,
     TargetsManager,
@@ -158,7 +158,7 @@ cpdef sim_rcs(
                 .format(len(targets))
             )
 
-    cdef shared_ptr[TargetsManager[float]] targets_manager = make_shared[TargetsManager[float]]()
+    cdef shared_ptr[TargetsManager[float_t]] targets_manager = make_shared[TargetsManager[float_t]]()
     cdef Vec3[cpp_complex[double]] inc_pol_cpp
     cdef Vec3[cpp_complex[double]] obs_pol_cpp
 
@@ -257,8 +257,8 @@ cpdef sim_rcs(
     # when this machine actually has a CUDA device. Fall back to the CPU policy
     # otherwise, which is also what a CPU-only build always uses.
     cdef:
-        RcsSimulator[double, cpu_policy] rcs_sim_cpu
-        RcsSimulator[double, gpu_policy] rcs_sim_gpu
+        RcsSimulator[double, cpu_policy, float_t] rcs_sim_cpu
+        RcsSimulator[double, gpu_policy, float_t] rcs_sim_gpu
         bint use_gpu = device_lower == "gpu"
         RadarSimErrorCode err
         vector[double] rcs_vect

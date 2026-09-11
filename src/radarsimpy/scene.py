@@ -37,7 +37,7 @@ def get_scene_state(
         * **radar_boresight** (*numpy.ndarray*): Global boresight direction of the radar platform.
           Shape is ``[3]`` if `timestamp` is scalar, or ``[..., 3]`` if array.
     """
-    from radarsimpy.lib import cp_GetSceneStateChannels
+    from radarsimpy.lib import cp_GetSceneStateChannels, np_float
 
     t = np.asarray(timestamp)
     t_shape = t.shape
@@ -60,20 +60,20 @@ def get_scene_state(
         flat_locs = sim_locs.reshape(-1, 3)[sort_idx]
         flat_rots = sim_rots.reshape(-1, 3)[sort_idx]
 
-        q_locs = np.zeros((t_flat.size, 3), dtype=np.float32)
-        q_rots = np.zeros((t_flat.size, 3), dtype=np.float32)
+        q_locs = np.zeros((t_flat.size, 3), dtype=np_float)
+        q_rots = np.zeros((t_flat.size, 3), dtype=np_float)
         for i in range(3):
             q_locs[:, i] = np.interp(t_flat, flat_times, flat_locs[:, i])
             q_rots[:, i] = np.interp(t_flat, flat_times, flat_rots[:, i])
     else:
         # Static/constant velocity motion
         t_expand = t_flat[..., np.newaxis]
-        q_locs = (radar.radar_prop["location"] + radar.radar_prop["speed"] * t_expand).astype(np.float32)
-        q_rots = (radar.radar_prop["rotation"] + radar.radar_prop["rotation_rate"] * t_expand).astype(np.float32)
+        q_locs = (radar.radar_prop["location"] + radar.radar_prop["speed"] * t_expand).astype(np_float)
+        q_rots = (radar.radar_prop["rotation"] + radar.radar_prop["rotation_rate"] * t_expand).astype(np_float)
 
     # 3. Call C++ Rotate wrapper
-    tx_local_locs = radar.radar_prop["transmitter"].txchannel_prop["locations"].astype(np.float32)
-    rx_local_locs = radar.radar_prop["receiver"].rxchannel_prop["locations"].astype(np.float32)
+    tx_local_locs = radar.radar_prop["transmitter"].txchannel_prop["locations"].astype(np_float)
+    rx_local_locs = radar.radar_prop["receiver"].rxchannel_prop["locations"].astype(np_float)
 
     tx_global_flat, rx_global_flat, radar_boresight_flat = cp_GetSceneStateChannels(
         tx_local_locs,
