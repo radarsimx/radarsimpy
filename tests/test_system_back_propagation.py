@@ -116,8 +116,13 @@ def test_back_propagated_return_lands_at_its_true_path_length(
 
     so the path is 30 + 20 + 20 + 30 = 100 m, i.e. a range of 50 m. Measuring
     the *first* hit's distance to the receiver instead -- the natural mistake,
-    and one this simulator has made -- puts it at 40 m. Two GHz of bandwidth
-    separates those by more than fifty range bins.
+    and one this simulator has made -- puts it at 40 m. 200 MHz of bandwidth
+    separates those by more than ten range bins.
+
+    The parameters are sized for cost, which is rays times samples: 24 GHz
+    rather than 77 GHz keeps the ray count down, since density is per
+    wavelength, and 200 samples cover the 50 m with room to spare. The 77 GHz /
+    2 GHz / 2000-sample version gave the same answer in six minutes on CPU.
     """
     del mesh_module  # fixture is a skip guard
 
@@ -129,14 +134,14 @@ def test_back_propagated_return_lands_at_its_true_path_length(
         {"model": plate_b, "location": (0, 0, 0)},
     ]
 
-    samples, pulse_length = 2000, 20e-6
+    samples, pulse_length = 200, 20e-6
     radar = make_radar(
-        tx_kwargs={"f": [76e9, 78e9], "t": pulse_length, "tx_power": 20},
+        tx_kwargs={"f": [24e9, 24.2e9], "t": pulse_length, "tx_power": 20},
         rx_kwargs={"fs": (samples + 0.5) / pulse_length, "baseband_gain": 60},
     )
 
-    off = sim_radar(radar, targets, density=2.0, back_propagating=False)
-    on = sim_radar(radar, targets, density=2.0, back_propagating=True)
+    off = sim_radar(radar, targets, density=1.0, back_propagating=False)
+    on = sim_radar(radar, targets, density=1.0, back_propagating=True)
 
     added = np.abs(np.fft.fft(on["baseband"][0, 0, :] - off["baseband"][0, 0, :]))
     assert added.max() > 0.0, "back propagation added nothing; test is vacuous"
