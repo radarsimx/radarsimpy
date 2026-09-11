@@ -113,6 +113,16 @@ experience the same thermal noise.
    noise at different time indices and thus receive **different** noise
    values.
 
+.. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/noise_rx_streams.svg
+    :width: 100%
+    :alt: Each physical Rx has one noise stream on the absolute sample grid; a virtual channel reads the window its timestamps select
+
+    Each physical Rx has one noise stream per frame, laid out on the absolute
+    sample grid. A virtual channel reads the stretch of its Rx stream that its
+    own timestamps select. Top: both Tx channels fire together, so ``ch0`` and
+    ``ch2`` read the same Rx0 samples. Bottom: a Tx1 delay moves ``ch2`` and
+    ``ch3`` to later samples, which are independent.
+
 Impact on MIMO Signal Processing
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -128,6 +138,16 @@ When performing MIMO beamforming or angle estimation:
 * **SNR estimation**: the noise power per virtual channel equals the physical
   Rx noise power. Averaging across virtual channels that share the same Rx
   does **not** reduce noise because the samples are identical.
+
+.. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/noise_mimo_covariance.svg
+    :width: 100%
+    :alt: Virtual channels sharing an Rx and its timing carry fully correlated noise; staggered Tx timing makes them independent
+
+    The noise covariance of the 2 Tx × 2 Rx example, taken at the same
+    fast-time sample. When both Tx channels fire together, ``ch0``/``ch2``
+    and ``ch1``/``ch3`` are fully correlated, giving the block structure. A
+    Tx delay puts them on different sample indices, and the matrix becomes the
+    identity.
 
 Example
 ^^^^^^^
@@ -223,8 +243,21 @@ Phase noise is specified as a SSB power spectral density profile:
 * ``pn_power`` — SSB phase noise power at each offset (dBc/Hz), 1-D array of
   the same length as ``pn_f``.
 
-The profile is piecewise log-linear interpolated across the baseband frequency
-grid :math:`[0,\, f_s/2]`. The DC point is always anchored at 0 dBc/Hz.
+The profile is interpolated onto the baseband frequency grid
+:math:`[0,\, f_s/2]`, linearly in log-frequency between points. A 0 dBc/Hz
+point is added at DC, but on a log-frequency axis DC lies arbitrarily far to
+the left. Below the first ``pn_f`` the level therefore stays at the first
+``pn_power``, and the DC bin itself is removed. Above the last ``pn_f`` the
+last ``pn_power`` holds up to :math:`f_s/2`.
+
+.. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/phase_noise_profile.svg
+    :width: 100%
+    :alt: How pn_f and pn_power become the phase-noise spectrum on the baseband grid
+
+    ``pn_f = [1e3, 1e4, 1e5, 3e6]``, ``pn_power = [-75, -90, -105, -125]``
+    with ``fs = 2e6``. The three points below :math:`f_s/2` are joined by
+    straight lines in log-frequency and held flat at either end. The 3 MHz
+    point lies above :math:`f_s/2`, so it is dropped.
 
 Phase Noise Properties
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -269,6 +302,19 @@ two-way propagation delay :math:`\tau` of the target:
 * **Long-range degradation** — as :math:`\tau` increases the correlation
   decreases and the residual phase noise grows, raising the noise floor and
   degrading the signal-to-noise ratio for distant targets.
+
+.. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/phase_noise_range_correlation.svg
+    :width: 100%
+    :alt: Range correlation: the residual phase noise in the baseband grows with the delay between the echo and the reference
+
+    The residual phase noise is the transmitted profile scaled by
+    :math:`4\sin^2(\pi f \Delta)`. Here :math:`\Delta` is the delay between
+    the echo and the reference: the round trip :math:`\tau`, or
+    :math:`\tau` minus ``gate_delay`` when a range gate is set. The profile is
+    the one from the example below. At 1 kHz offset the close-in noise is
+    suppressed by about 40 dB at 300 m, but only about 20 dB at 3 km. The
+    longer delay also stops cancelling at a lower offset, above which the
+    response becomes a comb of nulls spaced :math:`1/\Delta` apart.
 
 * **Doppler smearing** — rapid phase fluctuations spread target energy across
   adjacent Doppler bins, raising the integrated sidelobe level in the

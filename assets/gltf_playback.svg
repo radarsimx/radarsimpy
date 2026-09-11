@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 325" width="860" height="325"
+     role="img" aria-label="Simulation time maps to animation time through time_offset and time_scale; loop wraps past the end of the clip, otherwise the last pose is held">
+  <title>Simulation time maps to animation time through time_offset and time_scale; loop wraps past the end of the clip, otherwise the last pose is held</title>
+  <style>
+    .bg    { fill:#ffffff; stroke:#d0d7de; stroke-width:1 }
+    .panel { fill:#f6f8fa; stroke:#d8dee4; stroke-width:1 }
+    .hd    { font:600 13px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#0d1117 }
+    .lbl   { font:11.5px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#6b7280 }
+    .ax    { font:600 14px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif }
+    .code  { font:12.5px 'IBM Plex Mono',Consolas,'Courier New',monospace; fill:#0d1117 }
+    .mono  { font:11px 'IBM Plex Mono',Consolas,'Courier New',monospace }
+    .ink   { fill:#0d1117 }
+    .blue  { fill:#1e73be }
+    .green { fill:#1a7f37 }
+    .coral { fill:#cf4640 }
+  </style>
+  <defs>
+    <marker id="pAx" markerWidth="10" markerHeight="9" refX="8.4" refY="3.6" orient="auto">
+      <path d="M0,0 L9,3.6 L0,7.2 z" fill="#848d97"/></marker>
+  </defs>
+
+  <rect class="bg" x="0.5" y="0.5" width="859" height="324" rx="8"/>
+  <rect class="panel" x="24.5" y="24.5" width="399" height="276" rx="6"/>
+  <text class="code" x="44" y="50">loop=True</text>
+  <text class="lbl" x="44" y="68">wraps back to the start of the clip</text>
+  <rect x="128" y="194.0" width="271" height="60.0" fill="#1e73be" fill-opacity="0.08"/>
+  <line x1="128" y1="194.0" x2="399" y2="194.0" stroke="#1e73be" stroke-width="1" stroke-dasharray="4 3" opacity="0.6"/>
+  <text class="mono" x="120" y="258.0" text-anchor="end" fill="#6b7280">0</text>
+  <text class="mono" x="120" y="198.0" text-anchor="end" fill="#6b7280">duration</text>
+  <text class="lbl blue" x="393" y="209.0" text-anchor="end">clip</text>
+  <line x1="128" y1="254" x2="405" y2="254" stroke="#848d97" stroke-width="1.2" marker-end="url(#pAx)"/>
+  <line x1="128" y1="254" x2="128" y2="93.0" stroke="#848d97" stroke-width="1.2" marker-end="url(#pAx)"/>
+  <text class="lbl ink" x="136" y="97.0">animation time</text>
+  <text class="lbl ink" x="405" y="272" text-anchor="end">simulation time</text>
+  <line x1="128.0" y1="236.0" x2="382.1" y2="101.0" stroke="#848d97" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <line x1="128.0" y1="236.0" x2="207.0" y2="194.0" stroke="#1e73be" stroke-width="2.6" stroke-linecap="round"/>
+  <line x1="207.0" y1="254.0" x2="320.0" y2="194.0" stroke="#1e73be" stroke-width="2.6" stroke-linecap="round"/>
+  <line x1="207.0" y1="194.0" x2="207.0" y2="254.0" stroke="#1e73be" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/>
+  <line x1="320.0" y1="254.0" x2="399.0" y2="212.0" stroke="#1e73be" stroke-width="2.6" stroke-linecap="round"/>
+  <line x1="320.0" y1="194.0" x2="320.0" y2="254.0" stroke="#1e73be" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/>
+  <text class="lbl blue" x="213.0" y="209.0">wraps</text>
+  <circle cx="128.0" cy="236.0" r="3.4" fill="#0d1117"/>
+  <text class="mono ink" x="120.0" y="240.0" text-anchor="end">time_offset</text>
+  <text class="mono" x="272.4" y="149.0" text-anchor="end" fill="#6b7280">slope = time_scale</text>
+  <rect class="panel" x="436.5" y="24.5" width="399" height="276" rx="6"/>
+  <text class="code" x="456" y="50">loop=False</text>
+  <text class="lbl" x="456" y="68">holds the last pose, and the rates drop to zero</text>
+  <rect x="540" y="194.0" width="271" height="60.0" fill="#1e73be" fill-opacity="0.08"/>
+  <line x1="540" y1="194.0" x2="811" y2="194.0" stroke="#1e73be" stroke-width="1" stroke-dasharray="4 3" opacity="0.6"/>
+  <text class="mono" x="532" y="258.0" text-anchor="end" fill="#6b7280">0</text>
+  <text class="mono" x="532" y="198.0" text-anchor="end" fill="#6b7280">duration</text>
+  <text class="lbl blue" x="805" y="209.0" text-anchor="end">clip</text>
+  <line x1="540" y1="254" x2="817" y2="254" stroke="#848d97" stroke-width="1.2" marker-end="url(#pAx)"/>
+  <line x1="540" y1="254" x2="540" y2="93.0" stroke="#848d97" stroke-width="1.2" marker-end="url(#pAx)"/>
+  <text class="lbl ink" x="548" y="97.0">animation time</text>
+  <text class="lbl ink" x="817" y="272" text-anchor="end">simulation time</text>
+  <line x1="540.0" y1="236.0" x2="794.1" y2="101.0" stroke="#848d97" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <rect x="619.0" y="178.0" width="192.0" height="32" fill="#cf4640" fill-opacity="0.12"/>
+  <polyline points="540.0,236.0 619.0,194.0 811.0,194.0" fill="none" stroke="#1e73be" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <text class="lbl coral" x="715.0" y="224.0" text-anchor="middle">last pose held, rates = 0</text>
+  <circle cx="540.0" cy="236.0" r="3.4" fill="#0d1117"/>
+  <text class="mono ink" x="532.0" y="240.0" text-anchor="end">time_offset</text>
+  <text class="mono" x="684.4" y="149.0" text-anchor="end" fill="#6b7280">slope = time_scale</text>
+  <line x1="44" y1="286" x2="66" y2="286" stroke="#1e73be" stroke-width="2.6"/>
+  <text class="lbl" x="74" y="290">animation time the pose is taken from</text>
+  <line x1="456" y1="286" x2="478" y2="286" stroke="#848d97" stroke-width="1.2" stroke-dasharray="4 3"/>
+  <text class="lbl" x="486" y="290">time_offset + time_scale &#215; t</text>
+</svg>

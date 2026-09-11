@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 311" width="860" height="311"
+     role="img" aria-label="Virtual channels sharing an Rx and its timing carry fully correlated noise; staggered Tx timing makes them independent">
+  <title>Virtual channels sharing an Rx and its timing carry fully correlated noise; staggered Tx timing makes them independent</title>
+  <style>
+    .bg    { fill:#ffffff; stroke:#d0d7de; stroke-width:1 }
+    .panel { fill:#f6f8fa; stroke:#d8dee4; stroke-width:1 }
+    .hd    { font:600 13px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#0d1117 }
+    .lbl   { font:11.5px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#6b7280 }
+    .ax    { font:600 14px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif }
+    .code  { font:12.5px 'IBM Plex Mono',Consolas,'Courier New',monospace; fill:#0d1117 }
+    .mono  { font:11px 'IBM Plex Mono',Consolas,'Courier New',monospace }
+    .ink   { fill:#0d1117 }
+    .blue  { fill:#1e73be }
+    .green { fill:#1a7f37 }
+    .coral { fill:#cf4640 }
+  </style>
+
+  <rect class="bg" x="0.5" y="0.5" width="859" height="310" rx="8"/>
+  <rect class="panel" x="24.5" y="24.5" width="399" height="262" rx="6"/>
+  <text class="hd" x="44" y="50">Tx channels fire together</text>
+  <text class="lbl" x="44" y="68">noise covariance / &#963;&#178; across virtual channels, same fast-time sample</text>
+  <text class="mono" x="241.0" y="96" text-anchor="middle" fill="#6b7280">ch0</text>
+  <text class="mono" x="275.0" y="96" text-anchor="middle" fill="#6b7280">ch1</text>
+  <text class="mono" x="309.0" y="96" text-anchor="middle" fill="#6b7280">ch2</text>
+  <text class="mono" x="343.0" y="96" text-anchor="middle" fill="#6b7280">ch3</text>
+  <text class="mono" x="214" y="125.0" text-anchor="end"><tspan fill="#0d1117">ch0</tspan> <tspan fill="#6b7280">Tx0&#8594;Rx0</tspan></text>
+  <rect x="224" y="104" width="34" height="34" fill="#1e73be" fill-opacity="0.85" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="241.0" y="125.0" text-anchor="middle" fill="#ffffff">1</text>
+  <rect x="258" y="104" width="34" height="34" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="275.0" y="125.0" text-anchor="middle" fill="#6b7280">0</text>
+  <rect x="292" y="104" width="34" height="34" fill="#1e73be" fill-opacity="0.85" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="309.0" y="125.0" text-anchor="middle" fill="#ffffff">1</text>
+  <rect x="326" y="104" width="34" height="34" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="343.0" y="125.0" text-anchor="middle" fill="#6b7280">0</text>
+  <text class="mono" x="214" y="159.0" text-anchor="end"><tspan fill="#0d1117">ch1</tspan> <tspan fill="#6b7280">Tx0&#8594;Rx1</tspan></text>
+  <rect x="224" y="138" width="34" height="34" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="241.0" y="159.0" text-anchor="middle" fill="#6b7280">0</text>
+  <rect x="258" y="138" width="34" height="34" fill="#1e73be" fill-opacity="0.85" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="275.0" y="159.0" text-anchor="middle" fill="#ffffff">1</text>
+  <rect x="292" y="138" width="34" height="34" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="309.0" y="159.0" text-anchor="middle" fill="#6b7280">0</text>
+  <rect x="326" y="138" width="34" height="34" fill="#1e73be" fill-opacity="0.85" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="343.0" y="159.0" text-anchor="middle" fill="#ffffff">1</text>
+  <text class="mono" x="214" y="193.0" text-anchor="end"><tspan fill="#0d1117">ch2</tspan> <tspan fill="#6b7280">Tx1&#8594;Rx0</tspan></text>
+  <rect x="224" y="172" width="34" height="34" fill="#1e73be" fill-opacity="0.85" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="241.0" y="193.0" text-anchor="middle" fill="#ffffff">1</text>
+  <rect x="258" y="172" width="34" height="34" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="275.0" y="193.0" text-anchor="middle" fill="#6b7280">0</text>
+  <rect x="292" y="172" width="34" height="34" fill="#1e73be" fill-opacity="0.85" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="309.0" y="193.0" text-anchor="middle" fill="#ffffff">1</text>
+  <rect x="326" y="172" width="34" height="34" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="343.0" y="193.0" text-anchor="middle" fill="#6b7280">0</text>
+  <text class="mono" x="214" y="227.0" text-anchor="end"><tspan fill="#0d1117">ch3</tspan> <tspan fill="#6b7280">Tx1&#8594;Rx1</tspan></text>
+  <rect x="224" y="206" width="34" height="34" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="241.0" y="227.0" text-anchor="middle" fill="#6b7280">0</text>
+  <rect x="258" y="206" width="34" height="34" fill="#1e73be" fill-opacity="0.85" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="275.0" y="227.0" text-anchor="middle" fill="#ffffff">1</text>
+  <rect x="292" y="206" width="34" height="34" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="309.0" y="227.0" text-anchor="middle" fill="#6b7280">0</text>
+  <rect x="326" y="206" width="34" height="34" fill="#1e73be" fill-opacity="0.85" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="343.0" y="227.0" text-anchor="middle" fill="#ffffff">1</text>
+  <text class="lbl ink" x="292" y="266" text-anchor="middle">only N = 2 independent noise sources</text>
+  <rect class="panel" x="436.5" y="24.5" width="399" height="262" rx="6"/>
+  <text class="hd" x="456" y="50">Tx1 fires later (TDM delay)</text>
+  <text class="lbl" x="456" y="68">noise covariance / &#963;&#178; across virtual channels, same fast-time sample</text>
+  <text class="mono" x="653.0" y="96" text-anchor="middle" fill="#6b7280">ch0</text>
+  <text class="mono" x="687.0" y="96" text-anchor="middle" fill="#6b7280">ch1</text>
+  <text class="mono" x="721.0" y="96" text-anchor="middle" fill="#6b7280">ch2</text>
+  <text class="mono" x="755.0" y="96" text-anchor="middle" fill="#6b7280">ch3</text>
+  <text class="mono" x="626" y="125.0" text-anchor="end"><tspan fill="#0d1117">ch0</tspan> <tspan fill="#6b7280">Tx0&#8594;Rx0</tspan></text>
+  <rect x="636" y="104" width="34" height="34" fill="#1e73be" fill-opacity="0.85" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="653.0" y="125.0" text-anchor="middle" fill="#ffffff">1</text>
+  <rect x="670" y="104" width="34" height="34" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="687.0" y="125.0" text-anchor="middle" fill="#6b7280">0</text>
+  <rect x="704" y="104" width="34" height="34" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="721.0" y="125.0" text-anchor="middle" fill="#6b7280">0</text>
+  <rect x="738" y="104" width="34" height="34" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="755.0" y="125.0" text-anchor="middle" fill="#6b7280">0</text>
+  <text class="mono" x="626" y="159.0" text-anchor="end"><tspan fill="#0d1117">ch1</tspan> <tspan fill="#6b7280">Tx0&#8594;Rx1</tspan></text>
+  <rect x="636" y="138" width="34" height="34" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="653.0" y="159.0" text-anchor="middle" fill="#6b7280">0</text>
+  <rect x="670" y="138" width="34" height="34" fill="#1e73be" fill-opacity="0.85" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="687.0" y="159.0" text-anchor="middle" fill="#ffffff">1</text>
+  <rect x="704" y="138" width="34" height="34" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="721.0" y="159.0" text-anchor="middle" fill="#6b7280">0</text>
+  <rect x="738" y="138" width="34" height="34" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="755.0" y="159.0" text-anchor="middle" fill="#6b7280">0</text>
+  <text class="mono" x="626" y="193.0" text-anchor="end"><tspan fill="#0d1117">ch2</tspan> <tspan fill="#6b7280">Tx1&#8594;Rx0</tspan></text>
+  <rect x="636" y="172" width="34" height="34" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="653.0" y="193.0" text-anchor="middle" fill="#6b7280">0</text>
+  <rect x="670" y="172" width="34" height="34" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="687.0" y="193.0" text-anchor="middle" fill="#6b7280">0</text>
+  <rect x="704" y="172" width="34" height="34" fill="#1e73be" fill-opacity="0.85" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="721.0" y="193.0" text-anchor="middle" fill="#ffffff">1</text>
+  <rect x="738" y="172" width="34" height="34" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="755.0" y="193.0" text-anchor="middle" fill="#6b7280">0</text>
+  <text class="mono" x="626" y="227.0" text-anchor="end"><tspan fill="#0d1117">ch3</tspan> <tspan fill="#6b7280">Tx1&#8594;Rx1</tspan></text>
+  <rect x="636" y="206" width="34" height="34" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="653.0" y="227.0" text-anchor="middle" fill="#6b7280">0</text>
+  <rect x="670" y="206" width="34" height="34" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="687.0" y="227.0" text-anchor="middle" fill="#6b7280">0</text>
+  <rect x="704" y="206" width="34" height="34" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="721.0" y="227.0" text-anchor="middle" fill="#6b7280">0</text>
+  <rect x="738" y="206" width="34" height="34" fill="#1e73be" fill-opacity="0.85" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="755.0" y="227.0" text-anchor="middle" fill="#ffffff">1</text>
+  <text class="lbl ink" x="704" y="266" text-anchor="middle">all four channels independent</text>
+</svg>

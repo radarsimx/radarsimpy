@@ -50,6 +50,15 @@ into the nearest animated ancestor, so each target moves as one rigid body.
 Meshes with no animated ancestor are merged into a single static target
 (``merge_static=False`` keeps them separate).
 
+.. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/gltf_node_mapping.svg
+    :width: 100%
+    :alt: Each animated glTF node becomes one target holding its own mesh and every static mesh beneath it
+
+    A drone with two animated rotor nodes. Each rotor takes its own hub and
+    the blades beneath it, because it is their nearest animated ancestor. The
+    body, gimbal and camera have no animated ancestor, so they merge into one
+    static target. Animated parts come first in the returned list.
+
 **Motion is sampled at the radar's own timestamps.** The node's world pose is
 evaluated at every entry of ``radar.time_prop["timestamp"]`` and emitted as
 time-varying ``location`` and ``rotation`` arrays, exactly the form the
@@ -60,9 +69,29 @@ taken from the derivative of the keyframe interpolation itself. RadarSimCpp
 derives hit-point velocity from those two keys rather than from successive
 positions, so getting them right is what makes the Doppler correct.
 
+.. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/gltf_analytic_rates.svg
+    :width: 100%
+    :alt: Rates are the slope of the keyframe interpolation at each radar timestamp; differencing the wrapped angles would spike
+
+    Left: radar timestamps arrive in short bursts, one per pulse. At each one,
+    the emitted rate is the slope of the curve through the keyframes, whatever
+    the gap to the next sample. Right: a spinning rotor's ``rotation`` is
+    emitted wrapped to ±180°. Differencing it would put a spurious
+    −360°/Δt spike in ``rotation_rate`` at every wrap. The analytic rate stays
+    constant.
+
 **Frames are converted.** glTF is Y-up; RadarSimPy is Z-up (see
 :doc:`coordinate_systems`). Geometry, poses and rates are rotated accordingly. Pass
 ``up_axis="z"`` for an asset already exported Z-up.
+
+.. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/gltf_up_axis.svg
+    :width: 100%
+    :alt: A Y-up glTF model read directly in the Z-up frame lies on its side; a +90 degree turn about x stands it upright
+
+    A wind turbine authored Y-up, drawn in RadarSimPy's axes. Read as-is, its
+    tower lies along +y. The default ``up_axis="y"`` applies a +90° turn about
+    x, which stands the tower on +z and points the glTF +z forward axis
+    along −y.
 
 Placing and driving the whole model
 -----------------------------------
@@ -95,6 +124,16 @@ Controlling playback
 
 With ``loop=False`` the first and last poses are held instead, and the rates go
 to zero outside the clip.
+
+.. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/gltf_playback.svg
+    :width: 100%
+    :alt: Simulation time maps to animation time through time_offset and time_scale; loop wraps past the end of the clip, otherwise the last pose is held
+
+    Simulation time ``t`` maps to animation time as
+    ``time_offset + time_scale × t`` (dashed). With ``loop=True`` that value
+    wraps back to the start of the clip each time it passes the end. With
+    ``loop=False`` the last pose is held, and ``speed`` and ``rotation_rate``
+    are zero from then on.
 
 Static snapshots for RCS and lidar
 -----------------------------------

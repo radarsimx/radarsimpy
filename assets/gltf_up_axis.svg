@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 365" width="860" height="365"
+     role="img" aria-label="A Y-up glTF model read directly in the Z-up frame lies on its side; a +90 degree turn about x stands it upright">
+  <title>A Y-up glTF model read directly in the Z-up frame lies on its side; a +90 degree turn about x stands it upright</title>
+  <style>
+    .bg    { fill:#ffffff; stroke:#d0d7de; stroke-width:1 }
+    .panel { fill:#f6f8fa; stroke:#d8dee4; stroke-width:1 }
+    .hd    { font:600 13px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#0d1117 }
+    .lbl   { font:11.5px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#6b7280 }
+    .ax    { font:600 14px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif }
+    .code  { font:12.5px 'IBM Plex Mono',Consolas,'Courier New',monospace; fill:#0d1117 }
+    .mono  { font:11px 'IBM Plex Mono',Consolas,'Courier New',monospace }
+    .ink   { fill:#0d1117 }
+    .blue  { fill:#1e73be }
+    .green { fill:#1a7f37 }
+    .coral { fill:#cf4640 }
+  </style>
+  <defs>
+    <marker id="uX" markerWidth="10" markerHeight="9" refX="8.4" refY="3.6" orient="auto">
+      <path d="M0,0 L9,3.6 L0,7.2 z" fill="#cf4640"/></marker>
+    <marker id="uY" markerWidth="10" markerHeight="9" refX="8.4" refY="3.6" orient="auto">
+      <path d="M0,0 L9,3.6 L0,7.2 z" fill="#1a7f37"/></marker>
+    <marker id="uZ" markerWidth="10" markerHeight="9" refX="8.4" refY="3.6" orient="auto">
+      <path d="M0,0 L9,3.6 L0,7.2 z" fill="#1e73be"/></marker>
+    <marker id="uArr" markerWidth="10" markerHeight="9" refX="8.4" refY="3.6" orient="auto">
+      <path d="M0,0 L9,3.6 L0,7.2 z" fill="#848d97"/></marker>
+  </defs>
+
+  <rect class="bg" x="0.5" y="0.5" width="859" height="364" rx="8"/>
+  <rect class="panel" x="24.5" y="24.5" width="368" height="316" rx="6"/>
+  <text class="hd" x="44" y="50">glTF file, read as-is</text>
+  <text class="lbl" x="44" y="68">its up is +y, so the model lies on its side</text>
+  <line x1="196.0" y1="234.0" x2="122.5" y2="281.2" stroke="#cf4640" stroke-width="2" marker-end="url(#uX)"/>
+  <text class="ax" x="112.7" y="292.6" text-anchor="middle" fill="#cf4640">x</text>
+  <line x1="196.0" y1="234.0" x2="358.0" y2="234.0" stroke="#1a7f37" stroke-width="2" marker-end="url(#uY)"/>
+  <text class="ax" x="370.0" y="239.0" text-anchor="middle" fill="#1a7f37">y</text>
+  <line x1="196.0" y1="234.0" x2="196.0" y2="119.0" stroke="#1e73be" stroke-width="2" marker-end="url(#uZ)"/>
+  <text class="ax" x="196.0" y="112.0" text-anchor="middle" fill="#1e73be">z</text>
+  <circle cx="196.0" cy="234.0" r="3" fill="#0d1117"/>
+  <line x1="196.0" y1="234.0" x2="296.0" y2="234.0" stroke="#57606a" stroke-width="5" stroke-linecap="round"/>
+  <polygon points="263.8,254.7 267.9,254.6 272.3,254.4 276.8,254.0 281.5,253.5 286.3,252.8 291.1,251.9 296.0,251.0 300.9,249.9 305.8,248.6 310.5,247.3 315.2,245.9 319.7,244.3 324.1,242.7 328.2,241.1 332.1,239.4 335.7,237.6 339.0,235.8 342.0,234.0 344.6,232.2 346.9,230.4 348.8,228.6 350.2,226.9 351.3,225.3 351.9,223.7 352.2,222.1 351.9,220.7 351.3,219.4 350.2,218.1 348.8,217.0 346.9,216.1 344.6,215.2 342.0,214.5 339.0,214.0 335.7,213.6 332.1,213.4 328.2,213.3 324.1,213.4 319.7,213.6 315.2,214.0 310.5,214.5 305.7,215.2 300.9,216.1 296.0,217.0 291.1,218.1 286.2,219.4 281.5,220.7 276.8,222.1 272.3,223.6 267.9,225.3 263.8,226.9 259.9,228.6 256.3,230.4 253.0,232.2 250.0,234.0 247.4,235.8 245.1,237.6 243.2,239.4 241.8,241.1 240.7,242.7 240.1,244.3 239.8,245.9 240.1,247.3 240.7,248.6 241.8,249.9 243.2,251.0 245.1,251.9 247.4,252.8 250.0,253.5 253.0,254.0 256.3,254.4 259.9,254.6 263.8,254.7" fill="#0d1117" fill-opacity="0.05" stroke="#57606a" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="296.0" y1="234.0" x2="342.0" y2="234.0" stroke="#0d1117" stroke-width="3" stroke-linecap="round"/>
+  <line x1="296.0" y1="234.0" x2="300.9" y2="216.1" stroke="#0d1117" stroke-width="3" stroke-linecap="round"/>
+  <line x1="296.0" y1="234.0" x2="245.1" y2="251.9" stroke="#0d1117" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="296.0" cy="234.0" r="4.5" fill="#0d1117"/>
+  <text class="mono" x="372" y="324" text-anchor="end" fill="#6b7280">glTF: +y up, +z forward</text>
+  <path d="M402,186 Q430,160 458,186" fill="none" stroke="#848d97" stroke-width="1.6" marker-end="url(#uArr)"/>
+  <text class="code" x="430" y="210" text-anchor="middle" style="font-size:11.5px">+90&#176;</text>
+  <text class="lbl" x="430" y="226" text-anchor="middle">about x</text>
+  <rect class="panel" x="467.5" y="24.5" width="368" height="316" rx="6"/>
+  <text class="hd" x="487" y="50">RadarSimPy target</text>
+  <text class="lbl" x="487" y="68">geometry, poses and rates all turned upright</text>
+  <line x1="640.0" y1="272.0" x2="570.0" y2="317.0" stroke="#cf4640" stroke-width="2" marker-end="url(#uX)"/>
+  <text class="ax" x="560.2" y="328.3" text-anchor="middle" fill="#cf4640">x</text>
+  <line x1="640.0" y1="272.0" x2="795.0" y2="272.0" stroke="#1a7f37" stroke-width="2" marker-end="url(#uY)"/>
+  <text class="ax" x="807.0" y="277.0" text-anchor="middle" fill="#1a7f37">y</text>
+  <line x1="640.0" y1="272.0" x2="640.0" y2="98.0" stroke="#1e73be" stroke-width="2" marker-end="url(#uZ)"/>
+  <text class="ax" x="640.0" y="91.0" text-anchor="middle" fill="#1e73be">z</text>
+  <circle cx="640.0" cy="272.0" r="3" fill="#0d1117"/>
+  <line x1="640.0" y1="272.0" x2="640.0" y2="172.0" stroke="#57606a" stroke-width="5" stroke-linecap="round"/>
+  <polygon points="607.8,192.7 607.9,188.6 608.3,184.4 608.9,180.1 609.7,175.7 610.8,171.3 612.1,166.9 613.6,162.6 615.3,158.3 617.2,154.1 619.3,150.1 621.5,146.2 623.9,142.5 626.4,139.1 629.0,135.9 631.7,132.9 634.4,130.3 637.2,128.0 640.0,126.0 642.8,124.4 645.6,123.1 648.3,122.2 651.0,121.7 653.6,121.6 656.1,121.8 658.5,122.4 660.7,123.5 662.8,124.8 664.7,126.6 666.4,128.7 667.9,131.1 669.2,133.8 670.3,136.8 671.1,140.1 671.7,143.6 672.1,147.4 672.2,151.3 672.1,155.4 671.7,159.6 671.1,163.9 670.3,168.3 669.2,172.7 667.9,177.1 666.4,181.4 664.7,185.7 662.8,189.9 660.7,193.9 658.5,197.8 656.1,201.5 653.6,204.9 651.0,208.1 648.3,211.1 645.6,213.7 642.8,216.0 640.0,218.0 637.2,219.6 634.4,220.9 631.7,221.8 629.0,222.3 626.4,222.4 623.9,222.2 621.5,221.6 619.3,220.5 617.2,219.2 615.3,217.4 613.6,215.3 612.1,212.9 610.8,210.2 609.7,207.2 608.9,203.9 608.3,200.4 607.9,196.6 607.8,192.7" fill="#0d1117" fill-opacity="0.05" stroke="#57606a" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="640.0" y1="172.0" x2="640.0" y2="126.0" stroke="#0d1117" stroke-width="3" stroke-linecap="round"/>
+  <line x1="640.0" y1="172.0" x2="667.9" y2="177.1" stroke="#0d1117" stroke-width="3" stroke-linecap="round"/>
+  <line x1="640.0" y1="172.0" x2="612.1" y2="212.9" stroke="#0d1117" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="640.0" cy="172.0" r="4.5" fill="#0d1117"/>
+  <text class="mono" x="816" y="324" text-anchor="end" fill="#6b7280">x &#8594; x &#160; y &#8594; z &#160; z &#8594; &#8722;y</text>
+</svg>

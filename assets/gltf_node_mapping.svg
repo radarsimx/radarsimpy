@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 311" width="860" height="311"
+     role="img" aria-label="Each animated glTF node becomes one target holding its own mesh and every static mesh beneath it; the remaining meshes merge into one static target">
+  <title>Each animated glTF node becomes one target holding its own mesh and every static mesh beneath it; the remaining meshes merge into one static target</title>
+  <style>
+    .bg    { fill:#ffffff; stroke:#d0d7de; stroke-width:1 }
+    .panel { fill:#f6f8fa; stroke:#d8dee4; stroke-width:1 }
+    .hd    { font:600 13px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#0d1117 }
+    .lbl   { font:11.5px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#6b7280 }
+    .ax    { font:600 14px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif }
+    .code  { font:12.5px 'IBM Plex Mono',Consolas,'Courier New',monospace; fill:#0d1117 }
+    .mono  { font:11px 'IBM Plex Mono',Consolas,'Courier New',monospace }
+    .ink   { fill:#0d1117 }
+    .blue  { fill:#1e73be }
+    .green { fill:#1a7f37 }
+    .coral { fill:#cf4640 }
+  </style>
+  <defs>
+    <marker id="nArr" markerWidth="10" markerHeight="9" refX="8.4" refY="3.6" orient="auto">
+      <path d="M0,0 L9,3.6 L0,7.2 z" fill="#848d97"/></marker>
+  </defs>
+
+  <rect class="bg" x="0.5" y="0.5" width="859" height="310" rx="8"/>
+  <rect class="panel" x="24.5" y="24.5" width="436" height="262" rx="6"/>
+  <text class="hd" x="44" y="50">glTF node tree</text>
+  <text class="lbl" x="44" y="68">as authored in the file</text>
+  <rect x="38.0" y="143.0" width="132" height="126" rx="8" fill="#1e73be" fill-opacity="0.07" stroke="#1e73be" stroke-opacity="0.35" stroke-dasharray="4 3"/>
+  <rect x="176.0" y="143.0" width="132" height="126" rx="8" fill="#cf4640" fill-opacity="0.07" stroke="#cf4640" stroke-opacity="0.35" stroke-dasharray="4 3"/>
+  <line x1="242" y1="125.0" x2="104" y2="151.0" stroke="#848d97" stroke-width="1.2"/>
+  <line x1="242" y1="125.0" x2="242" y2="151.0" stroke="#848d97" stroke-width="1.2"/>
+  <line x1="242" y1="125.0" x2="380" y2="151.0" stroke="#848d97" stroke-width="1.2"/>
+  <line x1="104" y1="193.0" x2="104" y2="219.0" stroke="#848d97" stroke-width="1.2"/>
+  <line x1="242" y1="193.0" x2="242" y2="219.0" stroke="#848d97" stroke-width="1.2"/>
+  <line x1="380" y1="193.0" x2="380" y2="219.0" stroke="#848d97" stroke-width="1.2"/>
+  <rect x="184.0" y="83.0" width="116" height="42" rx="5" fill="#ffffff" stroke="#1a7f37" stroke-width="1.2"/>
+  <rect x="184.0" y="83.0" width="116" height="42" rx="5" fill="#1a7f37" fill-opacity="0.10"/>
+  <text class="code" x="242" y="101" text-anchor="middle">drone</text>
+  <text class="lbl" x="242" y="117" text-anchor="middle">body mesh</text>
+  <rect x="46.0" y="151.0" width="116" height="42" rx="5" fill="#ffffff" stroke="#1e73be" stroke-width="2.2"/>
+  <rect x="46.0" y="151.0" width="116" height="42" rx="5" fill="#1e73be" fill-opacity="0.10"/>
+  <text class="code" x="104" y="169" text-anchor="middle">rotor_1</text>
+  <text class="lbl blue" x="104" y="185" text-anchor="middle" style="font-weight:600">animated · hub</text>
+  <rect x="184.0" y="151.0" width="116" height="42" rx="5" fill="#ffffff" stroke="#cf4640" stroke-width="2.2"/>
+  <rect x="184.0" y="151.0" width="116" height="42" rx="5" fill="#cf4640" fill-opacity="0.10"/>
+  <text class="code" x="242" y="169" text-anchor="middle">rotor_2</text>
+  <text class="lbl coral" x="242" y="185" text-anchor="middle" style="font-weight:600">animated · hub</text>
+  <rect x="322.0" y="151.0" width="116" height="42" rx="5" fill="#ffffff" stroke="#1a7f37" stroke-width="1.2"/>
+  <rect x="322.0" y="151.0" width="116" height="42" rx="5" fill="#1a7f37" fill-opacity="0.10"/>
+  <text class="code" x="380" y="169" text-anchor="middle">gimbal</text>
+  <text class="lbl" x="380" y="185" text-anchor="middle">frame mesh</text>
+  <rect x="46.0" y="219.0" width="116" height="42" rx="5" fill="#ffffff" stroke="#1e73be" stroke-width="1.2"/>
+  <rect x="46.0" y="219.0" width="116" height="42" rx="5" fill="#1e73be" fill-opacity="0.10"/>
+  <text class="code" x="104" y="237" text-anchor="middle">blades_1</text>
+  <text class="lbl" x="104" y="253" text-anchor="middle">blade mesh</text>
+  <rect x="184.0" y="219.0" width="116" height="42" rx="5" fill="#ffffff" stroke="#cf4640" stroke-width="1.2"/>
+  <rect x="184.0" y="219.0" width="116" height="42" rx="5" fill="#cf4640" fill-opacity="0.10"/>
+  <text class="code" x="242" y="237" text-anchor="middle">blades_2</text>
+  <text class="lbl" x="242" y="253" text-anchor="middle">blade mesh</text>
+  <rect x="322.0" y="219.0" width="116" height="42" rx="5" fill="#ffffff" stroke="#1a7f37" stroke-width="1.2"/>
+  <rect x="322.0" y="219.0" width="116" height="42" rx="5" fill="#1a7f37" fill-opacity="0.10"/>
+  <text class="code" x="380" y="237" text-anchor="middle">camera</text>
+  <text class="lbl" x="380" y="253" text-anchor="middle">camera mesh</text>
+  <line x1="470" y1="172" x2="518" y2="172" stroke="#848d97" stroke-width="1.6" marker-end="url(#nArr)"/>
+  <rect class="panel" x="530.5" y="24.5" width="305" height="262" rx="6"/>
+  <text class="hd" x="550" y="50">targets returned</text>
+  <text class="lbl" x="550" y="68">one per rigid group, animated first</text>
+  <rect x="550" y="79" width="266" height="50" rx="5" fill="#ffffff" stroke="#1e73be" stroke-width="1.6"/>
+  <rect x="550" y="79" width="266" height="50" rx="5" fill="#1e73be" fill-opacity="0.10"/>
+  <rect x="550" y="79" width="5" height="50" fill="#1e73be"/>
+  <text class="mono" x="568" y="99" fill="#6b7280">targets[0]</text>
+  <text class="code" x="654" y="99">rotor_1</text>
+  <text class="lbl" x="568" y="118">hub + blades_1 <tspan fill="#1e73be">· pose sampled over time</tspan></text>
+  <rect x="550" y="147" width="266" height="50" rx="5" fill="#ffffff" stroke="#cf4640" stroke-width="1.6"/>
+  <rect x="550" y="147" width="266" height="50" rx="5" fill="#cf4640" fill-opacity="0.10"/>
+  <rect x="550" y="147" width="5" height="50" fill="#cf4640"/>
+  <text class="mono" x="568" y="167" fill="#6b7280">targets[1]</text>
+  <text class="code" x="654" y="167">rotor_2</text>
+  <text class="lbl" x="568" y="186">hub + blades_2 <tspan fill="#cf4640">· pose sampled over time</tspan></text>
+  <rect x="550" y="215" width="266" height="50" rx="5" fill="#ffffff" stroke="#1a7f37" stroke-width="1.6"/>
+  <rect x="550" y="215" width="266" height="50" rx="5" fill="#1a7f37" fill-opacity="0.10"/>
+  <rect x="550" y="215" width="5" height="50" fill="#1a7f37"/>
+  <text class="mono" x="568" y="235" fill="#6b7280">targets[2]</text>
+  <text class="code" x="654" y="235">static</text>
+  <text class="lbl" x="568" y="254">body + frame + camera <tspan fill="#1a7f37">· fixed pose</tspan></text>
+</svg>

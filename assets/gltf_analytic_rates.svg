@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 325" width="860" height="325"
+     role="img" aria-label="Rates are the slope of the keyframe interpolation at each radar timestamp; differencing the wrapped angles would spike">
+  <title>Rates are the slope of the keyframe interpolation at each radar timestamp; differencing the wrapped angles would spike</title>
+  <style>
+    .bg    { fill:#ffffff; stroke:#d0d7de; stroke-width:1 }
+    .panel { fill:#f6f8fa; stroke:#d8dee4; stroke-width:1 }
+    .hd    { font:600 13px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#0d1117 }
+    .lbl   { font:11.5px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif; fill:#6b7280 }
+    .ax    { font:600 14px 'IBM Plex Sans','Segoe UI',Roboto,Helvetica,Arial,sans-serif }
+    .code  { font:12.5px 'IBM Plex Mono',Consolas,'Courier New',monospace; fill:#0d1117 }
+    .mono  { font:11px 'IBM Plex Mono',Consolas,'Courier New',monospace }
+    .ink   { fill:#0d1117 }
+    .blue  { fill:#1e73be }
+    .green { fill:#1a7f37 }
+    .coral { fill:#cf4640 }
+  </style>
+  <defs>
+    <marker id="vAx" markerWidth="10" markerHeight="9" refX="8.4" refY="3.6" orient="auto">
+      <path d="M0,0 L9,3.6 L0,7.2 z" fill="#848d97"/></marker>
+  </defs>
+
+  <rect class="bg" x="0.5" y="0.5" width="859" height="324" rx="8"/>
+  <rect class="panel" x="24.5" y="24.5" width="400" height="276" rx="6"/>
+  <text class="hd" x="44" y="50"><tspan class="code" style="font-weight:400">speed</tspan> from the keyframe curve</text>
+  <text class="lbl" x="44" y="68">the slope of the interpolation at each sample</text>
+  <line x1="60" y1="256" x2="408" y2="256" stroke="#848d97" stroke-width="1.2" marker-end="url(#vAx)"/>
+  <line x1="60" y1="256" x2="60" y2="84" stroke="#848d97" stroke-width="1.2" marker-end="url(#vAx)"/>
+  <text class="lbl ink" x="68" y="88">position</text>
+  <text class="lbl ink" x="406" y="274" text-anchor="end">animation time</text>
+  <polyline points="60.0,245.7 62.8,244.0 65.7,242.3 68.5,240.5 71.3,238.7 74.2,236.9 77.0,235.1 79.8,233.2 82.7,231.3 85.5,229.5 88.3,227.6 91.2,225.7 94.0,223.8 96.8,221.8 99.7,219.9 102.5,218.0 105.3,216.1 108.2,214.2 111.0,212.3 113.8,210.4 116.7,208.6 119.5,206.7 122.3,204.9 125.2,203.1 128.0,201.3 130.8,199.6 133.7,197.9 136.5,196.2 139.3,194.5 142.2,192.9 145.0,191.4 147.8,189.8 150.7,188.4 153.5,186.9 156.3,185.6 159.2,184.3 162.0,183.0 164.8,181.8 167.7,180.7 170.5,179.6 173.3,178.6 176.2,177.7 179.0,176.8 181.8,176.1 184.7,175.5 187.5,174.9 190.3,174.4 193.2,174.0 196.0,173.7 198.8,173.4 201.7,173.2 204.5,173.1 207.3,172.9 210.2,172.9 213.0,172.8 215.8,172.8 218.7,172.8 221.5,172.9 224.3,172.9 227.2,173.0 230.0,173.1 232.8,173.2 235.7,173.3 238.5,173.3 241.3,173.4 244.2,173.4 247.0,173.4 249.8,173.4 252.7,173.4 255.5,173.3 258.3,173.1 261.2,173.0 264.0,172.7 266.8,172.4 269.7,172.1 272.5,171.6 275.3,171.1 278.2,170.5 281.0,169.9 283.8,169.1 286.7,168.3 289.5,167.3 292.3,166.3 295.2,165.3 298.0,164.2 300.8,163.0 303.7,161.8 306.5,160.5 309.3,159.2 312.2,157.8 315.0,156.4 317.8,155.0 320.7,153.5 323.5,152.0 326.3,150.4 329.2,148.8 332.0,147.2 334.8,145.6 337.7,143.9 340.5,142.2 343.3,140.5 346.2,138.8 349.0,137.1 351.8,135.3 354.7,133.6 357.5,131.8 360.3,130.1 363.2,128.3 366.0,126.5 368.8,124.8 371.7,123.0 374.5,121.3 377.3,119.5 380.2,117.8 383.0,116.1 385.8,114.4 388.7,112.7 391.5,111.1 394.3,109.5 397.2,107.9 400.0,106.3" fill="none" stroke="#1a7f37" stroke-width="2.2"/>
+  <rect x="98.1" y="92" width="37.2" height="164" fill="#1e73be" fill-opacity="0.06"/>
+  <line x1="78.2" y1="233.8" x2="155.2" y2="183.4" stroke="#1e73be" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="103.1" cy="217.6" r="2.6" fill="#1e73be"/>
+  <circle cx="109.9" cy="213.1" r="2.6" fill="#1e73be"/>
+  <circle cx="116.7" cy="208.6" r="2.6" fill="#1e73be"/>
+  <circle cx="123.5" cy="204.2" r="2.6" fill="#1e73be"/>
+  <circle cx="130.3" cy="199.9" r="2.6" fill="#1e73be"/>
+  <rect x="205.7" y="92" width="37.2" height="164" fill="#1e73be" fill-opacity="0.06"/>
+  <line x1="178.3" y1="171.9" x2="270.3" y2="174.0" stroke="#1e73be" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="210.7" cy="172.9" r="2.6" fill="#1e73be"/>
+  <circle cx="217.5" cy="172.8" r="2.6" fill="#1e73be"/>
+  <circle cx="224.3" cy="172.9" r="2.6" fill="#1e73be"/>
+  <circle cx="231.1" cy="173.1" r="2.6" fill="#1e73be"/>
+  <circle cx="237.9" cy="173.3" r="2.6" fill="#1e73be"/>
+  <rect x="319.1" y="92" width="37.2" height="164" fill="#1e73be" fill-opacity="0.06"/>
+  <line x1="298.1" y1="167.3" x2="377.3" y2="120.5" stroke="#1e73be" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="324.1" cy="151.6" r="2.6" fill="#1e73be"/>
+  <circle cx="330.9" cy="147.8" r="2.6" fill="#1e73be"/>
+  <circle cx="337.7" cy="143.9" r="2.6" fill="#1e73be"/>
+  <circle cx="344.5" cy="139.8" r="2.6" fill="#1e73be"/>
+  <circle cx="351.3" cy="135.7" r="2.6" fill="#1e73be"/>
+  <path d="M60.0,239.7 L66.0,245.7 L60.0,251.7 L54.0,245.7 Z" fill="#ffffff" stroke="#0d1117" stroke-width="1.5"/>
+  <path d="M173.3,172.6 L179.3,178.6 L173.3,184.6 L167.3,178.6 Z" fill="#ffffff" stroke="#0d1117" stroke-width="1.5"/>
+  <path d="M286.7,162.3 L292.7,168.3 L286.7,174.3 L280.7,168.3 Z" fill="#ffffff" stroke="#0d1117" stroke-width="1.5"/>
+  <path d="M400.0,100.3 L406.0,106.3 L400.0,112.3 L394.0,106.3 Z" fill="#ffffff" stroke="#0d1117" stroke-width="1.5"/>
+  <path d="M52,280 L58,286 L52,292 L46,286 Z" fill="#ffffff" stroke="#0d1117" stroke-width="1.5"/>
+  <text class="lbl" x="64" y="290">keyframe</text>
+  <circle cx="134" cy="286" r="2.6" fill="#1e73be"/>
+  <text class="lbl" x="142" y="290">radar timestamp</text>
+  <line x1="250" y1="286" x2="272" y2="286" stroke="#1e73be" stroke-width="2" stroke-linecap="round"/>
+  <text class="lbl" x="280" y="290">emitted rate</text>
+  <rect class="panel" x="436.5" y="24.5" width="399" height="276" rx="6"/>
+  <text class="hd" x="456" y="50">why not difference the samples?</text>
+  <text class="lbl" x="456" y="68">a spinning rotor: its yaw is emitted wrapped to &#177;180&#176;</text>
+  <line x1="500" y1="127.0" x2="812" y2="127.0" stroke="#d0d7de" stroke-width="1"/>
+  <line x1="500" y1="86" x2="500" y2="168" stroke="#848d97" stroke-width="1.2"/>
+  <text class="mono" x="494" y="94" text-anchor="end" fill="#6b7280">+180</text>
+  <text class="mono" x="494" y="168" text-anchor="end" fill="#6b7280">&#8722;180</text>
+  <text class="code" x="508" y="84" style="font-size:11.5px">rotation</text>
+  <line x1="500.0" y1="152.9" x2="602.0" y2="90.0" stroke="#1a7f37" stroke-width="2.2"/>
+  <line x1="602.0" y1="164.0" x2="722.0" y2="90.0" stroke="#1a7f37" stroke-width="2.2"/>
+  <line x1="722.0" y1="164.0" x2="812.0" y2="108.5" stroke="#1a7f37" stroke-width="2.2"/>
+  <line x1="602.0" y1="90" x2="602.0" y2="164" stroke="#1a7f37" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/>
+  <line x1="722.0" y1="90" x2="722.0" y2="164" stroke="#1a7f37" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/>
+  <line x1="500" y1="192" x2="500" y2="266" stroke="#848d97" stroke-width="1.2"/>
+  <line x1="500" y1="236" x2="812" y2="236" stroke="#d0d7de" stroke-width="1"/>
+  <text class="mono" x="494" y="240" text-anchor="end" fill="#6b7280">0</text>
+  <text class="code" x="508" y="186" style="font-size:11.5px">rotation_rate</text>
+  <line x1="500" y1="214" x2="812" y2="214" stroke="#1e73be" stroke-width="3.4"/>
+  <polyline points="500.0,214.0 598.0,214.0 602.0,264.0 606.0,214.0 718.0,214.0 722.0,264.0 726.0,214.0 812.0,214.0" fill="none" stroke="#cf4640" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M598.0,260 L602.0,268 L606.0,260" fill="none" stroke="#cf4640" stroke-width="1.5"/>
+  <path d="M718.0,260 L722.0,268 L726.0,260" fill="none" stroke="#cf4640" stroke-width="1.5"/>
+  <line x1="456" y1="286" x2="478" y2="286" stroke="#1e73be" stroke-width="3.4"/>
+  <text class="lbl" x="486" y="290">analytic: constant</text>
+  <line x1="604" y1="286" x2="626" y2="286" stroke="#cf4640" stroke-width="1.5"/>
+  <text class="lbl" x="634" y="290">differenced: spikes at each wrap</text>
+</svg>
