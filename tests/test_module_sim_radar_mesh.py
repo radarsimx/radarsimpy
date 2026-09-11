@@ -3125,3 +3125,43 @@ def test_sim_radar_back_propagating():
             ]
         ),
     )
+
+
+@pytest.mark.parametrize("samples", [40, 41, 47])
+def test_low_fidelity_pulse_index_odd_sample_count(samples):
+    """At ``level=None`` every sample lands in its own pulse.
+
+    The baseband kernel used to split the flat pulse-sample index with a float
+    reciprocal, ``(int)(pusa * fl(1/S))``, which for sample counts such as 41 and
+    47 rounds the first sample of some pulses down into the previous pulse. That
+    sample then took the wrong start time and ``s_idx == S``, and came out
+    about 100% off. ``level="pulse"`` indexes pulses from the snapshot instead,
+    so for a static target the two must agree everywhere.
+    """
+    pulse_length = 20e-6
+    tx = Transmitter(
+        f=[76e9, 77e9],
+        t=pulse_length,
+        tx_power=15,
+        prp=100e-6,
+        pulses=8,
+        channels=[{"location": (0, 0, 0)}],
+    )
+    rx = Receiver(
+        fs=(samples + 0.5) / pulse_length,
+        noise_figure=8,
+        rf_gain=20,
+        load_resistor=500,
+        baseband_gain=30,
+        channels=[{"location": (0, 0, 0)}],
+    )
+    radar = Radar(transmitter=tx, receiver=rx)
+    target = [{"model": "./models/plate5x5.stl", "location": (20, 0, 0)}]
+
+    low = sim_radar(radar, target, density=0.3, device="cpu")["baseband"]
+    mid = sim_radar(radar, target, density=0.3, level="pulse", device="cpu")[
+        "baseband"
+    ]
+
+    assert low.shape[-1] == samples
+    np.testing.assert_allclose(low, mid, rtol=0, atol=1e-9 * np.max(np.abs(mid)))
