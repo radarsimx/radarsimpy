@@ -27,6 +27,16 @@ from radarsimpy.simulator import sim_radar  # pylint: disable=no-name-in-module
 # Every test here loads an .stl model.
 pytestmark = pytest.mark.mesh
 
+#: Relative tolerance for comparing baseband against the values recorded in
+#: this file. They were captured from an all-FP64 build, while the simulator
+#: evaluates the baseband in its low-precision type L (``float_t`` in
+#: ``type_def.pxd``, float by default) and keeps only range, delay, gate and
+#: the waveform phase difference in H. A sample whose ray contributions
+#: largely cancel therefore sits a few parts in 1e5 from these numbers -- the
+#: worst across this file is 2.4e-5, against 2.6e-6 typical -- on CPU and GPU
+#: alike. Rebuild with ``float_t = double`` to reproduce them to ~1e-6.
+BASEBAND_RTOL = 1e-4
+
 
 def test_scene_single_target():
     """
@@ -94,6 +104,7 @@ def test_scene_single_target():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -137,6 +148,7 @@ def test_scene_single_target():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -219,6 +231,7 @@ def test_scene_varing_prp():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -262,6 +275,7 @@ def test_scene_varing_prp():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -345,6 +359,7 @@ def test_scene_tx_delay():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -388,6 +403,7 @@ def test_scene_tx_delay():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -468,6 +484,7 @@ def test_scene_tx_offset():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -511,6 +528,7 @@ def test_scene_tx_offset():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -591,6 +609,7 @@ def test_scene_rx_offset():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -608,11 +627,6 @@ def test_scene_rx_offset():
 
     result = sim_radar(radar, targets, density=0.4, device="cpu")
 
-    # rtol is looser than this file's default: the mesh baseband is
-    # evaluated in the simulator's low-precision type L (float_t), so a
-    # sample where the ray contributions largely cancel sits a few parts
-    # in 1e5 from these values, which were recorded from an all-FP64
-    # build. Rebuild with float_t = double to reproduce them exactly.
     assert np.allclose(
         result["baseband"],
         np.array(
@@ -639,7 +653,7 @@ def test_scene_rx_offset():
                 ]
             ]
         ),
-        rtol=1e-4,
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -726,6 +740,7 @@ def test_scene_multiple_targets():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -769,6 +784,7 @@ def test_scene_multiple_targets():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -850,6 +866,7 @@ def test_scene_single_target_speed():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -893,6 +910,7 @@ def test_scene_single_target_speed():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -973,6 +991,7 @@ def test_scene_radar_location():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1016,6 +1035,7 @@ def test_scene_radar_location():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1096,6 +1116,7 @@ def test_scene_radar_moving():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1139,6 +1160,7 @@ def test_scene_radar_moving():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1240,6 +1262,7 @@ def test_scene_2_frames_moving_target():
                 ],
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1308,6 +1331,7 @@ def test_scene_2_frames_moving_target():
                 ],
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1414,6 +1438,7 @@ def test_scene_2_frames_moving_radar():
                 ],
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1482,6 +1507,7 @@ def test_scene_2_frames_moving_radar():
                 ],
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1572,6 +1598,7 @@ def test_scene_tx_az_pattern():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1615,6 +1642,7 @@ def test_scene_tx_az_pattern():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1665,6 +1693,7 @@ def test_scene_tx_az_pattern():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1708,6 +1737,7 @@ def test_scene_tx_az_pattern():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1793,6 +1823,7 @@ def test_scene_rx_az_pattern():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1836,6 +1867,7 @@ def test_scene_rx_az_pattern():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1886,6 +1918,7 @@ def test_scene_rx_az_pattern():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1929,6 +1962,7 @@ def test_scene_rx_az_pattern():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2014,6 +2048,7 @@ def test_scene_tx_el_pattern():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2057,6 +2092,7 @@ def test_scene_tx_el_pattern():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2107,6 +2143,7 @@ def test_scene_tx_el_pattern():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2150,6 +2187,7 @@ def test_scene_tx_el_pattern():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2235,6 +2273,7 @@ def test_scene_rx_el_pattern():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2278,6 +2317,7 @@ def test_scene_rx_el_pattern():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2328,6 +2368,7 @@ def test_scene_rx_el_pattern():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2371,6 +2412,7 @@ def test_scene_rx_el_pattern():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2452,6 +2494,7 @@ def test_scene_freq_offset():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2529,6 +2572,7 @@ def test_scene_pulse_modulation():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2612,6 +2656,7 @@ def test_scene_waveform_modulation():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2692,6 +2737,7 @@ def test_scene_arbitrary_waveform():
                 ]
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2982,6 +3028,7 @@ def test_sim_radar_back_propagating():
                 0.12640762,
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -3030,6 +3077,7 @@ def test_sim_radar_back_propagating():
                 0.44886890,
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
     data = sim_radar(radar, targets, density=1, back_propagating=True, device="cpu")
@@ -3082,13 +3130,9 @@ def test_sim_radar_back_propagating():
                 0.12640762,
             ]
         ),
+        rtol=BASEBAND_RTOL,
     )
 
-    # rtol is looser than this file's default: the mesh baseband is
-    # evaluated in the simulator's low-precision type L (float_t), so a
-    # sample where the ray contributions largely cancel sits a few parts
-    # in 1e5 from these values, which were recorded from an all-FP64
-    # build. Rebuild with float_t = double to reproduce them exactly.
     assert np.allclose(
         np.imag(baseband[0, 0, :]),
         np.array(
@@ -3135,7 +3179,7 @@ def test_sim_radar_back_propagating():
                 0.44886890,
             ]
         ),
-        rtol=1e-4,
+        rtol=BASEBAND_RTOL,
     )
 
 
