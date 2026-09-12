@@ -487,6 +487,13 @@ REM   Sets CMAKE_FAILED=1 and exits on any CMake failures
         set CMAKE_OPTIONS=-DRADARSIMX_CUDA_FAST_MATH=!RADARSIMX_CUDA_FAST_MATH! !CMAKE_OPTIONS!
     )
 
+    REM Same idea for device parity, which makes a GPU run reproduce a CPU run
+    REM bit for bit at about 25%% of the baseband kernel's speed: `set
+    REM RADARSIMX_DEVICE_PARITY=ON`.
+    if defined RADARSIMX_DEVICE_PARITY (
+        set CMAKE_OPTIONS=-DRADARSIMX_DEVICE_PARITY=!RADARSIMX_DEVICE_PARITY! !CMAKE_OPTIONS!
+    )
+
     cmake !CMAKE_OPTIONS! ..
 
     if %errorlevel% neq 0 (
