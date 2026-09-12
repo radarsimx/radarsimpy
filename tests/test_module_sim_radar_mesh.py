@@ -27,15 +27,43 @@ from radarsimpy.simulator import sim_radar  # pylint: disable=no-name-in-module
 # Every test here loads an .stl model.
 pytestmark = pytest.mark.mesh
 
-#: Relative tolerance for comparing baseband against the values recorded in
-#: this file. They were captured from an all-FP64 build, while the simulator
+#: How far a baseband sample may sit from the values recorded in this file,
+#: as a fraction of the strongest sample (3e-5 is -90 dBc).
+#:
+#: Those values were captured from an all-FP64 build. The simulator now
 #: evaluates the baseband in its low-precision type L (``float_t`` in
-#: ``type_def.pxd``, float by default) and keeps only range, delay, gate and
-#: the waveform phase difference in H. A sample whose ray contributions
-#: largely cancel therefore sits a few parts in 1e5 from these numbers -- the
-#: worst across this file is 2.4e-5, against 2.6e-6 typical -- on CPU and GPU
-#: alike. Rebuild with ``float_t = double`` to reproduce them to ~1e-6.
-BASEBAND_RTOL = 1e-4
+#: ``type_def.pxd``), keeping only the range, delay, gate and waveform phase
+#: difference in H, so each ray's contribution carries ~1e-7 of rounding and
+#: the coherent sum over rays amplifies it wherever contributions cancel.
+#:
+#: Measured against a build of the last all-FP64 commit, same scenes, same
+#: geometry, on both the CPU and GPU paths: 6.3e-8 (one float ulp) in
+#: well-conditioned scenes, 8.9e-6 at worst, the worst case being
+#: ``test_scene_rx_offset``, whose density sits near a partial null. Sweeping
+#: that scene's density gives 5.1e-7 (0.2), 8.9e-6 (0.4), 1.0e-5 (1.0) and
+#: 1.3e-5 (2.0) -- growing with ray count, as accumulated rounding does and a
+#: formula error would not. 3e-5 leaves 3.4x over the worst of those while
+#: staying far tighter than any real defect: for reference, a gate-delay
+#: narrowing caught during this work showed up as 56 degrees of phase.
+#:
+#: Rebuild with ``float_t = double`` to reproduce the stored values to ~5e-7.
+BASEBAND_PEAK_ATOL = 3e-5
+
+
+def assert_baseband_close(actual, expected, atol_frac=BASEBAND_PEAK_ATOL):
+    """Assert a baseband array matches ``expected`` relative to its peak.
+
+    Referenced to the peak rather than element-wise, because the rounding this
+    absorbs is a property of the coherent sum as a whole, not of each sample:
+    an element-wise tolerance is simultaneously too tight on samples near a
+    null and too loose on the ones carrying the signal.
+    """
+    expected = np.asarray(expected)
+    peak = np.max(np.abs(expected))
+    np.testing.assert_allclose(
+        np.asarray(actual), expected, rtol=0, atol=atol_frac * peak
+    )
+    return True
 
 
 def test_scene_single_target():
@@ -78,7 +106,7 @@ def test_scene_single_target():
     ]
     result = sim_radar(radar, targets, density=0.4)
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -104,7 +132,6 @@ def test_scene_single_target():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -122,7 +149,7 @@ def test_scene_single_target():
 
     result = sim_radar(radar, targets, density=0.4, device="cpu")
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -148,7 +175,6 @@ def test_scene_single_target():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -205,7 +231,7 @@ def test_scene_varing_prp():
     ]
     result = sim_radar(radar, targets, density=0.4)
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -231,7 +257,6 @@ def test_scene_varing_prp():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -249,7 +274,7 @@ def test_scene_varing_prp():
 
     result = sim_radar(radar, targets, density=0.4, device="cpu")
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -275,7 +300,6 @@ def test_scene_varing_prp():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -333,7 +357,7 @@ def test_scene_tx_delay():
     ]
     result = sim_radar(radar, targets, density=0.4)
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -359,7 +383,6 @@ def test_scene_tx_delay():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -377,7 +400,7 @@ def test_scene_tx_delay():
 
     result = sim_radar(radar, targets, density=0.4, device="cpu")
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -403,7 +426,6 @@ def test_scene_tx_delay():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -458,7 +480,7 @@ def test_scene_tx_offset():
     ]
     result = sim_radar(radar, targets, density=0.4)
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -484,7 +506,6 @@ def test_scene_tx_offset():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -502,7 +523,7 @@ def test_scene_tx_offset():
 
     result = sim_radar(radar, targets, density=0.4, device="cpu")
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -528,7 +549,6 @@ def test_scene_tx_offset():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -583,7 +603,7 @@ def test_scene_rx_offset():
     ]
     result = sim_radar(radar, targets, density=0.4)
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -609,7 +629,6 @@ def test_scene_rx_offset():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -627,7 +646,7 @@ def test_scene_rx_offset():
 
     result = sim_radar(radar, targets, density=0.4, device="cpu")
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -653,7 +672,6 @@ def test_scene_rx_offset():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -714,7 +732,7 @@ def test_scene_multiple_targets():
     ]
     result = sim_radar(radar, targets, density=0.4)
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -740,7 +758,6 @@ def test_scene_multiple_targets():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -758,7 +775,7 @@ def test_scene_multiple_targets():
 
     result = sim_radar(radar, targets, density=0.4, device="cpu")
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -784,7 +801,6 @@ def test_scene_multiple_targets():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -840,7 +856,7 @@ def test_scene_single_target_speed():
     ]
     result = sim_radar(radar, targets, density=0.4)
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -866,7 +882,6 @@ def test_scene_single_target_speed():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -884,7 +899,7 @@ def test_scene_single_target_speed():
 
     result = sim_radar(radar, targets, density=0.4, device="cpu")
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -910,7 +925,6 @@ def test_scene_single_target_speed():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -965,7 +979,7 @@ def test_scene_radar_location():
     ]
     result = sim_radar(radar, targets, density=0.4)
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -991,7 +1005,6 @@ def test_scene_radar_location():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1009,7 +1022,7 @@ def test_scene_radar_location():
 
     result = sim_radar(radar, targets, density=0.4, device="cpu")
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -1035,7 +1048,6 @@ def test_scene_radar_location():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1090,7 +1102,7 @@ def test_scene_radar_moving():
     ]
     result = sim_radar(radar, targets, density=0.4)
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -1116,7 +1128,6 @@ def test_scene_radar_moving():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1134,7 +1145,7 @@ def test_scene_radar_moving():
 
     result = sim_radar(radar, targets, density=0.4, device="cpu")
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -1160,7 +1171,6 @@ def test_scene_radar_moving():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1216,7 +1226,7 @@ def test_scene_2_frames_moving_target():
     ]
     result = sim_radar(radar, targets, density=0.4)
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -1262,7 +1272,6 @@ def test_scene_2_frames_moving_target():
                 ],
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1285,7 +1294,7 @@ def test_scene_2_frames_moving_target():
 
     result = sim_radar(radar, targets, density=0.4, device="cpu")
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -1331,7 +1340,6 @@ def test_scene_2_frames_moving_target():
                 ],
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1392,7 +1400,7 @@ def test_scene_2_frames_moving_radar():
     ]
     result = sim_radar(radar, targets, density=0.4)
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -1438,7 +1446,6 @@ def test_scene_2_frames_moving_radar():
                 ],
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1461,7 +1468,7 @@ def test_scene_2_frames_moving_radar():
 
     result = sim_radar(radar, targets, density=0.4, device="cpu")
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -1507,7 +1514,6 @@ def test_scene_2_frames_moving_radar():
                 ],
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1572,7 +1578,7 @@ def test_scene_tx_az_pattern():
     ]
     result = sim_radar(radar, targets, density=1)
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -1598,7 +1604,6 @@ def test_scene_tx_az_pattern():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1616,7 +1621,7 @@ def test_scene_tx_az_pattern():
 
     result = sim_radar(radar, targets, density=1, device="cpu")
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -1642,7 +1647,6 @@ def test_scene_tx_az_pattern():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1667,7 +1671,7 @@ def test_scene_tx_az_pattern():
     ]
     result = sim_radar(radar, targets, density=1)
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -1693,7 +1697,6 @@ def test_scene_tx_az_pattern():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1711,7 +1714,7 @@ def test_scene_tx_az_pattern():
 
     result = sim_radar(radar, targets, density=1, device="cpu")
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -1737,7 +1740,6 @@ def test_scene_tx_az_pattern():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1797,7 +1799,7 @@ def test_scene_rx_az_pattern():
     ]
     result = sim_radar(radar, targets, density=1)
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -1823,7 +1825,6 @@ def test_scene_rx_az_pattern():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1841,7 +1842,7 @@ def test_scene_rx_az_pattern():
 
     result = sim_radar(radar, targets, density=1, device="cpu")
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -1867,7 +1868,6 @@ def test_scene_rx_az_pattern():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1892,7 +1892,7 @@ def test_scene_rx_az_pattern():
     ]
     result = sim_radar(radar, targets, density=1)
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -1918,7 +1918,6 @@ def test_scene_rx_az_pattern():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -1936,7 +1935,7 @@ def test_scene_rx_az_pattern():
 
     result = sim_radar(radar, targets, density=1, device="cpu")
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -1962,7 +1961,6 @@ def test_scene_rx_az_pattern():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2022,7 +2020,7 @@ def test_scene_tx_el_pattern():
     ]
     result = sim_radar(radar, targets, density=1)
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -2048,7 +2046,6 @@ def test_scene_tx_el_pattern():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2066,7 +2063,7 @@ def test_scene_tx_el_pattern():
 
     result = sim_radar(radar, targets, density=1, device="cpu")
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -2092,7 +2089,6 @@ def test_scene_tx_el_pattern():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2117,7 +2113,7 @@ def test_scene_tx_el_pattern():
     ]
     result = sim_radar(radar, targets, density=1)
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -2143,7 +2139,6 @@ def test_scene_tx_el_pattern():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2161,7 +2156,7 @@ def test_scene_tx_el_pattern():
 
     result = sim_radar(radar, targets, density=1, device="cpu")
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -2187,7 +2182,6 @@ def test_scene_tx_el_pattern():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2247,7 +2241,7 @@ def test_scene_rx_el_pattern():
     ]
     result = sim_radar(radar, targets, density=1)
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -2273,7 +2267,6 @@ def test_scene_rx_el_pattern():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2291,7 +2284,7 @@ def test_scene_rx_el_pattern():
 
     result = sim_radar(radar, targets, density=1, device="cpu")
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -2317,7 +2310,6 @@ def test_scene_rx_el_pattern():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2342,7 +2334,7 @@ def test_scene_rx_el_pattern():
     ]
     result = sim_radar(radar, targets, density=1)
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -2368,7 +2360,6 @@ def test_scene_rx_el_pattern():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2386,7 +2377,7 @@ def test_scene_rx_el_pattern():
 
     result = sim_radar(radar, targets, density=1, device="cpu")
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -2412,7 +2403,6 @@ def test_scene_rx_el_pattern():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2468,7 +2458,7 @@ def test_scene_freq_offset():
     ]
     result = sim_radar(radar, targets, density=0.4)
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -2494,7 +2484,6 @@ def test_scene_freq_offset():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2551,7 +2540,7 @@ def test_scene_pulse_modulation():
     ]
     result = sim_radar(radar, targets, density=0.4)
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -2572,7 +2561,6 @@ def test_scene_pulse_modulation():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2630,7 +2618,7 @@ def test_scene_waveform_modulation():
     ]
     result = sim_radar(radar, targets, density=0.4)
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -2656,7 +2644,6 @@ def test_scene_waveform_modulation():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2711,7 +2698,7 @@ def test_scene_arbitrary_waveform():
     ]
     result = sim_radar(radar, targets, density=0.4)
 
-    assert np.allclose(
+    assert assert_baseband_close(
         result["baseband"],
         np.array(
             [
@@ -2737,7 +2724,6 @@ def test_scene_arbitrary_waveform():
                 ]
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     assert np.allclose(
@@ -2982,7 +2968,7 @@ def test_sim_radar_back_propagating():
 
     baseband = data["baseband"]
 
-    assert np.allclose(
+    assert assert_baseband_close(
         np.real(baseband[0, 0, :]),
         np.array(
             [
@@ -3028,10 +3014,9 @@ def test_sim_radar_back_propagating():
                 0.12640762,
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
-    assert np.allclose(
+    assert assert_baseband_close(
         np.imag(baseband[0, 0, :]),
         np.array(
             [
@@ -3077,14 +3062,13 @@ def test_sim_radar_back_propagating():
                 0.44886890,
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
     data = sim_radar(radar, targets, density=1, back_propagating=True, device="cpu")
 
     baseband = data["baseband"]
 
-    assert np.allclose(
+    assert assert_baseband_close(
         np.real(baseband[0, 0, :]),
         np.array(
             [
@@ -3130,10 +3114,9 @@ def test_sim_radar_back_propagating():
                 0.12640762,
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
-    assert np.allclose(
+    assert assert_baseband_close(
         np.imag(baseband[0, 0, :]),
         np.array(
             [
@@ -3179,7 +3162,6 @@ def test_sim_radar_back_propagating():
                 0.44886890,
             ]
         ),
-        rtol=BASEBAND_RTOL,
     )
 
 
