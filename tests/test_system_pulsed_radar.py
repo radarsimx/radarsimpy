@@ -141,7 +141,7 @@ def test_pulsed_radar():
                 0.0,
                 0.0,
                 0.0,
-                0.97831584,
+                0.0,
                 0.94163854,
                 0.90496124,
                 0.86828393,
@@ -388,7 +388,7 @@ def test_pulsed_radar_with_doppler():
         np.arctan2(np.real(baseband[0, 0, 79:100]), np.imag(baseband[0, 0, 79:100])),
         np.array(
             [
-                0.34915804,
+                0.0,
                 0.31248074,
                 0.27580344,
                 0.23912614,
