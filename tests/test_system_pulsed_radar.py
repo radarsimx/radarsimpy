@@ -304,6 +304,13 @@ def test_pulsed_radar():
                 0.0,
             ]
         ),
+        # An absolute floor in radians, because this sequence crosses zero and a
+        # purely relative bound is unsatisfiable there. The point simulator
+        # evaluates its final complex rotation in the low-precision type L, so
+        # the baseband phase carries ~8e-8 rad (5e-6 degrees) of rounding; this
+        # is an order above that and still far below anything physical.
+        rtol=1e-7,
+        atol=1e-6,
     )
 
 
@@ -404,7 +411,9 @@ def test_pulsed_radar_with_doppler():
                 -0.38438776,
             ]
         ),
-        1e-6,
+        # See the note on the same comparison in test_pulsed_radar.
+        rtol=1e-6,
+        atol=1e-6,
     )
 
 
