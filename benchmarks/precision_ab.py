@@ -1,10 +1,12 @@
 """
-Accuracy and speed of the mesh baseband kernel across precision builds.
+Accuracy and speed of the baseband kernels across precision builds.
 
-Which quantities the mesh baseband kernel evaluates in double follows the
-simulator's template types: the precision-critical ones (absolute range, delay,
-gate and the waveform phase difference) use ``H``, everything else ``L``. On the
-Python side ``L`` is ``float_t`` in ``src/radarsimpy/includes/type_def.pxd``:
+Covers all three: the mesh (SBR) simulator, the ideal point-target simulator
+and the radar-to-radar interference simulator. Which quantities each evaluates
+in double follows the simulator's template types: the precision-critical ones
+(absolute range, delay, gate and the waveform phase difference) use ``H``,
+everything else ``L``. On the Python side ``L`` is ``float_t`` in
+``src/radarsimpy/includes/type_def.pxd``:
 
 - ``ctypedef float float_t``   -> mixed precision (the default build)
 - ``ctypedef double float_t``  -> all-FP64, the reference
@@ -21,6 +23,10 @@ So a comparison is between two builds. Capture each, then compare::
 times in one process, after a warm-up that pays for CUDA context creation.
 Absolute GPU wall times on a laptop drift by a few percent between builds, so
 only speed differences well outside that are meaningful here.
+
+``--paths`` restricts the run to one family (``mesh``, ``point``,
+``interference``). The point and interference scenes need no ``.stl`` model, so
+they run on a checkout without the bundled geometry.
 
 ---
 
@@ -238,6 +244,186 @@ def build_scene(name):
             {"density": 0.005},
         )
 
+    if name == "point_fmcw24":
+        # Four point targets spread across the swath of a 24 GHz FMCW, two of
+        # them closing. Nothing here is marginal: it is the ordinary case, and
+        # the one that has to stay clean.
+        return (
+            _fmcw([24.075e9, 24.175e9], 80e-6, 100e-6, 16, 256, rx_channels=4),
+            [
+                {"location": (10, 0, 0), "rcs": 20},
+                {"location": (50, 5, 0), "rcs": 15, "speed": (-30, 0, 0)},
+                {"location": (120, -8, 2), "rcs": 25},
+                {"location": (180, 0, 0), "rcs": 30, "speed": (20, 0, 0)},
+            ],
+            {},
+        )
+
+    if name == "point_phase_noise":
+        # Phase noise over two frames, which is what puts the point path's LUT
+        # indices -- a difference of delays scaled by fs, and so H -- under
+        # load. The seed pins the realisation across builds.
+        tx = Transmitter(
+            f=[24.125e9 - 50e6, 24.125e9 + 50e6],
+            t=80e-6,
+            tx_power=40,
+            prp=100e-6,
+            pulses=16,
+            pn_f=np.array([1000, 10000, 100000, 1000000]),
+            pn_power=np.array([-65, -70, -65, -90]),
+            channels=[{"location": (0, 0, 0)}],
+        )
+        rx = Receiver(
+            fs=(160 + 0.5) / 80e-6,
+            noise_figure=8,
+            rf_gain=20,
+            load_resistor=500,
+            baseband_gain=30,
+            channels=[{"location": (0, 0, 0)}],
+        )
+        return (
+            Radar(transmitter=tx, receiver=rx, frame_time=[0, 0.05], seed=7),
+            [{"location": (30, 0, 0), "rcs": 20, "speed": (-10, 2, 0)}],
+            {},
+        )
+
+    if name == "point_range_gate":
+        # The point-target twin of range_gate_111km: the absolute delay is
+        # ~0.74 ms and only the residual matters, which is the worst case for
+        # forming the phase difference and the modulation time.
+        c = 299792458.0
+        gate_range = 111.12e3
+        tx = Transmitter(
+            f=[9e9 - 150e6, 9e9 + 150e6],
+            t=50e-6,
+            tx_power=40,
+            prp=1e-3,
+            pulses=16,
+            channels=[{"location": (0, 0, 0)}],
+        )
+        rx = Receiver(
+            fs=40e6,
+            noise_figure=8,
+            rf_gain=20,
+            load_resistor=500,
+            baseband_gain=30,
+            gate_delay=2 * gate_range / c,
+            channels=[{"location": (0, 0, 0)}],
+        )
+        return (
+            Radar(transmitter=tx, receiver=rx),
+            [
+                {
+                    "location": (gate_range + 150.0, 0, 0),
+                    "rcs": 40,
+                    "speed": (-250, 0, 0),
+                }
+            ],
+            {},
+        )
+
+    if name == "point_ego_attitude":
+        # A moving, tilted platform. The multi-axis attitude is what makes the
+        # ego rotation matrix matter, and the rotation rate is what stops
+        # SetupRadar() from caching it, so this covers the uncached branch.
+        base = _fmcw([77e9, 78e9], 40e-6, 80e-6, 32, 128, rx_channels=2)
+        radar = Radar(
+            transmitter=base.radar_prop["transmitter"],
+            receiver=base.radar_prop["receiver"],
+            location=(0, 0, 3),
+            speed=(12, 0, 0),
+            rotation=(20, 8, 5),
+            rotation_rate=(3, 0, 0),
+        )
+        return (
+            radar,
+            [
+                {"location": (60, 12, 0), "rcs": 20},
+                {"location": (140, -20, 1), "rcs": 25, "speed": (-15, 0, 0)},
+            ],
+            {},
+        )
+
+    if name == "interf_fmcw":
+        # A 77 GHz victim and a slightly offset 77 GHz interferer 40 m away,
+        # whose chirps sweep through each other's baseband bandwidth.
+        victim = _fmcw([77e9, 77.4e9], 80e-6, 100e-6, 16, 256, rx_channels=4)
+        interf_tx = Transmitter(
+            f=[77.1e9, 77.5e9],
+            t=60e-6,
+            tx_power=15,
+            prp=90e-6,
+            pulses=16,
+            channels=[{"location": (0, 0, 0)}],
+        )
+        interf_rx = Receiver(
+            fs=(256 + 0.5) / 60e-6,
+            noise_figure=8,
+            rf_gain=20,
+            load_resistor=500,
+            baseband_gain=30,
+            channels=[{"location": (0, 0, 0)}],
+        )
+        interf = Radar(
+            transmitter=interf_tx,
+            receiver=interf_rx,
+            location=(40, 8, 0),
+            rotation=(180, 0, 0),
+        )
+        return (
+            victim,
+            [{"location": (25, 0, 0), "rcs": 20, "speed": (-10, 0, 0)}],
+            {"interf": interf},
+        )
+
+    if name == "point_timing":
+        # Sized so a round takes seconds: 8 receive channels x 64 pulses x
+        # 512 samples x 8 targets is ~1.3e7 evaluations of the core.
+        return (
+            _fmcw([76e9, 77e9], 40e-6, 100e-6, 64, 512, rx_channels=8),
+            [
+                {
+                    "location": (20 + 15 * idx, 3 * idx - 6, 0),
+                    "rcs": 20,
+                    "speed": (-5 * idx, 0, 0),
+                }
+                for idx in range(8)
+            ],
+            {},
+        )
+
+    if name == "interf_timing":
+        # Same shape, with a two-channel interferer so the per-interferer loop
+        # runs more than once.
+        victim = _fmcw([76e9, 77e9], 40e-6, 100e-6, 64, 512, rx_channels=8)
+        interf_tx = Transmitter(
+            f=[76.2e9, 77.2e9],
+            t=40e-6,
+            tx_power=20,
+            prp=95e-6,
+            pulses=64,
+            channels=[{"location": (0, 0, 0)}, {"location": (0, 0.002, 0)}],
+        )
+        interf_rx = Receiver(
+            fs=(512 + 0.5) / 40e-6,
+            noise_figure=8,
+            rf_gain=20,
+            load_resistor=500,
+            baseband_gain=30,
+            channels=[{"location": (0, 0, 0)}],
+        )
+        interf = Radar(
+            transmitter=interf_tx,
+            receiver=interf_rx,
+            location=(60, 10, 0),
+            rotation=(180, 0, 0),
+        )
+        return (
+            victim,
+            [{"location": (30, 0, 0), "rcs": 20}],
+            {"interf": interf},
+        )
+
     if name == "timing_ball":
         # The profiled workload, cut to 32 pulses so a round takes seconds.
         return (
@@ -256,7 +442,9 @@ def build_scene(name):
     raise KeyError(name)
 
 
-ACCURACY_SCENES = [f"ref:{name}" for name in sorted(REFERENCE_CASES)] + [
+#: Scenes per simulator family. The mesh ones need the bundled ``.stl``
+#: models; the point and interference ones do not.
+MESH_ACCURACY_SCENES = [f"ref:{name}" for name in sorted(REFERENCE_CASES)] + [
     "pulse_doppler",
     "fmcw77_200m",
     "long_cpi_low",
@@ -264,7 +452,37 @@ ACCURACY_SCENES = [f"ref:{name}" for name in sorted(REFERENCE_CASES)] + [
     "range_gate_111km",
     "timing_ball",
 ]
-SPEED_SCENES = ["timing_ball", "timing_turbine"]
+MESH_SPEED_SCENES = ["timing_ball", "timing_turbine"]
+
+POINT_ACCURACY_SCENES = [
+    "point_fmcw24",
+    "point_phase_noise",
+    "point_range_gate",
+    "point_ego_attitude",
+    "point_timing",
+]
+POINT_SPEED_SCENES = ["point_timing"]
+
+INTERF_ACCURACY_SCENES = ["interf_fmcw", "interf_timing"]
+INTERF_SPEED_SCENES = ["interf_timing"]
+
+#: Which scenes each ``--paths`` value selects.
+PATHS = {
+    "mesh": (MESH_ACCURACY_SCENES, MESH_SPEED_SCENES),
+    "point": (POINT_ACCURACY_SCENES, POINT_SPEED_SCENES),
+    "interference": (INTERF_ACCURACY_SCENES, INTERF_SPEED_SCENES),
+}
+
+
+def select_scenes(paths):
+    """Return ``(accuracy_scenes, speed_scenes)`` for the named families."""
+    accuracy = []
+    speed = []
+    for name in paths:
+        acc, spd = PATHS[name]
+        accuracy.extend(acc)
+        speed.extend(spd)
+    return list(dict.fromkeys(accuracy)), list(dict.fromkeys(speed))
 
 
 # --------------------------------------------------------------------------
@@ -350,18 +568,26 @@ def phase_smoothness(bb):
 # --------------------------------------------------------------------------
 
 
-def capture(out_path, device, rounds):
+def capture(out_path, device, rounds, paths):
     """Run every scene on the installed build and save basebands and times."""
     # pylint: disable=import-outside-toplevel
     from radarsimpy.simulator import sim_radar  # pylint: disable=no-name-in-module
 
-    # Pay CUDA context creation outside every timed region.
-    warm_radar, warm_targets, _ = build_scene("ref:plate_normal")
-    sim_radar(warm_radar, warm_targets, density=0.1, device=device)
+    accuracy_scenes, speed_scenes = select_scenes(paths)
+
+    # Pay CUDA context creation outside every timed region. The point path
+    # needs no model file, so it warms up a point scene when the mesh scenes
+    # are not selected at all.
+    if "mesh" in paths:
+        warm_radar, warm_targets, _ = build_scene("ref:plate_normal")
+        sim_radar(warm_radar, warm_targets, density=0.1, device=device)
+    else:
+        warm_radar, warm_targets, _ = build_scene("point_fmcw24")
+        sim_radar(warm_radar, warm_targets, device=device)
 
     saved = {}
-    for scene in dict.fromkeys(ACCURACY_SCENES + SPEED_SCENES):
-        runs = rounds if scene in SPEED_SCENES else 1
+    for scene in dict.fromkeys(accuracy_scenes + speed_scenes):
+        runs = rounds if scene in speed_scenes else 1
         times = []
         for _ in range(runs):
             radar, targets, sim_kw = build_scene(scene)
@@ -412,6 +638,9 @@ def main():
     c.add_argument("--device", default="gpu", choices=["cpu", "gpu"])
     c.add_argument("--rounds", type=int, default=4,
                    help="timed repeats of each speed scene")
+    c.add_argument("--paths", nargs="+", default=sorted(PATHS),
+                   choices=sorted(PATHS),
+                   help="simulator families to cover (default: all)")
 
     d = sub.add_parser("compare", help="diff a capture against a reference")
     d.add_argument("ref", help="capture from the float_t = double build")
@@ -420,7 +649,7 @@ def main():
 
     args = parser.parse_args()
     if args.cmd == "capture":
-        capture(args.out, args.device, args.rounds)
+        capture(args.out, args.device, args.rounds, args.paths)
     else:
         compare(args.ref, args.test, args.json)
 

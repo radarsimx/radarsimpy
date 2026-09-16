@@ -12,6 +12,8 @@ Provides:
   optional glTF library used by ``radarsimpy.animation_kit``.
 * ``make_transmitter`` / ``make_receiver`` / ``make_radar`` factories for the
   small radar configurations that many tests need.
+* ``assert_baseband_close`` plus the two peak-referenced tolerances the
+  baseband suites compare against.
 
 ---
 
@@ -47,6 +49,84 @@ GLTF_MODULE = "pygltflib"
 
 #: Repository root, i.e. the directory holding ``models/``.
 REPO_ROOT = Path(__file__).resolve().parent.parent
+
+
+# =============================================================================
+# Baseband tolerances
+# =============================================================================
+
+#: How far a mesh (SBR) baseband sample may sit from a recorded value, as a
+#: fraction of the strongest sample (3e-5 is -90 dBc).
+#:
+#: The arrays in ``test_module_sim_radar_mesh.py`` are recorded at full
+#: round-trip precision from a **CPU** run of the shipped build, and reproduce
+#: exactly there -- all 48 comparisons return a residual of 0. The CPU path is
+#: the deterministic one: it keeps the lookup-table summation innermost and
+#: serial, so a bin's contributions are always added in the same order. On the
+#: GPU the ray contributions arrive through ``atomicAdd`` in whatever order the
+#: scheduler produces, which is reproducible only to ~6e-17 of the peak.
+#:
+#: What sets this bound is the gap between the two devices: forcing the suite
+#: onto the GPU moves samples by up to **8.6e-6** of the peak, the worst case
+#: being ``test_scene_rx_offset``, whose density sits near a partial null. The
+#: two devices do not share a math library, and the coherent sum over rays
+#: amplifies an ulp of difference by ~150x wherever contributions cancel. 3e-5
+#: leaves 3.5x over that while staying far tighter than any real defect: for
+#: reference, a gate-delay narrowing caught during this work showed up as 56
+#: degrees of phase. Building with ``RADARSIMX_DEVICE_PARITY`` closes the gap.
+#:
+#: Note that this is NOT reproducible from an all-FP64 build, and do not treat
+#: it as if it were. ``L`` is also the geometry and BVH type, so ``float_t =
+#: double`` changes which rays are launched and what they hit. With these
+#: scenes at their default density -- which is not converged -- that moves the
+#: answer by up to **159%** (``test_scene_multiple_targets``), and 17-21% on
+#: the four antenna-pattern scenes. Measured 2026-09-16, replacing an earlier
+#: claim here that an FP64 rebuild reproduced these values to ~5e-7.
+#:
+#: Re-record with ``plans/rerecord_suite.py`` after any deliberate change:
+#: ``record cpu`` runs the suite and saves what it produced, ``rewrite``
+#: patches the literals, ``verify [cpu|gpu]`` reports the residual per call,
+#: ``repeat [cpu|gpu]`` checks run-to-run reproducibility first.
+BASEBAND_PEAK_ATOL = 3e-5
+
+#: The same bound for the point-target and interference paths (1e-6 is
+#: -120 dBc).
+#:
+#: Those paths are far better conditioned than the mesh one: a bin sums a
+#: handful of contributions rather than tens of thousands of rays, so nothing
+#: amplifies the rounding. Moving them to mixed precision was measured at
+#: 5.5e-8 to 6.8e-8 of the peak -- one float ulp -- across the point and
+#: interference scenes in ``benchmarks/precision_ab.py``, or -150 to -162 dBc
+#: on the range-Doppler map.
+#:
+#: What sets this bound is neither of those, but the gap between the two
+#: devices. The arrays in ``test_module_sim_radar_ideal.py`` were recorded from
+#: a GPU run at full round-trip precision, and reproduce **exactly** there --
+#: every one of the 25 comparisons returns a residual of 0. Forcing the same
+#: tests onto the CPU moves them by at most 2.1e-7 of the peak, because the two
+#: devices do not share a math library. 1e-6 leaves 4.7x over that. Building
+#: with ``RADARSIMX_DEVICE_PARITY`` closes the gap and would allow much tighter.
+#:
+#: Re-record with ``<scratchpad>/rerecord_ideal.py`` after any deliberate
+#: change: ``record`` runs the suite and saves what it produced, ``rewrite``
+#: patches the literals, ``verify [cpu|gpu]`` reports the residual per call.
+IDEAL_BASEBAND_PEAK_ATOL = 1e-6
+
+
+def assert_baseband_close(actual, expected, atol_frac=BASEBAND_PEAK_ATOL):
+    """Assert a baseband array matches ``expected`` relative to its peak.
+
+    Referenced to the peak rather than element-wise, because the rounding this
+    absorbs is a property of the coherent sum as a whole, not of each sample:
+    an element-wise tolerance is simultaneously too tight on samples near a
+    null and too loose on the ones carrying the signal.
+    """
+    expected = np.asarray(expected)
+    peak = np.max(np.abs(expected))
+    np.testing.assert_allclose(
+        np.asarray(actual), expected, rtol=0, atol=atol_frac * peak
+    )
+    return True
 
 
 def _any_mesh_module_installed():
