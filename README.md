@@ -102,18 +102,48 @@ radarsimpy/
 
 ## Acceleration
 
-This module supports CPU/GPU parallelization:
+Simulations run in parallel on the CPU or the GPU:
 
-- **CPU:** via OpenMP
-- **GPU:** via CUDA (since v6.0.0)
+- **CPU:** OpenMP, using all cores by default (limit it with `OMP_NUM_THREADS`)
+- **GPU:** CUDA, in the GPU build of the module; see [Dependencies](#dependencies) for the GPU and driver requirements
 
-|         | CPU (x86-64) | CPU (ARM64) | GPU (CUDA) |
-| ------- | ------------ | ----------- | ---------- |
-| Windows | ✔️           | ❌️         | ✔️         |
-| Linux   | ✔️           | ❌️         | ✔️         |
-| MacOS   | ✔️           | ✔️          | ❌️        |
+|                 | CPU (x86-64) | CPU (ARM64) | GPU (CUDA) |
+| --------------- | ------------ | ----------- | ---------- |
+| Windows         | ✔️           | ❌️         | ✔️         |
+| Linux (x86-64)  | ✔️           | ❌️         | ✔️         |
+| MacOS           | ✔️           | ✔️          | ❌️        |
 
-<img src="https://github.com/radarsimx/radarsimpy/raw/master/assets/performance.svg" alt="performance" width="500"/>
+### Selecting a device
+
+`sim_radar`, `sim_rcs` and `sim_lidar` take a `device` argument:
+
+```python
+from radarsimpy.simulator import sim_radar, gpu_available
+
+print(gpu_available())  # True only on a GPU build with a usable CUDA device
+
+data = sim_radar(radar, targets, device="auto")  # "auto" (default), "gpu" or "cpu"
+```
+
+- `"auto"` uses the GPU when one is usable and the CPU otherwise, without a warning.
+- `"gpu"` falls back to the CPU with a `RuntimeWarning` when no GPU is usable, so a timing taken from that run is a CPU timing.
+- `CUDA_VISIBLE_DEVICES=-1` hides the GPU, which makes `"auto"` run on the CPU.
+
+### Performance
+
+Execution time in seconds for examples from the [radarsimnb repository](https://github.com/radarsimx/radarsimnb), across releases:
+
+| Example                                                                                                             | v12.5.0 CPU | v12.5.0 GPU | v12.6.1 CPU | v12.6.1 GPU | v15.4.0 CPU | v15.4.0 GPU |
+| ------------------------------------------------------------------------------------------------------------------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |
+| [FMCW imaging radar](https://github.com/radarsimx/radarsimnb/blob/master/notebooks/scene_fmcw_imaging_radar.ipynb)  | > 7200      | 2259.91     | > 7200      | 445.48      | **854.76**  | **63.59**   |
+| [FMCW radar with a car](https://github.com/radarsimx/radarsimnb/blob/master/notebooks/scene_fmcw_car.ipynb)         | 909.33      | 9.72        | 373.96      | 5.17        | **8.14**    | **0.75**    |
+| [Doppler of a turbine](https://github.com/radarsimx/radarsimnb/blob/master/notebooks/scene_doppler_turbine.ipynb)   | 2069.66     | 117.76      | 2719.24     | 126.71      | **95.54**   | **63.40**   |
+| [Multi-path](https://github.com/radarsimx/radarsimnb/blob/master/notebooks/scene_multi_path.ipynb)                  | 151.64      | 4.85        | 88.40       | 4.63        | **5.62**    | **1.60**    |
+| [FMCW interference](https://github.com/radarsimx/radarsimnb/blob/master/notebooks/waveform_fmcw_interference.ipynb) | 0.006       | 0.198       | 0.004       | 0.123       | **0.0013**  | **0.0015**  |
+
+The GPU helps most on ray-traced 3D models with many channels or samples. Point-target and interference simulations are already fast on the CPU, so the GPU gains nothing there.
+
+<sub>Measured on a laptop with an Intel Core i7-11800H (16 threads, 32 GB RAM) and an NVIDIA GeForce RTX 3050 Laptop GPU (4 GB). v15.4.0 times only the `sim_radar()` call, as the median of 3 runs after a warm-up for runs under 60 s and a single run otherwise; earlier releases were timed with the notebook's own timer.</sub>
 
 ---
 
