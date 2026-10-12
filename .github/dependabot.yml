@@ -1,20 +1,26 @@
 # ==============================================================================
-# Dependabot Configuration: GitHub Actions
+# Dependabot Configuration: GitHub Actions and Python Packages
 # ==============================================================================
 #
-# Keeps the actions used by the workflows in `.github/workflows/` up to date.
-# Dependabot scans every workflow in that directory and opens a pull request
-# when a newer version of a referenced action is published.
+# Keeps the actions used by the workflows in `.github/workflows/` and the
+# Python packages listed in `requirements*.txt` up to date. Dependabot opens a
+# pull request when a newer version of a referenced action is published, or
+# when a Python requirement no longer admits the latest release.
 #
 # Notes:
 #   - `directory: "/"` is the required value for the github-actions ecosystem;
-#     it always means "the repository's .github/workflows directory".
+#     it always means "the repository's .github/workflows directory". For pip
+#     it is the repository root, where requirements.txt and
+#     requirements-dev.txt live.
 #   - Updates are grouped so a weekly run produces one PR instead of one per
-#     action. Major bumps are kept separate because they may require workflow
-#     changes (e.g. new required inputs, dropped Node runtime).
-#   - Only GitHub Actions are covered here. Python dependencies are pinned as
-#     minimum versions in requirements*.txt and are resolved at install time,
-#     so they are intentionally not managed by Dependabot.
+#     dependency. Major bumps are kept separate because they may require
+#     changes (e.g. new required inputs, dropped Node runtime, removed APIs).
+#   - Python requirements are minimum versions (`>=`), and requirements.txt is
+#     read by setup.py as the wheel's `install_requires`. The pip entry
+#     therefore uses `versioning-strategy: increase-if-necessary`, which leaves
+#     a requirement alone while it still admits the latest release. The
+#     default strategy would raise every floor to the newest version each
+#     week, forcing users of the published wheels onto the latest NumPy/SciPy.
 # ==============================================================================
 
 version: 2
@@ -39,6 +45,30 @@ updates:
           - "minor"
           - "patch"
       actions-major:
+        applies-to: version-updates
+        update-types:
+          - "major"
+
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    versioning-strategy: "increase-if-necessary"
+    commit-message:
+      prefix: "build"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "python"
+    groups:
+      python-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
+      python-major:
         applies-to: version-updates
         update-types:
           - "major"
