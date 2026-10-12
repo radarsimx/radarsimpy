@@ -1,10 +1,11 @@
 # ==============================================================================
-# GitHub Actions Workflow: Ubuntu x64 Unit Testing (22.04, 24.04 & 26.04)
+# GitHub Actions Workflow: Ubuntu Unit Testing (x64 & ARM64; 22.04, 24.04 & 26.04)
 # ==============================================================================
 #
 # This workflow performs continuous integration testing for RadarSimPy on
-# Ubuntu 22.04, 24.04, and 26.04 x64 platforms. It builds and tests the radar simulation
-# library across multiple Python versions to ensure compatibility and reliability.
+# Ubuntu 22.04, 24.04, and 26.04, on both x64 and ARM64. It builds and tests the
+# radar simulation library across multiple Python versions to ensure
+# compatibility and reliability.
 #
 # Triggers:
 #   - Push to master branch
@@ -14,10 +15,26 @@
 #   - Defined once, as JSON, in the `setup` job's "Define test matrix" step.
 #     The `build` job consumes it via job outputs, so adding/removing an entry
 #     only requires editing that one step.
-#   - CPU builds: Python 3.10, 3.11, 3.12, 3.13, 3.14 on each Ubuntu version
-#   - GPU build: Ubuntu 24.04 / Python 3.13 only
-#   - Platform: Ubuntu 22.04, Ubuntu 24.04, Ubuntu 26.04
+#   - CPU builds: Python 3.10, 3.11, 3.12, 3.13, 3.14 on each Ubuntu version,
+#     for both x64 and ARM64
+#   - GPU build: Ubuntu 24.04 x64 / Python 3.13 only
+#   - Platform: Ubuntu 22.04, Ubuntu 24.04, Ubuntu 26.04 (x64 and ARM64 runners)
 #   - Compilers: GCC-11 (22.04), GCC-13 (24.04), GCC-15 (26.04)
+#   - `arch` is the build architecture (cpu/gpu) passed to build.sh. The CPU
+#     architecture comes from the runner: `ubuntu-XX.04` is x64 and
+#     `ubuntu-XX.04-arm` is ARM64.
+#
+# About the ARM64 entries:
+#   radarsimx-deps does not publish HDF5/mbedTLS for linux_aarch64 yet, neither
+#   in its committed libs/ tree nor in its release archives, so `--deps=release`
+#   has nothing to download on ARM64. Until it does, the `deps-arm64` job builds
+#   them from the pinned deps submodule and the ARM64 entries link that build.
+#   It runs once, on Ubuntu 22.04 with GCC-11, the same baseline the published
+#   linux_x86_64 archives are built on, and is cached on the deps sources, so it
+#   only rebuilds when the deps submodule moves. Once the deps release carries
+#   linux_aarch64 and radarsimcpp's cmake/deps_manifest.cmake pins its
+#   checksums, delete that job, the download step and the ARM64 branch of the
+#   "Build & Test" step.
 #
 # About the GPU entry:
 #   GitHub-hosted runners have no CUDA device, so this entry does not exercise
@@ -32,6 +49,7 @@
 #   - Pip package caching for faster builds
 #   - GCC environment setup for C++ compilation
 #   - CUDA toolkit installation for the GPU entry only
+#   - HDF5/mbedTLS built from source for the ARM64 entries only
 #   - System information display for debugging
 #   - Build and C++ test log capture on failure
 #   - Timeout protection (90 minutes, sized for the slower CUDA build)
@@ -81,13 +99,72 @@ jobs:
             { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.12", "arch": "cpu" },
             { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.13", "arch": "cpu" },
             { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.14", "arch": "cpu" },
+            { "runner": "ubuntu-22.04-arm", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22-arm64", "python-version": "3.10", "arch": "cpu" },
+            { "runner": "ubuntu-22.04-arm", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22-arm64", "python-version": "3.11", "arch": "cpu" },
+            { "runner": "ubuntu-22.04-arm", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22-arm64", "python-version": "3.12", "arch": "cpu" },
+            { "runner": "ubuntu-22.04-arm", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22-arm64", "python-version": "3.13", "arch": "cpu" },
+            { "runner": "ubuntu-22.04-arm", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22-arm64", "python-version": "3.14", "arch": "cpu" },
+            { "runner": "ubuntu-24.04-arm", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24-arm64", "python-version": "3.10", "arch": "cpu" },
+            { "runner": "ubuntu-24.04-arm", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24-arm64", "python-version": "3.11", "arch": "cpu" },
+            { "runner": "ubuntu-24.04-arm", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24-arm64", "python-version": "3.12", "arch": "cpu" },
+            { "runner": "ubuntu-24.04-arm", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24-arm64", "python-version": "3.13", "arch": "cpu" },
+            { "runner": "ubuntu-24.04-arm", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24-arm64", "python-version": "3.14", "arch": "cpu" },
+            { "runner": "ubuntu-26.04-arm", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26-arm64", "python-version": "3.10", "arch": "cpu" },
+            { "runner": "ubuntu-26.04-arm", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26-arm64", "python-version": "3.11", "arch": "cpu" },
+            { "runner": "ubuntu-26.04-arm", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26-arm64", "python-version": "3.12", "arch": "cpu" },
+            { "runner": "ubuntu-26.04-arm", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26-arm64", "python-version": "3.13", "arch": "cpu" },
+            { "runner": "ubuntu-26.04-arm", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26-arm64", "python-version": "3.14", "arch": "cpu" },
             { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.13", "arch": "gpu" }
           ]
           EOF
           echo "matrix=$(jq -c . matrix.json)" >> "$GITHUB_OUTPUT"
 
+  # Stand-in for the linux_aarch64 archives radarsimx-deps does not publish yet.
+  # See "About the ARM64 entries" at the top of this file.
+  deps-arm64:
+    name: Prebuilt dependencies / linux_aarch64
+    timeout-minutes: 60
+    runs-on: ubuntu-22.04-arm
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          ssh-key: ${{secrets.RADARSIMC}}
+          submodules: recursive
+
+      - name: Cache staged dependencies
+        id: deps-cache
+        uses: actions/cache@v6
+        with:
+          path: src/radarsimcpp/deps/output
+          key: deps-linux_aarch64-${{ hashFiles('src/radarsimcpp/deps/CMakeLists.txt', 'src/radarsimcpp/deps/build.sh', 'src/radarsimcpp/deps/cmake/**', 'src/radarsimcpp/deps/recipes/**') }}
+
+      - name: Build dependencies
+        if: steps.deps-cache.outputs.cache-hit != 'true'
+        working-directory: src/radarsimcpp/deps
+        env:
+          CC: gcc-11
+          CXX: g++-11
+        run: ./build.sh
+
+      - name: Verify staged output
+        working-directory: src/radarsimcpp/deps
+        run: bash verify.sh linux_aarch64
+
+      - name: Upload staged dependencies
+        uses: actions/upload-artifact@v7
+        with:
+          name: deps-linux-aarch64
+          path: src/radarsimcpp/deps/output
+          retention-days: 1
+          if-no-files-found: error
+
   build:
-    needs: setup
+    needs: [setup, deps-arm64]
+    # Without this a failed deps-arm64 would skip every entry. Run them anyway:
+    # the x64 entries do not use it, and the ARM64 ones then fail at the
+    # download step, which points at the real cause.
+    if: ${{ !cancelled() && needs.setup.result == 'success' }}
     name: ${{ matrix.os_label }} / ${{ matrix.arch }} / Python ${{ matrix.python-version }}
     # Sized for the GPU entry: nvcc compiles the whole library from scratch,
     # which does not fit in the 60 minutes the CPU entries need.
@@ -114,9 +191,9 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements-dev.txt') }}
+          key: ${{ runner.os }}-${{ runner.arch }}-pip-${{ hashFiles('**/requirements-dev.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-${{ runner.arch }}-pip-
 
       - name: Setup CUDA Toolkit
         if: matrix.arch == 'gpu'
@@ -143,6 +220,13 @@ jobs:
           ls -la /usr/local/cuda/lib64/ || echo "CUDA lib64 directory not found"
           echo "::endgroup::"
 
+      - name: Download prebuilt dependencies (ARM64)
+        if: runner.arch == 'ARM64'
+        uses: actions/download-artifact@v8
+        with:
+          name: deps-linux-aarch64
+          path: src/radarsimcpp/deps/output
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -167,6 +251,8 @@ jobs:
           ${{ matrix.c_compiler }} --version
           echo "G++ version:"
           ${{ matrix.cxx_compiler }} --version
+          echo "Architecture:"
+          uname -m
 
       - name: Build & Test
         env:
@@ -176,7 +262,14 @@ jobs:
         run: |
           sudo chown -R $USER:$USER /home/runner/work/radarsimpy
           chmod +x build.sh
-          ./build.sh --license=on --arch=${{ matrix.arch }} --test=on --deps=release
+          # An explicit RADARSIMCPP_<DEP>_ROOT wins over --deps=release, which
+          # has no linux_aarch64 archive to download.
+          extra_args=()
+          if [ "${{ runner.arch }}" = "ARM64" ]; then
+            deps_output="${{ github.workspace }}/src/radarsimcpp/deps/output"
+            extra_args+=("--cmake-args=-DRADARSIMCPP_HDF5_ROOT=${deps_output}/hdf5 -DRADARSIMCPP_MBEDTLS_ROOT=${deps_output}/mbedtls")
+          fi
+          ./build.sh --license=on --arch=${{ matrix.arch }} --test=on --deps=release "${extra_args[@]}"
 
       - name: Display build logs on failure
         if: failure()
@@ -202,6 +295,7 @@ jobs:
         with:
           # arch is part of the name because the CPU and GPU entries share an
           # Ubuntu version and Python version; upload-artifact rejects duplicates.
+          # os_label keeps the x64 and ARM64 entries apart the same way.
           name: build-logs-python-${{ matrix.python-version }}-${{ matrix.os_label }}-${{ matrix.arch }}
           path: build_logs/
           retention-days: 1
