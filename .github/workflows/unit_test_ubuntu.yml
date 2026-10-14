@@ -24,17 +24,16 @@
 #     architecture comes from the runner: `ubuntu-XX.04` is x64 and
 #     `ubuntu-XX.04-arm` is ARM64.
 #
-# About the ARM64 entries:
-#   radarsimx-deps does not publish HDF5/mbedTLS for linux_aarch64 yet, neither
-#   in its committed libs/ tree nor in its release archives, so `--deps=release`
-#   has nothing to download on ARM64. Until it does, the `deps-arm64` job builds
-#   them from the pinned deps submodule and the ARM64 entries link that build.
-#   It runs once, on Ubuntu 22.04 with GCC-11, the same baseline the published
-#   linux_x86_64 archives are built on, and is cached on the deps sources, so it
-#   only rebuilds when the deps submodule moves. Once the deps release carries
-#   linux_aarch64 and radarsimcpp's cmake/deps_manifest.cmake pins its
-#   checksums, delete that job, the download step and the ARM64 branch of the
-#   "Build & Test" step.
+# Prebuilt dependencies:
+#   The x64 entries pass `--deps=release`, which downloads the checksum-pinned
+#   HDF5/mbedTLS archives from the radarsimx-deps release. That release has no
+#   linux_aarch64 archives yet and radarsimcpp's cmake/deps_manifest.cmake pins
+#   no checksum for them, so the download path refuses to run on ARM64. The
+#   ARM64 entries pass `--deps=repo` instead, which links the linux_aarch64
+#   libraries committed in the deps submodule's libs/ tree, pinned by the
+#   submodule commit. Switch them to `--deps=release` once the deps release
+#   carries linux_aarch64 and the manifest pins its checksums; the ARM64 branch
+#   of the "Build & Test" step is then the only thing to delete.
 #
 # About the GPU entry:
 #   GitHub-hosted runners have no CUDA device, so this entry does not exercise
@@ -49,7 +48,7 @@
 #   - Pip package caching for faster builds
 #   - GCC environment setup for C++ compilation
 #   - CUDA toolkit installation for the GPU entry only
-#   - HDF5/mbedTLS built from source for the ARM64 entries only
+#   - Prebuilt HDF5/mbedTLS: release archives on x64, committed libs on ARM64
 #   - System information display for debugging
 #   - Build and C++ test log capture on failure
 #   - Timeout protection (90 minutes, sized for the slower CUDA build)
@@ -119,52 +118,8 @@ jobs:
           EOF
           echo "matrix=$(jq -c . matrix.json)" >> "$GITHUB_OUTPUT"
 
-  # Stand-in for the linux_aarch64 archives radarsimx-deps does not publish yet.
-  # See "About the ARM64 entries" at the top of this file.
-  deps-arm64:
-    name: Prebuilt dependencies / linux_aarch64
-    timeout-minutes: 60
-    runs-on: ubuntu-22.04-arm
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
-        with:
-          ssh-key: ${{secrets.RADARSIMC}}
-          submodules: recursive
-
-      - name: Cache staged dependencies
-        id: deps-cache
-        uses: actions/cache@v6
-        with:
-          path: src/radarsimcpp/deps/output
-          key: deps-linux_aarch64-${{ hashFiles('src/radarsimcpp/deps/CMakeLists.txt', 'src/radarsimcpp/deps/build.sh', 'src/radarsimcpp/deps/cmake/**', 'src/radarsimcpp/deps/recipes/**') }}
-
-      - name: Build dependencies
-        if: steps.deps-cache.outputs.cache-hit != 'true'
-        working-directory: src/radarsimcpp/deps
-        env:
-          CC: gcc-11
-          CXX: g++-11
-        run: ./build.sh
-
-      - name: Verify staged output
-        working-directory: src/radarsimcpp/deps
-        run: bash verify.sh linux_aarch64
-
-      - name: Upload staged dependencies
-        uses: actions/upload-artifact@v7
-        with:
-          name: deps-linux-aarch64
-          path: src/radarsimcpp/deps/output
-          retention-days: 1
-          if-no-files-found: error
-
   build:
-    needs: [setup, deps-arm64]
-    # Without this a failed deps-arm64 would skip every entry. Run them anyway:
-    # the x64 entries do not use it, and the ARM64 ones then fail at the
-    # download step, which points at the real cause.
-    if: ${{ !cancelled() && needs.setup.result == 'success' }}
+    needs: setup
     name: ${{ matrix.os_label }} / ${{ matrix.arch }} / Python ${{ matrix.python-version }}
     # Sized for the GPU entry: nvcc compiles the whole library from scratch,
     # which does not fit in the 60 minutes the CPU entries need.
@@ -220,13 +175,6 @@ jobs:
           ls -la /usr/local/cuda/lib64/ || echo "CUDA lib64 directory not found"
           echo "::endgroup::"
 
-      - name: Download prebuilt dependencies (ARM64)
-        if: runner.arch == 'ARM64'
-        uses: actions/download-artifact@v8
-        with:
-          name: deps-linux-aarch64
-          path: src/radarsimcpp/deps/output
-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -262,14 +210,13 @@ jobs:
         run: |
           sudo chown -R $USER:$USER /home/runner/work/radarsimpy
           chmod +x build.sh
-          # An explicit RADARSIMCPP_<DEP>_ROOT wins over --deps=release, which
-          # has no linux_aarch64 archive to download.
-          extra_args=()
+          # --deps=repo on ARM64, --deps=release on x64: see "Prebuilt
+          # dependencies" at the top of this file.
+          deps=release
           if [ "${{ runner.arch }}" = "ARM64" ]; then
-            deps_output="${{ github.workspace }}/src/radarsimcpp/deps/output"
-            extra_args+=("--cmake-args=-DRADARSIMCPP_HDF5_ROOT=${deps_output}/hdf5 -DRADARSIMCPP_MBEDTLS_ROOT=${deps_output}/mbedtls")
+            deps=repo
           fi
-          ./build.sh --license=on --arch=${{ matrix.arch }} --test=on --deps=release "${extra_args[@]}"
+          ./build.sh --license=on --arch=${{ matrix.arch }} --test=on --deps="${deps}"
 
       - name: Display build logs on failure
         if: failure()

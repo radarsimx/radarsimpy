@@ -2,20 +2,36 @@ name: Release on Ubuntu
 
 # GitHub Actions workflow for building and packaging RadarSimPy on Ubuntu platforms.
 #
-# This workflow builds RadarSimPy across multiple Ubuntu LTS versions and Python versions.
-# It supports Ubuntu 22.04 LTS, Ubuntu 24.04 LTS, and Ubuntu 26.04 LTS to provide
-# comprehensive Linux coverage with different GCC compiler versions.
+# This workflow builds RadarSimPy across multiple Ubuntu LTS versions and Python versions,
+# on both x86_64 and ARM64 (aarch64). It supports Ubuntu 22.04 LTS, Ubuntu 24.04 LTS,
+# and Ubuntu 26.04 LTS to provide comprehensive Linux coverage with different GCC
+# compiler versions.
 #
 # Build Matrix:
 # - Defined once, as JSON, in the `setup` job's "Define build matrix" step.
 #   The `build`, `pack-artifacts`, and `build-summary` jobs all consume it via
-#   job outputs, so adding/removing an Ubuntu version or Python version only
-#   requires editing that one step — no other job needs to change.
-# - Ubuntu 22.04 LTS: GCC-11 compiler, 5 builds (5 Python versions)
-# - Ubuntu 24.04 LTS: GCC-13 compiler, 5 builds (5 Python versions)
-# - Ubuntu 26.04 LTS: GCC-15 compiler, 5 builds (5 Python versions)
+#   job outputs, so adding/removing an Ubuntu version, CPU architecture, or
+#   Python version only requires editing that one step — no other job needs
+#   to change.
+# - Ubuntu 22.04 LTS: GCC-11 compiler, 10 builds (5 Python versions × 2 CPU architectures)
+# - Ubuntu 24.04 LTS: GCC-13 compiler, 10 builds (5 Python versions × 2 CPU architectures)
+# - Ubuntu 26.04 LTS: GCC-15 compiler, 10 builds (5 Python versions × 2 CPU architectures)
 # - Python versions: 3.10, 3.11, 3.12, 3.13, 3.14
-# - Total builds: 15
+# - CPU architectures: x86_64 (`ubuntu-XX.04` runners), ARM64 (`ubuntu-XX.04-arm` runners)
+# - Total builds: 30
+# - `arch` is the build architecture (cpu/gpu) passed to build.sh. `cpu_arch` is
+#   the runner's CPU architecture and names the packed directory.
+#
+# Prebuilt dependencies:
+#   `deps` is the `--deps` value passed to build.sh. The x86_64 entries use
+#   `release`, which downloads the checksum-pinned HDF5/mbedTLS archives from
+#   the radarsimx-deps release. That release has no linux_aarch64 archives yet
+#   and radarsimcpp's cmake/deps_manifest.cmake pins no checksum for them, so
+#   the download path refuses to run on ARM64. The ARM64 entries use `repo`
+#   instead, which links the linux_aarch64 libraries committed in the deps
+#   submodule's libs/ tree, pinned by the submodule commit. Switch them to
+#   `release` once the deps release carries linux_aarch64 and the manifest pins
+#   its checksums.
 #
 # Features:
 # - Comprehensive caching (pip, ccache)
@@ -29,7 +45,7 @@ name: Release on Ubuntu
 #
 # Outputs:
 # - Individual artifacts for each build configuration
-# - Packed archive containing all builds organized by Ubuntu version
+# - Packed archive containing all builds organized by Ubuntu version and CPU architecture
 # - Build summaries and statistics
 #
 # Triggers:
@@ -61,21 +77,36 @@ jobs:
         run: |
           cat > matrix.json << 'EOF'
           [
-            { "os": "ubuntu-22.04", "python-version": "3.10", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "cpu", "ubuntu_version": "22", "artifact_name": "radarsimpy_ubuntu_22_04_py3.10" },
-            { "os": "ubuntu-22.04", "python-version": "3.11", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "cpu", "ubuntu_version": "22", "artifact_name": "radarsimpy_ubuntu_22_04_py3.11" },
-            { "os": "ubuntu-22.04", "python-version": "3.12", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "cpu", "ubuntu_version": "22", "artifact_name": "radarsimpy_ubuntu_22_04_py3.12" },
-            { "os": "ubuntu-22.04", "python-version": "3.13", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "cpu", "ubuntu_version": "22", "artifact_name": "radarsimpy_ubuntu_22_04_py3.13" },
-            { "os": "ubuntu-22.04", "python-version": "3.14", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "cpu", "ubuntu_version": "22", "artifact_name": "radarsimpy_ubuntu_22_04_py3.14" },
-            { "os": "ubuntu-24.04", "python-version": "3.10", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "cpu", "ubuntu_version": "24", "artifact_name": "radarsimpy_ubuntu_24_04_py3.10" },
-            { "os": "ubuntu-24.04", "python-version": "3.11", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "cpu", "ubuntu_version": "24", "artifact_name": "radarsimpy_ubuntu_24_04_py3.11" },
-            { "os": "ubuntu-24.04", "python-version": "3.12", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "cpu", "ubuntu_version": "24", "artifact_name": "radarsimpy_ubuntu_24_04_py3.12" },
-            { "os": "ubuntu-24.04", "python-version": "3.13", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "cpu", "ubuntu_version": "24", "artifact_name": "radarsimpy_ubuntu_24_04_py3.13" },
-            { "os": "ubuntu-24.04", "python-version": "3.14", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "cpu", "ubuntu_version": "24", "artifact_name": "radarsimpy_ubuntu_24_04_py3.14" },
-            { "os": "ubuntu-26.04", "python-version": "3.10", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "cpu", "ubuntu_version": "26", "artifact_name": "radarsimpy_ubuntu_26_04_py3.10" },
-            { "os": "ubuntu-26.04", "python-version": "3.11", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "cpu", "ubuntu_version": "26", "artifact_name": "radarsimpy_ubuntu_26_04_py3.11" },
-            { "os": "ubuntu-26.04", "python-version": "3.12", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "cpu", "ubuntu_version": "26", "artifact_name": "radarsimpy_ubuntu_26_04_py3.12" },
-            { "os": "ubuntu-26.04", "python-version": "3.13", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "cpu", "ubuntu_version": "26", "artifact_name": "radarsimpy_ubuntu_26_04_py3.13" },
-            { "os": "ubuntu-26.04", "python-version": "3.14", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "cpu", "ubuntu_version": "26", "artifact_name": "radarsimpy_ubuntu_26_04_py3.14" }
+            { "os": "ubuntu-22.04", "python-version": "3.10", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "cpu", "ubuntu_version": "22", "cpu_arch": "x86_64", "deps": "release", "artifact_name": "radarsimpy_ubuntu_22_04_py3.10" },
+            { "os": "ubuntu-22.04", "python-version": "3.11", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "cpu", "ubuntu_version": "22", "cpu_arch": "x86_64", "deps": "release", "artifact_name": "radarsimpy_ubuntu_22_04_py3.11" },
+            { "os": "ubuntu-22.04", "python-version": "3.12", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "cpu", "ubuntu_version": "22", "cpu_arch": "x86_64", "deps": "release", "artifact_name": "radarsimpy_ubuntu_22_04_py3.12" },
+            { "os": "ubuntu-22.04", "python-version": "3.13", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "cpu", "ubuntu_version": "22", "cpu_arch": "x86_64", "deps": "release", "artifact_name": "radarsimpy_ubuntu_22_04_py3.13" },
+            { "os": "ubuntu-22.04", "python-version": "3.14", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "cpu", "ubuntu_version": "22", "cpu_arch": "x86_64", "deps": "release", "artifact_name": "radarsimpy_ubuntu_22_04_py3.14" },
+            { "os": "ubuntu-24.04", "python-version": "3.10", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "cpu", "ubuntu_version": "24", "cpu_arch": "x86_64", "deps": "release", "artifact_name": "radarsimpy_ubuntu_24_04_py3.10" },
+            { "os": "ubuntu-24.04", "python-version": "3.11", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "cpu", "ubuntu_version": "24", "cpu_arch": "x86_64", "deps": "release", "artifact_name": "radarsimpy_ubuntu_24_04_py3.11" },
+            { "os": "ubuntu-24.04", "python-version": "3.12", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "cpu", "ubuntu_version": "24", "cpu_arch": "x86_64", "deps": "release", "artifact_name": "radarsimpy_ubuntu_24_04_py3.12" },
+            { "os": "ubuntu-24.04", "python-version": "3.13", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "cpu", "ubuntu_version": "24", "cpu_arch": "x86_64", "deps": "release", "artifact_name": "radarsimpy_ubuntu_24_04_py3.13" },
+            { "os": "ubuntu-24.04", "python-version": "3.14", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "cpu", "ubuntu_version": "24", "cpu_arch": "x86_64", "deps": "release", "artifact_name": "radarsimpy_ubuntu_24_04_py3.14" },
+            { "os": "ubuntu-26.04", "python-version": "3.10", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "cpu", "ubuntu_version": "26", "cpu_arch": "x86_64", "deps": "release", "artifact_name": "radarsimpy_ubuntu_26_04_py3.10" },
+            { "os": "ubuntu-26.04", "python-version": "3.11", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "cpu", "ubuntu_version": "26", "cpu_arch": "x86_64", "deps": "release", "artifact_name": "radarsimpy_ubuntu_26_04_py3.11" },
+            { "os": "ubuntu-26.04", "python-version": "3.12", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "cpu", "ubuntu_version": "26", "cpu_arch": "x86_64", "deps": "release", "artifact_name": "radarsimpy_ubuntu_26_04_py3.12" },
+            { "os": "ubuntu-26.04", "python-version": "3.13", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "cpu", "ubuntu_version": "26", "cpu_arch": "x86_64", "deps": "release", "artifact_name": "radarsimpy_ubuntu_26_04_py3.13" },
+            { "os": "ubuntu-26.04", "python-version": "3.14", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "cpu", "ubuntu_version": "26", "cpu_arch": "x86_64", "deps": "release", "artifact_name": "radarsimpy_ubuntu_26_04_py3.14" },
+            { "os": "ubuntu-22.04-arm", "python-version": "3.10", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "cpu", "ubuntu_version": "22", "cpu_arch": "ARM64", "deps": "repo", "artifact_name": "radarsimpy_ubuntu_22_04_arm64_py3.10" },
+            { "os": "ubuntu-22.04-arm", "python-version": "3.11", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "cpu", "ubuntu_version": "22", "cpu_arch": "ARM64", "deps": "repo", "artifact_name": "radarsimpy_ubuntu_22_04_arm64_py3.11" },
+            { "os": "ubuntu-22.04-arm", "python-version": "3.12", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "cpu", "ubuntu_version": "22", "cpu_arch": "ARM64", "deps": "repo", "artifact_name": "radarsimpy_ubuntu_22_04_arm64_py3.12" },
+            { "os": "ubuntu-22.04-arm", "python-version": "3.13", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "cpu", "ubuntu_version": "22", "cpu_arch": "ARM64", "deps": "repo", "artifact_name": "radarsimpy_ubuntu_22_04_arm64_py3.13" },
+            { "os": "ubuntu-22.04-arm", "python-version": "3.14", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "cpu", "ubuntu_version": "22", "cpu_arch": "ARM64", "deps": "repo", "artifact_name": "radarsimpy_ubuntu_22_04_arm64_py3.14" },
+            { "os": "ubuntu-24.04-arm", "python-version": "3.10", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "cpu", "ubuntu_version": "24", "cpu_arch": "ARM64", "deps": "repo", "artifact_name": "radarsimpy_ubuntu_24_04_arm64_py3.10" },
+            { "os": "ubuntu-24.04-arm", "python-version": "3.11", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "cpu", "ubuntu_version": "24", "cpu_arch": "ARM64", "deps": "repo", "artifact_name": "radarsimpy_ubuntu_24_04_arm64_py3.11" },
+            { "os": "ubuntu-24.04-arm", "python-version": "3.12", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "cpu", "ubuntu_version": "24", "cpu_arch": "ARM64", "deps": "repo", "artifact_name": "radarsimpy_ubuntu_24_04_arm64_py3.12" },
+            { "os": "ubuntu-24.04-arm", "python-version": "3.13", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "cpu", "ubuntu_version": "24", "cpu_arch": "ARM64", "deps": "repo", "artifact_name": "radarsimpy_ubuntu_24_04_arm64_py3.13" },
+            { "os": "ubuntu-24.04-arm", "python-version": "3.14", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "cpu", "ubuntu_version": "24", "cpu_arch": "ARM64", "deps": "repo", "artifact_name": "radarsimpy_ubuntu_24_04_arm64_py3.14" },
+            { "os": "ubuntu-26.04-arm", "python-version": "3.10", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "cpu", "ubuntu_version": "26", "cpu_arch": "ARM64", "deps": "repo", "artifact_name": "radarsimpy_ubuntu_26_04_arm64_py3.10" },
+            { "os": "ubuntu-26.04-arm", "python-version": "3.11", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "cpu", "ubuntu_version": "26", "cpu_arch": "ARM64", "deps": "repo", "artifact_name": "radarsimpy_ubuntu_26_04_arm64_py3.11" },
+            { "os": "ubuntu-26.04-arm", "python-version": "3.12", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "cpu", "ubuntu_version": "26", "cpu_arch": "ARM64", "deps": "repo", "artifact_name": "radarsimpy_ubuntu_26_04_arm64_py3.12" },
+            { "os": "ubuntu-26.04-arm", "python-version": "3.13", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "cpu", "ubuntu_version": "26", "cpu_arch": "ARM64", "deps": "repo", "artifact_name": "radarsimpy_ubuntu_26_04_arm64_py3.13" },
+            { "os": "ubuntu-26.04-arm", "python-version": "3.14", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "cpu", "ubuntu_version": "26", "cpu_arch": "ARM64", "deps": "repo", "artifact_name": "radarsimpy_ubuntu_26_04_arm64_py3.14" }
           ]
           EOF
           echo "matrix=$(jq -c . matrix.json)" >> "$GITHUB_OUTPUT"
@@ -141,6 +172,7 @@ jobs:
           echo "OS: ${{ matrix.os }}"
           echo "Python: ${{ matrix.python-version }}"
           echo "Architecture: ${{ matrix.arch }}"
+          echo "CPU Architecture: ${{ matrix.cpu_arch }}"
           echo "C Compiler: ${{ matrix.c_compiler }}"
           echo "C++ Compiler: ${{ matrix.cxx_compiler }}"
           echo "::endgroup::"
@@ -164,7 +196,8 @@ jobs:
           echo "::group::Build Process"
           sudo chown -R $USER:$USER /home/runner/work/radarsimpy
           chmod +x build.sh
-          ./build.sh --license=on --arch=${{ matrix.arch }} --test=off --verbose --deps=release
+          # matrix.deps: see "Prebuilt dependencies" at the top of this file.
+          ./build.sh --license=on --arch=${{ matrix.arch }} --test=off --verbose --deps=${{ matrix.deps }}
           echo "::endgroup::"
 
       - name: Display build statistics
@@ -255,11 +288,11 @@ jobs:
         run: |
           mkdir -p packed/radarsimpy_ubuntu_cpu_all
 
-          # Build artifact_name -> ubuntu_version lookup table from the matrix
-          declare -A ubuntu_version_for
-          while IFS=$'\t' read -r name ver; do
-            ubuntu_version_for["$name"]="$ver"
-          done < <(jq -r '.[] | [.artifact_name, .ubuntu_version] | @tsv' matrix.json)
+          # Build artifact_name -> package directory lookup table from the matrix
+          declare -A package_dir_for
+          while IFS=$'\t' read -r name ver cpu_arch; do
+            package_dir_for["$name"]="Ubuntu${ver}_${cpu_arch}_CPU"
+          done < <(jq -r '.[] | [.artifact_name, .ubuntu_version, .cpu_arch] | @tsv' matrix.json)
 
           # Copy each artifact to its matrix-defined directory
           for dir in artifacts/*/; do
@@ -267,12 +300,12 @@ jobs:
               artifact_name=$(basename "$dir")
               echo "Processing artifact: $artifact_name"
 
-              ver="${ubuntu_version_for[$artifact_name]}"
-              if [ -z "$ver" ]; then
+              package_dir="${package_dir_for[$artifact_name]}"
+              if [ -z "$package_dir" ]; then
                 echo "Unknown artifact $artifact_name, skipping"
                 continue
               fi
-              target_dir="temp/Ubuntu${ver}_x86_64_CPU/radarsimpy"
+              target_dir="temp/${package_dir}/radarsimpy"
 
               mkdir -p "$target_dir"
 
@@ -287,7 +320,8 @@ jobs:
             fi
           done
 
-          # Create one zip and one tar.gz per Ubuntu version actually produced
+          # Create one zip and one tar.gz per Ubuntu version and CPU architecture
+          # actually produced
           cd temp
           for combo_dir in */; do
             combo_dir="${combo_dir%/}"
@@ -308,19 +342,23 @@ jobs:
 
       - name: Create README for packed artifacts
         run: |
-          # ver/gcc pairs, one per unique Ubuntu version, sorted ascending
-          ubuntu_info=$(jq -r '
-            [.[] | {ver: .ubuntu_version, gcc: (.c_compiler | sub("gcc-";""))}]
-            | unique_by(.ver) | sort_by(.ver | tonumber) | .[] | "\(.ver) \(.gcc)"
+          # ver/cpu_arch/gcc triples, one per packed file pair, sorted by Ubuntu
+          # version and then CPU architecture
+          package_info=$(jq -r '
+            [.[] | {ver: .ubuntu_version, cpu_arch: .cpu_arch, gcc: (.c_compiler | sub("gcc-";""))}]
+            | unique_by([.ver, .cpu_arch]) | sort_by([(.ver | tonumber), .cpu_arch])
+            | .[] | "\(.ver) \(.cpu_arch) \(.gcc)"
           ' matrix.json)
           total_builds=$(jq 'length' matrix.json)
-          num_versions=$(echo "$ubuntu_info" | wc -l)
+          num_packages=$(echo "$package_info" | wc -l)
+          ubuntu_versions=$(jq -r '[.[].ubuntu_version] | unique | sort_by(tonumber) | map(. + ".04 LTS") | join(", ")' matrix.json)
+          cpu_archs=$(jq -r '[.[].cpu_arch] | unique | join(", ")' matrix.json)
           python_versions=$(jq -r '[.[]."python-version"] | unique | join(", ")' matrix.json)
 
           {
             echo "# RadarSimPy Ubuntu Build Artifacts"
             echo
-            echo "This archive contains all RadarSimPy builds for Ubuntu platforms organized by version."
+            echo "This archive contains all RadarSimPy builds for Ubuntu platforms organized by version and CPU architecture."
             echo
             echo "## Directory Structure"
             echo
@@ -328,26 +366,26 @@ jobs:
             echo
             echo '```'
             echo "radarsimpy_ubuntu_cpu_all/"
-            while read -r ver gcc; do
-              echo "├── Ubuntu${ver}_x86_64_CPU.zip"
-              echo "├── Ubuntu${ver}_x86_64_CPU.tar.gz"
-            done <<< "$ubuntu_info"
+            while read -r ver cpu_arch gcc; do
+              echo "├── Ubuntu${ver}_${cpu_arch}_CPU.zip"
+              echo "├── Ubuntu${ver}_${cpu_arch}_CPU.tar.gz"
+            done <<< "$package_info"
             echo '```'
             echo
             echo "## Version Information"
-            while read -r ver gcc; do
+            while read -r ver cpu_arch gcc; do
               echo
-              echo "### Ubuntu${ver}_x86_64_CPU (Ubuntu ${ver}.04 LTS)"
+              echo "### Ubuntu${ver}_${cpu_arch}_CPU (Ubuntu ${ver}.04 LTS, ${cpu_arch})"
               echo "- Built with GCC-${gcc} compiler"
               echo "- Available in both ZIP and tar.gz formats"
               echo "- Each archive contains the complete radarsimpy module with all Python versions supported"
-            done <<< "$ubuntu_info"
+            done <<< "$package_info"
             echo
             echo "## Build Information"
             echo
-            echo "- **Total Builds**: ${total_builds} (packaged into $((num_versions * 2)) files: ${num_versions} ZIP + ${num_versions} tar.gz)"
-            echo "- **Ubuntu Versions**: $(echo "$ubuntu_info" | awk '{printf "%s.04 LTS, ", $1}' | sed 's/, $//')"
-            echo "- **Architecture**: x86_64"
+            echo "- **Total Builds**: ${total_builds} (packaged into $((num_packages * 2)) files: ${num_packages} ZIP + ${num_packages} tar.gz)"
+            echo "- **Ubuntu Versions**: ${ubuntu_versions}"
+            echo "- **Architectures**: ${cpu_archs}"
             echo "- **Python Versions**: ${python_versions}"
             echo "- **Formats**: ZIP and tar.gz for maximum compatibility"
             echo "- **Build Date**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
@@ -355,7 +393,7 @@ jobs:
             echo "## Usage"
             echo
             echo "1. Extract the main archive"
-            echo "2. Extract the appropriate Ubuntu version file (choose ZIP or tar.gz based on your preference)"
+            echo "2. Extract the file for your Ubuntu version and CPU architecture (choose ZIP or tar.gz based on your preference)"
             echo "3. The radarsimpy module will be ready for use"
           } > packed/radarsimpy_ubuntu_cpu_all/README.md
 
@@ -391,22 +429,28 @@ jobs:
         run: |
           echo '${{ needs.setup.outputs.matrix }}' > matrix.json
           total_builds=$(jq 'length' matrix.json)
-          ubuntu_versions=$(jq -r '[.[].ubuntu_version] | unique | .[]' matrix.json)
-          num_versions=$(echo "$ubuntu_versions" | wc -l)
+          # ver/cpu_arch pairs, one per packed file pair
+          package_info=$(jq -r '
+            [.[] | {ver: .ubuntu_version, cpu_arch: .cpu_arch}]
+            | unique | sort_by([(.ver | tonumber), .cpu_arch]) | .[] | "\(.ver) \(.cpu_arch)"
+          ' matrix.json)
+          num_packages=$(echo "$package_info" | wc -l)
+          num_versions=$(jq -r '[.[].ubuntu_version] | unique | length' matrix.json)
+          num_archs=$(jq -r '[.[].cpu_arch] | unique | length' matrix.json)
           python_versions=$(jq -r '[.[]."python-version"] | unique | join(", ")' matrix.json)
           num_python=$(jq -r '[.[]."python-version"] | unique | length' matrix.json)
 
           echo "# Ubuntu Build Summary 📊" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## Build Matrix Results" >> $GITHUB_STEP_SUMMARY
-          echo "Total builds: ${total_builds} (${num_python} Python versions × ${num_versions} Ubuntu versions)" >> $GITHUB_STEP_SUMMARY
+          echo "Total builds: ${total_builds} (${num_python} Python versions × ${num_versions} Ubuntu versions × ${num_archs} CPU architectures)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Ubuntu Version Distribution" >> $GITHUB_STEP_SUMMARY
-          while read -r ver; do
-            gcc=$(jq -r --arg v "$ver" '[.[] | select(.ubuntu_version == $v) | .c_compiler] | first' matrix.json)
-            count=$(jq -r --arg v "$ver" '[.[] | select(.ubuntu_version == $v)] | length' matrix.json)
-            echo "- **Ubuntu ${ver}.04 LTS**: ${count} builds with ${gcc}" >> $GITHUB_STEP_SUMMARY
-          done <<< "$ubuntu_versions"
+          while read -r ver cpu_arch; do
+            gcc=$(jq -r --arg v "$ver" --arg a "$cpu_arch" '[.[] | select(.ubuntu_version == $v and .cpu_arch == $a) | .c_compiler] | first' matrix.json)
+            count=$(jq -r --arg v "$ver" --arg a "$cpu_arch" '[.[] | select(.ubuntu_version == $v and .cpu_arch == $a)] | length' matrix.json)
+            echo "- **Ubuntu ${ver}.04 LTS (${cpu_arch})**: ${count} builds with ${gcc}" >> $GITHUB_STEP_SUMMARY
+          done <<< "$package_info"
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Python Versions" >> $GITHUB_STEP_SUMMARY
           echo "- Python ${python_versions}" >> $GITHUB_STEP_SUMMARY
@@ -416,8 +460,8 @@ jobs:
             echo "✅ **All artifacts successfully packed into ZIP and tar.gz files**" >> $GITHUB_STEP_SUMMARY
             echo "- Archive: \`radarsimpy_ubuntu_cpu_all_builds\`" >> $GITHUB_STEP_SUMMARY
             echo "- Formats: tar.gz, zip" >> $GITHUB_STEP_SUMMARY
-            echo "- Structure: $((num_versions * 2)) files (${num_versions} Ubuntu versions × 2 formats)" >> $GITHUB_STEP_SUMMARY
-            echo "- Contains: All ${total_builds} build variants organized by Ubuntu version" >> $GITHUB_STEP_SUMMARY
+            echo "- Structure: $((num_packages * 2)) files (${num_packages} Ubuntu version/architecture combinations × 2 formats)" >> $GITHUB_STEP_SUMMARY
+            echo "- Contains: All ${total_builds} build variants organized by Ubuntu version and CPU architecture" >> $GITHUB_STEP_SUMMARY
           else
             echo "⚠️ **Artifact packing failed or was skipped**" >> $GITHUB_STEP_SUMMARY
           fi
