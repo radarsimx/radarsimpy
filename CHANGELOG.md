@@ -4,20 +4,53 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [Unreleased]
+## [15.5.0] - 2026-10-13
 
 ### Added
 
-- `tests/test_system_back_propagation.py`, which states back propagation and the reflection filter as properties rather than stored numbers: the flag is inert without multipath, what it adds lands at the path length it stands for, a scene of only skipped surfaces is silent, and every reflection band summed reconstructs the unfiltered run. `benchmarks/scenes.py` gained multi-target scenes to go with them, and the reference capture two cases that are sensitive to back propagation by measurement -- the pre-existing `sphere_backprop` moves by exactly zero and is the negative control
+- Linux ARM64 (aarch64) packages for Ubuntu 22.04, 24.04 and 26.04, in both CPU and CUDA 13 versions, for Python 3.10-3.14. The Ubuntu unit tests also run on ARM64 (CPU only)
+- New User Guide pages: System Model, Transmitter, Receiver and Mutual Interference
+- New User Guide sections on pulsed waveforms, and on simultaneous transmit channels (how to combine the separated M x N channels into the signal a real receiver sees)
+- New figures for the animated-target, receiver-noise and phase-noise guides
+- `RADARSIMX_DEVICE_PARITY` build option. Run `set RADARSIMX_DEVICE_PARITY=ON` before `build.bat` to get a GPU build whose results match the CPU exactly, bit for bit. It runs about 1.7x slower, so it is off by default
+- `sim_radar` now raises a `RuntimeError` (`[ERROR_PO_LUT_OVERFLOW]`) when a scene produces more scattering points than it can store, instead of returning an incomplete result. The message explains how to fix it: lower `density`, narrow `ray_filter`, or set `skip_diffusion=True` on large surrounding surfaces
+- `radarsimpy.lib.np_float`, the NumPy dtype that matches the floating-point type the package was built with
+- `benchmarks/precision_ab.py`, a script that compares the accuracy and speed of two builds
+- Back-propagation test suite (`tests/test_system_back_propagation.py`) and multi-target benchmark scenes to go with it
+- Regression tests for the pulsed-radar, modulation and pulse-index fixes listed below
+- Dependabot now also checks the Python requirements files
 
 ### Fixed
 
-- `sim_radar(..., back_propagating=True)` no longer reports multi-bounce returns at too short a range. Back propagation follows a ray out, scatters at a hit point and sends the field back down the same chain, so the round trip includes that chain twice; the return leg was being measured from the ray's first hit instead, which dropped the stretch between there and the scattering point. On two plates 30 m and 20 m from the radar and 20 m apart, the back-propagated return appeared at 40 m rather than its true 50 m. Only affects `back_propagating=True`; everything else is bit-identical
+- `sim_radar(..., back_propagating=True)` reported multi-bounce returns at too short a range. For example, with two plates 30 m and 20 m from the radar and 20 m apart, the return showed up at 40 m instead of the correct 50 m. Simulations without back propagation are not affected
+- Pulsed radar: a target beyond the unambiguous range (`c * prp / 2`) could add a ghost return at the wrong sample, with a random and sometimes huge amplitude. The folded echo now appears only where it should. This affected point targets, mesh targets and interference
+- Waveform modulation was applied one sample too early, just before the echo arrived. For example, a 21-sample pulse came out 22 samples long
+- `sim_radar` with the default `level=None` could get the first sample of a pulse wrong for some numbers of samples per pulse (41, 47, 55, 61, ...). Common sizes such as 100, 128, 200 and 256 were not affected
+- Mesh simulation on the GPU with phase noise enabled failed with a CUDA error. This was a regression in 15.4.0. CPU runs were not affected
+- Documentation errors:
+  - The User Guide said that transmitting on several channels at once gives a combined signal. It does not: the simulator always returns the channels separated
+  - The README described `theta` and `pitch` incorrectly. `theta` is measured from the +z axis, and a positive `pitch` turns +x toward +z
+  - `mod_t` must be equally spaced. This was not stated before
 
 ### Changed
 
-- `sim_radar(..., back_propagating=True)` is redesigned. It used to run a second ray-tracing and baseband pass that rewrote the traced rays in place; a return path is now described by the scattering point it belongs to, so both kinds of return are computed together. Three things change for a user: a return that reflects on its way out is checked against the surfaces it claims to reflect off, instead of being assumed to close; `ray_filter` counts such a path at its true length, where a seven-bounce return was previously filtered as if it were four; and returns are only built for rays that left the scene, not for rays the trace depth stopped. Scenes that leave the flag off are bit-identical, and so is any scene where rays do not bounce -- a single convex target returns exactly what it did before
-- `ray_filter` counts reflections end to end, including those a back-propagated return takes on its way out. `ray_filter[1]` continues to cap trace depth
+- Faster simulation through mixed-precision math. Values that need double precision (range, delay, phase) keep it, and everything else is now computed in single precision. On an RTX 3050 the baseband step of a mesh simulation is about **4x** faster. Point-target and interference simulation is **1.1x-2.6x** faster on the GPU and **1.05x-4.4x** faster on the CPU
+- Simulation results change very slightly because of the mixed-precision math. The difference is below -113 dBc for mesh scenes and below -145 dBc for point targets and interference
+- Interference simulation on the CPU now uses all cores; it was single-threaded before. Point-target simulation on Windows also makes better use of multiple cores
+- `sim_radar(..., back_propagating=True)` is redesigned. Direct and back-propagated returns are now computed together in one pass. For users this means:
+  - Each back-propagated return is checked against the surfaces it reflects off. A return that misses a surface or is blocked is dropped
+  - `ray_filter` counts all the reflections of a back-propagated return. Before, a seven-bounce return was counted as four
+  - Back-propagated returns are built only for rays that left the scene, not for rays stopped by the trace-depth limit
+  - Results are unchanged when the flag is off, and for scenes where rays do not bounce between surfaces, such as a single convex target
+- `ray_filter` counts the reflections of the whole path, including those on the way back with `back_propagating=True`. `ray_filter[1]` still limits how deep rays are traced
+- `float_t` in `type_def.pxd` now sets the precision of the whole package: `float` (default) gives the mixed-precision build and `double` gives an all-double build. Building with `double` did not compile before. Note that `double` also changes the precision of the mesh geometry, so mesh results differ from the default build
+- Stored test reference values are re-recorded. Tests now allow an error relative to the peak of the expected signal (1e-6 for the ideal and interference tests, 3e-5 for the mesh tests) instead of comparing element by element
+- Documentation:
+  - The coordinate systems page is rewritten, with new figures, a summary table and worked examples
+  - The ray-tracing guide is updated for the new back propagation
+  - The README has a new section on choosing the CPU or GPU, a benchmark table across releases, an index of the User Guide, and lists `pygltflib` as an optional dependency
+  - All figures are redrawn in one consistent style
+- Updated `radarsimcpp` submodule to v15.5.0
 
 ---
 
