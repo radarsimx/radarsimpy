@@ -89,7 +89,12 @@ Linux
 **Ubuntu 22.04/24.04/26.04**
 
 * **Operating System**: Ubuntu 22.04 LTS or Ubuntu 24.04 LTS or Ubuntu 26.04 LTS
-* **Architecture**: x86_64 (64-bit)
+* **Architecture**:
+
+  * x86_64 (64-bit Intel/AMD)
+  * ARM64 (aarch64)
+
+  Download the package that matches your machine; ``uname -m`` prints ``x86_64`` or ``aarch64``.
 * **Compiler Runtime**: GCC standard library (included by default)
 
 If you encounter library issues, ensure system libraries are up to date:
@@ -101,7 +106,7 @@ If you encounter library issues, ensure system libraries are up to date:
 
 **GPU-Accelerated Version**
 
-For CUDA support on Ubuntu:
+For CUDA support on Ubuntu (available for both x86_64 and ARM64):
 
 * **CUDA Version**: CUDA Toolkit 13.x
 * **GPU**: NVIDIA GPU with Compute Capability 7.5 (Turing) or higher — CUDA 13 dropped offline compilation support for Maxwell, Pascal, and Volta GPUs

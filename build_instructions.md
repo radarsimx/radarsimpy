@@ -137,6 +137,8 @@ python build_config.py
 
 ## Ubuntu 22.04/24.04/26.04 and Other Linux Distributions
 
+The steps below build natively on both x86_64 and ARM64 (aarch64) machines.
+
 ### Linux Prerequisites
 
 1. **Build tools and dependencies**:
@@ -289,7 +291,6 @@ than linking something unverified. The cache lives outside the build directory,
 so a clean build does not re-download. Note that `--deps=release` only works
 for platforms that the pinned release actually published; if one is missing,
 the build stops with the reason instead of silently falling back.
-
 ## Building Documentation
 
 RadarSimPy includes comprehensive documentation built with Sphinx. The documentation source files are located in the `gen_docs/` directory and include API references, user guides, and examples.

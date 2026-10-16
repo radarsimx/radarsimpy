@@ -14,7 +14,8 @@ Follow these steps to install RadarSimPy:
 2. **Extract** the downloaded package to a temporary location
 3. **Copy** the ``radarsimpy/`` folder into your project directory
 
-Pre-built modules are available for Windows, Linux and MacOS. See
+Pre-built modules are available for Windows (x86_64), Linux (x86_64 and ARM64)
+and MacOS (Intel and Apple Silicon). See
 :doc:`dependencies` for the supported OS versions, architectures and runtime
 components each platform needs.
 
@@ -69,7 +70,7 @@ The package includes platform-specific compiled libraries:
     └── simulator.*.so          # Python extension module
 
 .. note::
-   The ``simulator.*.pyd`` or ``simulator.*.so`` filename includes Python version information (e.g., ``simulator.cpython-312-x86_64-linux-gnu.so``).
+   The ``simulator.*.pyd`` or ``simulator.*.so`` filename includes Python version information (e.g., ``simulator.cpython-312-x86_64-linux-gnu.so``, or ``simulator.cpython-312-aarch64-linux-gnu.so`` on Linux ARM64).
 
 Verification
 ------------

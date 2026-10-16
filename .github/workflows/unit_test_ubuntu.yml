@@ -24,17 +24,6 @@
 #     architecture comes from the runner: `ubuntu-XX.04` is x64 and
 #     `ubuntu-XX.04-arm` is ARM64.
 #
-# Prebuilt dependencies:
-#   The x64 entries pass `--deps=release`, which downloads the checksum-pinned
-#   HDF5/mbedTLS archives from the radarsimx-deps release. That release has no
-#   linux_aarch64 archives yet and radarsimcpp's cmake/deps_manifest.cmake pins
-#   no checksum for them, so the download path refuses to run on ARM64. The
-#   ARM64 entries pass `--deps=repo` instead, which links the linux_aarch64
-#   libraries committed in the deps submodule's libs/ tree, pinned by the
-#   submodule commit. Switch them to `--deps=release` once the deps release
-#   carries linux_aarch64 and the manifest pins its checksums; the ARM64 branch
-#   of the "Build & Test" step is then the only thing to delete.
-#
 # About the GPU entry:
 #   GitHub-hosted runners have no CUDA device, so this entry does not exercise
 #   any GPU code path. What it covers is that a CUDA-enabled build compiles and
@@ -48,7 +37,6 @@
 #   - Pip package caching for faster builds
 #   - GCC environment setup for C++ compilation
 #   - CUDA toolkit installation for the GPU entry only
-#   - Prebuilt HDF5/mbedTLS: release archives on x64, committed libs on ARM64
 #   - System information display for debugging
 #   - Build and C++ test log capture on failure
 #   - Timeout protection (90 minutes, sized for the slower CUDA build)
@@ -210,13 +198,7 @@ jobs:
         run: |
           sudo chown -R $USER:$USER /home/runner/work/radarsimpy
           chmod +x build.sh
-          # --deps=repo on ARM64, --deps=release on x64: see "Prebuilt
-          # dependencies" at the top of this file.
-          deps=release
-          if [ "${{ runner.arch }}" = "ARM64" ]; then
-            deps=repo
-          fi
-          ./build.sh --license=on --arch=${{ matrix.arch }} --test=on --deps="${deps}"
+          ./build.sh --license=on --arch=${{ matrix.arch }} --test=on --deps=release
 
       - name: Display build logs on failure
         if: failure()

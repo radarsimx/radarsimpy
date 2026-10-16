@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Unreleased]
+
+### Changed
+
+- Linux ARM64 builds in CI now download the prebuilt HDF5 and mbedTLS from the radarsimx-deps release (`--deps=release`), the same way every other platform does. Before, they used the copies in the `deps` submodule, because the release had no ARM64 archives
+- The README and the Dependencies, Installation and Build pages now list Linux ARM64 as supported, for both the CPU and GPU (CUDA) modules
+
 ## [15.5.0] - 2026-10-13
 
 ### Added

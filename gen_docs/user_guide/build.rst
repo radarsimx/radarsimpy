@@ -25,7 +25,7 @@ Before building RadarSimPy, ensure you have the following installed:
 **Platform-Specific Requirements**
 
 - **Windows**: Visual Studio 2022 or later with "Desktop development with C++" workload
-- **Linux**: GCC 11 (Ubuntu 22.04), GCC 13 (Ubuntu 24.04), or GCC 15 (Ubuntu 26.04) — the distribution's default compiler
+- **Linux** (x86_64 or ARM64): GCC 11 (Ubuntu 22.04), GCC 13 (Ubuntu 24.04), or GCC 15 (Ubuntu 26.04) — the distribution's default compiler
 - **MacOS**: Xcode Command Line Tools (Clang)
 
 **For GPU Version**
@@ -82,6 +82,8 @@ Navigate to the RadarSimPy root directory and run the appropriate build script.
 
 Linux
 ^^^^^
+
+The same commands build natively on x86_64 and ARM64 (aarch64) machines.
 
 Make the build script executable (first time only):
 

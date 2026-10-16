@@ -60,17 +60,17 @@ Full detail, including platform and hardware requirements, is on the [Dependenci
 - **Windows**
   - [Visual C++ Runtime](https://aka.ms/vs/16/release/vc_redist.x64.exe/)
   - GPU version (CUDA13) – requires a GPU with Compute Capability 7.5 (Turing) or higher; see [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1)
-- **Ubuntu 22.04**
+- **Ubuntu 22.04** (x86-64 and ARM64)
   - GCC 11 (default)
   - GPU version (CUDA13) – requires a GPU with Compute Capability 7.5 (Turing) or higher; see [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1)
-- **Ubuntu 24.04**
+- **Ubuntu 24.04** (x86-64 and ARM64)
   - GCC 13 (default)
   - GPU version (CUDA13) – requires a GPU with Compute Capability 7.5 (Turing) or higher; see [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1)
-- **Ubuntu 26.04**
+- **Ubuntu 26.04** (x86-64 and ARM64)
   - GCC 15 (default)
   - GPU version (CUDA13) – requires a GPU with Compute Capability 7.5 (Turing) or higher; see [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1)
-- **Generic Linux x86-64**
-  - Try Ubuntu 22.04/24.04 module, or [request a custom build](https://radarsimx.com/request-a-custom-build/)
+- **Generic Linux (x86-64 or ARM64)**
+  - Try the Ubuntu 22.04/24.04 module for your architecture, or [request a custom build](https://radarsimx.com/request-a-custom-build/)
 - **MacOS**
   - Intel: use default Clang (no extra dependency)
   - Apple Silicon: use default Clang (no extra dependency)
@@ -110,8 +110,10 @@ Simulations run in parallel on the CPU or the GPU:
 |                 | CPU (x86-64) | CPU (ARM64) | GPU (CUDA) |
 | --------------- | ------------ | ----------- | ---------- |
 | Windows         | ✔️           | ❌️         | ✔️         |
-| Linux (x86-64)  | ✔️           | ❌️         | ✔️         |
+| Linux           | ✔️           | ✔️          | ✔️         |
 | MacOS           | ✔️           | ✔️          | ❌️        |
+
+On Linux, the GPU (CUDA) module is available for both x86-64 and ARM64.
 
 ### Selecting a device
 
