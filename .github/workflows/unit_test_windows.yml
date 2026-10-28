@@ -108,7 +108,8 @@ jobs:
         uses: radarsimx/cuda-toolkit@master
         with:
           cuda: "13.4.3"
-          method: "local"
+          method: "network"
+          sub-packages: '["nvcc", "visual_studio_integration"]'
           use-github-cache: false
 
       - name: Verify CUDA installation
