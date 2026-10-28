@@ -160,7 +160,7 @@ jobs:
       - name: Setup CUDA Toolkit
         uses: radarsimx/cuda-toolkit@master
         with:
-          cuda: "13.3.1"
+          cuda: "13.4.3"
           method: "network"
           sub-packages: '["nvcc"]'
           linux-local-args: '["--toolkit", "--silent"]'
