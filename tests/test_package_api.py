@@ -67,8 +67,8 @@ class TestPackageMetadata:
 class TestGetInfo:
     """``radarsimpy.get_info``."""
 
-    @staticmethod
     @pytest.fixture(scope="class")
+    @staticmethod
     def info():
         """The info dictionary, built once for the class."""
         return rs.get_info()
