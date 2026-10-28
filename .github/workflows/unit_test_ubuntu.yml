@@ -101,7 +101,8 @@ jobs:
             { "runner": "ubuntu-26.04-arm", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26-arm64", "python-version": "3.12", "arch": "cpu" },
             { "runner": "ubuntu-26.04-arm", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26-arm64", "python-version": "3.13", "arch": "cpu" },
             { "runner": "ubuntu-26.04-arm", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26-arm64", "python-version": "3.14", "arch": "cpu" },
-            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.13", "arch": "gpu" }
+            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.13", "arch": "gpu" },
+            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.14", "arch": "gpu" }
           ]
           EOF
           echo "matrix=$(jq -c . matrix.json)" >> "$GITHUB_OUTPUT"
