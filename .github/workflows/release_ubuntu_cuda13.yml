@@ -167,7 +167,7 @@ jobs:
 
       - name: Install CUDA cuRAND development headers
         run: |
-          sudo apt-get install -y libcurand-dev-13-3
+          sudo apt-get install -y libcurand-dev-13-4
 
       - name: Verify CUDA installation
         run: |
