@@ -96,12 +96,14 @@ jobs:
             ${{ runner.os }}-${{ matrix.python-version }}-
             ${{ runner.os }}-
 
+      # Restores the installed toolkit from the Actions cache when it can; see
+      # .github/actions/setup-cuda-windows for why. CUDA 12 ships crt and nvvm
+      # inside nvcc, so they are not listed separately as they are for 13.
       - name: Setup CUDA Toolkit
-        uses: Jimver/cuda-toolkit@v0.2.36
+        uses: ./.github/actions/setup-cuda-windows
         with:
           cuda: "12.9.1"
-          method: "local"
-          use-github-cache: false
+          sub-packages: '["nvcc", "cudart", "curand_dev", "thrust", "visual_studio_integration"]'
 
       - name: Verify CUDA installation
         run: |

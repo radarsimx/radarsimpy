@@ -99,13 +99,13 @@ jobs:
             ${{ runner.os }}-${{ matrix.python-version }}-
             ${{ runner.os }}-
 
+      # Restores the installed toolkit from the Actions cache when it can; see
+      # .github/actions/setup-cuda-windows for why.
       - name: Setup CUDA Toolkit
-        uses: radarsimx/cuda-toolkit@master
+        uses: ./.github/actions/setup-cuda-windows
         with:
           cuda: "13.4.3"
-          method: "network"
-          sub-packages: '["nvcc", "crt", "nvvm", "cudart", "curand", "curand_dev", "thrust", "visual_studio_integration"]'
-          use-github-cache: false
+          sub-packages: '["nvcc", "crt", "nvvm", "cudart", "curand_dev", "thrust", "visual_studio_integration"]'
 
       - name: Verify CUDA installation
         run: |

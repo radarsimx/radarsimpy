@@ -1,0 +1,121 @@
+# ==============================================================================
+# Composite action: CUDA toolkit for Windows runners, cached after install
+# ==============================================================================
+#
+# NVIDIA's Windows installer is the slow part of a CUDA job: the network
+# installer took ~210 s per job to download and install a handful of
+# sub-packages, and the full local installer ~600 s. Neither is cached by
+# cuda-toolkit's `use-github-cache`, which only keeps the installer itself.
+#
+# This caches the installed toolkit folder instead. On a hit the installer
+# never runs: the folder is restored, the environment the installer would set
+# is exported, and the Visual Studio integration files (which a normal install
+# copies into VS) are copied from the toolkit's own extras folder.
+#
+# The cache key covers the CUDA version, the sub-package list and the runner
+# image, so changing any of them starts a fresh cache. The first run after a
+# change installs as before and saves the folder right away, before the build,
+# so a failing build still leaves a cache for the next run.
+#
+# Usage:
+#   - uses: ./.github/actions/setup-cuda-windows
+#     with:
+#       cuda: "13.4.3"
+#       sub-packages: '["nvcc", "crt", "nvvm", "cudart", "curand_dev", "thrust", "visual_studio_integration"]'
+#
+# ==============================================================================
+
+name: Setup CUDA (Windows, cached)
+description: Install selected CUDA toolkit sub-packages on Windows, restoring them from the Actions cache when possible.
+
+inputs:
+  cuda:
+    description: Full CUDA version, e.g. 13.4.3
+    required: true
+  sub-packages:
+    description: JSON list of CUDA sub-packages to install on a cache miss
+    required: true
+
+outputs:
+  cache-hit:
+    description: Whether the toolkit was restored from the cache
+    value: ${{ steps.restore.outputs.cache-hit }}
+
+runs:
+  using: composite
+  steps:
+    - name: Compute toolkit path and cache key
+      id: meta
+      shell: pwsh
+      run: |
+        $parts = "${{ inputs.cuda }}".Split('.')
+        $mm = "$($parts[0]).$($parts[1])"
+        $root = "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v$mm"
+        $sha = [System.Security.Cryptography.SHA256]::Create()
+        $bytes = [System.Text.Encoding]::UTF8.GetBytes('${{ inputs.sub-packages }}')
+        $hash = ([System.BitConverter]::ToString($sha.ComputeHash($bytes)) -replace '-', '').Substring(0, 12).ToLower()
+        "root=$root" >> $env:GITHUB_OUTPUT
+        "major=$($parts[0])" >> $env:GITHUB_OUTPUT
+        "minor=$($parts[1])" >> $env:GITHUB_OUTPUT
+        "key=cuda-${{ runner.os }}-${{ runner.arch }}-$env:ImageOS-${{ inputs.cuda }}-$hash" >> $env:GITHUB_OUTPUT
+
+    - name: Restore CUDA toolkit from cache
+      id: restore
+      uses: actions/cache/restore@v6
+      with:
+        path: ${{ steps.meta.outputs.root }}
+        key: ${{ steps.meta.outputs.key }}
+
+    - name: Install CUDA toolkit (cache miss)
+      if: steps.restore.outputs.cache-hit != 'true'
+      uses: radarsimx/cuda-toolkit@master
+      with:
+        cuda: ${{ inputs.cuda }}
+        method: network
+        sub-packages: ${{ inputs.sub-packages }}
+        use-github-cache: false
+
+    # Saved before the build so a failing build still leaves a cache. When
+    # several matrix entries miss at once, the first save wins and the rest
+    # log a "cache already exists" warning, which is harmless.
+    - name: Save CUDA toolkit to cache
+      if: steps.restore.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v6
+      with:
+        path: ${{ steps.meta.outputs.root }}
+        key: ${{ steps.meta.outputs.key }}
+
+    # What the installer would otherwise have done outside the toolkit folder.
+    - name: Register restored CUDA toolkit
+      if: steps.restore.outputs.cache-hit == 'true'
+      shell: pwsh
+      run: |
+        $root = "${{ steps.meta.outputs.root }}"
+        if (-not (Test-Path "$root\bin\nvcc.exe")) {
+          throw "Restored CUDA toolkit has no nvcc at $root\bin"
+        }
+
+        # CUDA_PATH_Vx_y is what the VS integration props use to find the
+        # toolkit; CUDA_PATH is what setup.py and the build scripts use.
+        "CUDA_PATH=$root" >> $env:GITHUB_ENV
+        "CUDA_PATH_V${{ steps.meta.outputs.major }}_${{ steps.meta.outputs.minor }}=$root" >> $env:GITHUB_ENV
+        "$root\bin" >> $env:GITHUB_PATH
+
+        # Copy the MSBuild integration into every VC toolset folder of the
+        # installed Visual Studio, as the installer does.
+        $ext = "$root\extras\visual_studio_integration\MSBuildExtensions"
+        if (-not (Test-Path $ext)) {
+          throw "Restored CUDA toolkit has no Visual Studio integration at $ext"
+        }
+        $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+        $copied = 0
+        foreach ($vs in & $vswhere -all -products * -property installationPath) {
+          foreach ($bc in Get-ChildItem "$vs\MSBuild\Microsoft\VC\*\BuildCustomizations" -Directory -ErrorAction SilentlyContinue) {
+            Copy-Item "$ext\*" $bc.FullName -Force
+            Write-Host "Copied CUDA MSBuild integration to $($bc.FullName)"
+            $copied++
+          }
+        }
+        if ($copied -eq 0) {
+          throw "No Visual Studio BuildCustomizations folder found to register CUDA with"
+        }
