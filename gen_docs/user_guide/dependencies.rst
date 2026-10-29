@@ -74,11 +74,11 @@ Windows
   * Required for running the C++ simulation engine
   * Download and install if you encounter DLL errors
 
-**GPU-Accelerated Version**
+**GPU Acceleration**
 
-If using the CUDA-enabled version for GPU acceleration:
+The Windows module is CUDA-enabled. It uses the GPU when a usable one is present and otherwise runs on the CPU with OpenMP, so the same module works on machines without an NVIDIA GPU. The CUDA runtime is built in, so no CUDA Toolkit needs to be installed. To run on the GPU:
 
-* **CUDA Version**: CUDA Toolkit 13.x compatible
+* **CUDA Version**: a driver that supports CUDA 13.x
 * **GPU**: NVIDIA GPU with Compute Capability 7.5 (Turing) or higher — CUDA 13 dropped offline compilation support for Maxwell, Pascal, and Volta GPUs
 * **Drivers**: Latest NVIDIA drivers for your GPU
 * **Compatibility**: See `NVIDIA CUDA Compatibility Guide <https://docs.nvidia.com/deploy/cuda-compatibility/#id1>`_
@@ -104,11 +104,11 @@ If you encounter library issues, ensure system libraries are up to date:
     sudo apt-get update
     sudo apt-get install libstdc++6
 
-**GPU-Accelerated Version**
+**GPU Acceleration**
 
-For CUDA support on Ubuntu (available for both x86_64 and ARM64):
+The Ubuntu modules (x86_64 and ARM64) are CUDA-enabled. They use the GPU when a usable one is present and otherwise run on the CPU with OpenMP, so the same module works on machines without an NVIDIA GPU. The CUDA runtime is built in, so no CUDA Toolkit needs to be installed. To run on the GPU:
 
-* **CUDA Version**: CUDA Toolkit 13.x
+* **CUDA Version**: a driver that supports CUDA 13.x
 * **GPU**: NVIDIA GPU with Compute Capability 7.5 (Turing) or higher — CUDA 13 dropped offline compilation support for Maxwell, Pascal, and Volta GPUs
 * **Drivers**: Install latest NVIDIA drivers:
 

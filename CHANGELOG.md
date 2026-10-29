@@ -8,6 +8,10 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Windows and Linux now ship a single CUDA-enabled module instead of separate CPU and GPU (CUDA) modules. It runs on the GPU when a usable one is present and on the CPU with OpenMP otherwise. The CPU-only release workflows (`release_windows.yml`, `release_ubuntu.yml`) are removed, and the Windows and Ubuntu unit tests now build the CUDA module for every entry. MacOS stays CPU-only
+- The Python extensions link the static CUDA runtime (`cudart_static`) instead of the shared one, so the CUDA module imports on a machine with no CUDA Toolkit installed
+- `gpu_available()` now also returns `False` when the GPU is older than every architecture the module was built for (for example a Pascal or Volta card with the CUDA 13 build). Before, it returned `True` and every kernel launch then failed; now the simulation falls back to the CPU
+- CPU runs of the CUDA module are faster: up to 1.4x for `level="sample"` and 1.2x at high `density`, which brings them in line with a CPU-only build. Host code in a CUDA build called CUDA's host-side `sin`/`cos`/`sincos` instead of the standard library's
 - Linux ARM64 builds in CI now download the prebuilt HDF5 and mbedTLS from the radarsimx-deps release (`--deps=release`), the same way every other platform does. Before, they used the copies in the `deps` submodule, because the release had no ARM64 archives
 - The README and the Dependencies, Installation and Build pages now list Linux ARM64 as supported, for both the CPU and GPU (CUDA) modules
 

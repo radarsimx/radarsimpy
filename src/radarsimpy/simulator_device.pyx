@@ -47,7 +47,11 @@ def gpu_available():
     Two separate things have to be true, and this reports their conjunction:
     the module has to have been compiled with CUDA support, and the machine has
     to expose at least one usable CUDA device. Either one missing means the
-    simulators run on the CPU.
+    simulators run on the CPU, with OpenMP.
+
+    "Usable" means a device is present, its driver supports this build's CUDA
+    version, and the build has a kernel image the device can run. A GPU older
+    than every architecture the module was compiled for reports ``False``.
 
     This is what ``device="auto"`` resolves against, so it also answers "what
     will auto pick?" for ``sim_radar``, ``sim_rcs`` and ``sim_lidar``.
@@ -118,7 +122,12 @@ cdef str resolve_device(device):
         # benchmarking with device="gpu" on a CPU wheel records CPU timings
         # believing they are GPU timings, with nothing on screen to say so.
         if CUDA_BUILD:
-            reason = "No CUDA device was detected on this machine."
+            reason = (
+                "No CUDA device was detected on this machine that this build "
+                "can use (no NVIDIA GPU, a driver too old for this build's "
+                "CUDA version, or a GPU older than the architectures it was "
+                "compiled for)."
+            )
         else:
             reason = (
                 "This build of radarsimpy was compiled without CUDA support "

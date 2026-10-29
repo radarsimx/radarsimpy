@@ -59,16 +59,16 @@ Full detail, including platform and hardware requirements, is on the [Dependenci
 
 - **Windows**
   - [Visual C++ Runtime](https://aka.ms/vs/16/release/vc_redist.x64.exe/)
-  - GPU version (CUDA13) – requires a GPU with Compute Capability 7.5 (Turing) or higher; see [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1)
+  - GPU execution (CUDA13) – requires a GPU with Compute Capability 7.5 (Turing) or higher and a recent driver; see [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1). Without one, the same module runs on the CPU; no CUDA toolkit is needed
 - **Ubuntu 22.04** (x86-64 and ARM64)
   - GCC 11 (default)
-  - GPU version (CUDA13) – requires a GPU with Compute Capability 7.5 (Turing) or higher; see [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1)
+  - GPU execution (CUDA13) – requires a GPU with Compute Capability 7.5 (Turing) or higher and a recent driver; see [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1). Without one, the same module runs on the CPU; no CUDA toolkit is needed
 - **Ubuntu 24.04** (x86-64 and ARM64)
   - GCC 13 (default)
-  - GPU version (CUDA13) – requires a GPU with Compute Capability 7.5 (Turing) or higher; see [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1)
+  - GPU execution (CUDA13) – requires a GPU with Compute Capability 7.5 (Turing) or higher and a recent driver; see [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1). Without one, the same module runs on the CPU; no CUDA toolkit is needed
 - **Ubuntu 26.04** (x86-64 and ARM64)
   - GCC 15 (default)
-  - GPU version (CUDA13) – requires a GPU with Compute Capability 7.5 (Turing) or higher; see [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1)
+  - GPU execution (CUDA13) – requires a GPU with Compute Capability 7.5 (Turing) or higher and a recent driver; see [Minimum Required Driver Versions](https://docs.nvidia.com/deploy/cuda-compatibility/#id1). Without one, the same module runs on the CPU; no CUDA toolkit is needed
 - **Generic Linux (x86-64 or ARM64)**
   - Try the Ubuntu 22.04/24.04 module for your architecture, or [request a custom build](https://radarsimx.com/request-a-custom-build/)
 - **MacOS**
@@ -105,7 +105,9 @@ radarsimpy/
 Simulations run in parallel on the CPU or the GPU:
 
 - **CPU:** OpenMP, using all cores by default (limit it with `OMP_NUM_THREADS`)
-- **GPU:** CUDA, in the GPU build of the module; see [Dependencies](#dependencies) for the GPU and driver requirements
+- **GPU:** CUDA; see [Dependencies](#dependencies) for the GPU and driver requirements
+
+The Windows and Linux modules are a single CUDA-enabled build: they use the GPU when a usable one is present and otherwise run on the CPU with OpenMP, at about the same speed as a CPU-only build. MacOS modules are CPU-only.
 
 |                 | CPU (x86-64) | CPU (ARM64) | GPU (CUDA) |
 | --------------- | ------------ | ----------- | ---------- |

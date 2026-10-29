@@ -15,28 +15,30 @@
 #   - Defined once, as JSON, in the `setup` job's "Define test matrix" step.
 #     The `build` job consumes it via job outputs, so adding/removing an entry
 #     only requires editing that one step.
-#   - CPU builds: Python 3.10, 3.11, 3.12, 3.13, 3.14 on each Ubuntu version,
-#     for both x64 and ARM64
-#   - GPU build: Ubuntu 24.04 x64 / Python 3.13 only
+#   - GPU (CUDA) builds: Python 3.10, 3.11, 3.12, 3.13, 3.14 on each Ubuntu
+#     version, for both x64 and ARM64. The CPU-only build is no longer
+#     shipped for Linux: the CUDA build runs on the CPU (OpenMP) when no
+#     usable GPU is present, so it is the one tested here. macOS still
+#     covers the CPU-only build configuration.
 #   - Platform: Ubuntu 22.04, Ubuntu 24.04, Ubuntu 26.04 (x64 and ARM64 runners)
 #   - Compilers: GCC-11 (22.04), GCC-13 (24.04), GCC-15 (26.04)
 #   - `arch` is the build architecture (cpu/gpu) passed to build.sh. The CPU
 #     architecture comes from the runner: `ubuntu-XX.04` is x64 and
 #     `ubuntu-XX.04-arm` is ARM64.
+#   - RADARSIMX_CUDA_ARCHITECTURES is pinned to 75 to keep compile time down.
 #
-# About the GPU entry:
-#   GitHub-hosted runners have no CUDA device, so this entry does not exercise
-#   any GPU code path. What it covers is that a CUDA-enabled build compiles and
-#   then falls back to CPU execution at runtime: `gpu_available()` reports no
-#   device, `sim_radar`/`sim_rcs`/`sim_lidar` dispatch to the CPU policy, and
-#   the C++ GPU-policy tests skip instead of failing. That behavior does not
-#   vary by Python version or Ubuntu release, which the CPU entries already
-#   cover, so one entry is enough. Add more entries below if that changes.
+# About the GPU entries:
+#   GitHub-hosted runners have no CUDA device, so no GPU code path runs here.
+#   What every entry covers is the shipped configuration as most users run it:
+#   a CUDA-enabled build that falls back to CPU execution at runtime.
+#   `gpu_available()` reports no device, `sim_radar`/`sim_rcs`/`sim_lidar`
+#   dispatch to the CPU policy, and the C++ GPU-policy tests skip instead of
+#   failing.
 #
 # Key Features:
 #   - Pip package caching for faster builds
 #   - GCC environment setup for C++ compilation
-#   - CUDA toolkit installation for the GPU entry only
+#   - CUDA toolkit installation
 #   - System information display for debugging
 #   - Build and C++ test log capture on failure
 #   - Timeout protection (90 minutes, sized for the slower CUDA build)
@@ -45,7 +47,7 @@
 # Requirements:
 #   - RADARSIMC SSH key secret for submodule access
 #   - CMake, GCC, and Python dependencies
-#   - CUDA toolkit (GPU entry only)
+#   - CUDA toolkit
 #   - build.sh script
 #
 # ==============================================================================
@@ -71,38 +73,36 @@ jobs:
         run: |
           cat > matrix.json << 'EOF'
           [
-            { "runner": "ubuntu-22.04", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22", "python-version": "3.10", "arch": "cpu" },
-            { "runner": "ubuntu-22.04", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22", "python-version": "3.11", "arch": "cpu" },
-            { "runner": "ubuntu-22.04", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22", "python-version": "3.12", "arch": "cpu" },
-            { "runner": "ubuntu-22.04", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22", "python-version": "3.13", "arch": "cpu" },
-            { "runner": "ubuntu-22.04", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22", "python-version": "3.14", "arch": "cpu" },
-            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.10", "arch": "cpu" },
-            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.11", "arch": "cpu" },
-            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.12", "arch": "cpu" },
-            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.13", "arch": "cpu" },
-            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.14", "arch": "cpu" },
-            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.10", "arch": "cpu" },
-            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.11", "arch": "cpu" },
-            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.12", "arch": "cpu" },
-            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.13", "arch": "cpu" },
-            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.14", "arch": "cpu" },
-            { "runner": "ubuntu-22.04-arm", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22-arm64", "python-version": "3.10", "arch": "cpu" },
-            { "runner": "ubuntu-22.04-arm", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22-arm64", "python-version": "3.11", "arch": "cpu" },
-            { "runner": "ubuntu-22.04-arm", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22-arm64", "python-version": "3.12", "arch": "cpu" },
-            { "runner": "ubuntu-22.04-arm", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22-arm64", "python-version": "3.13", "arch": "cpu" },
-            { "runner": "ubuntu-22.04-arm", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22-arm64", "python-version": "3.14", "arch": "cpu" },
-            { "runner": "ubuntu-24.04-arm", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24-arm64", "python-version": "3.10", "arch": "cpu" },
-            { "runner": "ubuntu-24.04-arm", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24-arm64", "python-version": "3.11", "arch": "cpu" },
-            { "runner": "ubuntu-24.04-arm", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24-arm64", "python-version": "3.12", "arch": "cpu" },
-            { "runner": "ubuntu-24.04-arm", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24-arm64", "python-version": "3.13", "arch": "cpu" },
-            { "runner": "ubuntu-24.04-arm", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24-arm64", "python-version": "3.14", "arch": "cpu" },
-            { "runner": "ubuntu-26.04-arm", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26-arm64", "python-version": "3.10", "arch": "cpu" },
-            { "runner": "ubuntu-26.04-arm", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26-arm64", "python-version": "3.11", "arch": "cpu" },
-            { "runner": "ubuntu-26.04-arm", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26-arm64", "python-version": "3.12", "arch": "cpu" },
-            { "runner": "ubuntu-26.04-arm", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26-arm64", "python-version": "3.13", "arch": "cpu" },
-            { "runner": "ubuntu-26.04-arm", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26-arm64", "python-version": "3.14", "arch": "cpu" },
+            { "runner": "ubuntu-22.04", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22", "python-version": "3.10", "arch": "gpu" },
+            { "runner": "ubuntu-22.04", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22", "python-version": "3.11", "arch": "gpu" },
+            { "runner": "ubuntu-22.04", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22", "python-version": "3.12", "arch": "gpu" },
+            { "runner": "ubuntu-22.04", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22", "python-version": "3.13", "arch": "gpu" },
+            { "runner": "ubuntu-22.04", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22", "python-version": "3.14", "arch": "gpu" },
+            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.10", "arch": "gpu" },
+            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.11", "arch": "gpu" },
+            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.12", "arch": "gpu" },
             { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.13", "arch": "gpu" },
-            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.14", "arch": "gpu" }
+            { "runner": "ubuntu-24.04", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24", "python-version": "3.14", "arch": "gpu" },
+            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.10", "arch": "gpu" },
+            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.11", "arch": "gpu" },
+            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.12", "arch": "gpu" },
+            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.13", "arch": "gpu" },
+            { "runner": "ubuntu-26.04", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26", "python-version": "3.14", "arch": "gpu" },
+            { "runner": "ubuntu-22.04-arm", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22-arm64", "python-version": "3.10", "arch": "gpu" },
+            { "runner": "ubuntu-22.04-arm", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22-arm64", "python-version": "3.11", "arch": "gpu" },
+            { "runner": "ubuntu-22.04-arm", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22-arm64", "python-version": "3.12", "arch": "gpu" },
+            { "runner": "ubuntu-22.04-arm", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22-arm64", "python-version": "3.13", "arch": "gpu" },
+            { "runner": "ubuntu-22.04-arm", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "os_label": "ubuntu22-arm64", "python-version": "3.14", "arch": "gpu" },
+            { "runner": "ubuntu-24.04-arm", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24-arm64", "python-version": "3.10", "arch": "gpu" },
+            { "runner": "ubuntu-24.04-arm", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24-arm64", "python-version": "3.11", "arch": "gpu" },
+            { "runner": "ubuntu-24.04-arm", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24-arm64", "python-version": "3.12", "arch": "gpu" },
+            { "runner": "ubuntu-24.04-arm", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24-arm64", "python-version": "3.13", "arch": "gpu" },
+            { "runner": "ubuntu-24.04-arm", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "os_label": "ubuntu24-arm64", "python-version": "3.14", "arch": "gpu" },
+            { "runner": "ubuntu-26.04-arm", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26-arm64", "python-version": "3.10", "arch": "gpu" },
+            { "runner": "ubuntu-26.04-arm", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26-arm64", "python-version": "3.11", "arch": "gpu" },
+            { "runner": "ubuntu-26.04-arm", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26-arm64", "python-version": "3.12", "arch": "gpu" },
+            { "runner": "ubuntu-26.04-arm", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26-arm64", "python-version": "3.13", "arch": "gpu" },
+            { "runner": "ubuntu-26.04-arm", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "os_label": "ubuntu26-arm64", "python-version": "3.14", "arch": "gpu" }
           ]
           EOF
           echo "matrix=$(jq -c . matrix.json)" >> "$GITHUB_OUTPUT"
@@ -196,6 +196,9 @@ jobs:
           CC: ${{ matrix.c_compiler }}
           CXX: ${{ matrix.cxx_compiler }}
           PYTHONPATH: ${{ github.workspace }}
+          # Runners have no GPU, so one architecture is enough to compile and
+          # link the CUDA build; the release workflows build the full set.
+          RADARSIMX_CUDA_ARCHITECTURES: "75"
         run: |
           sudo chown -R $USER:$USER /home/runner/work/radarsimpy
           chmod +x build.sh

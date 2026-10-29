@@ -155,9 +155,14 @@ class BuildConfig:
         else:
             raise OSError(f"Unsupported operating system: {self.os_type}")
 
-        # Add CUDA libraries if GPU build
+        # Add CUDA libraries if GPU build. The static runtime, so a GPU build
+        # imports on a machine with no CUDA toolkit and falls back to the CPU:
+        # the shared libcudart.so / cudart64_*.dll would have to be installed
+        # just to load the module. The driver is loaded lazily at runtime.
         if self.is_gpu:
-            self.libs.append("cudart")
+            self.libs.append("cudart_static")
+            if self.os_type == "Linux":
+                self.libs.extend(["rt", "pthread", "dl"])
 
     def _configure_macros(self) -> None:
         """Configure preprocessor macros.
