@@ -135,15 +135,13 @@ data = sim_radar(radar, targets, device="auto")  # "auto" (default), "gpu" or "c
 
 Execution time in seconds for examples from the [radarsimnb repository](https://github.com/radarsimx/radarsimnb), across releases:
 
-| Example                                                                                                             | v12.5.0 CPU | v12.5.0 GPU | v12.6.1 CPU | v12.6.1 GPU | v15.4.0 CPU | v15.4.0 GPU |
+| Example                                                                                                             | v12.5.0 CPU | v12.5.0 GPU | v12.6.1 CPU | v12.6.1 GPU | v15.5.0 CPU | v15.5.0 GPU |
 | ------------------------------------------------------------------------------------------------------------------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |
 | [FMCW imaging radar](https://github.com/radarsimx/radarsimnb/blob/master/notebooks/scene_fmcw_imaging_radar.ipynb)  | > 7200      | 2259.91     | > 7200      | 445.48      | **854.76**  | **63.59**   |
 | [FMCW radar with a car](https://github.com/radarsimx/radarsimnb/blob/master/notebooks/scene_fmcw_car.ipynb)         | 909.33      | 9.72        | 373.96      | 5.17        | **8.14**    | **0.75**    |
 | [Doppler of a turbine](https://github.com/radarsimx/radarsimnb/blob/master/notebooks/scene_doppler_turbine.ipynb)   | 2069.66     | 117.76      | 2719.24     | 126.71      | **95.54**   | **63.40**   |
 | [Multi-path](https://github.com/radarsimx/radarsimnb/blob/master/notebooks/scene_multi_path.ipynb)                  | 151.64      | 4.85        | 88.40       | 4.63        | **5.62**    | **1.60**    |
 | [FMCW interference](https://github.com/radarsimx/radarsimnb/blob/master/notebooks/waveform_fmcw_interference.ipynb) | 0.006       | 0.198       | 0.004       | 0.123       | **0.0013**  | **0.0015**  |
-
-The GPU helps most on ray-traced 3D models with many channels or samples. Point-target and interference simulations are already fast on the CPU, so the GPU gains nothing there.
 
 <sub>Measured on a laptop with an Intel Core i7-11800H (16 threads, 32 GB RAM) and an NVIDIA GeForce RTX 3050 Laptop GPU (4 GB). v15.4.0 times only the `sim_radar()` call, as the median of 3 runs after a warm-up for runs under 60 s and a single run otherwise; earlier releases were timed with the notebook's own timer.</sub>
 
