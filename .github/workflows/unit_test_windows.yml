@@ -20,6 +20,9 @@
 #     macOS still covers the CPU-only build configuration.
 #   - Platform: windows-2025 runner, x64
 #   - RADARSIMX_CUDA_ARCHITECTURES is pinned to 75 to keep compile time down.
+#   - `cpp-tests` marks the one entry that builds and runs the C++ (Google
+#     Test) suite. It does not depend on the Python version, so building it in
+#     every entry only cost time. The other entries run pytest alone.
 #
 # About the GPU entries:
 #   GitHub-hosted runners have no CUDA device, so no GPU code path runs here.
@@ -66,11 +69,11 @@ jobs:
         run: |
           cat > matrix.json << 'EOF'
           [
-            { "python-version": "3.10", "arch": "gpu" },
-            { "python-version": "3.11", "arch": "gpu" },
-            { "python-version": "3.12", "arch": "gpu" },
-            { "python-version": "3.13", "arch": "gpu" },
-            { "python-version": "3.14", "arch": "gpu" }
+            { "python-version": "3.10", "arch": "gpu", "cpp-tests": false },
+            { "python-version": "3.11", "arch": "gpu", "cpp-tests": false },
+            { "python-version": "3.12", "arch": "gpu", "cpp-tests": false },
+            { "python-version": "3.13", "arch": "gpu", "cpp-tests": true },
+            { "python-version": "3.14", "arch": "gpu", "cpp-tests": false }
           ]
           EOF
           echo "matrix=$(jq -c . matrix.json)" >> "$GITHUB_OUTPUT"
@@ -101,9 +104,11 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ~\AppData\Local\pip\Cache
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements-dev.txt') }}
+          # Wheels are per Python version, so the version is part of the key;
+          # without it the first job to finish saved only its own wheels.
+          key: ${{ runner.os }}-py${{ matrix.python-version }}-pip-${{ hashFiles('requirements.txt', 'requirements-test.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-py${{ matrix.python-version }}-pip-
 
       # Restores the installed toolkit from the Actions cache when it can; see
       # .github/actions/setup-cuda-windows for why.
@@ -137,7 +142,9 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
+          # Build and test dependencies only. requirements-dev.txt adds the lint
+          # and docs tools, which took ~40 s to install and are never used here.
+          pip install -r requirements-test.txt
 
       - name: Setup license file
         run: |
@@ -155,14 +162,25 @@ jobs:
           echo "CMake version:"
           cmake --version
 
+      # The C++ test binary does not depend on the Python version, and building
+      # it was ~5.5 min of every job while its tests ran in under a second. So
+      # only the `cpp-tests` entry builds and runs it (build.bat --test=on runs
+      # pytest too); the others build the module alone and run pytest below.
       - name: Build & Test
         run: |
-          .\build.bat --license=on --arch=${{ matrix.arch }} --test=on --deps=release
+          .\build.bat --license=on --arch=${{ matrix.arch }} --test=${{ matrix.cpp-tests && 'on' || 'off' }} --deps=release
         env:
           PYTHONPATH: ${{ github.workspace }}
           # Runners have no GPU, so one architecture is enough to compile and
           # link the CUDA build; the release workflows build the full set.
           RADARSIMX_CUDA_ARCHITECTURES: "75"
+
+      - name: Python tests
+        if: ${{ !matrix.cpp-tests }}
+        run: |
+          pytest
+        env:
+          PYTHONPATH: ${{ github.workspace }}
 
       - name: Display build logs on failure
         if: failure()

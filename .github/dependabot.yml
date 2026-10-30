@@ -10,8 +10,8 @@
 # Notes:
 #   - `directory: "/"` is the required value for the github-actions ecosystem;
 #     it always means "the repository's .github/workflows directory". For pip
-#     it is the repository root, where requirements.txt and
-#     requirements-dev.txt live.
+#     it is the repository root, where requirements.txt,
+#     requirements-test.txt and requirements-dev.txt live.
 #   - Updates are grouped so a weekly run produces one PR instead of one per
 #     dependency. Major bumps are kept separate because they may require
 #     changes (e.g. new required inputs, dropped Node runtime, removed APIs).
