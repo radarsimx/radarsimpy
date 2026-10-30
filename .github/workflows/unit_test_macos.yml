@@ -19,6 +19,10 @@
 #   - Platform: MacOS 26 (x64), MacOS 26 (ARM64)
 #   - Compilers: Clang/Clang++
 #   - Architecture: x64, arm64 (CPU-only builds)
+#   - `cpp-tests` marks the one entry per architecture (Python 3.13) that
+#     builds and runs the C++ (Google Test) suite. It does not depend on the
+#     Python version, so building it in every entry only cost time. The other
+#     entries run pytest alone.
 #
 # Key Features:
 #   - Pip package caching for faster builds
@@ -55,16 +59,16 @@ jobs:
         run: |
           cat > matrix.json << 'EOF'
           [
-            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosx64", "python-version": "3.10" },
-            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosx64", "python-version": "3.11" },
-            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosx64", "python-version": "3.12" },
-            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosx64", "python-version": "3.13" },
-            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosx64", "python-version": "3.14" },
-            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosarm64", "python-version": "3.10" },
-            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosarm64", "python-version": "3.11" },
-            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosarm64", "python-version": "3.12" },
-            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosarm64", "python-version": "3.13" },
-            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosarm64", "python-version": "3.14" }
+            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosx64", "python-version": "3.10", "cpp-tests": false },
+            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosx64", "python-version": "3.11", "cpp-tests": false },
+            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosx64", "python-version": "3.12", "cpp-tests": false },
+            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosx64", "python-version": "3.13", "cpp-tests": true },
+            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosx64", "python-version": "3.14", "cpp-tests": false },
+            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosarm64", "python-version": "3.10", "cpp-tests": false },
+            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosarm64", "python-version": "3.11", "cpp-tests": false },
+            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosarm64", "python-version": "3.12", "cpp-tests": false },
+            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosarm64", "python-version": "3.13", "cpp-tests": true },
+            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosarm64", "python-version": "3.14", "cpp-tests": false }
           ]
           EOF
           echo "matrix=$(jq -c . matrix.json)" >> "$GITHUB_OUTPUT"
@@ -99,15 +103,18 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ~/Library/Caches/pip
-          key: ${{ matrix.arch == 'arm64' && format('{0}-arm64-pip-{1}', runner.os, hashFiles('**/requirements-dev.txt')) || format('{0}-pip-{1}', runner.os, hashFiles('**/requirements-dev.txt')) }}
+          # Wheels are per Python version and CPU architecture, so both are part
+          # of the key; without the version only one job's wheels were saved.
+          key: ${{ runner.os }}-${{ matrix.arch }}-py${{ matrix.python-version }}-pip-${{ hashFiles('requirements.txt', 'requirements-test.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
-            ${{ runner.os }}-arm64-pip-
+            ${{ runner.os }}-${{ matrix.arch }}-py${{ matrix.python-version }}-pip-
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
+          # Build and test dependencies only. requirements-dev.txt adds the lint
+          # and docs tools, which are never used here.
+          pip install -r requirements-test.txt
 
       - name: Setup license file
         run: |
@@ -133,6 +140,10 @@ jobs:
           echo "Architecture:"
           uname -m
 
+      # The C++ test binary does not depend on the Python version, so only the
+      # `cpp-tests` entry of each runner builds and runs it (build.sh
+      # --test=on runs pytest too); the others build the module alone and run
+      # pytest in the next step.
       - name: Build & Test
         env:
           CC: ${{ matrix.c_compiler }}
@@ -140,7 +151,14 @@ jobs:
           PYTHONPATH: ${{ github.workspace }}
         run: |
           chmod +x build.sh
-          ./build.sh --license=on --arch=cpu --test=on --deps=release
+          ./build.sh --license=on --arch=cpu --test=${{ matrix.cpp-tests && 'on' || 'off' }} --deps=release
+
+      - name: Python tests
+        if: ${{ !matrix.cpp-tests }}
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          pytest
 
       - name: Display build logs on failure
         if: failure()
