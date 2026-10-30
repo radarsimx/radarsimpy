@@ -33,7 +33,7 @@
 #
 # Requirements:
 #   - RADARSIMC SSH key secret for submodule access
-#   - Xcode 26.4.1, Clang, and Python dependencies
+#   - Xcode 26.6, Clang, and Python dependencies
 #   - build.sh script
 #
 # ==============================================================================
@@ -59,16 +59,16 @@ jobs:
         run: |
           cat > matrix.json << 'EOF'
           [
-            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosx64", "python-version": "3.10", "cpp-tests": false },
-            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosx64", "python-version": "3.11", "cpp-tests": false },
-            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosx64", "python-version": "3.12", "cpp-tests": false },
-            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosx64", "python-version": "3.13", "cpp-tests": true },
-            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosx64", "python-version": "3.14", "cpp-tests": false },
-            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosarm64", "python-version": "3.10", "cpp-tests": false },
-            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosarm64", "python-version": "3.11", "cpp-tests": false },
-            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosarm64", "python-version": "3.12", "cpp-tests": false },
-            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosarm64", "python-version": "3.13", "cpp-tests": true },
-            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.4.1", "os_label": "macosarm64", "python-version": "3.14", "cpp-tests": false }
+            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosx64", "python-version": "3.10", "cpp-tests": false },
+            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosx64", "python-version": "3.11", "cpp-tests": false },
+            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosx64", "python-version": "3.12", "cpp-tests": false },
+            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosx64", "python-version": "3.13", "cpp-tests": true },
+            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosx64", "python-version": "3.14", "cpp-tests": false },
+            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosarm64", "python-version": "3.10", "cpp-tests": false },
+            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosarm64", "python-version": "3.11", "cpp-tests": false },
+            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosarm64", "python-version": "3.12", "cpp-tests": false },
+            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosarm64", "python-version": "3.13", "cpp-tests": true },
+            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosarm64", "python-version": "3.14", "cpp-tests": false }
           ]
           EOF
           echo "matrix=$(jq -c . matrix.json)" >> "$GITHUB_OUTPUT"
