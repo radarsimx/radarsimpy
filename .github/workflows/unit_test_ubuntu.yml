@@ -42,7 +42,8 @@
 # Key Features:
 #   - Pip package caching for faster builds
 #   - GCC environment setup for C++ compilation
-#   - CUDA toolkit installation
+#   - CUDA toolkit installation, restored from the Actions cache after the
+#     first run (.github/actions/setup-cuda-linux)
 #   - System information display for debugging
 #   - Build and C++ test log capture on failure
 #   - Timeout protection (90 minutes, sized for the slower CUDA build)
@@ -145,19 +146,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-${{ runner.arch }}-py${{ matrix.python-version }}-pip-
 
+      # Restores the installed toolkit (with the cuRAND headers) from the
+      # Actions cache when it can; see .github/actions/setup-cuda-linux.
       - name: Setup CUDA Toolkit
         if: matrix.arch == 'gpu'
-        uses: radarsimx/cuda-toolkit@master
+        uses: ./.github/actions/setup-cuda-linux
         with:
           cuda: "13.4.3"
-          method: "network"
           sub-packages: '["nvcc"]'
-          linux-local-args: '["--toolkit", "--silent"]'
-
-      - name: Install CUDA cuRAND development headers
-        if: matrix.arch == 'gpu'
-        run: |
-          sudo apt-get install -y libcurand-dev-13-4
+          apt-packages: "libcurand-dev-13-4"
 
       - name: Verify CUDA installation
         if: matrix.arch == 'gpu'

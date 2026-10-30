@@ -1,0 +1,113 @@
+# ==============================================================================
+# Composite action: CUDA toolkit for Ubuntu runners, cached after install
+# ==============================================================================
+#
+# The Linux counterpart of setup-cuda-windows. The apt install is already
+# quick (~24 s: two `apt-get update`s, ~100 MB of packages, then cuRAND), but
+# the Ubuntu unit tests run it in 30 jobs, so restoring the installed folder
+# (/usr/local/cuda-X.Y) from the Actions cache instead still adds up.
+#
+# On a hit the installer and apt never run: the folder is restored and the
+# environment cuda-toolkit would have exported is exported here. Nothing
+# outside the folder is needed to build: radarsimpy links the static CUDA
+# runtime, and nvcc finds its own components relative to its bin directory.
+#
+# The key covers the CUDA version, the package lists, the CPU architecture and
+# the Ubuntu release, so x64/ARM64 and 22.04/24.04/26.04 each get their own.
+#
+# Usage:
+#   - uses: ./.github/actions/setup-cuda-linux
+#     with:
+#       cuda: "13.4.3"
+#       sub-packages: '["nvcc"]'
+#       apt-packages: "libcurand-dev-13-4"
+#
+# ==============================================================================
+
+name: Setup CUDA (Linux, cached)
+description: Install selected CUDA toolkit packages on Ubuntu, restoring them from the Actions cache when possible.
+
+inputs:
+  cuda:
+    description: Full CUDA version, e.g. 13.4.3
+    required: true
+  sub-packages:
+    description: JSON list of cuda-toolkit sub-packages to install on a cache miss
+    required: true
+  apt-packages:
+    description: Extra apt packages from NVIDIA's repository to install on a cache miss (space separated)
+    required: false
+    default: ""
+
+outputs:
+  cache-hit:
+    description: Whether the toolkit was restored from the cache
+    value: ${{ steps.restore.outputs.cache-hit }}
+
+runs:
+  using: composite
+  steps:
+    - name: Compute toolkit path and cache key
+      id: meta
+      shell: bash
+      run: |
+        IFS=. read -r major minor _ <<< "${{ inputs.cuda }}"
+        hash=$(printf '%s|%s' '${{ inputs.sub-packages }}' '${{ inputs.apt-packages }}' | sha256sum | cut -c1-12)
+        echo "root=/usr/local/cuda-${major}.${minor}" >> "$GITHUB_OUTPUT"
+        echo "key=cuda-${{ runner.os }}-${{ runner.arch }}-${ImageOS}-${{ inputs.cuda }}-${hash}" >> "$GITHUB_OUTPUT"
+
+    # /usr/local is root's, and the cache restore runs as the runner user, so
+    # the folder must exist and be writable before anything is extracted.
+    - name: Prepare toolkit folder
+      shell: bash
+      run: |
+        sudo mkdir -p "${{ steps.meta.outputs.root }}"
+        sudo chown "$(id -u):$(id -g)" "${{ steps.meta.outputs.root }}"
+
+    - name: Restore CUDA toolkit from cache
+      id: restore
+      uses: actions/cache/restore@v6
+      with:
+        path: ${{ steps.meta.outputs.root }}
+        key: ${{ steps.meta.outputs.key }}
+
+    - name: Install CUDA toolkit (cache miss)
+      if: steps.restore.outputs.cache-hit != 'true'
+      uses: radarsimx/cuda-toolkit@master
+      with:
+        cuda: ${{ inputs.cuda }}
+        method: network
+        sub-packages: ${{ inputs.sub-packages }}
+        linux-local-args: '["--toolkit", "--silent"]'
+
+    - name: Install extra CUDA packages (cache miss)
+      if: steps.restore.outputs.cache-hit != 'true' && inputs.apt-packages != ''
+      shell: bash
+      run: |
+        sudo apt-get install -y ${{ inputs.apt-packages }}
+
+    # Saved before the build so a failing build still leaves a cache. When
+    # several matrix entries miss at once, the first save wins and the rest
+    # log a "cache already exists" warning, which is harmless.
+    - name: Save CUDA toolkit to cache
+      if: steps.restore.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v6
+      with:
+        path: ${{ steps.meta.outputs.root }}
+        key: ${{ steps.meta.outputs.key }}
+
+    # What cuda-toolkit would otherwise have exported, plus the /usr/local/cuda
+    # link the apt packages create.
+    - name: Register restored CUDA toolkit
+      if: steps.restore.outputs.cache-hit == 'true'
+      shell: bash
+      run: |
+        root="${{ steps.meta.outputs.root }}"
+        if [ ! -x "$root/bin/nvcc" ]; then
+          echo "::error::Restored CUDA toolkit has no nvcc at $root/bin"
+          exit 1
+        fi
+        sudo ln -sfn "$root" /usr/local/cuda
+        echo "CUDA_PATH=$root" >> "$GITHUB_ENV"
+        echo "LD_LIBRARY_PATH=$root/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
+        echo "$root/bin" >> "$GITHUB_PATH"
