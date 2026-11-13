@@ -1,43 +1,48 @@
 Radar System Model
 ==================
 
-Every simulation in RadarSimPy is built from the same three objects: a
-:class:`radarsimpy.Transmitter`, a :class:`radarsimpy.Receiver`, and a
-:class:`radarsimpy.Radar` that binds them to a platform. This page describes
-what each object owns, what the ``Radar`` derives from the pair, and how that
-determines the shape of the array you get back.
+Every RadarSimPy simulation uses three objects:
+
+* a :class:`radarsimpy.Transmitter`, which describes the transmitted signal,
+* a :class:`radarsimpy.Receiver`, which describes how the echo is received and
+  sampled,
+* a :class:`radarsimpy.Radar`, which combines the two and places them in the
+  scene.
+
+This page explains what each object contains, what ``Radar`` calculates from
+them, and how this sets the shape of the simulation output.
 
 
 The Transceiver
 ---------------
 
-RadarSimPy models a coherent transceiver in which the receiver deramps against
-the same oscillator that drives the transmitter:
+RadarSimPy models a coherent radar: the receiver mixes the echo with the same
+oscillator signal that the transmitter sends. This mixing step is called
+*deramping* or *dechirping*.
 
 .. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/architecture.svg
     :width: 100%
     :alt: Coherent radar transceiver, transmitter above and receiver below
 
-    The transmit chain generates the waveform, modulates it, amplifies it and
-    radiates it. The receive chain amplifies the echo and mixes it against a
-    tap of the same source, so the baseband output carries the *difference*
-    between the transmitted and the received signal. The mixer feeds an I and a
-    Q branch — that pair is what ``bb_type="complex"`` returns, and a real
-    baseband keeps only one of them.
+    The transmit chain generates, modulates, amplifies and radiates the
+    waveform. The receive chain amplifies the echo and mixes it with a copy of
+    the same signal, so the baseband output contains the *difference* between
+    the transmitted and received signals. The mixer has an I and a Q output.
+    ``bb_type="complex"`` returns both; a real baseband keeps only one.
 
-Because the local oscillator is shared, the baseband signal is fully coherent
-with the transmit waveform. That single fact is what makes range appear as a
-beat frequency in an FMCW system, and what makes phase noise partially cancel
-for close-in targets — see :doc:`noise`.
+Because the transmitter and receiver share one oscillator, the baseband signal
+is coherent with the transmitted waveform. This is why, in an FMCW radar, a
+target's range shows up as a beat frequency. It is also why phase noise
+partly cancels for nearby targets (see :doc:`noise`).
 
-Two consequences are worth stating up front:
+Two things follow from this design:
 
-* **There is no separate IF stage to configure.** The mixer output *is* the
-  simulated baseband. Everything from the antenna to the ADC is described by
-  :class:`radarsimpy.Receiver`.
-* **The deramp reference is a delayed copy of the transmit waveform.** By
-  default the delay is zero; ``gate_delay`` moves it, which is what makes
-  long-range stretch processing possible (:doc:`stretch_processing`).
+* **There is no separate IF stage to configure.** The mixer output is the
+  simulated baseband. :class:`radarsimpy.Receiver` describes everything from
+  the antenna to the analog-to-digital converter (ADC).
+* **The mixer reference is a delayed copy of the transmitted waveform.** The
+  delay is zero by default. The receiver's ``gate_delay`` changes it, which is
+  how long-range stretch processing works (:doc:`stretch_processing`).
 
 
 From Objects to Baseband
@@ -47,11 +52,11 @@ From Objects to Baseband
     :width: 100%
     :alt: Transmitter and Receiver combine into a Radar, which sim_radar turns into baseband
 
-    ``Transmitter`` and ``Receiver`` are pure configuration. ``Radar`` binds
-    them to a platform and derives the timing and array geometry. ``sim_radar``
-    adds the scene and produces the output arrays.
+    ``Transmitter`` and ``Receiver`` only hold settings. ``Radar`` places them
+    on a platform and calculates the timing and the array geometry.
+    ``sim_radar`` adds the scene and produces the output arrays.
 
-A minimal end-to-end configuration:
+A minimal complete simulation:
 
 .. code-block:: python
 
@@ -85,72 +90,72 @@ A minimal end-to-end configuration:
    result = sim_radar(radar, targets=[{"location": (50, 0, 0), "rcs": 10}])
    baseband = result["baseband"] + result["noise"]
 
-The division of responsibility is strict:
+Each object is responsible for one part of the setup:
 
 .. list-table::
    :header-rows: 1
    :widths: 22 78
 
    * - Object
-     - Owns
+     - Responsible for
    * - ``Transmitter``
-     - The waveform in time and frequency, how many pulses there are and how
-       they are spaced, transmit power and phase noise, and the transmit
-       array. See :doc:`transmitter`.
+     - The waveform (frequency over time), the number of pulses and their
+       spacing, transmit power, phase noise, and the transmit antennas. See
+       :doc:`transmitter`.
    * - ``Receiver``
-     - Sampling rate and baseband type, the gain and noise budget from antenna
-       to ADC, the range gate, and the receive array. See :doc:`receiver`.
+     - Sampling rate, baseband type, gains and noise from antenna to ADC, the
+       range gate, and the receive antennas. See :doc:`receiver`.
    * - ``Radar``
-     - Where the platform is and how it moves, when frames start, and the
-       random seed. Everything else on ``Radar`` is *derived* from the
-       transmitter and the receiver.
+     - The platform's position and motion, frame start times, and the random
+       seed. All other ``Radar`` properties are *calculated* from the
+       transmitter and receiver.
    * - ``sim_radar``
-     - The scene: targets, ray-tracing settings, interference and the
-       execution device. See :doc:`ray_tracing_simulation`.
+     - The scene: targets, ray-tracing settings, interference, and whether to
+       run on CPU or GPU. See :doc:`ray_tracing_simulation`.
 
 
-What the Radar Derives
-----------------------
+What the Radar Calculates
+-------------------------
 
-Constructing a ``Radar`` computes three things that neither the transmitter nor
-the receiver could know on its own.
+When you create a ``Radar``, it calculates four things from the transmitter and
+receiver together.
 
 Samples per pulse
 ~~~~~~~~~~~~~~~~~
 
-The receive window is open for one pulse length, so
+The receiver records for one pulse length per pulse, so
 
 .. math::
 
    \text{samples\_per\_pulse} = \text{pulse\_length} \times f_s
 
-This is the only place the transmitter's timing and the receiver's sampling
-rate meet, and it is a hard constraint: the product must be at least 1, or the
-constructor raises. Read it back with ``radar.samples_per_pulse``.
+The result must be at least 1, or the constructor raises an error. Read it back
+with ``radar.samples_per_pulse``.
 
 .. note::
 
-   Choose ``fs`` and ``pulse_length`` so that the product is an exact integer.
-   Values that land a hair below an integer in binary — ``fs = N / 20e-6`` for
-   power-of-two ``N`` is the classic case — are snapped to the nearest integer,
-   but keeping the product clean avoids the question entirely.
+   Choose ``fs`` and ``pulse_length`` so that their product is an exact
+   integer. If floating-point rounding puts the product just below an integer
+   (for example ``fs = N / 20e-6`` with ``N`` a power of two), RadarSimPy
+   rounds it to the nearest integer, but a clean product avoids the issue.
 
 The virtual array
 ~~~~~~~~~~~~~~~~~
 
-With :math:`M` transmit channels and :math:`N` receive channels the simulator
-produces :math:`M \times N` virtual elements, each at the vector sum of a
-transmit and a receive location:
+With :math:`M` transmit channels and :math:`N` receive channels, the simulator
+outputs :math:`M \times N` *virtual channels*, one for each transmit–receive
+pair. Each virtual channel acts like a single antenna placed at the sum of its
+transmit and receive locations:
 
 .. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/baseband_cube.svg
     :width: 100%
     :alt: Virtual array element ordering and the shape of the baseband array
 
-    Left: two transmit elements spaced by the full receive aperture give eight
-    uniformly spaced virtual elements out of six physical ones. Right: the
-    returned arrays are indexed ``[channel, pulse, sample]``.
+    Left: two transmit antennas spaced by the width of the receive array give
+    eight evenly spaced virtual channels from six physical antennas. Right:
+    the output arrays are indexed ``[channel, pulse, sample]``.
 
-The ordering is fixed, with the receive index varying fastest:
+The channel order is fixed, with the receive index changing fastest:
 
 .. code-block:: text
 
@@ -162,23 +167,22 @@ The ordering is fixed, with the receive index varying fastest:
    ...
    ch[M*N-1]   = Tx(M-1) -> Rx(N-1)
 
-so channel ``n`` corresponds to ``Tx[n // N]`` and ``Rx[n % N]``. The element
-positions are available as ``radar.virtual_array_locations``, an ``[M*N, 3]``
-array.
+So channel ``n`` uses ``Tx[n // N]`` and ``Rx[n % N]``. The virtual channel
+positions are in ``radar.virtual_array_locations``, an ``[M*N, 3]`` array.
 
 .. note::
 
-   The simulator returns these :math:`M \times N` channels already separated,
-   whatever the transmit channels happen to be doing at the time — see
-   `Simultaneous Transmit Channels`_. Real hardware has to earn that separation
-   with TDM, CDM or DDM; :doc:`transmitter` covers the controls that do it.
+   The simulator returns the :math:`M \times N` channels already separated,
+   even if all transmitters are on at the same time. Real hardware has to
+   separate them with a modulation scheme such as TDM, CDM or DDM. See
+   `Simultaneous Transmit Channels`_ below.
 
 The timestamp
 ~~~~~~~~~~~~~
 
-``radar.time_prop["timestamp"]`` holds the absolute time of every sample,
-shaped ``[channels, pulses, samples]`` like the baseband. It is assembled from
-four contributions:
+``radar.time_prop["timestamp"]`` holds the time of every sample. It has the
+same ``[channels, pulses, samples]`` shape as the baseband and is the sum of
+four parts:
 
 .. code-block:: text
 
@@ -187,26 +191,26 @@ four contributions:
                        + pulse_start_time[p]         # cumsum(prp) - prp[0]
                        + gate_delay + s / fs         # receive window
 
-This array is also the time base for time-varying motion. Target and radar
-trajectories are written as functions of ``radar.time_prop["timestamp"]`` and
-indexed positionally by the simulator, so anything that shifts the timestamps —
-a transmit delay, a range gate, a non-uniform PRP — shifts the motion sampling
-with them.
+The simulator also uses these timestamps to move targets and the radar. Moving
+objects are written as functions of ``radar.time_prop["timestamp"]``.
+Anything that changes the timestamps — a transmit delay, a range gate, uneven
+pulse spacing — also changes when the motion is sampled.
 
 Noise amplitude
 ~~~~~~~~~~~~~~~
 
-The thermal-noise standard deviation follows from the receiver's gain and
-bandwidth budget alone. It is computed once at construction and stored in
-``radar.sample_prop["noise"]``; the chain is laid out in :doc:`receiver`.
+The standard deviation of the thermal noise depends only on the receiver's
+gains and bandwidth. It is calculated once, when the ``Radar`` is created, and
+stored in ``radar.sample_prop["noise"]``. :doc:`receiver` shows the
+calculation.
 
 
 Frames
 ------
 
-``frame_time`` repeats the whole configuration at a list of start times. The
-per-frame blocks stack along the same first axis as the channels, with the
-frame index varying slowest:
+``frame_time`` repeats the whole pulse sequence at a list of start times. The
+frames are stacked along the first (channel) axis, with the frame index
+changing slowest:
 
 .. code-block:: python
 
@@ -217,19 +221,19 @@ frame index varying slowest:
 
    cube = result["baseband"].reshape(3, M * N, pulses, samples)
 
-Each frame gets an independent thermal-noise realization. Within a frame, all
-virtual channels that share a physical receiver and a timestamp get *identical*
-noise; :doc:`noise` covers what that means for covariance estimation.
+Each frame has its own independent thermal noise. Within a frame, virtual
+channels that share a physical receiver and a timestamp have *identical*
+noise. :doc:`noise` explains what this means for covariance estimation.
 
 
 Simultaneous Transmit Channels
 ------------------------------
 
-``sim_radar`` computes every transmit–receive path **in isolation**. Channel
-``n`` of the returned array holds only the energy that ``Tx[n // N]`` radiated
-and ``Rx[n % N]`` collected, regardless of what the other transmitters were
-doing at that instant. Adding a second transmitter does not disturb the first
-one's channel:
+``sim_radar`` computes every transmit–receive path **separately**. Channel
+``n`` contains only the signal that ``Tx[n // N]`` sent and ``Rx[n % N]``
+received. It does not include signals from the other transmitters, even if
+they were transmitting at the same time. Adding a second transmitter does not
+change the first transmitter's channels:
 
 .. code-block:: python
 
@@ -238,70 +242,39 @@ one's channel:
 
    np.allclose(two[0], one[0])   # True — bit for bit
 
-Real hardware does not behave that way. A physical receiver collects the sum of
-everything radiating while its window is open, and the whole job of a MIMO
-modulation scheme is to make that sum separable again after digitising. The
-simulator hands you the *result* of a perfect separation and skips the sum, so
-when you want the superposition you have to build it yourself.
+Real hardware is different. A physical receiver picks up the sum of all
+transmitters that are on while it is recording, and a MIMO modulation scheme
+is needed to separate them again. The simulator gives you the result of a
+perfect separation. If you need the summed signal, you build it yourself.
 
-Why it works this way
-~~~~~~~~~~~~~~~~~~~~~
+Why the outputs are kept separate
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There is no MIMO mode switch in the API. TDM, CDM, DDM and intra-pulse coding
-are not options you select — they are what emerges from combining a per-channel
-``delay``, a ``pulse_phs`` sequence, a ``mod_t`` / ``phs`` table and
-``f_offset`` (:doc:`transmitter`). That is the point of building the
-transmitter out of primitives: it lets you model a scheme the library has never
-heard of. But it also means the simulator has no way to infer which scheme you
-had in mind. It cannot know which transmitters are meant to overlap, nor how
-you intend to pull them apart again, so it does not guess.
+RadarSimPy has no "MIMO mode" setting. TDM, CDM, DDM and intra-pulse coding
+are all built from the same basic transmitter settings — a per-channel
+``delay``, a ``pulse_phs`` sequence, a ``mod_t`` / ``phs`` table, and
+``f_offset`` (see :doc:`transmitter`). The simulator cannot tell which scheme
+you intend, so it does not mix the channels for you. Summing separate channels
+is easy, but separating a sum is generally impossible, so returning separate
+paths keeps every option open.
 
-The same choice is what puts unusual waveforms within reach. ``f`` and ``t``
-describe an arbitrary frequency-versus-time law instead of selecting from a
-list, and ``mod_t`` / ``amp`` / ``phs`` carry an arbitrary complex envelope
-through the pulse. Between them they *describe* a waveform rather than name
-one: non-linear FM, stepped frequency, phase-coded PMCW, an OFDM symbol built
-by loading subcarriers and taking an IFFT — and, on the same terms, schemes
-that do not exist yet. The simulator never needs to have heard of a waveform
-for it to be simulated; the waveform only has to be expressible as
-:math:`f(t)` and a complex envelope.
+The same applies to the other outputs. ``baseband`` contains only the target
+echoes, with no noise. ``noise`` and ``interference`` are returned as separate
+arrays of the same shape. Add together only the parts you need.
 
 .. note::
 
-   One boundary is worth knowing about. The fast-time table is indexed by time
-   *within* a pulse, so it repeats identically from pulse to pulse. A single
-   symbol — one OFDM symbol, one phase code — is direct. A frame that carries
-   *different* data in every symbol, as a full OFDM data frame or an OTFS grid
-   does, is not expressible in a single call: build it from several and
-   assemble the frame yourself. That this works at all is the same property
-   again — nothing comes back pre-mixed.
-
-The asymmetry settles the question. Superimposing channels is a one-line sum.
-Recovering the individual paths from a sum is, in general, impossible — and no
-more possible for the simulator than for you. So ``sim_radar`` returns the
-finest decomposition it computed and leaves composition to the caller, where
-the knowledge of the scheme actually lives.
-
-The same rule shapes the rest of the return value. ``baseband`` holds the
-target response with no thermal noise in it at all, while ``noise`` and
-``interference`` come back as separate arrays of the same shape. Nothing is
-pre-mixed. You add the components you want and omit the ones you do not, which
-is what makes it straightforward to compute a noise-free reference, isolate an
-interference contribution, or take a single transmit–receive path on its own to
-check a geometry.
-
-Keeping the paths apart costs nothing, either. Every Tx–Rx pair already has its
-own delay, Doppler, antenna-pattern weighting and polarization, so the engine
-evaluates it separately whether or not the result is summed afterwards. And
-because ``timestamp`` carries the same ``[channel, pulse, sample]`` layout, the
-per-channel outputs stay aligned with per-channel time bases — which genuinely
-differ the moment a transmitter is given a ``delay``.
+   Because the fast-time modulation table repeats identically in every pulse,
+   one call can simulate one OFDM symbol or one phase code. A frame that
+   carries *different* data in each symbol (a full OFDM data frame or an OTFS
+   grid) needs several calls, which you then combine yourself.
 
 Building the physical receive signal
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Sum the transmit channels that share a receiver. The first axis runs frame,
-then Tx, then Rx, so a reshape does it:
+To get what each physical receiver would record, sum the transmit channels
+that share a receiver. The first axis is ordered frame, then Tx, then Rx, so a
+reshape does this:
 
 .. code-block:: python
 
@@ -322,41 +295,35 @@ then Tx, then Rx, so a reshape does it:
 
 .. important::
 
-   Sum the signal, but take the noise **once**. Every virtual channel sharing a
-   physical receiver and a timestamp carries an *identical* noise realization,
-   so summing ``result["noise"]`` alongside the baseband multiplies the noise
-   amplitude by :math:`M` — those are :math:`M` copies of one draw, not
-   :math:`M` independent ones. A real receiver has one front end and one noise
-   process, which is what the ``[:, 0]`` above keeps.
+   Sum the signal, but add the noise only **once**. Virtual channels that share
+   a physical receiver and a timestamp contain the *same* noise values. If you
+   sum ``result["noise"]`` over the transmitters, the noise amplitude grows by
+   a factor of :math:`M`, because you are adding :math:`M` copies of the same
+   noise. A real receiver has one noise source, which is what ``[:, 0]`` keeps.
 
-When it matters
-~~~~~~~~~~~~~~~
+When this matters
+~~~~~~~~~~~~~~~~~
 
-**TDM** — a per-channel ``delay`` puts each transmitter in its own time slot,
-so the channels never overlap to begin with. The simulator's per-path output
-already matches what the hardware yields once the slots are de-interleaved.
-Nothing to do.
-
-**CDM and DDM** — the transmitters radiate together and are pulled apart
-afterwards, by code or by Doppler. Superimposing is what lets you see what the
-demodulator actually faces: residual cross-talk between codes, the way a
-target's own Doppler mixes with a DDM phase ramp, and the dynamic range the ADC
-needs to hold :math:`M` overlapping returns at once.
-
-**No modulation at all** — several transmitters at different locations sending
-identical waveforms simultaneously are not separable by anything. The simulator
-still returns :math:`M \times N` tidy channels; the hardware would return
-:math:`N` channels of superimposed echoes with no way back to the individual
-paths. Building a virtual array from the simulator output here describes an
-array that could not be built.
+* **TDM** — each transmitter has its own time slot (a per-channel ``delay``),
+  so the signals never overlap. The separate outputs already match the
+  hardware. No extra work is needed.
+* **CDM and DDM** — all transmitters are on at the same time and are separated
+  afterwards, by code or by Doppler. Sum the channels to study what the
+  demodulator really sees: cross-talk between codes, interaction between a
+  target's Doppler and the DDM phase ramp, and the ADC dynamic range needed
+  for :math:`M` overlapping echoes.
+* **No modulation** — transmitters at different locations sending the same
+  waveform at the same time cannot be separated at all. The simulator still
+  returns :math:`M \times N` channels, but real hardware would return only
+  :math:`N`. A virtual array built from the simulator output in this case
+  could not exist in hardware.
 
 .. note::
 
-   None of this forbids using the :math:`M \times N` channels directly. Ideal
-   separation is the right model for plenty of work — array geometry, angle
-   estimation, beampattern studies — and it is both faster and cleaner than
-   simulating a scheme only to undo it. The point is to choose deliberately
-   rather than by default.
+   Using the :math:`M \times N` channels directly is fine for many studies,
+   such as array geometry, angle estimation and beam patterns. It is faster
+   and simpler than simulating a modulation scheme only to undo it. Just make
+   this choice on purpose.
 
 
 See Also

@@ -1,143 +1,84 @@
 Overview
 ========
 
-RadarSimPy provides comprehensive tools for radar system modeling, simulation, and signal processing. This page outlines the core capabilities available in the library.
+RadarSimPy is a radar simulator for Python. You describe a radar and a scene,
+and it returns the baseband signal the radar would sample. It also includes
+the signal-processing and detection tools you need to analyse that signal.
 
-Radar System Modeling
+This page lists what the library can do and where to read more about each
+part.
+
+
+Describing the Radar
+--------------------
+
+A radar is built from a :class:`radarsimpy.Transmitter` and a
+:class:`radarsimpy.Receiver`, combined into a :class:`radarsimpy.Radar`. See
+:doc:`system_model` for how the three fit together.
+
+* **Waveforms.** Continuous wave (CW), frequency-modulated continuous wave
+  (FMCW), phase-modulated continuous wave (PMCW), pulsed waveforms, and any
+  custom frequency-versus-time sweep. See :doc:`transmitter`.
+* **Modulation.** Amplitude and phase can change from pulse to pulse (slow
+  time) and within each pulse (fast time).
+* **MIMO.** Multiple transmit and receive channels. You can separate the
+  transmit channels by time (TDM), code (CDM), frequency (FDM), Doppler (DDM),
+  or any mix of these.
+* **Receiver chain.** Sampling rate, gains, noise figure and range gating. See
+  :doc:`receiver`.
+* **Noise.** Receiver thermal noise and oscillator phase noise. See
+  :doc:`noise`.
+
+
+Simulating a Scene
+------------------
+
+* **Point targets.** Ideal scatterers with a position, velocity, acceleration
+  and radar cross-section (RCS). This is the fastest kind of simulation.
+* **3D mesh targets.** Models loaded from common mesh formats (STL, OBJ, PLY,
+  and others). The simulator uses ray tracing and Physical Optics (PO) to
+  compute the scattered signal, including multipath between objects. See
+  :doc:`ray_tracing_simulation`.
+* **Moving and animated targets.** Targets can move, rotate, and follow
+  keyframed glTF animations. See :doc:`animated_targets`.
+* **RCS.** Monostatic and bistatic RCS of a 3D model, for any frequency,
+  aspect angle and polarization.
+* **Interference.** The signal one radar receives from another radar. See
+  :doc:`interference`.
+* **LiDAR.** Point clouds from a 3D scene.
+
+
+Processing the Signal
 ---------------------
 
-**Transceiver Configuration**
+The :mod:`radarsimpy.processing` module covers the standard processing chain:
 
-RadarSimPy supports flexible radar transceiver modeling with:
+* **Range and Doppler FFTs**, and the 2D range-Doppler map.
+* **Direction of arrival (DoA)** for uniform linear arrays: MUSIC, Root-MUSIC,
+  ESPRIT and the iterative adaptive approach (IAA).
+* **Beamforming:** Bartlett (delay-and-sum) and Capon (minimum variance
+  distortionless response, MVDR).
+* **CFAR detection:** cell-averaging (CA-CFAR) and ordered-statistic
+  (OS-CFAR), each in 1D and 2D.
 
-* **Arbitrary Waveforms** - Full support for various radar waveforms:
-  
-  * Continuous Wave (CW)
-  * Frequency Modulated Continuous Wave (FMCW)
-  * Phase Modulated Continuous Wave (PMCW)
-  * Pulsed radar waveforms
-  * Custom user-defined waveforms
 
-* **Phase Noise Modeling** - Simulate realistic oscillator phase noise effects on radar performance
+Detection Performance
+---------------------
 
-* **Modulation Schemes** - Multiple modulation techniques for MIMO and multi-channel systems:
-  
-  * Code Division Multiplexing (CDM)
-  * Frequency Division Multiplexing (FDM)
-  * Doppler Division Multiplexing (DDM)
-  * Time Division Multiplexing (TDM)
-  * Hybrid modulation schemes
+The :mod:`radarsimpy.tools` module computes the probability of detection for a
+given signal-to-noise ratio (SNR), probability of false alarm and number of
+integrated pulses. It supports the Swerling 0 (non-fluctuating) and Swerling
+I–IV target models, and can generate receiver operating characteristic (ROC)
+curves.
 
-* **Signal Modulation** - Advanced modulation capabilities:
-  
-  * Fast-time modulation (pulse-to-pulse variation)
-  * Slow-time modulation (across radar frames)
-  * Amplitude and phase control
 
-Radar Simulation Capabilities
-------------------------------
+Performance
+-----------
 
-**Target Simulation**
+The simulation engine is written in C++ and runs in parallel on all CPU cores.
+On Windows and Linux it also runs on an NVIDIA GPU when one is available. See
+:doc:`dependencies` for the hardware requirements.
 
-* **Point Target Simulation** - Generate radar baseband data from point scatterers with configurable:
-  
-  * Position, velocity, and acceleration
-  * Radar cross-section (RCS)
-  * Multi-path and reflection effects
-
-* **3D Object Simulation** - High-fidelity simulation from 3D mesh models:
-  
-  * Support for common 3D formats (STL, OBJ, PLY, etc.)
-  * Ray-tracing based electromagnetic scattering
-  * Dynamic object motion and articulation
-  * Complex scene environments with multiple objects
-
-* **RCS Calculation** - Compute monostatic and bistatic radar cross-sections for 3D models across:
-  
-  * Multiple frequencies
-  * Various aspect angles
-  * Polarization configurations
-
-**Interference Simulation**
-
-* Model radar-to-radar interference scenarios
-* Evaluate mutual interference effects in dense radar environments
-* Support for both intra-vehicle and inter-vehicle interference
-
-**LiDAR Simulation**
-
-* Generate realistic LiDAR point clouds from 3D environments
-* Configurable sensor parameters (resolution, field of view)
-
-Signal Processing Toolkit
---------------------------
-
-**Range-Doppler Processing**
-
-RadarSimPy includes optimized algorithms for standard radar signal processing:
-
-* **FFT-based Range Processing** - Fast Fourier Transform for range compression
-* **Doppler Processing** - Coherent integration and velocity estimation
-* **2D Range-Doppler Maps** - Generate and visualize range-Doppler spectra
-
-**Direction of Arrival (DoA) Estimation**
-
-Advanced DoA estimation for uniform linear arrays (ULA):
-
-* **MUSIC Algorithm** - MUltiple SIgnal Classification for super-resolution angle estimation
-* **Root-MUSIC** - Polynomial-rooting variant for improved computational efficiency
-* **ESPRIT Algorithm** - Estimation of Signal Parameters via Rotational Invariance Techniques
-* **Iterative Adaptive Approach (IAA)** - High-resolution amplitude and phase estimation with excellent sidelobe suppression
-
-**Beamforming Techniques**
-
-* **Capon Beamformer** - Minimum variance distortionless response (MVDR) for optimal interference rejection
-* **Bartlett Beamformer** - Conventional delay-and-sum beamforming
-
-**CFAR Detection**
-
-Constant False Alarm Rate (CFAR) detectors for automatic target detection:
-
-* **CA-CFAR** - Cell-Averaging CFAR for homogeneous clutter
-  
-  * 1D implementation for range or Doppler
-  * 2D implementation for range-Doppler maps
-
-* **OS-CFAR** - Ordered-Statistic CFAR for heterogeneous environments
-  
-  * 1D implementation for range or Doppler
-  * 2D implementation for range-Doppler maps
-  * Improved performance in multi-target scenarios and clutter edges
-
-Radar Performance Characterization
------------------------------------
-
-**Detection Analysis**
-
-* **Swerling Target Models** - Evaluate radar detection performance using statistical target models:
-  
-  * Swerling Case I - Constant RCS (one scan)
-  * Swerling Case II - Variable RCS (pulse-to-pulse)
-  * Swerling Case III - Dominant constant scatterer
-  * Swerling Case IV - Dominant variable scatterer
-  * Swerling Case V - Non-fluctuating targets
-
-* **Probability of Detection (Pd)** - Calculate detection probabilities for given:
-  
-  * Signal-to-noise ratio (SNR)
-  * Probability of false alarm (Pfa)
-  * Number of pulses integrated
-  * Target fluctuation model
-
-Performance Considerations
---------------------------
-
-RadarSimPy leverages optimized C++ implementations for computationally intensive operations, providing:
-
-* **High-speed simulations** suitable for Monte Carlo analysis
-* **Multi-threaded processing** for parallel computation
-* **Efficient memory management** for large-scale scenarios
-* **GPU acceleration** support (where applicable)
 
 See Also
 --------

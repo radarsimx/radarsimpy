@@ -1,37 +1,35 @@
 Installation
 ============
 
-RadarSimPy is distributed as a pre-built module for easy installation across Windows, Linux, and MacOS platforms.
+RadarSimPy is distributed as a pre-built module for Windows, Linux and macOS.
+You do not install it with ``pip``; you copy the module folder into your
+project.
 
-Quick Start
------------
 
-Follow these steps to install RadarSimPy:
+Install the Module
+------------------
 
-**Installation Steps**
-
-1. **Download** the `pre-built module <https://radarsimx.com/product/radarsimpy/>`_ for your platform (Windows, Linux, or MacOS)
-2. **Extract** the downloaded package to a temporary location
-3. **Copy** the ``radarsimpy/`` folder into your project directory
+1. Download the `pre-built module <https://radarsimx.com/product/radarsimpy/>`_
+   for your platform.
+2. Extract the downloaded archive.
+3. Copy the ``radarsimpy/`` folder into your project directory.
 
 Pre-built modules are available for Windows (x86_64), Linux (x86_64 and ARM64)
-and MacOS (Intel and Apple Silicon). See
-:doc:`dependencies` for the supported OS versions, architectures and runtime
-components each platform needs.
+and macOS (Intel and Apple Silicon). See :doc:`dependencies` for the supported
+operating system versions and the packages you need to install first.
+
 
 Directory Structure
 -------------------
 
-After installation, your project directory should have the following structure:
-
-**Project Layout**
+After you copy the folder, your project should look like this:
 
 .. code-block:: none
 
     your_project/
     ├── your_script.py          # Your radar simulation script
-    ├── your_notebook.ipynb     # Or Jupyter notebook
-    └── radarsimpy/             # RadarSimPy package
+    ├── your_notebook.ipynb     # Or a Jupyter notebook
+    └── radarsimpy/             # The RadarSimPy package
         ├── __init__.py         # Package initialization
         ├── radar.py            # Radar configuration
         ├── transmitter.py      # Transmitter definitions
@@ -40,65 +38,60 @@ After installation, your project directory should have the following structure:
         ├── tools.py            # Helper functions
         └── lib/                # Native library bindings
 
-Platform-Specific Components
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The ``radarsimpy/`` folder also contains compiled libraries for your platform:
 
-The package includes platform-specific compiled libraries:
+.. list-table::
+   :header-rows: 1
+   :widths: 20 40 40
 
-**Windows**
-
-.. code-block:: none
-
-    radarsimpy/
-    ├── radarsimcpp.dll         # C++ simulation engine
-    └── simulator.*.pyd         # Python extension module
-
-**Linux**
-
-.. code-block:: none
-
-    radarsimpy/
-    ├── libradarsimcpp.so       # C++ simulation engine
-    └── simulator.*.so          # Python extension module
-
-**MacOS**
-
-.. code-block:: none
-
-    radarsimpy/
-    ├── libradarsimcpp.dylib    # C++ simulation engine
-    └── simulator.*.so          # Python extension module
+   * - Platform
+     - C++ simulation engine
+     - Python extension module
+   * - Windows
+     - ``radarsimcpp.dll``
+     - ``simulator.*.pyd``
+   * - Linux
+     - ``libradarsimcpp.so``
+     - ``simulator.*.so``
+   * - macOS
+     - ``libradarsimcpp.dylib``
+     - ``simulator.*.so``
 
 .. note::
-   The ``simulator.*.pyd`` or ``simulator.*.so`` filename includes Python version information (e.g., ``simulator.cpython-312-x86_64-linux-gnu.so``, or ``simulator.cpython-312-aarch64-linux-gnu.so`` on Linux ARM64).
+   The extension module's file name includes the Python version and platform,
+   for example ``simulator.cpython-312-x86_64-linux-gnu.so``, or
+   ``simulator.cpython-312-aarch64-linux-gnu.so`` on Linux ARM64. The module
+   only loads in the Python version it was built for.
 
-Verification
-------------
 
-Verify your installation by importing the package and checking the version:
+Check the Installation
+----------------------
+
+Import the package and print its version:
 
 .. code-block:: python
 
     import radarsimpy
     print(f"RadarSimPy version: {radarsimpy.__version__}")
 
-You should see output similar to:
+You should see something like:
 
 .. code-block:: none
 
-    RadarSimPy version: 14.x.x
+    RadarSimPy version: 15.x.x
 
-License Configuration
----------------------
 
-RadarSimPy supports both free tier and licensed operation modes. License files enable access to advanced features and remove free tier limitations.
+License
+-------
 
-License File Placement
-^^^^^^^^^^^^^^^^^^^^^^
+Without a license, RadarSimPy runs in **free tier** mode, which has some
+limits. A license file removes those limits.
 
-**Automatic Detection**
+Where to put the license file
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The simplest way to activate your license is to place the license file in the ``radarsimpy/`` package directory:
+The easiest way is to put the license file in the ``radarsimpy/`` folder.
+RadarSimPy finds it automatically:
 
 .. code-block:: none
 
@@ -110,14 +103,10 @@ The simplest way to activate your license is to place the license file in the ``
         ├── radar.py
         └── ...
 
-License files must follow the naming pattern: ``license_RadarSimPy_*.lic``
+The file name must match ``license_RadarSimPy_*.lic``.
 
-.. note::
-   RadarSimPy automatically searches for and validates all ``license_RadarSimPy_*.lic`` files in the package directory. As long as one valid license is found, full functionality is enabled.
-
-**Multiple License Files**
-
-You can place multiple license files in the directory. The system will try each one until a valid license is found:
+You can put several license files in the folder. RadarSimPy tries each one, and
+enables full functionality as soon as one of them is valid:
 
 .. code-block:: none
 
@@ -126,60 +115,57 @@ You can place multiple license files in the directory. The system will try each 
     ├── license_RadarSimPy_backup.lic
     └── license_RadarSimPy_trial.lic
 
-**Programmatic License Path**
+Loading a license from another location
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Use ``set_license(path)`` to load a license file from a custom location at runtime:
+If the license file is stored somewhere else, such as a shared network drive,
+load it at run time with ``set_license(path)``:
 
 .. code-block:: python
 
     import radarsimpy
 
-    # Load license from a custom path
     radarsimpy.set_license("/path/to/license_RadarSimPy_customer.lic")
 
-This is useful when the license file is stored outside the ``radarsimpy/`` package directory, such as a shared network location or a path managed by your deployment environment.
-
-Checking License Status
-^^^^^^^^^^^^^^^^^^^^^^^^
-
-You can verify your license status at any time:
+Checking the license status
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
 
     import radarsimpy
-    
-    # Check license status
+
     if radarsimpy.is_licensed():
-        # Get license information
         info = radarsimpy.get_license_info()
         print(f"License info: {info}")
     else:
         print("Running in free tier mode with limitations")
 
-**Example Output**
+Example output:
 
 .. code-block:: none
 
     License info: Licensed to: Company Name (365 days remaining)
 
-Free Tier Mode
-^^^^^^^^^^^^^^
+Free tier limits
+^^^^^^^^^^^^^^^^
 
-If no valid license file is found, RadarSimPy automatically operates in free tier mode with certain limitations:
+In free tier mode, RadarSimPy limits:
 
-- Limited target complexity
-- Limited radar channels
-- Other feature restrictions as documented
+- the complexity of targets,
+- the number of radar channels,
+- some other features, as described in the documentation.
 
 .. tip::
-   To obtain a license file, visit `radarsimx.com <https://radarsimx.com/product/radarsimpy/>`_ or contact info@radarsimx.com.
+   To get a license file, visit `radarsimx.com
+   <https://radarsimx.com/product/radarsimpy/>`_ or contact info@radarsimx.com.
+
 
 Building from Source
----------------------
+--------------------
 
-Most users should install the pre-built module as described above. If you have
-access to the ``radarsimcpp`` source code and need custom modifications, see
-:doc:`build`.
+Most users should use the pre-built module. If you have access to the
+``radarsimcpp`` source code and need to change it, see :doc:`build`.
+
 
 See Also
 --------

@@ -1,8 +1,10 @@
 Usage Examples
 ==============
 
-All usage examples are available on `radarsimx.com <https://radarsimx.com/category/examples/>`_. 
-Source files can be found in the `radarsimnb repository <https://github.com/radarsimx/radarsimnb>`_.
+Worked examples are published on `radarsimx.com
+<https://radarsimx.com/category/examples/>`_. The notebooks behind them are in
+the `radarsimnb repository <https://github.com/radarsimx/radarsimnb>`_. Some
+examples appear under more than one topic below.
 
 Waveform
 --------
@@ -50,7 +52,7 @@ Interference
 
 System Characterization
 -----------------------
-* `FMCW Radar Link Budget (Point Target) <https://radarsimx.com/2024/10/11/fmcw-radar-link-budget-point-target//>`_
+* `FMCW Radar Link Budget (Point Target) <https://radarsimx.com/2024/10/11/fmcw-radar-link-budget-point-target/>`_
 * `Phase noise <https://radarsimx.com/2021/01/13/phase-noise/>`_
 * `Receiver operating characteristic (ROC) <https://radarsimx.com/2019/10/06/receiver-operating-characteristic/>`_
 

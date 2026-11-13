@@ -1,162 +1,158 @@
 Dependencies
 ============
 
-RadarSimPy requires both Python packages and system-level dependencies to function properly. This page outlines all requirements for successful installation and operation.
+This page lists the Python packages, operating systems and hardware that
+RadarSimPy needs.
 
-Python Requirements
--------------------
 
-**Core Dependencies**
+Python Packages
+---------------
 
-RadarSimPy requires the following Python packages:
+Required
+^^^^^^^^
 
-* **Python** >= 3.10 (tested on 3.10 – 3.14)
-* **NumPy** >= 2.0 - Numerical computing and array operations
-* **SciPy** >= 1.11.0 - Scientific computing and signal processing algorithms
+* **Python**
+* **NumPy**
+* **SciPy**
 
-**Mesh Processing Libraries**
+Mesh library (for 3D models)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For 3D object simulation and RCS calculation, at least one of the following mesh processing libraries is required:
+To simulate 3D mesh targets or compute RCS, install **at least one** of these
+libraries:
 
-* **PyMeshLab** >= 2022.2 - Advanced mesh processing with MeshLab functionality
-* **PyVista** >= 0.43.0 - 3D visualization and mesh analysis
-* **trimesh** >= 4.0.0 - Lightweight mesh processing library
-* **meshio** >= 5.3.0 - Mesh input/output for various formats
+* **trimesh** — recommended: small and has few dependencies
+* **PyMeshLab**
+* **PyVista**
+* **meshio**
 
-.. note::
-   You only need to install one mesh processing library. ``trimesh`` is recommended for most users due to its simplicity and minimal dependencies.
+Animated models (optional)
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**Animated 3D Models**
+To load keyframe-animated glTF 2.0 / GLB models with
+:mod:`radarsimpy.animation_kit`, also install:
 
-To load keyframe-animated glTF 2.0 / GLB models with :mod:`radarsimpy.animation_kit`, install:
+* **pygltflib**
 
-* **pygltflib** >= 1.16.0 - glTF 2.0 / GLB parsing
+You do not need it for static ``.stl``, ``.ply`` or ``.obj`` files. See
+:doc:`animated_targets`.
 
-.. note::
-   This is only needed for animated models. Static ``.stl``, ``.ply`` and ``.obj``
-   files are handled by the mesh processing library above. See
-   :doc:`animated_targets`.
+Installing them
+^^^^^^^^^^^^^^^
 
-**Installation**
-
-Install all required dependencies using:
+Install everything in ``requirements.txt``:
 
 .. code-block:: bash
 
     pip install -r requirements.txt
 
-Or install individually:
+Or install the packages one by one:
 
 .. code-block:: bash
 
     pip install numpy scipy trimesh
 
-For animated glTF models:
+Add this for animated glTF models:
 
 .. code-block:: bash
 
     pip install pygltflib
 
-System Requirements
--------------------
 
-RadarSimPy includes pre-compiled native libraries that require specific system dependencies.
+Operating System
+----------------
+
+RadarSimPy ships with compiled native libraries, so each platform has its own
+requirements.
 
 Windows
 ^^^^^^^
 
-**Required Components**
-
-* **Operating System**: Windows 10 (version 1809 or later) or Windows 11
-* **Architecture**: x64 (64-bit)
-* **Visual C++ Runtime**: `Microsoft Visual C++ Redistributable <https://aka.ms/vs/16/release/vc_redist.x64.exe>`_
-  
-  * Required for running the C++ simulation engine
-  * Download and install if you encounter DLL errors
-
-**GPU Acceleration**
-
-The Windows module is CUDA-enabled. It uses the GPU when a usable one is present and otherwise runs on the CPU with OpenMP, so the same module works on machines without an NVIDIA GPU. The CUDA runtime is built in, so no CUDA Toolkit needs to be installed. To run on the GPU:
-
-* **CUDA Version**: a driver that supports CUDA 13.x
-* **GPU**: NVIDIA GPU with Compute Capability 7.5 (Turing) or higher — CUDA 13 dropped offline compilation support for Maxwell, Pascal, and Volta GPUs
-* **Drivers**: Latest NVIDIA drivers for your GPU
-* **Compatibility**: See `NVIDIA CUDA Compatibility Guide <https://docs.nvidia.com/deploy/cuda-compatibility/#id1>`_
+* **Operating system:** Windows 10 (version 1809 or later) or Windows 11
+* **Architecture:** x64 (64-bit)
+* **Visual C++ runtime:** `Microsoft Visual C++ Redistributable
+  <https://aka.ms/vs/16/release/vc_redist.x64.exe>`_. Install it if you see a
+  DLL error when importing RadarSimPy.
 
 Linux
 ^^^^^
 
-**Ubuntu 22.04/24.04/26.04**
+* **Operating system:** Ubuntu 22.04 LTS, 24.04 LTS or 26.04 LTS
+* **Architecture:** x86_64 or ARM64 (aarch64). Download the package that
+  matches your machine; ``uname -m`` prints ``x86_64`` or ``aarch64``.
+* **Compiler runtime:** the GCC standard library, which Ubuntu installs by
+  default.
 
-* **Operating System**: Ubuntu 22.04 LTS or Ubuntu 24.04 LTS or Ubuntu 26.04 LTS
-* **Architecture**:
-
-  * x86_64 (64-bit Intel/AMD)
-  * ARM64 (aarch64)
-
-  Download the package that matches your machine; ``uname -m`` prints ``x86_64`` or ``aarch64``.
-* **Compiler Runtime**: GCC standard library (included by default)
-
-If you encounter library issues, ensure system libraries are up to date:
+If you see errors about missing system libraries, update them:
 
 .. code-block:: bash
 
     sudo apt-get update
     sudo apt-get install libstdc++6
 
-**GPU Acceleration**
+**Other Linux distributions.** The pre-built modules are tested on Ubuntu only.
+On other distributions:
 
-The Ubuntu modules (x86_64 and ARM64) are CUDA-enabled. They use the GPU when a usable one is present and otherwise run on the CPU with OpenMP, so the same module works on machines without an NVIDIA GPU. The CUDA runtime is built in, so no CUDA Toolkit needs to be installed. To run on the GPU:
+1. Try the Ubuntu build first. It often works on related distributions such as
+   Debian and Mint.
+2. If it fails, check that your ``glibc`` and ``libstdc++`` versions are
+   compatible.
+3. If it still does not work, `request a custom build
+   <https://radarsimx.com/request-a-custom-build/>`_ for your distribution.
 
-* **CUDA Version**: a driver that supports CUDA 13.x
-* **GPU**: NVIDIA GPU with Compute Capability 7.5 (Turing) or higher — CUDA 13 dropped offline compilation support for Maxwell, Pascal, and Volta GPUs
-* **Drivers**: Install latest NVIDIA drivers:
+macOS
+^^^^^
+
+* **Operating system:** a recent macOS release. Builds are produced and tested
+  on macOS 26 "Tahoe" with Xcode 26.4.1. Older versions are not tested.
+* **Architecture:** Intel x64 or Apple Silicon (ARM64).
+* No extra runtime is needed.
+
+
+GPU Acceleration
+----------------
+
+The Windows and Linux modules support NVIDIA GPUs through CUDA. The same module
+works with or without a GPU:
+
+* If a usable GPU is present, the simulation runs on it.
+* Otherwise, it runs on the CPU, using all cores through OpenMP.
+
+The CUDA runtime is built into the module, so you do **not** need to install
+the CUDA Toolkit. To run on the GPU you need:
+
+* **GPU:** NVIDIA, compute capability 7.5 (Turing) or newer. CUDA 13 no longer
+  supports the older Maxwell, Pascal and Volta GPUs.
+* **Driver:** an NVIDIA driver that supports CUDA 13.x. Use the latest driver
+  for your GPU. On Ubuntu:
 
   .. code-block:: bash
 
       sudo apt-get install nvidia-driver-XXX
 
-  Replace ``XXX`` with the latest driver version number for your GPU.
+  Replace ``XXX`` with the latest driver version for your GPU.
+* See the `NVIDIA CUDA Compatibility Guide
+  <https://docs.nvidia.com/deploy/cuda-compatibility/#id1>`_ for details.
 
-**Other Linux Distributions**
+GPU acceleration is not available on macOS.
 
-RadarSimPy pre-built binaries are primarily tested on Ubuntu. For other distributions:
 
-1. **Try Ubuntu builds first** - They often work on compatible distributions (Debian, Mint, etc.)
-2. **Check dependencies** - Ensure compatible versions of ``glibc`` and ``libstdc++``
-3. **Request custom build** - If the Ubuntu build doesn't work, `request a custom build <https://radarsimx.com/request-a-custom-build/>`_ for your specific distribution
+Hardware
+--------
 
-MacOS
-^^^^^
+**Minimum**
 
-**Supported Versions**
+* **CPU:** multi-core processor (4 cores recommended)
+* **RAM:** 8 GB
+* **Disk:** 500 MB for RadarSimPy
 
-* **Operating System**: A recent macOS release (builds are produced and tested on macOS 26 "Tahoe" runners with Xcode 26.4.1; no minimum deployment target is pinned, but older macOS versions are untested)
-* **Architecture**:
+**Recommended for large simulations**
 
-  * Intel x64 (Intel-based Macs)
-  * ARM64 (Apple Silicon M1/M2/M3/M4)
+* **CPU:** 8 or more cores
+* **RAM:** 16 GB or more
+* **GPU:** NVIDIA GPU with 4 GB or more of memory
+* **Disk:** SSD
 
-**Platform-Specific Requirements**
-
-  * Intel Macs: Use default Clang runtime (no additional dependencies required)
-  * Apple Silicon Macs: Use default Clang runtime (no additional dependencies required)
-
-Hardware Recommendations
-------------------------
-
-**Minimum Requirements**
-
-* **CPU**: Multi-core processor (4 cores recommended)
-* **RAM**: 8 GB
-* **Storage**: 500 MB for RadarSimPy installation
-
-**Recommended for Large Simulations**
-
-* **CPU**: 8+ cores for parallel processing
-* **RAM**: 16 GB or more
-* **GPU**: NVIDIA GPU with 4+ GB VRAM (for GPU-accelerated version)
-* **Storage**: SSD for faster data I/O
 
 See Also
 --------

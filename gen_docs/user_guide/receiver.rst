@@ -1,13 +1,17 @@
 Receiver and Baseband
 =====================
 
-:class:`radarsimpy.Receiver` describes the path from the receive antenna to the
-ADC: the array geometry and patterns, the gain and noise budget, where the
-receive window sits, and how the baseband is sampled.
+:class:`radarsimpy.Receiver` describes everything from the receive antenna to
+the analog-to-digital converter (ADC):
 
-Because the mixer deramps against the transmit oscillator (:doc:`system_model`),
-the receiver has no independent frequency plan to configure — what it does have
-is a sampling rate, a gain chain, and a range gate.
+* the receive antennas (positions and patterns),
+* the gains and the noise they add,
+* when the receiver records (the receive window),
+* how the baseband is sampled.
+
+The receiver mixes the echo with the transmitter's own oscillator signal (see
+:doc:`system_model`), so there are no receiver frequencies to set. You only
+configure the sampling rate, the gains and the range gate.
 
 
 The Signal Chain
@@ -17,41 +21,41 @@ The Signal Chain
     :width: 100%
     :alt: Receiver blocks with their parameters, and the four-step thermal noise budget
 
-    Each block carries the parameters that configure it. The ledger below
-    tracks thermal noise from the antenna to the ADC; the result is the
-    standard deviation of the noise added to every baseband sample.
+    Each block is labelled with the parameters that configure it. The table
+    underneath follows the thermal noise from the antenna to the ADC. The
+    result is the standard deviation of the noise added to each baseband
+    sample.
 
-Nothing in the chain is optional — a receiver constructed with only ``fs`` uses
-the defaults (``noise_figure=10``, ``rf_gain=0``, ``baseband_gain=0``,
-``load_resistor=500``), which still produce a well-defined noise level.
+Every block has a default value. A receiver created with only ``fs`` uses
+``noise_figure=10``, ``rf_gain=0``, ``baseband_gain=0`` and
+``load_resistor=500``, which still gives a well-defined noise level.
 
 
 Sampling
 --------
 
-``fs`` is the baseband sampling rate, and it sets the number of samples taken
-during each pulse:
+``fs`` is the baseband sampling rate. It sets how many samples are taken in
+each pulse:
 
 .. math::
 
    \text{samples\_per\_pulse} = \text{pulse\_length} \times f_s
 
-The receive window is exactly one ``pulse_length`` long. It opens ``gate_delay``
-after each pulse starts and closes ``pulse_length`` later; it does not extend
-into the idle time between pulses.
+The receive window is exactly one ``pulse_length`` long. It opens
+``gate_delay`` after each pulse starts. The receiver does not record during
+the idle time between pulses.
 
 .. note::
 
-   Pick ``fs`` so that ``pulse_length * fs`` is an exact integer. The
-   constructor snaps values that fall within rounding noise of an integer, but
-   a clean product avoids any ambiguity between the Python and C++ sample
-   counts.
+   Choose ``fs`` so that ``pulse_length * fs`` is an exact integer. The
+   constructor rounds values that are within floating-point error of an
+   integer, but an exact product guarantees that Python and the C++ engine
+   agree on the sample count.
 
 Complex vs. real baseband
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``bb_type`` selects between a complex (I/Q) and a real baseband. The choice has
-three consequences:
+``bb_type`` selects a complex (I/Q) or a real baseband:
 
 .. list-table::
    :header-rows: 1
@@ -60,33 +64,34 @@ three consequences:
    * -
      - ``bb_type="complex"`` (default)
      - ``bb_type="real"``
-   * - Output dtype
+   * - Output data type
      - Complex
      - Real
    * - ``noise_bandwidth``
      - ``fs``
      - ``fs / 2``
-   * - Beat sign
-     - Resolved — positive and negative beats are distinguishable
-     - Not resolved — a target above the gate is indistinguishable from one the
-       same distance below it
+   * - Sign of the beat frequency
+     - Kept — positive and negative beat frequencies can be told apart
+     - Lost — a target a given distance beyond the gate looks the same as one
+       the same distance before it
 
-The noise bandwidth difference is why an otherwise identical real-baseband
-receiver reports a lower noise amplitude: it integrates over half the
-bandwidth, for :math:`\sqrt{2}` less noise voltage.
+Because a real baseband has half the noise bandwidth, its noise amplitude is
+:math:`\sqrt{2}` times lower than that of an otherwise identical complex
+receiver.
 
-Range span for deramped FMCW
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Range span for FMCW
+~~~~~~~~~~~~~~~~~~~
 
-For a linear FM waveform, range maps onto beat frequency through the chirp
-slope, so ``fs`` limits the recoverable range span:
+In an FMCW radar with a linear chirp, range is converted to beat frequency by
+the chirp slope. The sampling rate therefore limits the range span you can
+see:
 
 .. math::
 
    \text{span} = \frac{B_\text{usable} \cdot c}{2 \left| k \right|}
 
 where :math:`k` is the chirp slope and :math:`B_\text{usable}` is ``fs`` for
-complex baseband and ``fs/2`` for real. Both are available on the radar:
+a complex baseband or ``fs/2`` for a real one. The radar reports both:
 
 .. code-block:: python
 
@@ -97,23 +102,23 @@ complex baseband and ``fs/2`` for real. Both are available on the radar:
    >>> radar.unambiguous_range_window
    (0.0, 29.98)
 
-A 4 GHz sweep in 40 µs is a slope of 100 MHz/µs, so 20 MHz of complex baseband
-covers only 30 m. Widening that span means a faster ADC, a slower sweep, or a
-range gate.
+For example, a 4 GHz sweep in 40 µs has a slope of 100 MHz/µs, so a 20 MHz
+complex baseband covers only 30 m. To cover more range, use a faster ADC, a
+slower sweep, or a range gate.
 
 .. note::
 
-   These properties describe deramp (stretch) processing of a linear FM
-   waveform. They return ``None`` for CW, pulsed and arbitrary waveforms, where
-   range does not map onto beat frequency.
+   These properties only apply to a linear FM chirp. They return ``None`` for
+   CW, pulsed and arbitrary waveforms, where range does not map to beat
+   frequency.
 
 
 The Noise Budget
 ----------------
 
-The thermal-noise standard deviation is computed once, when the ``Radar`` is
-constructed, and stored in ``radar.sample_prop["noise"]``. It follows the
-ledger in the figure above:
+The standard deviation of the thermal noise is calculated once, when the
+``Radar`` is created, and stored in ``radar.sample_prop["noise"]``. The steps
+match the figure above:
 
 .. code-block:: text
 
@@ -122,8 +127,7 @@ ledger in the figure above:
    n3    = n2 + baseband_gain                                       [dBm]
    sigma = sqrt(1e-3 * 10**(n3/10) * load_resistor)                 [V]
 
-The reference temperature is fixed at 290 K. Worked through for a typical
-front end:
+The reference temperature is always 290 K. A worked example:
 
 .. list-table::
    :header-rows: 1
@@ -132,16 +136,16 @@ front end:
    * - Step
      - Expression
      - Value
-   * - Thermal floor, ``fs = 20 MHz`` complex
+   * - Thermal noise floor, ``fs = 20 MHz``, complex
      - :math:`-174 + 73.0`
      - −101.0 dBm
-   * - After the RF amp, ``noise_figure=8``, ``rf_gain=20``
+   * - After the RF amplifier, ``noise_figure=8``, ``rf_gain=20``
      - :math:`-101.0 + 28`
      - −73.0 dBm
-   * - After the baseband amp, ``baseband_gain=30``
+   * - After the baseband amplifier, ``baseband_gain=30``
      - :math:`-73.0 + 30`
      - −43.0 dBm
-   * - In volts across ``load_resistor=500``
+   * - As a voltage across ``load_resistor=500``
      - :math:`\sqrt{10^{-3} \cdot 10^{-4.3} \cdot 500}`
      - 5.03 mV
 
@@ -161,26 +165,27 @@ front end:
 
    radar.sample_prop["noise"]   # 0.005026...
 
-Two things about this that regularly surprise people:
+Two common surprises:
 
-* **The gains are not free.** ``rf_gain`` and ``baseband_gain`` amplify the
-  signal and the noise equally, so raising them changes the absolute scale of
-  the baseband but not the SNR. Only ``noise_figure`` and ``noise_bandwidth``
-  move the SNR.
-* **The noise is not added for you.** ``sim_radar`` returns the clean response
-  in ``result["baseband"]`` and the noise realization separately in
-  ``result["noise"]``; add them to get a noisy measurement.
+* **Gain does not improve SNR.** ``rf_gain`` and ``baseband_gain`` amplify the
+  signal and the noise by the same amount. They change the absolute level of
+  the baseband, but not the signal-to-noise ratio (SNR). Only
+  ``noise_figure`` and ``noise_bandwidth`` change the SNR.
+* **Noise is not added for you.** ``sim_radar`` returns the noise-free signal
+  in ``result["baseband"]`` and the noise in ``result["noise"]``. Add them to
+  get a noisy measurement.
 
-:doc:`noise` covers the statistics of the generated noise, its correlation
-structure across MIMO virtual channels, and the transmitter phase-noise model.
+:doc:`noise` describes the noise statistics, how noise is shared between MIMO
+virtual channels, and the phase-noise model.
 
 
 The Range Gate
 --------------
 
-``gate_delay`` moves the receive window and the deramp reference together, by
-the same amount. A target at range ``c * gate_delay / 2`` then produces a DC
-beat, and targets around it beat at ``2 * k * dR / c``:
+``gate_delay`` delays both the receive window and the mixer reference by the
+same amount. A target at range ``c * gate_delay / 2`` then produces a beat
+frequency of zero, and a target ``dR`` away from that range produces a beat
+frequency of ``2 * k * dR / c``:
 
 .. code-block:: python
 
@@ -189,19 +194,19 @@ beat, and targets around it beat at ``2 * k * dR / c``:
 
    rx.gate_range     # 111120.0
 
-With the default of ``0`` the reference sits at zero delay, which is fine at
-short range and impossible at long range: the beat frequency ``k * tau`` grows
-without bound with the round-trip delay and passes Nyquist long before real
-long-range radars operate. :doc:`stretch_processing` works through the
-arithmetic and the caveats — including how ``gate_delay`` interacts with
-per-pulse ``f_offset`` and phase codes.
+The default is ``0`` (no gate). That works at short range. At long range it
+does not: the beat frequency ``k * tau`` grows with the round-trip delay
+``tau`` and exceeds the Nyquist frequency long before the ranges of a real
+long-range radar. :doc:`stretch_processing` explains the calculation and the
+limitations, including how ``gate_delay`` interacts with per-pulse
+``f_offset`` and phase codes.
 
 
 Receive Channels
 ----------------
 
-``channels`` is a list of dictionaries, one per receive element, and
-``location`` is the only required key.
+``channels`` is a list of dictionaries, one per receive antenna. Only
+``location`` is required.
 
 .. list-table::
    :header-rows: 1
@@ -220,17 +225,18 @@ Receive Channels
        ``[0, 1, -1j]``.
    * - ``azimuth_angle`` / ``azimuth_pattern``
      - ``[-90, 90]`` / ``[0, 0]``
-     - Matched arrays of angle (degrees) and gain (dB).
+     - Angles (degrees) and gains (dB) of the azimuth pattern. Same length.
    * - ``elevation_angle`` / ``elevation_pattern``
      - ``[-90, 90]`` / ``[0, 0]``
-     - Same, in elevation.
+     - The same, for elevation.
 
-The pattern convention matches the transmitter: the **peak of the azimuth
-pattern** becomes the channel's antenna gain and the azimuth pattern is
-normalized to it, while the **elevation pattern is normalized to its own peak**
-and contributes shape only. Put absolute gain in the azimuth cut.
+Patterns work the same way as for the transmitter. The **peak of the azimuth
+pattern** is used as the channel's antenna gain, and the azimuth pattern is
+normalized to that peak. The **elevation pattern** is normalized to its own
+peak, so only its shape matters. Put the absolute gain in the azimuth pattern.
 
-A half-wavelength uniform linear array along the y axis:
+Example: a uniform linear array of 8 antennas along the y axis, spaced half a
+wavelength apart.
 
 .. code-block:: python
 
@@ -248,8 +254,8 @@ A half-wavelength uniform linear array along the y axis:
        ],
    )
 
-Receive locations combine with transmit locations to form the virtual array;
-the ordering is described in :doc:`system_model`.
+The receive and transmit locations together form the virtual array. See
+:doc:`system_model` for the channel order.
 
 
 Reading the Configuration Back

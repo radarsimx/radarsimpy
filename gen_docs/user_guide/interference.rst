@@ -1,58 +1,56 @@
 Interference Simulation
 =======================
 
-RadarSimPy can simulate mutual interference: the signal another radar
-transmits, received directly by the radar under test. This is the dominant
-impairment wherever several radars share a band, as automotive radars do at
-77 GHz and 60 GHz.
+RadarSimPy can simulate *mutual interference*: the signal that another radar
+transmits, received directly by the radar you are simulating (the *victim*).
+Interference is the main problem when several radars share a frequency band,
+as automotive radars do at 77 GHz and 60 GHz.
 
-The model is not tied to a particular waveform. Both radars are described by
-ordinary ``Transmitter`` objects, so any waveform that can be configured there —
-CW, FMCW, pulsed, phase-coded, stepped frequency, an arbitrary :math:`f(t)`
-sweep, with or without pulse and fast-time modulation — can act as the victim,
-the interferer, or both, and the two need not match.
+Interference travels one way, from the interferer to the victim, so its power
+falls as :math:`1/R^2`. A target echo travels both ways and falls as
+:math:`1/R^4`. As a result, a nearby interferer can be as strong as, or
+stronger than, real target echoes, even at low transmit power.
 
-Interference reaches the victim by a one-way path, so its power falls as
-:math:`1/R^2` against :math:`1/R^4` for a target echo. A nearby interferer can
-therefore rival or exceed genuine returns even at modest transmit power.
+Both radars are described with ordinary ``Transmitter`` objects, so any
+waveform works on either side: CW, FMCW, pulsed, phase-coded, stepped
+frequency or an arbitrary sweep, with or without modulation. The two radars do
+not need to use the same waveform.
 
 
-Features
---------
+What Is Modelled
+----------------
 
-* **Any waveform, on either side** — the victim and the interferer are
-  configured independently, each with its own ``f`` and ``t``, ``pulses``,
-  ``prp``, ``f_offset`` hopping, pulse modulation (``pulse_amp``,
-  ``pulse_phs``) and fast-time modulation (``mod_t``, ``amp``, ``phs``). See
-  :doc:`transmitter`.
-* **Both antenna patterns** — the interferer's transmit pattern toward the
-  victim and the victim's receive pattern toward the interferer, including
-  their fields of view.
-* **Platform geometry and motion** — both radars have their own ``location``,
-  ``speed``, ``rotation`` and ``rotation_rate``, evaluated per sample.
-* **Timing** — the interferer contributes only while it is actually
-  transmitting: not before its first frame, not between its pulses, and not
-  where its ``amp`` gate is off.
-* **Receiver passband** — only the part of the interfering signal that falls
-  inside the victim's baseband bandwidth reaches the output.
-* **A separate output** — interference comes back as its own array, next to
-  ``baseband`` and ``noise``, so it can be analysed, suppressed or combined as
-  needed.
+* **Any waveform on either side.** The victim and the interferer each have
+  their own ``f``, ``t``, ``pulses``, ``prp``, ``f_offset`` hopping, pulse
+  modulation (``pulse_amp``, ``pulse_phs``) and fast-time modulation
+  (``mod_t``, ``amp``, ``phs``). See :doc:`transmitter`.
+* **Both antenna patterns.** The interferer's transmit pattern toward the
+  victim, and the victim's receive pattern toward the interferer.
+* **Position and motion.** Each radar has its own ``location``, ``speed``,
+  ``rotation`` and ``rotation_rate``, evaluated at every sample.
+* **Timing.** The interferer only contributes while it is transmitting: not
+  before its first frame, not between its pulses, and not while its ``amp``
+  is zero.
+* **Receiver bandwidth.** Only the part of the interfering signal inside the
+  victim's baseband bandwidth reaches the output.
+* **A separate output.** Interference is returned in its own array, next to
+  ``baseband`` and ``noise``.
 
 
 Adding an Interferer
 --------------------
 
-1. Describe the interfering radar's waveform with a ``Transmitter``.
-2. Give it a ``Receiver`` — one is required to build a ``Radar``, but it takes
-   no part in the interference calculation, so any valid settings will do.
-3. Place and orient it with ``Radar(location=..., rotation=...)``.
+1. Describe the interferer's waveform with a ``Transmitter``.
+2. Give it a ``Receiver``. A ``Radar`` needs one, but it is not used in the
+   interference calculation, so any valid settings work.
+3. Set its position and orientation with ``Radar(location=..., rotation=...)``.
 4. Pass it to ``sim_radar`` as ``interf``.
 
-The configuration below is the one used in the
-`interference example <https://radarsimx.com/2023/01/13/interference/>`_: two
-60 GHz radars 30 m apart and facing each other, one down-chirping and one
-up-chirping across the same 200 MHz, each hopping carrier from chirp to chirp.
+This example is from the
+`interference example <https://radarsimx.com/2023/01/13/interference/>`_. Two
+60 GHz radars are 30 m apart and face each other. One chirps down and the other
+chirps up across the same 200 MHz, and both change their carrier frequency from
+chirp to chirp.
 
 .. code-block:: python
 
@@ -88,17 +86,16 @@ up-chirping across the same 200 MHz, each hopping carrier from chirp to chirp.
 
    result = sim_radar(radar, targets, interf=interferer)
 
-``rotation=(180, 0, 0)`` turns the interferer to face back along −x toward the
-victim; see :doc:`coordinate_systems` for the angle conventions.
+``rotation=(180, 0, 0)`` turns the interferer to face along −x, toward the
+victim. See :doc:`coordinate_systems` for the angle conventions.
 
 
 Other Waveforms
 ---------------
 
-Nothing in the setup above is specific to FMCW. Swapping the interferer's
-``Transmitter`` is all it takes to study a different kind of neighbour — here a
-CW tone, and the same tone phase-coded at 100 ns per chip, both aimed at the
-FMCW victim above:
+To simulate a different kind of interferer, change only its ``Transmitter``.
+The example below uses a CW tone, and the same tone with a phase code of
+100 ns per chip, against the FMCW victim from above:
 
 .. code-block:: python
 
@@ -119,22 +116,23 @@ FMCW victim above:
                          location=(30, 0, 0), rotation=(180, 0, 0))
        result = sim_radar(radar, targets, interf=neighbour)
 
-Pulsed, stepped-frequency or arbitrary-sweep neighbours are built the same way,
-using the patterns in :doc:`transmitter`. The victim can be any of these too.
+Pulsed, stepped-frequency and arbitrary-sweep interferers are set up the same
+way, using the examples in :doc:`transmitter`. The victim can use any of these
+waveforms too.
 
 
 Reading the Output
 ------------------
 
 ``result["interference"]`` has the same ``[channels, pulses, samples]`` shape
-and channel order as ``baseband`` and ``noise``. Nothing is pre-mixed, so the
-received signal is composed explicitly:
+and channel order as ``baseband`` and ``noise``. The parts are returned
+separately, so add them yourself to get the received signal:
 
 .. code-block:: python
 
    measured = result["baseband"] + result["noise"] + result["interference"]
 
-Keeping the components apart makes common analyses direct:
+Having the parts separately makes common analyses simple:
 
 .. code-block:: python
 
@@ -148,47 +146,50 @@ Keeping the components apart makes common analyses direct:
    # which samples were hit — the mask a blanking scheme needs
    mask = np.abs(result["interference"]) > 0
 
-Targets are optional. ``sim_radar(radar, [], interf=interferer)`` returns an
-all-zero ``baseband`` and a fully populated ``interference``, which is the
-quickest way to study the impairment on its own.
+You do not need any targets. ``sim_radar(radar, [], interf=interferer)``
+returns an all-zero ``baseband`` and the full ``interference``. This is the
+fastest way to study interference on its own.
 
 
-How Interference Appears
-------------------------
+When Interference Appears
+-------------------------
 
-For every sample, the simulator works out the victim's own instantaneous
-frequency, :math:`f_\text{lo}(t)`, and the frequency the interferer was
-radiating when the arriving energy left it, :math:`f_\text{interf}(t)`. Both
-come straight from each ``Transmitter``'s ``f``, ``t`` and ``f_offset``, so the
-rule is the same whatever the two waveforms are. The interferer reaches the
-output only while
+At every sample, the simulator compares two frequencies:
+
+* :math:`f_\text{lo}(t)` — the victim's own frequency at that moment,
+* :math:`f_\text{interf}(t)` — the frequency the interferer was transmitting
+  when the arriving signal left it.
+
+Both come from each ``Transmitter``'s ``f``, ``t`` and ``f_offset``, so the
+same rule applies to every waveform. The interference reaches the output only
+when
 
 .. math::
 
    \lvert f_\text{lo}(t) - f_\text{interf}(t) \rvert < f_s
 
-where :math:`f_s` is the victim receiver's sampling rate ``fs``. For a real
-baseband receiver (``bb_type="real"``) the passband is half as wide,
-:math:`f_s / 2` (:doc:`receiver`).
+where :math:`f_s` is the victim's sampling rate ``fs``. For a real baseband
+receiver (``bb_type="real"``) the limit is :math:`f_s / 2`
+(see :doc:`receiver`).
 
-Inside that window the interference carries the interferer's own amplitude and
-phase modulation — its pulse codes, its ``amp`` gate, its fast-time phase code
-— and oscillates at the beat frequency
-:math:`f_\text{lo} - f_\text{interf}`. The victim's own modulation does not
-gate reception: its receiver listens for the whole sample window whatever its
-transmitter is doing.
+When this condition holds, the interference oscillates at the difference
+frequency :math:`f_\text{lo} - f_\text{interf}` and carries the interferer's
+amplitude and phase modulation (its pulse codes, its ``amp`` gating, its
+fast-time phase code). The victim's own modulation has no effect: its receiver
+records during the whole sample window, regardless of what its transmitter is
+doing.
 
 .. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/interference_crossing.svg
     :width: 100%
     :alt: An interfering chirp only reaches the baseband while it crosses the victim receiver's passband
 
-    The rule applied to two linear chirps of different slope. Each time the
-    interferer crosses the victim's passband it leaves a burst in the baseband.
-    The burst has constant amplitude; its beat frequency sweeps through zero at
-    the moment the two chirps cross, so it oscillates quickly at its edges and
-    slowly at its centre.
+    Two linear chirps with different slopes. Each time the interferer's
+    frequency passes through the victim's receive band, a burst appears in the
+    baseband. The burst has constant amplitude. Its frequency passes through
+    zero when the two chirps cross, so it oscillates fast at the edges and
+    slowly in the middle.
 
-What the rule produces depends on how the two frequency curves meet:
+What you see depends on how the two frequency curves meet:
 
 .. list-table::
    :header-rows: 1
@@ -197,38 +198,38 @@ What the rule produces depends on how the two frequency curves meet:
    * - Victim and interferer
      - What appears in the baseband
    * - Two chirps, different slopes
-     - A short burst at each crossing, as in the figure
-   * - Two chirps, the same slope
-     - Persistent interference across the chirp; it behaves like a false
-       target rather than a transient
+     - A short burst each time they cross, as in the figure
+   * - Two chirps, same slope
+     - Interference during the whole chirp. It looks like a false target
+       rather than a short burst.
    * - A chirp and a CW tone
      - One burst per chirp, when the chirp sweeps past the tone
    * - Two CW tones
-     - A steady beat at their frequency offset, or nothing if the offset is
-       beyond the passband
+     - A constant tone at their frequency difference, or nothing if the
+       difference is larger than the receive band
    * - A phase-coded interferer
-     - Interference with the interferer's code imprinted on its phase, which
-       spreads it into a noise-like floor
+     - Interference carrying the interferer's phase code, which spreads it
+       into a noise-like floor
    * - A pulsed interferer
-     - Only the parts of the above that coincide with its pulses
+     - Only the parts of the above that fall within its pulses
    * - Arbitrary sweeps
-     - A burst wherever the two curves come within the passband of each other
+     - A burst wherever the two curves come within the receive band of each
+       other
 
-For two linear sweeps, a burst lasts as long as the interferer takes to
-traverse the passband, :math:`2 f_s / \lvert k_\text{victim} -
-k_\text{interf} \rvert`, where :math:`k` is the sweep rate and a CW tone has
-:math:`k = 0`.
+For two linear sweeps, a burst lasts
+:math:`2 f_s / \lvert k_\text{victim} - k_\text{interf} \rvert`, where
+:math:`k` is the sweep rate (:math:`k = 0` for a CW tone).
 
-Pulse to pulse, the bursts move, appear and disappear as the two radars'
-repetition periods and frequency hops walk past each other.
+From pulse to pulse, the bursts move, appear and disappear, because the two
+radars have different pulse periods and frequency hops.
 
 
 Several Interferers
 -------------------
 
-``interf`` accepts a single ``Radar``. For several interferers, simulate each
-one separately and sum the interference — contributions add linearly, and
-``baseband`` is unaffected by the choice of interferer:
+``interf`` takes one ``Radar``. For several interferers, simulate each one
+separately and add the results. Interference adds linearly, and ``baseband``
+does not depend on the interferer:
 
 .. code-block:: python
 
@@ -240,41 +241,39 @@ one separately and sum the interference — contributions add linearly, and
 
    measured = result["baseband"] + result["noise"] + interference
 
-Passing ``[]`` as the targets for the additional runs skips work that would
-only reproduce the same ``baseband``. The interferers can each use a different
-waveform.
+Passing ``[]`` as the targets in the extra runs avoids recomputing the same
+``baseband``. Each interferer can use a different waveform.
 
 
-Shaping the Scenario
---------------------
+Controlling the Scenario
+------------------------
 
-The same parameters that define each radar control how strongly, how often and
-where interference lands:
+These parameters control how strong the interference is, how often it occurs
+and where it appears:
 
-* **Geometry** — ``location`` sets the path length; ``rotation`` points each
-  antenna toward or away from the other; ``speed`` and ``rotation_rate`` make
-  the coupling evolve through the frame.
-* **Antenna patterns** — ``azimuth_pattern`` and ``elevation_pattern`` on
-  either side scale the coupling directly, and angles outside a pattern's span
+* **Geometry.** ``location`` sets the distance between the radars.
+  ``rotation`` points each antenna toward or away from the other. ``speed``
+  and ``rotation_rate`` make the interference change during the frame.
+* **Antenna patterns.** ``azimuth_pattern`` and ``elevation_pattern`` on
+  either radar scale the interference. Angles outside a pattern's range
   receive nothing (:doc:`transmitter`).
-* **Power** — the interferer's ``tx_power`` scales the interference linearly in
-  dB; the victim's scales only its own echoes.
-* **Waveform** — the two frequency curves decide when and for how long they
-  overlap; ``f_offset`` hopping and a staggered ``prp`` change which pulses
-  collide; the interferer's pulse and fast-time modulation are carried into
-  the interference.
-* **Receiver passband** — the victim's ``fs`` sets the passband width, halved
-  for real baseband, and with it how long each overlap lasts.
-* **Timing** — each radar's ``frame_time`` aligns or offsets the two
-  transmissions.
+* **Power.** The interferer's ``tx_power`` scales the interference (dB for
+  dB). The victim's ``tx_power`` only scales its own echoes.
+* **Waveform.** The two frequency curves decide when and for how long they
+  overlap. ``f_offset`` hopping and a staggered ``prp`` change which pulses
+  are hit. The interferer's modulation is carried into the interference.
+* **Receive bandwidth.** The victim's ``fs`` sets the width of the receive
+  band (halved for a real baseband), and so how long each overlap lasts.
+* **Timing.** Each radar's ``frame_time`` sets when it transmits relative to
+  the other.
 
 
 Limitations
 -----------
 
-* Only the **direct path** is modelled. The interferer's signal reflecting off
-  targets or the environment before reaching the victim is not included.
-* One interferer per ``sim_radar`` call; combine several as shown above.
+* Only the **direct path** from the interferer to the victim is modelled.
+  Interference that reflects off targets or the environment is not included.
+* One interferer per ``sim_radar`` call. Add several as shown above.
 * The interferer's ``Receiver`` is not used.
 
 

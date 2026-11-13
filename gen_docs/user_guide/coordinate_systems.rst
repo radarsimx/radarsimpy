@@ -1,12 +1,12 @@
 Coordinate Systems
 ==================
 
-RadarSimPy places everything — radars, targets, antenna patterns, motion — in a
-single right-handed, z-up Cartesian frame. Angles are in degrees, distances in
-metres, and no part of the library uses a different convention internally.
+RadarSimPy uses one coordinate frame for everything: radars, targets, antenna
+patterns and motion. It is a right-handed Cartesian frame with z pointing up.
+Angles are in degrees and distances are in metres.
 
-This page defines that frame, the two angle pairs used to point directions
-inside it, and the Euler angles that orient objects within it.
+This page defines the frame, the two ways of describing a direction in it, and
+the angles used to rotate objects.
 
 
 At a Glance
@@ -27,15 +27,15 @@ At a Glance
    * - phi
      - :math:`\phi`
      - °
-     - Azimuthal angle in the x–y plane, 0° at +x
+     - Angle in the x–y plane, 0° at +x
    * - theta
      - :math:`\theta`
      - °
-     - Polar angle from +z, 0° at zenith
+     - Angle down from +z, 0° straight up
    * - azimuth
      - —
      - °
-     - Same angle as :math:`\phi`, radar-centric name
+     - Same as :math:`\phi`; the name used for radar beams
    * - elevation
      - —
      - °
@@ -49,31 +49,31 @@ At a Glance
 The Global Frame
 ----------------
 
-The axes carry no built-in geographic meaning — you choose what they represent
-— but the handedness is fixed:
+The axes have no fixed geographic meaning; you decide what they represent. The
+directions are:
 
-- **x** — forward, the boresight direction for a radar at zero orientation
-- **y** — to the left, when looking along +x
-- **z** — up
+- **x** — forward. A radar with zero rotation points along +x.
+- **y** — left, when looking along +x.
+- **z** — up.
 
-Any direction can be named either by a unit vector or by the spherical pair
+You can describe a direction either as a unit vector or as two spherical angles,
 :math:`(\phi, \theta)`:
 
 .. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/phi_theta.svg
     :width: 100%
     :alt: Spherical angles phi and theta in the global right-handed frame
 
-    :math:`\phi` sweeps within the x–y plane starting from +x; :math:`\theta`
-    opens downward from +z. Both arrows show the direction of increase.
+    :math:`\phi` is measured in the x–y plane from +x. :math:`\theta` is
+    measured down from +z. The arrows show the direction in which each angle
+    increases.
 
-**phi** (:math:`\phi`) is the azimuthal angle in the x–y plane. It is 0° along
-+x and 90° along +y, increasing counter-clockwise when viewed from above, and
-spans 0°…360° (or equivalently −180°…180°).
+* **phi** (:math:`\phi`) is the angle in the x–y plane. It is 0° along +x and
+  90° along +y, and increases counter-clockwise when viewed from above. Its
+  range is 0°–360° (or, equivalently, −180°–180°).
+* **theta** (:math:`\theta`) is the angle from +z. It is 0° straight up, 90° in
+  the x–y plane and 180° straight down.
 
-**theta** (:math:`\theta`) is the polar angle measured from +z. It is 0° at the
-zenith, 90° in the x–y plane, and 180° at the nadir, spanning 0°…180°.
-
-Converting between the two descriptions:
+To convert between the two forms:
 
 .. math::
 
@@ -99,55 +99,54 @@ Converting between the two descriptions:
    to_spherical([1, 1, 1])     # (1.732, 45.0, 54.74)
 
 
-Radar-Centric Angles
---------------------
+Azimuth and Elevation
+---------------------
 
-Antenna patterns and beam geometry are more naturally described relative to
-boresight than to the zenith, so the same directions get a second pair of
-names:
+For antenna patterns and beams it is easier to measure angles from the radar's
+pointing direction (boresight, +x) than from straight up. Azimuth and elevation
+do this:
 
 .. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/azimuth_elevation.svg
     :width: 100%
     :alt: Radar-centric azimuth and elevation angles referenced to boresight along plus x
 
     Boresight is +x, where azimuth and elevation are both zero. Azimuth turns
-    within the x–y plane toward +y; elevation lifts out of that plane toward +z.
+    in the x–y plane toward +y. Elevation tilts up out of that plane toward +z.
 
-**azimuth** is the horizontal angle in the x–y plane. It is 0° at +x — the
-boresight — and positive toward +y, which is to the left as seen from behind
-the radar looking forward. It is the same angle as :math:`\phi`.
-
-**elevation** is the vertical angle away from the x–y plane, 0° at the horizon
-and positive toward +z.
+* **azimuth** is the horizontal angle. It is 0° at boresight (+x) and positive
+  toward +y, which is to the left when you stand behind the radar. It is the
+  same angle as :math:`\phi`.
+* **elevation** is the vertical angle. It is 0° at the horizon and positive
+  upward (toward +z).
 
 .. math::
 
    \text{azimuth} &= \phi \\
    \text{elevation} &= 90° - \theta
 
-The difference is only where zero sits and which way is positive; nothing is
-lost or gained by switching between the pairs.
+Both pairs describe the same directions; they only differ in where zero is.
 
 .. note::
 
-   Transmit and receive channels default to patterns spanning ``[-90, 90]`` in
-   both cuts (``azimuth_angle`` and ``elevation_angle``). That is the default
-   extent of the *pattern arrays*, not a restriction on the angles themselves.
-   See :doc:`transmitter` and :doc:`receiver` for how patterns are specified,
-   including the convention that the azimuth cut carries the absolute gain.
+   By default, transmit and receive antenna patterns are defined from −90° to
+   90° in both azimuth and elevation (``azimuth_angle`` and
+   ``elevation_angle``). That is only the default range of the pattern arrays,
+   not a limit on angles in general. See :doc:`transmitter` and
+   :doc:`receiver` for how to define patterns, and why the absolute gain goes
+   in the azimuth pattern.
 
 
 Orientation
 -----------
 
-Objects are oriented with three Euler angles given as ``[yaw, pitch, roll]``:
+You rotate an object with three angles, ``[yaw, pitch, roll]``:
 
 .. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/yaw_pitch_roll.svg
     :width: 100%
     :alt: Yaw, pitch and roll Euler angles, each coloured by the axis it turns about
 
-    Each arc is drawn in the colour of the axis it turns about. Pitch is the
-    exception worth noting: it turns about −y, not +y.
+    Each arc has the colour of the axis it rotates about. Note that pitch
+    rotates about −y, not +y.
 
 .. list-table::
    :header-rows: 1
@@ -155,7 +154,7 @@ Objects are oriented with three Euler angles given as ``[yaw, pitch, roll]``:
 
    * - Angle
      - About
-     - Positive sense
+     - Positive direction
      - Typical range
    * - ``yaw``
      - +z
@@ -170,7 +169,7 @@ Objects are oriented with three Euler angles given as ``[yaw, pitch, roll]``:
      - Turns +y toward +z
      - −180°…180°
 
-The composed rotation is
+The combined rotation matrix is
 
 .. math::
 
@@ -178,23 +177,28 @@ The composed rotation is
 
 .. important::
 
-   **Pitch is the odd one out.** Yaw and roll are ordinary right-handed
-   rotations about +z and +x. Pitch is not: a right-handed rotation about +y
-   would turn +x toward *−z*, whereas positive pitch turns +x toward *+z*. That
-   is the aerospace "nose up is positive" convention, and it is why the matrix
-   above carries :math:`R_y(-\text{pitch})` rather than :math:`R_y(\text{pitch})`.
-   Expect a sign flip on pitch when importing orientations from a toolchain
-   that uses the strict right-handed sense.
+   **Positive pitch means nose up.** Yaw and roll are standard right-handed
+   rotations about +z and +x. Pitch is different: a right-handed rotation about
+   +y would turn +x toward −z, but positive pitch turns +x toward +z. This is
+   the aerospace convention, and it is why the matrix uses
+   :math:`R_y(-\text{pitch})`. If you import orientations from a tool that uses
+   a strict right-handed pitch, flip the sign of pitch.
 
-Order of application
-~~~~~~~~~~~~~~~~~~~~
+Order of rotations
+~~~~~~~~~~~~~~~~~~
 
-The three angles are an intrinsic **yaw → pitch → roll** sequence: yaw about
-the global z, then pitch about the *already yawed* y, then roll about the
-*already yawed and pitched* x. Written as a matrix acting on a column vector,
-that same sequence reads right to left — roll reaches the vector first.
+The rotations are applied in the order **yaw, then pitch, then roll**, each
+about the object's own (already rotated) axes:
 
-Either way the order is not negotiable, because rotations do not commute:
+1. yaw about z,
+2. pitch about the new y axis,
+3. roll about the new x axis.
+
+In the matrix above, which acts on a column vector, the same sequence reads
+right to left.
+
+The order matters because rotations do not commute. Swapping the order gives a
+different result:
 
 .. code-block:: python
 
@@ -210,43 +214,41 @@ Either way the order is not negotiable, because rotations do not commute:
    # roll first, then yaw, about the fixed global axes: same answer
    rotate([90, 0, 0], rotate([0, 0, 90], [0, 1, 0]))    # -> [0, 0, 1]
 
-   # yaw first, then roll: a different direction entirely
+   # yaw first, then roll: a different direction
    rotate([0, 0, 90], rotate([90, 0, 0], [0, 1, 0]))    # -> [-1, 0, 0]
 
-Pointing the boresight
-~~~~~~~~~~~~~~~~~~~~~~
+Pointing a radar
+~~~~~~~~~~~~~~~~
 
-One consequence is worth having to hand. Roll turns about the body's own x
-axis, which *is* the boresight, so it never moves it. Yaw and pitch are then
-exactly the azimuth and elevation of the resulting boresight direction:
+Roll rotates about the object's own x axis, which is the boresight, so roll
+never changes where the radar points. Yaw and pitch are therefore exactly the
+azimuth and elevation of the boresight:
 
 .. code-block:: python
 
    rotation = [azimuth, elevation, roll]
 
-To aim a radar at 30° azimuth and 20° below the horizon, set
-``rotation=[30, -20, 0]``; the third angle is free to spin the antenna pattern
-about the beam without changing where it points.
+For example, to point a radar at 30° azimuth and 20° below the horizon, use
+``rotation=[30, -20, 0]``. Roll only spins the antenna pattern around the beam.
 
 Origin
 ~~~~~~
 
-- ``origin`` (m) is the point that rotation and translation act about.
-- A radar's origin is always ``[0, 0, 0]`` — position it with ``location``
-  instead.
-- Targets may set an arbitrary ``origin``, which is what lets a mesh rotate
-  about a hinge, an axle or its own centre of mass rather than about the model
-  file's zero.
+- ``origin`` (m) is the point that the object rotates about.
+- A radar's origin is always ``[0, 0, 0]``. Use ``location`` to place the
+  radar.
+- A target can set its own ``origin``. This lets a mesh rotate about a hinge,
+  an axle or its centre of mass, instead of the zero point of the model file.
 
 
 Notes
 -----
 
-- Angles are degrees and distances metres everywhere, including motion rates
-  (°/s and m/s).
-- Right-handedness holds throughout; ``pitch`` is a sign convention on top of
-  it, not a departure from it.
-- glTF assets arrive Y-up and are converted on import — see
+- All angles are in degrees and all distances in metres. This includes rates:
+  angular rates are in °/s and velocities in m/s.
+- The frame is always right-handed. The pitch sign is a convention for the
+  pitch angle only.
+- glTF models use a y-up frame and are converted to z-up when loaded. See
   :doc:`animated_targets`.
 
 

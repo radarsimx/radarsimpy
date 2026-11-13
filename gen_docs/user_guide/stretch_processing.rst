@@ -1,19 +1,22 @@
 Long-Range Stretch Processing
 =============================
 
-FMCW and stretch radars recover range by mixing the received echo against a
-reference chirp, producing a beat tone proportional to the delay difference.
-By default RadarSimPy deramps against a **zero-delay reference**: the beat
-frequency is :math:`k \tau`, where :math:`k` is the chirp slope and
-:math:`\tau = 2R/c` the full round-trip delay.
+An FMCW or stretch radar measures range by mixing the received echo with a
+reference chirp. The result is a *beat* tone whose frequency is proportional to
+the delay between the echo and the reference.
 
-That is fine at short range, but it breaks down long before the ranges real
-long-range radars operate at.
+By default, RadarSimPy uses a reference with **zero delay**. The beat frequency
+is then :math:`k \tau`, where :math:`k` is the chirp slope and
+:math:`\tau = 2R/c` is the round-trip delay to the target.
+
+This works at short range. At long range, the beat frequency becomes far too
+high to sample. This page shows how to fix that with a range gate.
+
 
 Why a Range Gate Is Needed
 --------------------------
 
-Consider an X-band stretch radar imaging ships at 60 nautical miles:
+Take an X-band stretch radar looking at ships 60 nautical miles away:
 
 .. list-table::
    :header-rows: 1
@@ -29,9 +32,9 @@ Consider an X-band stretch radar imaging ships at 60 nautical miles:
      - 50 µs
    * - Chirp slope :math:`k = B/T`
      - 6 × 10\ :sup:`12` Hz/s
-   * - IF/ADC rate :math:`f_s` (complex)
+   * - ADC rate :math:`f_s` (complex)
      - 40 MHz
-   * - Max un-gated range :math:`f_s c / 2k`
+   * - Max range without a gate, :math:`f_s c / 2k`
      - 999 m
    * - Target range :math:`R`
      - 111.12 km
@@ -40,20 +43,21 @@ Consider an X-band stretch radar imaging ships at 60 nautical miles:
    * - Beat frequency :math:`k \tau`
      - **4.45 GHz**
 
-The beat tone is over 200 times the Nyquist limit of ±20 MHz. The target
-aliases into an essentially arbitrary range bin and is unrecoverable. Note also
-that :math:`\tau` is nearly 15 chirp lengths, so the echo arrives long after the
-chirp that produced it has ended.
+The beat frequency is more than 200 times higher than the ±20 MHz the ADC can
+sample. The target aliases into a meaningless range bin and is lost. Also,
+:math:`\tau` is almost 15 chirp lengths, so the echo arrives long after its
+chirp has ended.
 
-Real long-range stretch radars avoid this by mixing against a reference chirp
-delayed to a **range gate**, so the beat depends only on the target's offset
-from the gate rather than on its absolute range.
+Real long-range stretch radars solve this by delaying the reference chirp to a
+**range gate**. The beat frequency then depends only on how far the target is
+from the gate, not on its total range.
+
 
 Using ``gate_delay``
 --------------------
 
-Set :code:`Receiver(gate_delay=...)` to the two-way delay of the range you want
-to gate on:
+Set ``Receiver(gate_delay=...)`` to the round-trip delay of the range you want
+to look at:
 
 .. code-block:: python
 
@@ -80,32 +84,34 @@ to gate on:
 
    radar = Radar(transmitter=tx, receiver=rx)
 
-The receive window now opens at the gate and the deramp reference is the
-transmit chirp delayed by the same amount. A target at exactly ``gate_range``
-beats at DC; a target offset by :math:`\Delta R` beats at
+Now the receive window opens at the gate, and the reference is the transmitted
+chirp delayed by the same amount. A target exactly at ``gate_range`` gives a
+beat frequency of zero. A target :math:`\Delta R` away from the gate gives
 :math:`2 k \Delta R / c`.
 
 .. note::
 
-   ``gate_delay`` defaults to ``0``, which reproduces the zero-delay behavior
-   exactly. Existing simulations are unaffected.
+   ``gate_delay`` defaults to ``0``, which gives exactly the zero-delay
+   behaviour. Existing simulations are not affected.
+
 
 Swath and Resolution
 --------------------
 
-The gate does not change resolution, only where the usable window sits:
+The gate does not change the range resolution. It only moves the range window
+you can see (the *swath*):
 
 .. math::
 
-   \text{swath about the gate} = \pm \frac{f_s c}{4 k}
+   \text{swath around the gate} = \pm \frac{f_s c}{4 k}
    \qquad
    \text{range resolution} = \frac{c}{2B}
 
-For the configuration above that is a **±500 m** swath at **0.5 m** resolution,
-i.e. 2000 range bins — exactly ``pulse_length * fs``, the number of samples per
-pulse. A 200–300 m ship fits comfortably inside one gate.
+For the example above, the swath is **±500 m** at **0.5 m** resolution. That is
+2000 range bins, which equals ``pulse_length * fs``, the number of samples per
+pulse. A 200–300 m ship fits easily in one gate.
 
-Both are available from the radar object:
+The radar object reports these values:
 
 .. code-block:: python
 
@@ -116,16 +122,18 @@ Both are available from the radar object:
 
 .. note::
 
-   Where the window sits depends on whether a gate is configured. Un-gated,
-   every target has a positive round-trip delay, so all beat tones are positive
-   and the whole ``[0, fs)`` band is usable — the window is ``[0, span]``. Once
-   a gate makes the residual delay signed, the usable band becomes
-   ``(-fs/2, +fs/2)`` and the window straddles the gate at ``+/- span/2``.
+   The window's position depends on whether a gate is set. **Without a gate**,
+   every target has a positive delay, so all beat frequencies are positive.
+   The usable band is ``[0, fs)`` and the window is ``[0, span]``. **With a
+   gate**, targets can be before or after the gate, so beat frequencies can be
+   negative. The usable band is ``(-fs/2, +fs/2)`` and the window extends
+   ``span/2`` on each side of the gate.
 
-Converting Beat Bins to Range
------------------------------
 
-Range is measured relative to the gate:
+Converting Beat Frequency to Range
+----------------------------------
+
+Range is measured from the gate:
 
 .. math::
 
@@ -140,14 +148,15 @@ Range is measured relative to the gate:
    freqs = np.fft.fftfreq(profile.size, d=1 / rx.bb_prop["fs"])
    ranges = radar.receiver.gate_range + freqs * const.c / (2 * radar.chirp_slope)
 
-Negative beat frequencies correspond to targets **inside** the gate, so with
-complex baseband the swath is two-sided about the gate.
+Negative beat frequencies are targets **closer** than the gate. With a complex
+baseband, the swath therefore covers both sides of the gate.
+
 
 Covering More Than One Swath
 ----------------------------
 
-A single simulation has a single gate. To cover a wider area, run the
-simulation once per gate and stitch the results:
+Each simulation has one gate. To cover a larger area, run one simulation per
+gate and combine the results:
 
 .. code-block:: python
 
@@ -155,45 +164,50 @@ simulation once per gate and stitch the results:
        rx = Receiver(..., gate_delay=2 * gate_range / const.c)
        ...
 
-Targets outside the swath alias exactly as they would without a gate. Sizing
-the gate is up to you; the simulator does not check target ranges against the
-window, since the beat-frequency relationship only applies to deramp processing
-of a linear FM waveform and not to the pulsed, CW, or arbitrary-waveform
-configurations RadarSimPy also supports.
+Targets outside the swath alias, just as they would without a gate. Choosing
+the gate is up to you. The simulator does not check whether targets fall inside
+the window, because the beat-frequency relationship only applies to a linear
+FM chirp, not to the pulsed, CW or arbitrary waveforms RadarSimPy also
+supports.
+
 
 Effect on Phase Noise
 ---------------------
 
-Transmitter phase noise partially cancels in a coherent radar because the
-reference and the echo are drawn from the same oscillator a short time apart —
-the *range correlation* effect. With a gate, the two are separated by the
-residual delay :math:`\tau - \text{gate\_delay}` rather than by the full round
-trip, which is the correct model for a digitally generated delayed reference
-(the usual long-range stretch architecture).
+In a coherent radar, the reference and the echo come from the same oscillator,
+so transmitter phase noise partly cancels. This is the *range correlation*
+effect (see :doc:`noise`). With a gate, the reference and the echo are
+separated by the remaining delay :math:`\tau - \text{gate\_delay}` instead of
+the full round trip. This is the correct model for a radar that generates the
+delayed reference digitally, which is the usual design for long-range stretch
+radars.
 
 .. important::
 
-   Phase-noise results at long range are only meaningful with a gate
-   configured. Without one, the reference and echo are separated by the full
-   round-trip delay and the phase-noise lookup wraps, so close-in phase noise
-   does not cancel as it would in real hardware.
+   Phase noise results at long range are only meaningful with a gate. Without
+   one, the reference and the echo are separated by the full round-trip delay,
+   and the close-in phase noise does not cancel the way it would in real
+   hardware.
+
 
 Limitations
 -----------
 
 .. note::
 
-   The echo of a gated return physically belongs to the chirp transmitted
+   With a gate, an echo actually comes from a chirp sent
    :math:`\text{round}(\text{gate\_delay} / \text{prp})` pulses earlier.
-   Per-pulse ``f_offset`` and ``pulse_amp`` / ``pulse_phs`` are applied using
-   the current pulse index, so frequency-hopped or phase-coded pulse trains are
-   not modeled exactly at long gate delays. Identical chirps — the common FMCW
-   case — are unaffected.
+   RadarSimPy applies per-pulse ``f_offset``, ``pulse_amp`` and ``pulse_phs``
+   using the *current* pulse index. So frequency-hopped or phase-coded pulse
+   trains are not modelled exactly at long gate delays. Identical chirps — the
+   usual FMCW case — are not affected.
 
-Near the edges of the window the reference and echo chirps only partially
-overlap. The simulator extrapolates the chirp there, modeling an ideal infinite
-chirp, which keeps the full window usable. Real hardware would see reduced
-correlation gain over roughly :math:`|\Delta \tau| f_s` samples.
+Near the edges of the window, the reference chirp and the echo chirp only
+partly overlap. The simulator extends the chirp there, as if it were
+infinitely long, which keeps the whole window usable. Real hardware would have
+less correlation gain over about :math:`|\Delta \tau| f_s` samples at the
+edges.
+
 
 See Also
 --------

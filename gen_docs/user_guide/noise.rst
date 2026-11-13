@@ -1,73 +1,67 @@
 Noise Simulation
 ================
 
-RadarSimPy models two distinct noise sources that affect radar signal quality:
-**receiver thermal noise**, introduced at the receiver front-end, and
-**transmitter phase noise**, arising from oscillator imperfections in the
-transmitter. Both are described in the sections below.
+RadarSimPy simulates two kinds of noise:
+
+* **receiver thermal noise**, added in the receiver front end,
+* **transmitter phase noise**, caused by an imperfect oscillator.
+
+This page explains how each is generated and what that means for your signal
+processing.
+
 
 Receiver Thermal Noise
 ----------------------
 
-RadarSimPy simulates thermal noise at the receiver. This section describes the
-statistical properties of the generated noise and how it behaves in
-single-channel and MIMO radar configurations.
+``sim_radar`` returns thermal noise in ``result["noise"]``, separate from the
+target signal in ``result["baseband"]``. Its level is set by the receiver
+settings (see :doc:`receiver`).
 
 Noise Properties
 ~~~~~~~~~~~~~~~~
 
-The receiver noise has the following properties:
+The thermal noise is:
 
-* **Gaussian white noise** — zero-mean, with standard deviation determined by
-  the receiver noise parameters (noise figure, gains, bandwidth, and load
-  resistance).
-* **Independent across frames** — each frame receives a fresh, independent
-  noise realization.
-* **Independent across Rx channels** — different physical Rx channels have
-  statistically independent noise.
-* **Deterministic given a seed** — when a random seed is provided, the noise
-  is fully reproducible.
+* **Gaussian and white**, with zero mean. Its standard deviation comes from
+  the noise figure, gains, bandwidth and load resistance.
+* **Independent between frames.** Each frame gets new noise.
+* **Independent between physical receive channels.**
+* **Reproducible.** With the same random seed, you get exactly the same noise.
 
 Complex vs. Real Baseband
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* **Complex baseband** (``bb_type="complex"``): noise has both real and
-  imaginary components. Each component is an independent Gaussian with
-  standard deviation :math:`\sigma / \sqrt{2}`, so the total RMS amplitude
-  equals :math:`\sigma`.
-* **Real baseband** (``bb_type="real"``): noise is purely real with standard
+* **Complex baseband** (``bb_type="complex"``): the real and imaginary parts
+  are independent Gaussian noise, each with standard deviation
+  :math:`\sigma / \sqrt{2}`. The total RMS amplitude is :math:`\sigma`.
+* **Real baseband** (``bb_type="real"``): the noise is real, with standard
   deviation :math:`\sigma`.
 
 Same Timestamp, Same Rx → Same Noise
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-A key property of the noise simulation is:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. important::
 
-   If two output samples belong to the **same physical Rx channel** and
-   correspond to the **same timestamp**, they receive **exactly identical**
-   noise values — regardless of how many virtual channels share that
-   combination.
+   Two output samples get **exactly the same** noise value if they come from
+   the **same physical Rx channel** at the **same timestamp**. This is true no
+   matter how many virtual channels share that receiver.
 
-The noise value for each sample is a deterministic function of three
-identifiers:
+The noise value of each sample depends only on three things:
 
-1. **Frame index** — which frame the sample belongs to.
-2. **Physical Rx channel** — determined by ``rx_ch = ch_idx % rx_size``.
-3. **Absolute sample index** — the sample's position on the discrete time grid
-   (timestamp offset from the minimum, quantized by the sampling rate).
+1. **Frame index** — which frame the sample is in.
+2. **Physical Rx channel** — ``rx_ch = ch_idx % rx_size``.
+3. **Absolute sample index** — the sample's position on the time grid (its
+   timestamp relative to the earliest one, divided into steps of
+   :math:`1/f_s`).
 
-Because the function is deterministic, any two samples with the same
-``(frame_idx, rx_ch, absolute_sample_index)`` tuple always produce the same
-noise value. No lookup table or shared buffer is required.
+Samples with the same ``(frame_idx, rx_ch, absolute_sample_index)`` always get
+the same noise value.
 
 Noise in MIMO Configurations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In a MIMO radar with :math:`M` Tx and :math:`N` Rx channels, the simulator
-produces :math:`M \times N` virtual channels per frame. The virtual channels
-are ordered as:
+With :math:`M` Tx and :math:`N` Rx channels, each frame has
+:math:`M \times N` virtual channels, in this order:
 
 .. code-block:: text
 
@@ -80,18 +74,18 @@ are ordered as:
    ...
    ch[M*N - 1]   = Tx(M-1) → Rx(N-1)
 
-Each virtual channel maps to a physical Rx channel via:
+The physical Rx channel of virtual channel ``ch_idx`` is:
 
 .. math::
 
    \text{rx\_ch} = \text{ch\_idx} \mod N
 
-Virtual Channel Grouping
-^^^^^^^^^^^^^^^^^^^^^^^^
+Which channels share noise
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-All virtual channels that share the **same physical Rx** and have the **same
-transmit timing** (i.e., identical timestamps) will contain identical noise.
-For example, with 2 Tx and 2 Rx:
+Virtual channels that use the **same physical Rx** and have the **same
+transmit timing** (identical timestamps) contain identical noise. For example,
+with 2 Tx and 2 Rx:
 
 .. code-block:: text
 
@@ -101,53 +95,49 @@ For example, with 2 Tx and 2 Rx:
    ch[1] = Tx0 → Rx1    ─┐
    ch[3] = Tx1 → Rx1    ─┘  Same Rx1, same timing → identical noise
 
-This matches the physical reality: the noise originates at the receiver
-front-end, so all signal paths through the same Rx channel at the same time
-experience the same thermal noise.
+This matches real hardware: thermal noise is generated in the receiver, so all
+signals passing through the same receiver at the same time see the same noise.
 
 .. note::
 
-   If the Tx channels have different timing offsets (e.g., TDM-MIMO with
-   staggered pulse timing), each Tx fires at a different time. In that case,
-   even though two virtual channels share the same Rx, they sample the
-   noise at different time indices and thus receive **different** noise
-   values.
+   If the Tx channels transmit at different times (for example, TDM-MIMO with
+   a per-channel delay), two virtual channels on the same Rx sample the noise
+   at different times. Their noise is then **different**.
 
 .. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/noise_rx_streams.svg
     :width: 100%
     :alt: Each physical Rx has one noise stream on the absolute sample grid; a virtual channel reads the window its timestamps select
 
-    Each physical Rx has one noise stream per frame, laid out on the absolute
-    sample grid. A virtual channel reads the stretch of its Rx stream that its
-    own timestamps select. Top: both Tx channels fire together, so ``ch0`` and
-    ``ch2`` read the same Rx0 samples. Bottom: a Tx1 delay moves ``ch2`` and
-    ``ch3`` to later samples, which are independent.
+    Each physical Rx has one noise sequence per frame, on the absolute sample
+    grid. Each virtual channel reads the part of its Rx sequence that matches
+    its timestamps. Top: both Tx channels transmit at the same time, so
+    ``ch0`` and ``ch2`` read the same Rx0 samples. Bottom: a delay on Tx1
+    moves ``ch2`` and ``ch3`` to later samples, which are independent.
 
-Impact on MIMO Signal Processing
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+What this means for MIMO processing
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-When performing MIMO beamforming or angle estimation:
+When you do MIMO beamforming or angle estimation:
 
-* **Noise correlation**: virtual channels sharing the same Rx have fully
+* **The noise is correlated.** Virtual channels that share an Rx have fully
   correlated noise. The noise covariance matrix across virtual channels is
-  **not** a scaled identity — it has block structure reflecting the Rx
-  grouping.
-* **Effective independent noise sources**: only :math:`N` independent noise
-  realizations exist (one per physical Rx), duplicated across the :math:`M`
-  Tx paths that share the same timing.
-* **SNR estimation**: the noise power per virtual channel equals the physical
-  Rx noise power. Averaging across virtual channels that share the same Rx
-  does **not** reduce noise because the samples are identical.
+  **not** a scaled identity matrix; it has a block structure that follows the
+  Rx grouping.
+* **There are only N independent noise sources**, one per physical Rx. Each is
+  repeated in the :math:`M` Tx paths that share its timing.
+* **Averaging does not reduce this noise.** Each virtual channel has the same
+  noise power as its physical Rx. Averaging virtual channels that share an Rx
+  does not lower the noise, because their noise samples are identical.
 
 .. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/noise_mimo_covariance.svg
     :width: 100%
     :alt: Virtual channels sharing an Rx and its timing carry fully correlated noise; staggered Tx timing makes them independent
 
-    The noise covariance of the 2 Tx × 2 Rx example, taken at the same
-    fast-time sample. When both Tx channels fire together, ``ch0``/``ch2``
-    and ``ch1``/``ch3`` are fully correlated, giving the block structure. A
-    Tx delay puts them on different sample indices, and the matrix becomes the
-    identity.
+    Noise covariance for the 2 Tx × 2 Rx example, at one fast-time sample.
+    When both Tx channels transmit together, ``ch0``/``ch2`` and
+    ``ch1``/``ch3`` are fully correlated, which gives the block structure.
+    With a Tx delay they use different sample indices, and the matrix becomes
+    the identity.
 
 Example
 ^^^^^^^
@@ -191,12 +181,11 @@ Example
    # Different Rx channels have independent noise
    assert not np.array_equal(noise[0], noise[1])
 
-Multi-Frame Behavior
-~~~~~~~~~~~~~~~~~~~~
+Multiple Frames
+~~~~~~~~~~~~~~~
 
-When simulating multiple frames, each frame generates an independent noise
-realization. Virtual channels in different frames always have different noise,
-even if they share the same physical Rx channel:
+Each frame gets independent noise. Virtual channels in different frames always
+have different noise, even on the same physical Rx:
 
 .. code-block:: python
 
@@ -204,51 +193,54 @@ even if they share the same physical Rx channel:
    # ch[0] = Frame 0, ch[1] = Frame 1
    assert not np.array_equal(noise[0], noise[1])
 
-This ensures that frame-to-frame processing (e.g., Doppler estimation) sees
-independent noise across slow-time snapshots.
+So processing across frames sees independent noise in each frame.
+
 
 Transmitter Phase Noise
 -----------------------
 
-RadarSimPy models transmitter oscillator phase noise using a VCO-based SSB
-(single-sideband) phase noise model. Phase noise is configured on the
-``Transmitter`` via the ``pn_f`` and ``pn_power`` parameters.
+Phase noise is random jitter in the phase of the transmitter's oscillator.
+You set it on the ``Transmitter`` with ``pn_f`` and ``pn_power``.
 
-Model Overview
-~~~~~~~~~~~~~~
+Model
+~~~~~
 
-If the oscillator output is:
+Write the oscillator output as
 
 .. math::
 
    V(t) = V_0 \cos\bigl(\omega_0 t + \phi(t)\bigr)
 
-then :math:`\phi(t)` is the phase noise process. Under the narrowband
-approximation (valid for any usable system):
+where :math:`\phi(t)` is the phase noise. Phase noise is small, so
+:math:`e^{jx} \approx 1 + jx` applies and
 
 .. math::
 
    V(t) \approx V_0 \bigl[\cos(\omega_0 t) - \sin(\omega_0 t)\,\phi(t)\bigr]
 
-which is equivalent to multiplying the complex baseband signal by
-:math:`e^{-j\phi(t)}`. In other words, :math:`e^{jx} \approx 1 + jx` for
-small :math:`x`.
+This is the same as multiplying the complex baseband signal by
+:math:`e^{-j\phi(t)}`.
 
 Parameters
 ~~~~~~~~~~
 
-Phase noise is specified as a SSB power spectral density profile:
+Phase noise is given as a single-sideband (SSB) power spectral density:
 
-* ``pn_f`` — frequency offsets from the carrier (Hz), non-negative, 1-D array.
-* ``pn_power`` — SSB phase noise power at each offset (dBc/Hz), 1-D array of
-  the same length as ``pn_f``.
+* ``pn_f`` — frequency offsets from the carrier (Hz). A 1-D array of
+  non-negative values.
+* ``pn_power`` — the SSB phase noise at each offset (dBc/Hz). A 1-D array
+  with the same length as ``pn_f``.
 
-The profile is interpolated onto the baseband frequency grid
-:math:`[0,\, f_s/2]`, linearly in log-frequency between points. A 0 dBc/Hz
-point is added at DC, but on a log-frequency axis DC lies arbitrarily far to
-the left. Below the first ``pn_f`` the level therefore stays at the first
-``pn_power``, and the DC bin itself is removed. Above the last ``pn_f`` the
-last ``pn_power`` holds up to :math:`f_s/2`.
+The simulator turns these points into a spectrum on the baseband frequency
+grid, from 0 to :math:`f_s/2`:
+
+* Between the given points, the level is interpolated linearly against
+  log-frequency.
+* Below the first ``pn_f``, the level stays at the first ``pn_power``. The DC
+  bin itself is removed.
+* Above the last ``pn_f``, the level stays at the last ``pn_power`` up to
+  :math:`f_s/2`.
+* Points above :math:`f_s/2` are ignored.
 
 .. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/phase_noise_profile.svg
     :width: 100%
@@ -256,82 +248,73 @@ last ``pn_power`` holds up to :math:`f_s/2`.
 
     ``pn_f = [1e3, 1e4, 1e5, 3e6]``, ``pn_power = [-75, -90, -105, -125]``
     with ``fs = 2e6``. The three points below :math:`f_s/2` are joined by
-    straight lines in log-frequency and held flat at either end. The 3 MHz
-    point lies above :math:`f_s/2`, so it is dropped.
+    straight lines in log-frequency and held constant at both ends. The 3 MHz
+    point is above :math:`f_s/2`, so it is ignored.
 
-Phase Noise Properties
-~~~~~~~~~~~~~~~~~~~~~~
+Properties
+~~~~~~~~~~
 
-**Shared synthesizer across all Tx channels**
-   Phase noise is modelled at the transmitter level, not per channel. All Tx
-   channels in an antenna array share a single synthesizer, so they experience
-   exactly the same phase noise process :math:`\phi(t)`. A single phase noise
-   realization is generated once per frame and applied identically to every Tx
+**All Tx channels share one oscillator.**
+   Phase noise is modelled for the whole transmitter, not per channel. One
+   phase noise sequence is generated per frame and applied to every Tx
    channel.
 
-**Independent across frames**
-   Each frame receives a fresh, statistically independent phase noise
-   realization. When a deterministic ``seed`` is supplied the per-frame seed
-   is derived as :math:`\text{seed} + \text{frame\_idx}`, guaranteeing
-   reproducibility while keeping frames uncorrelated.
+**Independent between frames.**
+   Each frame gets a new phase noise sequence. With a ``seed``, frame ``i``
+   uses :math:`\text{seed} + i`, so the result is reproducible and the frames
+   are still uncorrelated.
 
-**Deterministic given a seed**
-   Providing the same ``seed`` to ``Radar`` always produces the same phase
-   noise sequence for every frame, enabling reproducible simulations and
-   unit tests.
+**Reproducible.**
+   The same ``seed`` on ``Radar`` always gives the same phase noise.
 
-Impact on Radar Return Signals
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Effect on the Received Signal
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Phase noise modulates the transmitted waveform and therefore appears on every
-received echo. Its effect on the baseband (IF) signal depends on the
-two-way propagation delay :math:`\tau` of the target:
+Phase noise is part of the transmitted signal, so it appears in every echo.
+How much of it remains in the baseband depends on the round-trip delay
+:math:`\tau` of the target:
 
 .. math::
 
    s_{\mathrm{IF}}(t) \propto e^{\,j[\phi(t) - \phi(t-\tau)]}
 
-* **Range correlation effect** — because the same oscillator drives both the
-  transmitter and the receiver LO mixer, the transmitted phase noise
-  :math:`\phi(t)` and the delayed replica :math:`\phi(t-\tau)` are
-  correlated. For short-range targets (:math:`\tau \ll 1/f_{\mathrm{3dB}}`,
-  where :math:`f_{\mathrm{3dB}}` is the corner frequency of the phase noise
-  spectrum) the two terms nearly cancel and the residual IF phase noise is
-  small.
-
-* **Long-range degradation** — as :math:`\tau` increases the correlation
-  decreases and the residual phase noise grows, raising the noise floor and
-  degrading the signal-to-noise ratio for distant targets.
+* **Nearby targets: phase noise cancels.** The receiver mixes the echo with
+  the same oscillator, so :math:`\phi(t)` and the delayed :math:`\phi(t-\tau)`
+  are correlated. For short delays (:math:`\tau \ll 1/f_{\mathrm{3dB}}`, where
+  :math:`f_{\mathrm{3dB}}` is the corner frequency of the phase noise
+  spectrum) the two terms almost cancel. This is called the *range
+  correlation effect*.
+* **Distant targets: phase noise grows.** As :math:`\tau` increases, the two
+  terms are less correlated. More phase noise remains, which raises the noise
+  floor and lowers the SNR of distant targets.
 
 .. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/phase_noise_range_correlation.svg
     :width: 100%
     :alt: Range correlation: the residual phase noise in the baseband grows with the delay between the echo and the reference
 
-    The residual phase noise is the transmitted profile scaled by
-    :math:`4\sin^2(\pi f \Delta)`. Here :math:`\Delta` is the delay between
-    the echo and the reference: the round trip :math:`\tau`, or
-    :math:`\tau` minus ``gate_delay`` when a range gate is set. The profile is
-    the one from the example below. At 1 kHz offset the close-in noise is
-    suppressed by about 40 dB at 300 m, but only about 20 dB at 3 km. The
-    longer delay also stops cancelling at a lower offset, above which the
-    response becomes a comb of nulls spaced :math:`1/\Delta` apart.
+    The remaining phase noise equals the transmitted profile multiplied by
+    :math:`4\sin^2(\pi f \Delta)`. :math:`\Delta` is the delay between the
+    echo and the mixer reference: the round trip :math:`\tau`, or :math:`\tau`
+    minus ``gate_delay`` when a range gate is set. The profile is the one from
+    the example below. At 1 kHz offset, the noise is reduced by about 40 dB at
+    300 m but only about 20 dB at 3 km. At larger offsets the cancellation
+    stops, and the response becomes a series of nulls spaced :math:`1/\Delta`
+    apart.
 
-* **Doppler smearing** — rapid phase fluctuations spread target energy across
-  adjacent Doppler bins, raising the integrated sidelobe level in the
-  Doppler dimension.
+* **Doppler spreading.** Fast phase changes spread a target's energy into
+  neighbouring Doppler bins, which raises the sidelobes in the Doppler
+  dimension.
+* **No differences between Tx channels.** All Tx channels share the same
+  phase noise, so it is identical in every virtual channel. The cancellation
+  for nearby targets applies equally to all virtual channels, and phase noise
+  causes no channel-to-channel errors.
 
-* **MIMO impact** — because all Tx channels share the same phase noise, the
-  perturbation is common-mode across virtual channels. Range-correlation
-  suppression therefore holds uniformly for all virtual channels observing
-  the same target, and the phase noise does not introduce differential errors
-  between Tx channels.
-
-Constraints and Validation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Rules
+~~~~~
 
 * ``pn_f`` and ``pn_power`` must have the same length.
 * All values in ``pn_f`` must be non-negative.
-* Both arrays must be provided together; specifying only one raises an error.
+* Set both arrays or neither; setting only one raises an error.
 * Frequency offsets above :math:`f_s/2` are ignored.
 
 Example
@@ -362,6 +345,7 @@ Example
        channels=[{"location": (0, 0, 0)}],
    )
    radar = Radar(transmitter=tx, receiver=rx, seed=0)
+
 
 See Also
 --------

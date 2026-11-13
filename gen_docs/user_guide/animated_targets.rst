@@ -1,18 +1,28 @@
 Animated Targets (glTF 2.0 / GLB)
 ==================================
 
-A target's motion is normally written by hand as ``speed`` and ``rotation_rate``
-in its target dictionary. That works for a rigid body moving at a constant
-velocity and a constant rate, but many 3D assets already carry their motion
-inside the file: a drone with spinning rotors, a wind turbine, a car with
-turning wheels, or any object following a keyframed path.
+Normally you describe a target's motion yourself, with ``speed`` and
+``rotation_rate`` in its target dictionary. That works for a rigid object
+moving at constant velocity and turning at a constant rate. Many 3D models,
+however, already contain their own animation: a drone with spinning rotors, a
+wind turbine, a car with turning wheels, or an object following a keyframed
+path.
 
-:mod:`radarsimpy.animation_kit` reads that motion from a **glTF 2.0 / GLB**
-model and turns it into ordinary target dictionaries, so nothing else about
-your simulation changes.
+:mod:`radarsimpy.animation_kit` reads this animation from a **glTF 2.0 / GLB**
+file and converts it into ordinary target dictionaries. The rest of your
+simulation stays the same.
 
-Quick start
+
+Quick Start
 -----------
+
+Install the optional glTF parser first:
+
+.. code-block:: bash
+
+    pip install pygltflib
+
+Then load the model:
 
 .. code-block:: python
 
@@ -31,74 +41,71 @@ Quick start
 
     data = sim_radar(radar, targets)
 
-``load_animated_targets`` returns a plain ``list`` of target dictionaries. You
-can inspect them, edit them, or mix them with hand-written targets before
-passing them to :func:`radarsimpy.sim_radar`.
+``load_animated_targets`` returns a normal ``list`` of target dictionaries. You
+can inspect or edit them, or combine them with targets you wrote by hand,
+before passing them to :func:`radarsimpy.sim_radar`.
 
-Install the optional parser first:
 
-.. code-block:: bash
+How the Model Becomes Targets
+-----------------------------
 
-    pip install pygltflib
-
-How the mapping works
----------------------
-
-**One target per animated node.** Every glTF node that an animation channel
-targets becomes its own RadarSimPy target. Geometry beneath a node is grouped
-into the nearest animated ancestor, so each target moves as one rigid body.
-Meshes with no animated ancestor are merged into a single static target
-(``merge_static=False`` keeps them separate).
+**Each animated node becomes one target.** In glTF, a *node* is an object in
+the scene tree, and an animation moves nodes. Every animated node becomes its
+own RadarSimPy target. Any mesh under a node is assigned to the closest
+animated node above it, so each target moves as one rigid body. Meshes with no
+animated node above them are merged into one static target. Pass
+``merge_static=False`` to keep them separate.
 
 .. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/gltf_node_mapping.svg
     :width: 100%
     :alt: Each animated glTF node becomes one target holding its own mesh and every static mesh beneath it
 
-    A drone with two animated rotor nodes. Each rotor takes its own hub and
-    the blades beneath it, because it is their nearest animated ancestor. The
-    body, gimbal and camera have no animated ancestor, so they merge into one
-    static target. Animated parts come first in the returned list.
+    A drone with two animated rotor nodes. Each rotor target includes its hub
+    and the blades below it. The body, gimbal and camera have no animated node
+    above them, so they are merged into one static target. Animated parts come
+    first in the returned list.
 
-**Motion is sampled at the radar's own timestamps.** The node's world pose is
-evaluated at every entry of ``radar.time_prop["timestamp"]`` and emitted as
-time-varying ``location`` and ``rotation`` arrays, exactly the form the
-simulator already accepts for hand-written motion.
+**Motion is sampled at the radar's timestamps.** The pose of each node is
+calculated at every value in ``radar.time_prop["timestamp"]`` and returned as
+time-varying ``location`` and ``rotation`` arrays. This is the same format the
+simulator accepts for motion you write by hand.
 
-**Velocity is analytic, not differenced.** ``speed`` and ``rotation_rate`` are
-taken from the derivative of the keyframe interpolation itself. RadarSimCpp
-derives hit-point velocity from those two keys rather than from successive
-positions, so getting them right is what makes the Doppler correct.
+**Velocities are exact, not estimated from differences.** ``speed`` and
+``rotation_rate`` are calculated from the derivative of the keyframe
+interpolation. The simulator uses these two values (not the change in
+position between samples) to compute the velocity at each hit point, so they
+are what makes the Doppler correct.
 
 .. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/gltf_analytic_rates.svg
     :width: 100%
     :alt: Rates are the slope of the keyframe interpolation at each radar timestamp; differencing the wrapped angles would spike
 
-    Left: radar timestamps arrive in short bursts, one per pulse. At each one,
-    the emitted rate is the slope of the curve through the keyframes, whatever
-    the gap to the next sample. Right: a spinning rotor's ``rotation`` is
-    emitted wrapped to ±180°. Differencing it would put a spurious
-    −360°/Δt spike in ``rotation_rate`` at every wrap. The analytic rate stays
-    constant.
+    Left: radar timestamps come in short bursts, one per pulse. At each
+    timestamp, the rate is the slope of the keyframe curve, regardless of the
+    gap to the next sample. Right: a spinning rotor's ``rotation`` is wrapped
+    to ±180°. Taking differences would create a false −360°/Δt spike in
+    ``rotation_rate`` at every wrap. The exact rate stays constant.
 
-**Frames are converted.** glTF is Y-up; RadarSimPy is Z-up (see
-:doc:`coordinate_systems`). Geometry, poses and rates are rotated accordingly. Pass
-``up_axis="z"`` for an asset already exported Z-up.
+**Axes are converted.** glTF uses y as the up axis; RadarSimPy uses z (see
+:doc:`coordinate_systems`). Geometry, poses and rates are rotated to match. If
+your model was already exported with z up, pass ``up_axis="z"``.
 
 .. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/gltf_up_axis.svg
     :width: 100%
     :alt: A Y-up glTF model read directly in the Z-up frame lies on its side; a +90 degree turn about x stands it upright
 
-    A wind turbine authored Y-up, drawn in RadarSimPy's axes. Read as-is, its
-    tower lies along +y. The default ``up_axis="y"`` applies a +90° turn about
-    x, which stands the tower on +z and points the glTF +z forward axis
-    along −y.
+    A wind turbine created with y up, shown in RadarSimPy's axes. Without
+    conversion, its tower lies along +y. The default ``up_axis="y"`` rotates
+    it +90° about x, so the tower points along +z and the glTF forward axis
+    (+z) points along −y.
 
-Placing and driving the whole model
------------------------------------
 
-The ``location``, ``rotation``, ``speed`` and ``rotation_rate`` arguments place
-and drive the complete model on top of its internal animation. A drone flying
-past while its rotors spin is:
+Moving the Whole Model
+----------------------
+
+``location``, ``rotation``, ``speed`` and ``rotation_rate`` place and move the
+whole model. This motion is added on top of the model's own animation. For
+example, a drone flying past with its rotors spinning:
 
 .. code-block:: python
 
@@ -109,7 +116,8 @@ past while its rotors spin is:
         speed=(0, 12, 0),
     )
 
-Controlling playback
+
+Controlling Playback
 --------------------
 
 .. code-block:: python
@@ -122,36 +130,38 @@ Controlling playback
         loop=True,               # wrap when the simulation outlasts the clip
     )
 
-With ``loop=False`` the first and last poses are held instead, and the rates go
-to zero outside the clip.
+With ``loop=False``, the model holds its first pose before the clip and its
+last pose after it, and its rates are zero outside the clip.
 
 .. figure:: https://raw.githubusercontent.com/radarsimx/radarsimpy/master/assets/gltf_playback.svg
     :width: 100%
     :alt: Simulation time maps to animation time through time_offset and time_scale; loop wraps past the end of the clip, otherwise the last pose is held
 
-    Simulation time ``t`` maps to animation time as
-    ``time_offset + time_scale × t`` (dashed). With ``loop=True`` that value
-    wraps back to the start of the clip each time it passes the end. With
-    ``loop=False`` the last pose is held, and ``speed`` and ``rotation_rate``
+    Simulation time ``t`` becomes animation time
+    ``time_offset + time_scale × t`` (dashed line). With ``loop=True``, the
+    animation restarts each time it reaches the end of the clip. With
+    ``loop=False``, the last pose is held and ``speed`` and ``rotation_rate``
     are zero from then on.
 
-Static snapshots for RCS and lidar
------------------------------------
+
+Static Snapshots for RCS and LiDAR
+----------------------------------
 
 :func:`radarsimpy.sim_rcs` and :func:`radarsimpy.sim_lidar` do not accept
-time-varying motion. Ask for a single instant instead, which returns targets
-with ordinary scalar motion:
+time-varying motion. Instead, request a single moment with ``at_time``. This
+returns targets with ordinary, constant values:
 
 .. code-block:: python
 
     targets = load_animated_targets("turbine.glb", at_time=0.25)
     rcs = sim_rcs(targets, f=77e9, inc_phi=0, inc_theta=90)
 
-Inspecting the parts
+
+Inspecting the Parts
 --------------------
 
-:func:`radarsimpy.animation_kit.load_animated_model` exposes the split without
-sampling anything, which is useful for checking how a model decomposes:
+:func:`radarsimpy.animation_kit.load_animated_model` shows how a model is
+split into parts, without sampling any motion:
 
 .. code-block:: python
 
@@ -160,12 +170,12 @@ sampling anything, which is useful for checking how a model decomposes:
     for part in model["parts"]:
         print(part["name"], part["animated"], len(part["cells"]), "faces")
 
-Animated targets also work with
-:func:`radarsimpy.mesh_kit.get_target_mesh` and
-:func:`radarsimpy.get_scene_state`, so you can plot the transformed geometry at
-any query time.
+Animated targets also work with :func:`radarsimpy.mesh_kit.get_target_mesh`
+and :func:`radarsimpy.get_scene_state`, so you can plot the moved geometry at
+any time.
 
-What is supported
+
+What Is Supported
 -----------------
 
 .. list-table::
@@ -183,7 +193,7 @@ What is supported
    * - Nested node hierarchies
      - Supported
    * - Uniform, constant scale
-     - Supported (baked into the geometry)
+     - Supported (applied to the geometry when loading)
    * - Skinning (``skins``, ``JOINTS_0`` / ``WEIGHTS_0``)
      - Not supported
    * - Morph targets (``weights`` animation)
@@ -195,27 +205,30 @@ What is supported
    * - Non-triangle primitives
      - Not supported
 
-The unsupported cases all move individual vertices, while the ray tracer
-transforms each target rigidly. They raise a descriptive
-``NotImplementedError`` rather than producing a silently wrong result. To
-simulate a deforming object such as a walking pedestrian, split it into rigid
-parts and animate their nodes instead.
+All unsupported features move individual vertices, but the ray tracer can only
+move each target as a rigid body. These features raise a
+``NotImplementedError`` with an explanation, instead of giving a wrong result
+without warning. To simulate a deforming object, such as a walking person,
+split it into rigid parts and animate their nodes.
 
-Limitations to keep in mind
----------------------------
 
-**Memory.** Each animated part allocates twelve ``float32`` arrays the size of
-``radar.time_prop["timestamp"]``. For a 4-channel, 256-pulse, 512-sample record
-that is roughly 25 MB per part, so a twenty-part model approaches 500 MB. This
-is inherent to the time-varying motion path, whose arrays must match the
-baseband time matrix. Merge parts that do not move independently to reduce it.
+Limitations
+-----------
 
-**Gimbal lock.** Poses are emitted as ``[yaw, pitch, roll]``. At a pitch of
-±90° the yaw and roll split becomes ambiguous, and a warning is issued. Avoid
-authoring motion that passes exactly through the pole.
+**Memory.** Each animated part needs twelve ``float32`` arrays the size of
+``radar.time_prop["timestamp"]``. For 4 channels, 256 pulses and 512 samples,
+that is about 25 MB per part, so a model with twenty parts needs about 500 MB.
+This is required for time-varying motion, because the arrays must match the
+baseband's time grid. To reduce memory, merge parts that do not move
+independently.
 
-**Trial-version mesh limit.** The face-count cap applies per target, and each
-animated part is its own target.
+**Gimbal lock.** Poses are returned as ``[yaw, pitch, roll]``. At a pitch of
+exactly ±90°, yaw and roll cannot be told apart, and a warning is shown. Avoid
+animations that pass exactly through this angle.
+
+**Free tier mesh limit.** The face-count limit applies to each target
+separately, and each animated part is a separate target.
+
 
 See Also
 --------
