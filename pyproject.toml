@@ -21,7 +21,7 @@ name = "radarsimpy"
 dynamic = ["version"]
 description = "A Python-based Radar Simulator"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 authors = [{ name = "RadarSimX", email = "info@radarsimx.com" }]
 keywords = ["radar", "simulation", "signal-processing", "python", "cython"]
 classifiers = [
@@ -30,7 +30,6 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -85,3 +84,8 @@ dev = [
 
 [tool.uv]
 package = false
+# Resolve the lockfile for Python >= 3.11.5 only. Some dev tools' patched
+# releases (e.g. soupsieve >= 4.0, pulled in by the docs theme) need 3.11.5+,
+# and without this uv would keep a vulnerable fallback for 3.11.0-3.11.4 that
+# Dependabot cannot update. The published package still declares >=3.11.
+environments = ["python_full_version >= '3.11.5'"]

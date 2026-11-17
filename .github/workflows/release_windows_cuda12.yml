@@ -12,7 +12,7 @@ name: Release on Windows GPU CUDA12
 #   job outputs, so adding/removing a Python version only requires editing that
 #   one step — no other job needs to change.
 # - Windows x64: MSVC compiler, 5 builds (5 Python versions)
-# - Python versions: 3.10, 3.11, 3.12, 3.13, 3.14
+# - Python versions: 3.11, 3.12, 3.13, 3.14
 # - Total builds: 5
 #
 # Features:
@@ -54,7 +54,6 @@ jobs:
         run: |
           cat > matrix.json << 'EOF'
           [
-            { "python-version": "3.10", "arch": "gpu", "artifact_name": "radarsimpy_windows_cuda12_py3.10" },
             { "python-version": "3.11", "arch": "gpu", "artifact_name": "radarsimpy_windows_cuda12_py3.11" },
             { "python-version": "3.12", "arch": "gpu", "artifact_name": "radarsimpy_windows_cuda12_py3.12" },
             { "python-version": "3.13", "arch": "gpu", "artifact_name": "radarsimpy_windows_cuda12_py3.13" },

@@ -15,7 +15,7 @@
 #   - Defined once, as JSON, in the `setup` job's "Define build matrix" step.
 #     The `build` job consumes it via job outputs, so adding/removing a macOS
 #     architecture or Python version only requires editing that one step.
-#   - Python versions: 3.10, 3.11, 3.12, 3.13, 3.14
+#   - Python versions: 3.11, 3.12, 3.13, 3.14
 #   - Platform: MacOS 26 (x64), MacOS 26 (ARM64)
 #   - Compilers: Clang/Clang++
 #   - Architecture: x64, arm64 (CPU-only builds)
@@ -59,12 +59,10 @@ jobs:
         run: |
           cat > matrix.json << 'EOF'
           [
-            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosx64", "python-version": "3.10", "cpp-tests": false },
             { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosx64", "python-version": "3.11", "cpp-tests": false },
             { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosx64", "python-version": "3.12", "cpp-tests": false },
             { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosx64", "python-version": "3.13", "cpp-tests": true },
             { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosx64", "python-version": "3.14", "cpp-tests": false },
-            { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosarm64", "python-version": "3.10", "cpp-tests": false },
             { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosarm64", "python-version": "3.11", "cpp-tests": false },
             { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosarm64", "python-version": "3.12", "cpp-tests": false },
             { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosarm64", "python-version": "3.13", "cpp-tests": true },
