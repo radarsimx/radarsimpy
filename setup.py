@@ -34,7 +34,7 @@ try:
     from setuptools import Extension, find_packages, setup
 except ImportError as e:
     print(f"Error importing required packages: {e}")
-    print("Please install required dependencies: pip install numpy cython setuptools")
+    print("Please install required dependencies: uv sync (or pip install numpy cython setuptools)")
     sys.exit(1)
 
 # Configure logging
@@ -43,10 +43,6 @@ logger = logging.getLogger(__name__)
 
 # Package metadata
 PACKAGE_NAME = "radarsimpy"
-PACKAGE_DESCRIPTION = "A Python-based Radar Simulator"
-PACKAGE_URL = "https://github.com/radarsimx/radarsimpy"
-AUTHOR = "RadarSimX"
-AUTHOR_EMAIL = "info@radarsimx.com"
 
 # Build configuration constants
 VALID_ARCHS = ["cpu", "gpu"]
@@ -327,24 +323,6 @@ def create_extension(name: str, sources: List[str], config: BuildConfig) -> Exte
     )
 
 
-def get_long_description() -> str:
-    """Get long description from README file.
-
-    Reads the README.md file and returns its content as the long description.
-    Falls back to the package description if README.md is not available or readable.
-
-    :return: Long description text for the package
-    :rtype: str
-    """
-    readme_path = Path("README.md")
-    if readme_path.exists():
-        try:
-            return readme_path.read_text(encoding="utf-8")
-        except (OSError, UnicodeDecodeError) as e:
-            logger.warning("Could not read README.md: %s", e)
-    return PACKAGE_DESCRIPTION
-
-
 def main() -> None:
     """Main setup function.
 
@@ -389,58 +367,16 @@ def main() -> None:
         ),
     ]
 
-    # Read package requirements
-    requirements = []
-    requirements_path = Path("requirements.txt")
-    if requirements_path.exists():
-        try:
-            requirements = (
-                requirements_path.read_text(encoding="utf-8").strip().split("\n")
-            )
-            requirements = [req.strip() for req in requirements if req.strip()]
-        except (OSError, UnicodeDecodeError) as e:
-            logger.warning("Could not read requirements.txt: %s", e)
-
-    # Setup configuration
+    # Static metadata and dependencies live in pyproject.toml.
     setup(
-        name=PACKAGE_NAME,
         version=package_version,
-        description=PACKAGE_DESCRIPTION,
-        long_description=get_long_description(),
-        long_description_content_type="text/markdown",
-        author=AUTHOR,
-        author_email=AUTHOR_EMAIL,
-        url=PACKAGE_URL,
         packages=find_packages(),
-        install_requires=requirements,
-        python_requires=">=3.10",
         cmdclass={"build_ext": build_ext},
         ext_modules=cythonize(
             ext_modules,
             annotate=False,
             compiler_directives={"language_level": "3"},
         ),
-        classifiers=[
-            "Development Status :: 5 - Production/Stable",
-            "Intended Audience :: Developers",
-            "Intended Audience :: Science/Research",
-            "Operating System :: OS Independent",
-            "Programming Language :: Python :: 3",
-            "Programming Language :: Python :: 3.10",
-            "Programming Language :: Python :: 3.11",
-            "Programming Language :: Python :: 3.12",
-            "Programming Language :: Python :: 3.13",
-            "Programming Language :: C++",
-            "Programming Language :: Cython",
-            "Topic :: Scientific/Engineering",
-            "Topic :: Software Development :: Libraries :: Python Modules",
-        ],
-        keywords="radar simulation signal-processing python cython",
-        project_urls={
-            "Bug Reports": f"{PACKAGE_URL}/issues",
-            "Source": PACKAGE_URL,
-            "Documentation": "https://radarsimx.github.io/radarsimpy/",
-        },
     )
 
 

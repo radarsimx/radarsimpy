@@ -59,9 +59,9 @@ radarsimpy/
 ├── CHANGELOG.md                  # Project changelog
 ├── LICENSE                       # License file (RadarSimPy)
 ├── README.md                     # Project overview
-├── requirements-dev.txt          # Development dependencies
-├── requirements.txt              # Runtime dependencies
-└── setup.py                      # Python package setup
+├── pyproject.toml                # Project metadata and dependencies
+├── setup.py                      # Cython extension build
+└── uv.lock                       # Locked dependency versions (uv)
 ```
 
 ### Key Directories
@@ -80,11 +80,15 @@ radarsimpy/
 
 ### Python Dependencies
 
-Install the required Python packages:
+The Python dependencies are declared in `pyproject.toml` and locked in `uv.lock`. Install them into `.venv` with [uv](https://docs.astral.sh/uv/):
 
 ```bash
-pip install -r requirements-dev.txt
+uv sync
 ```
+
+Then run the build scripts through `uv run` (for example `uv run ./build.sh --arch=cpu`), or activate `.venv` first so that `python` is the project interpreter.
+
+`uv sync` installs every group (build, test, lint and docs tools). CI installs only what it needs: `uv sync --no-dev --group test` for the unit tests, `--group build` for the release builds.
 
 ## Validate Build Environment
 
@@ -301,10 +305,10 @@ Install the required documentation dependencies:
 
 ```bash
 # Install all development dependencies (includes Sphinx and extensions)
-pip install -r requirements-dev.txt
+uv sync
 ```
 
-The `requirements-dev.txt` file includes all necessary documentation tools:
+The `dev` dependency group in `pyproject.toml` includes all necessary documentation tools:
 
 - `sphinx`: Documentation generation framework
 - `pydata-sphinx-theme`: PyData community theme for professional documentation

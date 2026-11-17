@@ -1,0 +1,87 @@
+# RadarSimPy project configuration.
+#
+# Dependencies are managed with uv (https://docs.astral.sh/uv/):
+#
+#   uv sync                          # runtime + build + test + lint/docs tools
+#   uv sync --no-dev --group test    # what CI uses: runtime + build + test
+#   uv run ./build.sh --arch=cpu     # build inside the project environment
+#
+# The extension is not built by `uv sync`. It links against the C++ library
+# that build.sh / build.bat compile with CMake first, and is then built in
+# place with `setup.py build_ext`. `tool.uv.package = false` tells uv to only
+# install the dependencies and leave the project itself uninstalled.
+
+[build-system]
+requires = ["setuptools>=65.0.0", "cython>=0.29.0", "numpy>=2.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "radarsimpy"
+# Read from src/radarsimpy/__init__.py by setup.py.
+dynamic = ["version"]
+description = "A Python-based Radar Simulator"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "RadarSimX", email = "info@radarsimx.com" }]
+keywords = ["radar", "simulation", "signal-processing", "python", "cython"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: C++",
+    "Programming Language :: Cython",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "numpy>=2.0.0",
+    "scipy>=1.9.0",
+    # Basic mesh support. PyMeshLab, PyVista or meshio also work (see `mesh`).
+    "trimesh>=3.15.0",
+]
+
+[project.optional-dependencies]
+# Alternative mesh-processing libraries for 3D model support.
+mesh = ["pymeshlab>=2022.2", "pyvista>=0.36.0", "meshio>=5.0.0"]
+# glTF 2.0 / GLB keyframe animation support (radarsimpy.animation_kit).
+gltf = ["pygltflib>=1.16.0"]
+
+[project.urls]
+Homepage = "https://github.com/radarsimx/radarsimpy"
+Documentation = "https://radarsimx.github.io/radarsimpy/"
+Source = "https://github.com/radarsimx/radarsimpy"
+"Bug Reports" = "https://github.com/radarsimx/radarsimpy/issues"
+
+[dependency-groups]
+# Needed by build.sh / build.bat to compile the Cython extensions.
+build = ["cython>=0.29.0", "setuptools>=65.0.0"]
+# Build and test: what CI installs.
+test = [
+    { include-group = "build" },
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-xdist>=3.0.0",
+    # Optional runtime dependency exercised by the test suite.
+    "pygltflib>=1.16.0",
+]
+# Everything for local development: build, test, code quality and docs.
+dev = [
+    { include-group = "test" },
+    "black>=22.0.0",
+    "flake8>=5.0.0",
+    "isort>=5.10.0",
+    "mypy>=0.991",
+    "pylint>=2.15.0",
+    "sphinx>=5.0.0",
+    "pydata-sphinx-theme>=0.16.0",
+]
+
+[tool.uv]
+package = false

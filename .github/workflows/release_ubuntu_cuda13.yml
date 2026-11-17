@@ -30,7 +30,7 @@ name: Release on Ubuntu GPU CUDA13
 #   own L4T CUDA stack and are not covered.
 #
 # Features:
-# - Comprehensive caching (pip, ccache)
+# - Comprehensive caching (uv, ccache)
 # - Build optimization with ccache
 # - System dependency management
 # - Artifact verification and validation
@@ -128,15 +128,13 @@ jobs:
         uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
-          cache: "pip"
 
       - name: Cache build dependencies
         uses: actions/cache@v6
         with:
           path: |
-            ~/.cache/pip
             ~/.ccache
-          key: ${{ runner.os }}-${{ matrix.os }}-${{ matrix.python-version }}-${{ hashFiles('requirements-dev.txt') }}
+          key: ${{ runner.os }}-${{ matrix.os }}-${{ matrix.python-version }}-${{ hashFiles('uv.lock') }}
           restore-keys: |
             ${{ runner.os }}-${{ matrix.os }}-${{ matrix.python-version }}-
             ${{ runner.os }}-${{ matrix.os }}-
@@ -179,10 +177,21 @@ jobs:
           ls -la /usr/local/cuda/lib64/ || echo "CUDA lib64 directory not found"
           echo "::endgroup::"
 
+      # Creates .venv with the interpreter set up above and puts it first on
+      # PATH, so build.sh/build.bat, pytest and later steps all use it. The uv
+      # cache is keyed on uv.lock, the OS/arch and the Python version.
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+          activate-environment: true
+          enable-cache: true
+
       - name: Install Python dependencies
         run: |
-          python -m pip install --upgrade pip wheel setuptools
-          pip install -r requirements-dev.txt
+          # Runtime and build dependencies from uv.lock; the release build
+          # runs no tests.
+          uv sync --locked --no-dev --group build
 
       - name: Display build information
         run: |
@@ -200,7 +209,7 @@ jobs:
           uname -a
           lsb_release -a
           python --version
-          pip --version
+          uv --version
           ${{ matrix.c_compiler }} --version
           ${{ matrix.cxx_compiler }} --version
           nvcc --version

@@ -3,20 +3,19 @@
 # ==============================================================================
 #
 # Keeps the actions used by the workflows in `.github/workflows/` and the
-# Python packages listed in `requirements*.txt` up to date. Dependabot opens a
+# Python packages in `pyproject.toml` / `uv.lock` up to date. Dependabot opens a
 # pull request when a newer version of a referenced action is published, or
 # when a Python requirement no longer admits the latest release.
 #
 # Notes:
 #   - `directory: "/"` is the required value for the github-actions ecosystem;
 #     it always means "the repository's .github/workflows directory". For pip
-#     it is the repository root, where requirements.txt,
-#     requirements-test.txt and requirements-dev.txt live.
+#     it is the repository root, where pyproject.toml and uv.lock live.
 #   - Updates are grouped so a weekly run produces one PR instead of one per
 #     dependency. Major bumps are kept separate because they may require
 #     changes (e.g. new required inputs, dropped Node runtime, removed APIs).
-#   - Python requirements are minimum versions (`>=`), and requirements.txt is
-#     read by setup.py as the wheel's `install_requires`. The pip entry
+#   - Python requirements are minimum versions (`>=`), and the
+#     `[project] dependencies` are the package's runtime requirements. The uv entry
 #     therefore uses `versioning-strategy: increase-if-necessary`, which leaves
 #     a requirement alone while it still admits the latest release. The
 #     default strategy would raise every floor to the newest version each
@@ -49,7 +48,7 @@ updates:
         update-types:
           - "major"
 
-  - package-ecosystem: "pip"
+  - package-ecosystem: "uv"
     directory: "/"
     schedule:
       interval: "weekly"

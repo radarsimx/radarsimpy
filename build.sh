@@ -16,14 +16,14 @@
 #   - Python 3.10 or higher
 #   - GCC/G++ compiler
 #   - CUDA toolkit (for GPU builds)
-#   - Python packages: check requirements.txt for details
+#   - Python packages: see pyproject.toml; install with `uv sync`
 #
 #   macOS:
 #   - Xcode Command Line Tools
 #   - CMake 3.18 or higher
 #   - Python 3.10 or higher
 #   - Clang/Clang++ compiler
-#   - Python packages: check requirements.txt for details
+#   - Python packages: see pyproject.toml; install with `uv sync`
 #
 # USAGE:
 #   ./build.sh [OPTIONS]
@@ -366,7 +366,7 @@ check_requirements() {
     
     # Check for Python packages
     if ! python3 -c "import setuptools, Cython" 2>/dev/null; then
-        missing_deps+=("Python setuptools and Cython")
+        missing_deps+=("Python setuptools and Cython (run \`uv sync\` to create .venv)")
     fi
     
     # Check for platform-specific requirements
@@ -1129,6 +1129,14 @@ main() {
     readonly WORKPATH=$(pwd)
     log_info "Working directory: ${WORKPATH}"
     log_info "Detected platform: ${PLATFORM_NAME}"
+
+    # Use the project's uv environment (.venv, created by `uv sync`) when no
+    # virtual environment is active, so `./build.sh` works without `uv run`.
+    if [ -z "${VIRTUAL_ENV:-}" ] && [ -x "${SCRIPT_DIR}/.venv/bin/python3" ]; then
+        export VIRTUAL_ENV="${SCRIPT_DIR}/.venv"
+        export PATH="${VIRTUAL_ENV}/bin:${PATH}"
+        log_info "Using Python environment: ${VIRTUAL_ENV}"
+    fi
 
     # Validate all parsed parameters and check system requirements
     validate_parameters

@@ -50,7 +50,13 @@ RadarSimPy is a powerful and versatile Python-based Radar Simulator that models 
 - pygltflib, only for keyframed glTF 2.0 / GLB targets (`radarsimpy.animation_kit`)
 
 ```bash
-pip install -r requirements.txt
+pip install numpy scipy trimesh
+```
+
+From a source checkout, [uv](https://docs.astral.sh/uv/) installs them from `pyproject.toml`, together with the build, test and docs tools:
+
+```bash
+uv sync
 ```
 
 Full detail, including platform and hardware requirements, is on the [Dependencies page](https://radarsimx.github.io/radarsimpy/user_guide/dependencies.html).

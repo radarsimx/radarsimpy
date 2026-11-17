@@ -20,6 +20,8 @@ All platforms
 ^^^^^^^^^^^^^
 
 - Python >= 3.10 (tested on 3.10 – 3.14)
+- `uv <https://docs.astral.sh/uv/getting-started/installation/>`_, to install
+  the Python packages
 - CMake >= 3.18
 - Git
 - A C++ compiler with C++20 support
@@ -44,9 +46,53 @@ at run time.
 Python packages
 ^^^^^^^^^^^^^^^
 
+The Python packages are declared in ``pyproject.toml`` and pinned to exact
+versions in ``uv.lock``. From the RadarSimPy root directory, install them into
+a ``.venv`` folder:
+
 .. code-block:: bash
 
-    pip install -r requirements-dev.txt
+    uv sync
+
+``uv sync`` uses a Python that is already installed, or downloads one if none
+matches. Add ``--python 3.12`` (for example) to choose the version.
+
+The packages are split into groups, and ``uv sync`` installs all of them:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 75
+
+   * - Group
+     - Contents
+   * - (runtime)
+     - NumPy, SciPy and trimesh: what the module needs to run
+   * - ``build``
+     - Cython and setuptools, to compile the extensions
+   * - ``test``
+     - ``build`` plus pytest and pygltflib, to run the unit tests
+   * - ``dev``
+     - ``test`` plus the lint tools and Sphinx, to build the documentation
+
+To install less, name the groups you need. For example, to build and test
+only (this is what CI installs):
+
+.. code-block:: bash
+
+    uv sync --no-dev --group test
+
+``build.sh`` and ``build.bat`` use ``.venv`` automatically when no other
+virtual environment is active, so you do not need to activate it. Other
+commands, such as ``python`` or ``pytest``, need either ``uv run`` in front
+(``uv run pytest``) or an activated ``.venv``:
+
+.. code-block:: bash
+
+    source .venv/bin/activate      # Linux/macOS
+    .venv\Scripts\activate         # Windows
+
+After you change the dependencies in ``pyproject.toml``, run ``uv lock`` to
+update ``uv.lock`` and commit both files.
 
 Check your environment
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -56,7 +102,7 @@ problems, and suggests how to fix them:
 
 .. code-block:: bash
 
-    python build_config.py
+    uv run python build_config.py
 
 
 Building
@@ -241,27 +287,26 @@ The platform-specific binaries are:
 Building the Documentation
 --------------------------
 
-The documentation is built with Sphinx. Install the dependencies:
+The documentation is built with Sphinx, which ``uv sync`` installs with the
+``dev`` group. Build RadarSimPy first: the API pages are generated from the
+compiled module.
 
-.. code-block:: bash
-
-    pip install -r requirements-dev.txt
-
-Then build the HTML pages.
+Then build the HTML pages, running ``make`` through ``uv run`` so that it finds
+Sphinx in ``.venv`` (or activate ``.venv`` first and drop ``uv run``).
 
 Linux/macOS:
 
 .. code-block:: bash
 
     cd gen_docs
-    make html
+    uv run make html
 
 Windows:
 
 .. code-block:: batch
 
     cd gen_docs
-    make.bat html
+    uv run make.bat html
 
 Open ``gen_docs/_build/html/index.html`` in your browser to view the result.
 

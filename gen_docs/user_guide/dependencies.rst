@@ -40,13 +40,7 @@ You do not need it for static ``.stl``, ``.ply`` or ``.obj`` files. See
 Installing them
 ^^^^^^^^^^^^^^^
 
-Install everything in ``requirements.txt``:
-
-.. code-block:: bash
-
-    pip install -r requirements.txt
-
-Or install the packages one by one:
+Install them into the Python environment that runs your scripts:
 
 .. code-block:: bash
 
@@ -57,6 +51,13 @@ Add this for animated glTF models:
 .. code-block:: bash
 
     pip install pygltflib
+
+If you use `uv <https://docs.astral.sh/uv/>`_, run ``uv add numpy scipy
+trimesh`` in your project instead (or ``uv pip install`` with the same
+packages).
+
+If you build RadarSimPy from source, ``uv sync`` installs all of these, plus
+the build and test tools. See :doc:`build`.
 
 
 Operating System

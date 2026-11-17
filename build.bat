@@ -17,7 +17,7 @@ REM   - Visual Studio 2017 or later (with C++ tools) or Visual Studio Build Tool
 REM   - Python 3.10 or higher
 REM   - MSVC compiler (automatically detected via vswhere)
 REM   - CUDA toolkit (for GPU builds)
-REM   - Python packages: check requirements.txt for details
+REM   - Python packages: see pyproject.toml; install with `uv sync`
 REM
 REM USAGE:
 REM   build.bat [OPTIONS]
@@ -57,6 +57,14 @@ set TEST=on
 set DEPS=repo
 set BUILD_TYPE=Release
 set SCRIPT_DIR=%~dp0
+
+REM Use the project's uv environment (.venv, created by `uv sync`) when no
+REM virtual environment is active, so build.bat works without `uv run`.
+if not defined VIRTUAL_ENV if exist "%SCRIPT_DIR%.venv\Scripts\python.exe" (
+    set "VIRTUAL_ENV=%SCRIPT_DIR%.venv"
+    set "PATH=%SCRIPT_DIR%.venv\Scripts;%PATH%"
+    echo INFO: Using Python environment: %SCRIPT_DIR%.venv
+)
 set BUILD_FAILED=0
 set JOBS=0
 
@@ -320,7 +328,7 @@ REM Validate build environment
     python -c "import setuptools, Cython" >nul 2>&1
     if %errorlevel% neq 0 (
         echo WARNING: Python setuptools or Cython not found
-        echo Please install required Python packages: pip install setuptools Cython
+        echo Please install required Python packages: uv sync
     ) else (
         echo INFO: Required Python packages found
     )

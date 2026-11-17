@@ -54,10 +54,17 @@ jobs:
         with:
           python-version: ${{matrix.python-version}}
 
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: ${{matrix.python-version}}
+          activate-environment: true
+          enable-cache: true
+
       - name: Install Python and documentation dependencies
+        # The default `dev` group includes the build, Sphinx and theme packages.
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements-dev.txt
+          uv sync --locked
         shell: bash
 
       - name: Build project (Linux, CPU, no tests)
