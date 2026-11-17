@@ -21,7 +21,7 @@ cd "$SCRIPT_DIR"
 
 # Check if Python 3 is available
 if ! command -v python3 &> /dev/null; then
-    echo "[ERROR] Python 3 is required but not found. Please install Python 3.10 or higher."
+    echo "[ERROR] Python 3 is required but not found. Please install Python 3.11 or higher."
     exit 1
 fi
 

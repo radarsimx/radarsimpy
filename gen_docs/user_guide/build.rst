@@ -19,7 +19,7 @@ Prerequisites
 All platforms
 ^^^^^^^^^^^^^
 
-- Python >= 3.10 (tested on 3.10 – 3.14)
+- Python >= 3.11 (tested on 3.11 – 3.14)
 - `uv <https://docs.astral.sh/uv/getting-started/installation/>`_, to install
   the Python packages
 - CMake >= 3.18

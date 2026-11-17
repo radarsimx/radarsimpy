@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Removed
+
+- Python 3.10 support (end of life since October 2026). The minimum is now Python 3.11, and no 3.10 wheels are built. Patched releases of some dependencies (Pillow 13, soupsieve 4) no longer support 3.10, so the lockfile could not pick up their security fixes. `uv.lock` is resolved for Python 3.11.5 and later
+
 ### Changed
 
 - Windows and Linux now ship a single CUDA-enabled module instead of separate CPU and GPU (CUDA) modules. It runs on the GPU when a usable one is present and on the CPU with OpenMP otherwise. The CPU-only release workflows (`release_windows.yml`, `release_ubuntu.yml`) are removed, and the Windows and Ubuntu unit tests now build the CUDA module for every entry. MacOS stays CPU-only

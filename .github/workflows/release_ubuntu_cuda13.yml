@@ -16,7 +16,7 @@ name: Release on Ubuntu GPU CUDA13
 # - Ubuntu 22.04 LTS: GCC-11 compiler, 10 builds (5 Python versions × 2 CPU architectures)
 # - Ubuntu 24.04 LTS: GCC-13 compiler, 10 builds (5 Python versions × 2 CPU architectures)
 # - Ubuntu 26.04 LTS: GCC-15 compiler, 10 builds (5 Python versions × 2 CPU architectures)
-# - Python versions: 3.10, 3.11, 3.12, 3.13, 3.14
+# - Python versions: 3.11, 3.12, 3.13, 3.14
 # - CPU architectures: x86_64 (`ubuntu-XX.04` runners), ARM64 (`ubuntu-XX.04-arm` runners)
 # - Total builds: 30
 # - `arch` is the build architecture (cpu/gpu) passed to build.sh. `cpu_arch` is
@@ -73,32 +73,26 @@ jobs:
         run: |
           cat > matrix.json << 'EOF'
           [
-            { "os": "ubuntu-22.04", "python-version": "3.10", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "gpu", "ubuntu_version": "22", "cpu_arch": "x86_64", "artifact_name": "radarsimpy_ubuntu_22_04_cuda13_py3.10" },
             { "os": "ubuntu-22.04", "python-version": "3.11", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "gpu", "ubuntu_version": "22", "cpu_arch": "x86_64", "artifact_name": "radarsimpy_ubuntu_22_04_cuda13_py3.11" },
             { "os": "ubuntu-22.04", "python-version": "3.12", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "gpu", "ubuntu_version": "22", "cpu_arch": "x86_64", "artifact_name": "radarsimpy_ubuntu_22_04_cuda13_py3.12" },
             { "os": "ubuntu-22.04", "python-version": "3.13", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "gpu", "ubuntu_version": "22", "cpu_arch": "x86_64", "artifact_name": "radarsimpy_ubuntu_22_04_cuda13_py3.13" },
             { "os": "ubuntu-22.04", "python-version": "3.14", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "gpu", "ubuntu_version": "22", "cpu_arch": "x86_64", "artifact_name": "radarsimpy_ubuntu_22_04_cuda13_py3.14" },
-            { "os": "ubuntu-24.04", "python-version": "3.10", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "gpu", "ubuntu_version": "24", "cpu_arch": "x86_64", "artifact_name": "radarsimpy_ubuntu_24_04_cuda13_py3.10" },
             { "os": "ubuntu-24.04", "python-version": "3.11", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "gpu", "ubuntu_version": "24", "cpu_arch": "x86_64", "artifact_name": "radarsimpy_ubuntu_24_04_cuda13_py3.11" },
             { "os": "ubuntu-24.04", "python-version": "3.12", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "gpu", "ubuntu_version": "24", "cpu_arch": "x86_64", "artifact_name": "radarsimpy_ubuntu_24_04_cuda13_py3.12" },
             { "os": "ubuntu-24.04", "python-version": "3.13", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "gpu", "ubuntu_version": "24", "cpu_arch": "x86_64", "artifact_name": "radarsimpy_ubuntu_24_04_cuda13_py3.13" },
             { "os": "ubuntu-24.04", "python-version": "3.14", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "gpu", "ubuntu_version": "24", "cpu_arch": "x86_64", "artifact_name": "radarsimpy_ubuntu_24_04_cuda13_py3.14" },
-            { "os": "ubuntu-26.04", "python-version": "3.10", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "gpu", "ubuntu_version": "26", "cpu_arch": "x86_64", "artifact_name": "radarsimpy_ubuntu_26_04_cuda13_py3.10" },
             { "os": "ubuntu-26.04", "python-version": "3.11", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "gpu", "ubuntu_version": "26", "cpu_arch": "x86_64", "artifact_name": "radarsimpy_ubuntu_26_04_cuda13_py3.11" },
             { "os": "ubuntu-26.04", "python-version": "3.12", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "gpu", "ubuntu_version": "26", "cpu_arch": "x86_64", "artifact_name": "radarsimpy_ubuntu_26_04_cuda13_py3.12" },
             { "os": "ubuntu-26.04", "python-version": "3.13", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "gpu", "ubuntu_version": "26", "cpu_arch": "x86_64", "artifact_name": "radarsimpy_ubuntu_26_04_cuda13_py3.13" },
             { "os": "ubuntu-26.04", "python-version": "3.14", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "gpu", "ubuntu_version": "26", "cpu_arch": "x86_64", "artifact_name": "radarsimpy_ubuntu_26_04_cuda13_py3.14" },
-            { "os": "ubuntu-22.04-arm", "python-version": "3.10", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "gpu", "ubuntu_version": "22", "cpu_arch": "ARM64", "artifact_name": "radarsimpy_ubuntu_22_04_arm64_cuda13_py3.10" },
             { "os": "ubuntu-22.04-arm", "python-version": "3.11", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "gpu", "ubuntu_version": "22", "cpu_arch": "ARM64", "artifact_name": "radarsimpy_ubuntu_22_04_arm64_cuda13_py3.11" },
             { "os": "ubuntu-22.04-arm", "python-version": "3.12", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "gpu", "ubuntu_version": "22", "cpu_arch": "ARM64", "artifact_name": "radarsimpy_ubuntu_22_04_arm64_cuda13_py3.12" },
             { "os": "ubuntu-22.04-arm", "python-version": "3.13", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "gpu", "ubuntu_version": "22", "cpu_arch": "ARM64", "artifact_name": "radarsimpy_ubuntu_22_04_arm64_cuda13_py3.13" },
             { "os": "ubuntu-22.04-arm", "python-version": "3.14", "c_compiler": "gcc-11", "cxx_compiler": "g++-11", "arch": "gpu", "ubuntu_version": "22", "cpu_arch": "ARM64", "artifact_name": "radarsimpy_ubuntu_22_04_arm64_cuda13_py3.14" },
-            { "os": "ubuntu-24.04-arm", "python-version": "3.10", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "gpu", "ubuntu_version": "24", "cpu_arch": "ARM64", "artifact_name": "radarsimpy_ubuntu_24_04_arm64_cuda13_py3.10" },
             { "os": "ubuntu-24.04-arm", "python-version": "3.11", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "gpu", "ubuntu_version": "24", "cpu_arch": "ARM64", "artifact_name": "radarsimpy_ubuntu_24_04_arm64_cuda13_py3.11" },
             { "os": "ubuntu-24.04-arm", "python-version": "3.12", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "gpu", "ubuntu_version": "24", "cpu_arch": "ARM64", "artifact_name": "radarsimpy_ubuntu_24_04_arm64_cuda13_py3.12" },
             { "os": "ubuntu-24.04-arm", "python-version": "3.13", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "gpu", "ubuntu_version": "24", "cpu_arch": "ARM64", "artifact_name": "radarsimpy_ubuntu_24_04_arm64_cuda13_py3.13" },
             { "os": "ubuntu-24.04-arm", "python-version": "3.14", "c_compiler": "gcc-13", "cxx_compiler": "g++-13", "arch": "gpu", "ubuntu_version": "24", "cpu_arch": "ARM64", "artifact_name": "radarsimpy_ubuntu_24_04_arm64_cuda13_py3.14" },
-            { "os": "ubuntu-26.04-arm", "python-version": "3.10", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "gpu", "ubuntu_version": "26", "cpu_arch": "ARM64", "artifact_name": "radarsimpy_ubuntu_26_04_arm64_cuda13_py3.10" },
             { "os": "ubuntu-26.04-arm", "python-version": "3.11", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "gpu", "ubuntu_version": "26", "cpu_arch": "ARM64", "artifact_name": "radarsimpy_ubuntu_26_04_arm64_cuda13_py3.11" },
             { "os": "ubuntu-26.04-arm", "python-version": "3.12", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "gpu", "ubuntu_version": "26", "cpu_arch": "ARM64", "artifact_name": "radarsimpy_ubuntu_26_04_arm64_cuda13_py3.12" },
             { "os": "ubuntu-26.04-arm", "python-version": "3.13", "c_compiler": "gcc-15", "cxx_compiler": "g++-15", "arch": "gpu", "ubuntu_version": "26", "cpu_arch": "ARM64", "artifact_name": "radarsimpy_ubuntu_26_04_arm64_cuda13_py3.13" },

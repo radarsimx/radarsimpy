@@ -13,7 +13,7 @@
 # REQUIREMENTS:
 #   Linux:
 #   - CMake 3.18 or higher
-#   - Python 3.10 or higher
+#   - Python 3.11 or higher
 #   - GCC/G++ compiler
 #   - CUDA toolkit (for GPU builds)
 #   - Python packages: see pyproject.toml; install with `uv sync`
@@ -21,7 +21,7 @@
 #   macOS:
 #   - Xcode Command Line Tools
 #   - CMake 3.18 or higher
-#   - Python 3.10 or higher
+#   - Python 3.11 or higher
 #   - Clang/Clang++ compiler
 #   - Python packages: see pyproject.toml; install with `uv sync`
 #

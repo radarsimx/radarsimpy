@@ -6,7 +6,7 @@ REM
 REM This script is a simple wrapper that calls the Python packaging script.
 REM
 REM Requirements:
-REM   - Python 3.10 or higher
+REM   - Python 3.11 or higher
 REM
 REM Usage:
 REM   package_source.bat
@@ -25,7 +25,7 @@ cd /d "%SCRIPT_DIR%"
 REM Check if Python is available
 python --version >nul 2>&1
 if %errorlevel% neq 0 (
-    echo [ERROR] Python is required but not found. Please install Python 3.10 or higher.
+    echo [ERROR] Python is required but not found. Please install Python 3.11 or higher.
     exit /b 1
 )
 

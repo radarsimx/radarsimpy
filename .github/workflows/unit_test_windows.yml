@@ -14,7 +14,7 @@
 #   - Defined once, as JSON, in the `setup` job's "Define test matrix" step.
 #     The `build` job consumes it via job outputs, so adding/removing an entry
 #     only requires editing that one step.
-#   - GPU (CUDA) builds: Python 3.10, 3.11, 3.12, 3.13, 3.14. The CPU-only
+#   - GPU (CUDA) builds: Python 3.11, 3.12, 3.13, 3.14. The CPU-only
 #     build is no longer shipped for Windows: the CUDA build runs on the CPU
 #     (OpenMP) when no usable GPU is present, so it is the one tested here.
 #     macOS still covers the CPU-only build configuration.
@@ -69,7 +69,6 @@ jobs:
         run: |
           cat > matrix.json << 'EOF'
           [
-            { "python-version": "3.10", "arch": "gpu", "cpp-tests": false },
             { "python-version": "3.11", "arch": "gpu", "cpp-tests": false },
             { "python-version": "3.12", "arch": "gpu", "cpp-tests": false },
             { "python-version": "3.13", "arch": "gpu", "cpp-tests": true },
