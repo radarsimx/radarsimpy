@@ -313,7 +313,7 @@ jobs:
           # Build artifact_name -> package directory lookup table from the matrix
           declare -A package_dir_for
           while IFS=$'\t' read -r name ver cpu_arch; do
-            package_dir_for["$name"]="Ubuntu${ver}_${cpu_arch}_GPU"
+            package_dir_for["$name"]="Ubuntu${ver}_${cpu_arch}_CPU_GPU"
           done < <(jq -r '.[] | [.artifact_name, .ubuntu_version, .cpu_arch] | @tsv' matrix.json)
 
           # Copy each artifact to its matrix-defined directory
@@ -389,15 +389,15 @@ jobs:
             echo '```'
             echo "radarsimpy_ubuntu_cuda13_gpu_all/"
             while read -r ver cpu_arch gcc; do
-              echo "├── Ubuntu${ver}_${cpu_arch}_GPU.zip"
-              echo "├── Ubuntu${ver}_${cpu_arch}_GPU.tar.gz"
+              echo "├── Ubuntu${ver}_${cpu_arch}_CPU_GPU.zip"
+              echo "├── Ubuntu${ver}_${cpu_arch}_CPU_GPU.tar.gz"
             done <<< "$package_info"
             echo '```'
             echo
             echo "## Version Information"
             while read -r ver cpu_arch gcc; do
               echo
-              echo "### Ubuntu${ver}_${cpu_arch}_GPU (Ubuntu ${ver}.04 LTS, ${cpu_arch})"
+              echo "### Ubuntu${ver}_${cpu_arch}_CPU_GPU (Ubuntu ${ver}.04 LTS, ${cpu_arch})"
               echo "- Built with GCC-${gcc} compiler and CUDA support"
               echo "- Available in both ZIP and tar.gz formats"
               echo "- Each archive contains the complete radarsimpy module with all Python versions supported"

@@ -290,7 +290,7 @@ jobs:
                 echo "Unknown artifact $artifact_name, skipping"
                 continue
               fi
-              target_dir="temp/Ubuntu${ver}_x86_64_GPU/radarsimpy"
+              target_dir="temp/Ubuntu${ver}_x86_64_CPU_GPU/radarsimpy"
 
               mkdir -p "$target_dir"
 
@@ -347,15 +347,15 @@ jobs:
             echo '```'
             echo "radarsimpy_ubuntu_cuda12_gpu_all/"
             while read -r ver gcc; do
-              echo "├── Ubuntu${ver}_x86_64_GPU.zip"
-              echo "├── Ubuntu${ver}_x86_64_GPU.tar.gz"
+              echo "├── Ubuntu${ver}_x86_64_CPU_GPU.zip"
+              echo "├── Ubuntu${ver}_x86_64_CPU_GPU.tar.gz"
             done <<< "$ubuntu_info"
             echo '```'
             echo
             echo "## Version Information"
             while read -r ver gcc; do
               echo
-              echo "### Ubuntu${ver}_x86_64_GPU (Ubuntu ${ver}.04 LTS)"
+              echo "### Ubuntu${ver}_x86_64_CPU_GPU (Ubuntu ${ver}.04 LTS)"
               echo "- Built with GCC-${gcc} compiler and CUDA support"
               echo "- Available in both ZIP and tar.gz formats"
               echo "- Each archive contains the complete radarsimpy module with all Python versions supported"

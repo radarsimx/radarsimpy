@@ -262,8 +262,8 @@ jobs:
           done
 
           # Create ZIP file
-          echo "Creating Windows_x86_64_GPU.zip..."
-          cd temp && zip -r ../packed/radarsimpy_windows_cuda13_gpu_all/Windows_x86_64_GPU.zip . && cd ..
+          echo "Creating Windows_x86_64_CPU_GPU.zip..."
+          cd temp && zip -r ../packed/radarsimpy_windows_cuda13_gpu_all/Windows_x86_64_CPU_GPU.zip . && cd ..
 
       - name: Verify artifact structure
         run: |
@@ -273,11 +273,11 @@ jobs:
 
           echo ""
           echo "Verifying ZIP file exists:"
-          if [ -f "packed/radarsimpy_windows_cuda13_gpu_all/Windows_x86_64_GPU.zip" ]; then
-            echo "✓ Windows_x86_64_GPU.zip found"
-            ls -lh packed/radarsimpy_windows_cuda13_gpu_all/Windows_x86_64_GPU.zip
+          if [ -f "packed/radarsimpy_windows_cuda13_gpu_all/Windows_x86_64_CPU_GPU.zip" ]; then
+            echo "✓ Windows_x86_64_CPU_GPU.zip found"
+            ls -lh packed/radarsimpy_windows_cuda13_gpu_all/Windows_x86_64_CPU_GPU.zip
           else
-            echo "✗ Windows_x86_64_GPU.zip missing"
+            echo "✗ Windows_x86_64_CPU_GPU.zip missing"
             exit 1
           fi
           echo "::endgroup::"
@@ -296,12 +296,12 @@ jobs:
             echo
             echo '```'
             echo "radarsimpy_windows_cuda13_gpu_all/"
-            echo "└── Windows_x86_64_GPU.zip"
+            echo "└── Windows_x86_64_CPU_GPU.zip"
             echo '```'
             echo
             echo "## Build Information"
             echo
-            echo "### Windows_x86_64_GPU.zip (Windows x64 with GPU support)"
+            echo "### Windows_x86_64_CPU_GPU.zip (Windows x64, GPU with automatic CPU fallback)"
             echo "- Full-featured builds with all capabilities including GPU acceleration"
             echo "- Built on Windows with MSVC compiler and CUDA support"
             echo "- Contains the complete radarsimpy module with all Python versions supported"
@@ -317,7 +317,7 @@ jobs:
             echo "## Usage"
             echo
             echo "1. Extract the main archive"
-            echo "2. Extract the Windows_x86_64_GPU.zip file"
+            echo "2. Extract the Windows_x86_64_CPU_GPU.zip file"
             echo "3. The radarsimpy module will be ready for use with GPU acceleration"
           } > packed/radarsimpy_windows_cuda13_gpu_all/README.md
 
@@ -366,7 +366,7 @@ jobs:
             echo "✅ **All artifacts successfully packed into ZIP file**" >> $GITHUB_STEP_SUMMARY
             echo "- Archive: \`radarsimpy_windows_cuda13_gpu_all_builds\`" >> $GITHUB_STEP_SUMMARY
             echo "- Format: zip" >> $GITHUB_STEP_SUMMARY
-            echo "- Structure: Windows_x86_64_GPU.zip" >> $GITHUB_STEP_SUMMARY
+            echo "- Structure: Windows_x86_64_CPU_GPU.zip" >> $GITHUB_STEP_SUMMARY
             echo "- Contains: All ${total_builds} build variants" >> $GITHUB_STEP_SUMMARY
           else
             echo "⚠️ **Artifact packing failed or was skipped**" >> $GITHUB_STEP_SUMMARY
