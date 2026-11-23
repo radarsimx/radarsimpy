@@ -3,18 +3,16 @@ name: Release on MacOS
 # GitHub Actions workflow for building and packaging RadarSimPy on macOS platforms.
 #
 # This workflow builds RadarSimPy across multiple macOS versions and Python versions.
-# It supports both Intel x64 and Apple Silicon ARM64 architectures to provide
-# comprehensive macOS coverage.
+# It targets Apple Silicon (ARM64) only; Intel x64 builds have been dropped.
 #
 # Build Matrix:
 # - Defined once, as JSON, in the `setup` job's "Define build matrix" step.
 #   The `build`, `pack-artifacts`, and `build-summary` jobs all consume it via
 #   job outputs, so adding/removing a macOS architecture or Python version only
 #   requires editing that one step — no other job needs to change.
-# - macOS 26 (Intel x64): Clang compiler, 5 builds (5 Python)
-# - macOS 26 (Apple Silicon ARM64): Clang compiler, 5 builds (5 Python)
+# - macOS 26 (Apple Silicon ARM64): Clang compiler, 4 builds (4 Python)
 # - Python versions: 3.11, 3.12, 3.13, 3.14
-# - Total builds: 10
+# - Total builds: 4
 #
 # Features:
 # - Comprehensive caching (uv, Homebrew, ccache)
@@ -59,10 +57,6 @@ jobs:
         run: |
           cat > matrix.json << 'EOF'
           [
-            { "os": "macos-26-intel", "python-version": "3.11", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode_version": "26.6", "arch": "cpu", "dir_label": "x86_64", "platform_name": "Intel", "artifact_name": "radarsimpy_macos_py3.11" },
-            { "os": "macos-26-intel", "python-version": "3.12", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode_version": "26.6", "arch": "cpu", "dir_label": "x86_64", "platform_name": "Intel", "artifact_name": "radarsimpy_macos_py3.12" },
-            { "os": "macos-26-intel", "python-version": "3.13", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode_version": "26.6", "arch": "cpu", "dir_label": "x86_64", "platform_name": "Intel", "artifact_name": "radarsimpy_macos_py3.13" },
-            { "os": "macos-26-intel", "python-version": "3.14", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode_version": "26.6", "arch": "cpu", "dir_label": "x86_64", "platform_name": "Intel", "artifact_name": "radarsimpy_macos_py3.14" },
             { "os": "macos-26", "python-version": "3.11", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode_version": "26.6", "arch": "cpu", "dir_label": "ARM", "platform_name": "Apple Silicon", "artifact_name": "radarsimpy_macos_arm_py3.11" },
             { "os": "macos-26", "python-version": "3.12", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode_version": "26.6", "arch": "cpu", "dir_label": "ARM", "platform_name": "Apple Silicon", "artifact_name": "radarsimpy_macos_arm_py3.12" },
             { "os": "macos-26", "python-version": "3.13", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode_version": "26.6", "arch": "cpu", "dir_label": "ARM", "platform_name": "Apple Silicon", "artifact_name": "radarsimpy_macos_arm_py3.13" },

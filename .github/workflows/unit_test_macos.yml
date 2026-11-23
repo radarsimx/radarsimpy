@@ -1,9 +1,9 @@
 # ==============================================================================
-# GitHub Actions Workflow: MacOS Unit Testing (x64 & ARM64)
+# GitHub Actions Workflow: MacOS Unit Testing (ARM64)
 # ==============================================================================
 #
 # This workflow performs continuous integration testing for RadarSimPy on
-# both MacOS x64 and ARM64 (Apple Silicon) platforms. It builds and tests the
+# MacOS ARM64 (Apple Silicon). It builds and tests the
 # radar simulation library across multiple Python versions to ensure compatibility
 # and reliability.
 #
@@ -16,9 +16,9 @@
 #     The `build` job consumes it via job outputs, so adding/removing a macOS
 #     architecture or Python version only requires editing that one step.
 #   - Python versions: 3.11, 3.12, 3.13, 3.14
-#   - Platform: MacOS 26 (x64), MacOS 26 (ARM64)
+#   - Platform: MacOS 26 (ARM64)
 #   - Compilers: Clang/Clang++
-#   - Architecture: x64, arm64 (CPU-only builds)
+#   - Architecture: arm64 (CPU-only builds)
 #   - `cpp-tests` marks the one entry per architecture (Python 3.13) that
 #     builds and runs the C++ (Google Test) suite. It does not depend on the
 #     Python version, so building it in every entry only cost time. The other
@@ -59,10 +59,6 @@ jobs:
         run: |
           cat > matrix.json << 'EOF'
           [
-            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosx64", "python-version": "3.11", "cpp-tests": false },
-            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosx64", "python-version": "3.12", "cpp-tests": false },
-            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosx64", "python-version": "3.13", "cpp-tests": true },
-            { "arch": "x64", "runner": "macos-26-intel", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosx64", "python-version": "3.14", "cpp-tests": false },
             { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosarm64", "python-version": "3.11", "cpp-tests": false },
             { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosarm64", "python-version": "3.12", "cpp-tests": false },
             { "arch": "arm64", "runner": "macos-26", "c_compiler": "clang", "cxx_compiler": "clang++", "xcode": "26.6", "os_label": "macosarm64", "python-version": "3.13", "cpp-tests": true },
