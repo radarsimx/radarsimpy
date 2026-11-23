@@ -4,24 +4,30 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [Unreleased]
+## [15.6.0] - 2026-11-23
 
 ### Removed
 
 - Python 3.10 support (end of life since October 2026). The minimum is now Python 3.11, and no 3.10 wheels are built. Patched releases of some dependencies (Pillow 13, soupsieve 4) no longer support 3.10, so the lockfile could not pick up their security fixes. `uv.lock` is resolved for Python 3.11.5 and later
+- Prebuilt packages for Intel (x86-64) Macs. MacOS releases and unit tests now run on Apple Silicon (ARM64) only, on the `macos-26` runner
 
 ### Changed
 
 - Windows and Linux now ship a single CUDA-enabled module instead of separate CPU and GPU (CUDA) modules. It runs on the GPU when a usable one is present and on the CPU with OpenMP otherwise. The CPU-only release workflows (`release_windows.yml`, `release_ubuntu.yml`) are removed, and the Windows and Ubuntu unit tests now build the CUDA module for every entry. MacOS stays CPU-only
+- The Windows and Linux release packages are renamed from `*_GPU` to `*_CPU_GPU` (for example `Windows_x86_64_CPU_GPU.zip`, `Ubuntu24_aarch64_CPU_GPU.tar.gz`), since the same module runs on either device
 - The Python extensions link the static CUDA runtime (`cudart_static`) instead of the shared one, so the CUDA module imports on a machine with no CUDA Toolkit installed
 - `gpu_available()` now also returns `False` when the GPU is older than every architecture the module was built for (for example a Pascal or Volta card with the CUDA 13 build). Before, it returned `True` and every kernel launch then failed; now the simulation falls back to the CPU
 - CPU runs of the CUDA module are faster: up to 1.4x for `level="sample"` and 1.2x at high `density`, which brings them in line with a CPU-only build. Host code in a CUDA build called CUDA's host-side `sin`/`cos`/`sincos` instead of the standard library's
-- The Ubuntu unit tests cache the installed CUDA toolkit too (`.github/actions/setup-cuda-linux`), saving the ~24 s apt install in each of the 30 jobs
+- The Ubuntu unit tests cache the installed CUDA toolkit too (`.github/actions/setup-cuda-linux`), saving the ~24 s apt install in each GPU job
 - Windows CI caches the installed CUDA toolkit (`.github/actions/setup-cuda-windows`), so NVIDIA's installer runs only when the CUDA version or sub-package list changes. It took about 210 s per job with the network installer, and about 600 s with the local one that the CUDA 12 release workflow used. The unused cuRAND runtime library is no longer installed; only its headers are
-- The unit tests build and run the C++ (Google Test) suite in one Python version per runner instead of every entry, since it does not depend on the Python version: 1 of 5 entries on Windows, 6 of 30 on Ubuntu (one per release and CPU architecture) and 2 of 10 on MacOS. The other entries build the module and run pytest. The pip cache key now includes the Python version, so every version keeps its own wheels. CI installs `requirements-test.txt` (new: build and test dependencies) instead of `requirements-dev.txt`, which now includes it and adds the lint and docs tools. The C++ test binary follows `RADARSIMX_CUDA_ARCHITECTURES` when it is set, instead of always compiling for sm_75 and sm_86
+- The unit tests build and run the C++ (Google Test) suite in one Python version per runner instead of every entry, since it does not depend on the Python version: 1 of 4 entries on Windows, 6 of 24 on Ubuntu (one per release and CPU architecture) and 1 of 4 on MacOS. The other entries build the module and run pytest. The unit tests install only the `test` dependency group, not the lint and docs tools. The C++ test binary follows `RADARSIMX_CUDA_ARCHITECTURES` when it is set, instead of always compiling for sm_75 and sm_86
 - Python dependencies are managed with [uv](https://docs.astral.sh/uv/). They are declared in `pyproject.toml` (runtime dependencies, plus `build`, `test` and `dev` dependency groups) and locked in `uv.lock`, replacing `requirements.txt`, `requirements-test.txt` and `requirements-dev.txt`. Run `uv sync` to set up a development environment. CI installs from the lockfile with `astral-sh/setup-uv`, so every job gets the same package versions, and uses its cache in place of the pip caches. `setup.py` now only builds the extensions; the package metadata moved to `pyproject.toml`. New optional extras: `mesh` (PyMeshLab, PyVista, meshio) and `gltf` (pygltflib)
 - Linux ARM64 builds in CI now download the prebuilt HDF5 and mbedTLS from the radarsimx-deps release (`--deps=release`), the same way every other platform does. Before, they used the copies in the `deps` submodule, because the release had no ARM64 archives
 - The README and the Dependencies, Installation and Build pages now list Linux ARM64 as supported, for both the CPU and GPU (CUDA) modules
+- CUDA 13 builds use CUDA 13.4.3 (cuRAND headers from `libcurand-dev-13-4` on Ubuntu), and the Ubuntu unit tests add a GPU entry for Ubuntu 26.04 (GCC 15)
+- MacOS builds and tests use Xcode 26.6
+- The User Guide is rewritten for clarity and accuracy, with updated terminology, examples and platform and dependency requirements. A malformed example URL is fixed
+- Updated `radarsimcpp` submodule to v15.6.0
 
 ## [15.5.0] - 2026-10-13
 
